@@ -34,9 +34,9 @@ namespace MGUI.Shared.Input.Mouse
         public double? UpdatePriority { get; }
         public bool IsManualUpdate => !UpdatePriority.HasValue;
 
-        /// <summary>If true, <see cref="HandledByEventArgs.HandledBy"/> will always be set to <see cref="Owner"/> after invoking an event.</summary>
+        /// <summary>If true, <see cref="HandledByEventArgs{THandlerType}.HandledBy"/> will always be set to <see cref="Owner"/> after invoking an event.</summary>
         private bool AlwaysHandlesEvents { get; }
-        /// <summary>If true, events will still be invoked even if <see cref="HandledByEventArgs.IsHandled"/> is true.</summary>
+        /// <summary>If true, events will still be invoked even if <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> is true.</summary>
         private bool InvokeEvenIfHandled { get; }
 
         public DragStartCondition DragStartCondition { get; set; } = DragStartCondition.MouseMovedAfterPress;
@@ -195,7 +195,7 @@ namespace MGUI.Shared.Input.Mouse
         private bool IsMonitoringDrag => DragStart != null || Dragged != null || DragEnd != null;
         #endregion Events
 
-        /// <summary>Should only be invoked via <see cref="MouseTracker.UpdateHandlers(UpdateBaseArgs)"/></summary>
+        /// <summary>Should only be invoked via <see cref="MouseTracker.UpdateHandlers"/>></summary>
         internal void AutoUpdate()
         {
             if (IsManualUpdate)

@@ -48,7 +48,7 @@ namespace MGUI.Shared.Input.Mouse
     {
         public bool IsInside(Vector2 Position);
         /// <summary>Retrives an offset that should be added to the real mouse screen position before checking if the position is inside the viewport.<para/>
-        /// For example, if an <see cref="MGTextBlock"/> is inside an <see cref="MGScrollViewer"/> that is scrolled to VerticalOffset=100,<br/>
+        /// For example, if a TextBlock is inside a ScrollViewer that is scrolled to VerticalOffset=100,<br/>
         /// the viewport Rectangle remains unchanged, but the real mouse position is offseted by +100 along the Y-axis before checking if the position is inside the viewport.</summary>
         public Vector2 GetOffset();
     }
@@ -78,7 +78,7 @@ namespace MGUI.Shared.Input.Mouse
         public TimeSpan ClickTimeThreshold { get; set; } = TimeSpan.FromMilliseconds(300);
 
         /// <summary>The minimum number of pixels that the mouse must move by (in either the X or Y direction) while pressed before the a mouse drag event begins.<para/>
-        /// Only used if <see cref="DragStartCondition"/> == <see cref="DragStartConditions.OnMouseMovedAfterPress"/></summary>
+        /// Only used if <see cref="DragStartCondition"/> == <see cref="DragStartCondition.MouseMovedAfterPress"/></summary>
         public int DragThreshold { get; set; } = 3;
 
         public InputTracker InputTracker { get; }
@@ -101,17 +101,17 @@ namespace MGUI.Shared.Input.Mouse
         }
 
         /// <param name="UpdatePriority">The priority with which the handler receives mouse events. A higher priority means this handler will have the first chance to receive and handle events.</param>
-        /// <param name="AlwaysHandlesEvents">If true, the handler will always set <see cref="HandledByEventArgs.HandledBy"/> to <paramref name="Owner"/> when receiving the mouse event.</param>
-        /// <param name="InvokeEvenIfHandled">If true, the handler will still receive the mouse event even if <see cref="HandledByEventArgs.IsHandled"/> is true.</param>
+        /// <param name="AlwaysHandlesEvents">If true, the handler will always set <see cref="HandledByEventArgs{THandlerType}.HandledBy"/> to <paramref name="Owner"/> when receiving the mouse event.</param>
+        /// <param name="InvokeEvenIfHandled">If true, the handler will still receive the mouse event even if <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> is true.</param>
         public MouseHandler CreateHandler<T>(T Owner, InputUpdatePriority UpdatePriority, bool AlwaysHandlesEvents = false, bool InvokeEvenIfHandled = false)
             where T : IMouseHandlerHost => CreateHandler(Owner, (int)UpdatePriority, AlwaysHandlesEvents, InvokeEvenIfHandled);
 
         /// <param name="UpdatePriority">The priority with which the handler receives mouse events. A higher priority means this handler will have the first chance to receive and handle events.<para/>
-        /// If null, the caller is expected to manually call <see cref="MouseHandler.Update(UpdateBaseArgs)"/> themselves.<br/>
-        /// If not null, <see cref="MouseHandler.Update(UpdateBaseArgs)"/> will automatically be invoked when updating this <see cref="MouseTracker"/><para/>
+        /// If null, the caller is expected to manually call <see cref="MouseHandler.ManualUpdate"/> themselves.<br/>
+        /// If not null, <see cref="MouseHandler.AutoUpdate"/> will automatically be invoked when updating this <see cref="MouseTracker"/><para/>
         /// Minimum Value = 0. Maximum Value = 100. Recommended to use preset values from <see cref="InputUpdatePriority"/>.</param>
-        /// <param name="AlwaysHandlesEvents">If true, the handler will always set <see cref="HandledByEventArgs.HandledBy"/> to <paramref name="Owner"/> when receiving the mouse event.</param>
-        /// <param name="InvokeEvenIfHandled">If true, the handler will still receive the mouse event even if <see cref="HandledByEventArgs.IsHandled"/> is true.</param>
+        /// <param name="AlwaysHandlesEvents">If true, the handler will always set <see cref="HandledByEventArgs{THandlerType}.HandledBy"/> to <paramref name="Owner"/> when receiving the mouse event.</param>
+        /// <param name="InvokeEvenIfHandled">If true, the handler will still receive the mouse event even if <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> is true.</param>
         public MouseHandler CreateHandler<T>(T Owner, double? UpdatePriority, bool AlwaysHandlesEvents = false, bool InvokeEvenIfHandled = false)
             where T : IMouseHandlerHost
         {

@@ -19,9 +19,9 @@ namespace MGUI.Shared.Input.Keyboard
         public double? UpdatePriority { get; }
         public bool IsManualUpdate => !UpdatePriority.HasValue;
 
-        /// <summary>If true, <see cref="HandledByEventArgs.HandledBy"/> will always be set to <see cref="Owner"/> after invoking an event.</summary>
+        /// <summary>If true, <see cref="HandledByEventArgs{THandlerType}.HandledBy"/> will always be set to <see cref="Owner"/> after invoking an event.</summary>
         private bool AlwaysHandlesEvents { get; }
-        /// <summary>If true, events will still be invoked even if <see cref="HandledByEventArgs.IsHandled"/> is true.</summary>
+        /// <summary>If true, events will still be invoked even if <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> is true.</summary>
         private bool InvokeEvenIfHandled { get; }
 
         public override string ToString() => $"{nameof(KeyboardHandler)}: {nameof(Owner)} = {Owner}";
@@ -48,7 +48,7 @@ namespace MGUI.Shared.Input.Keyboard
         public bool HasSubscribedEvents => Pressed != null || Released != null || Clicked != null;
         #endregion Events
 
-        /// <summary>Should only be invoked via <see cref="KeyboardTracker.UpdateHandlers(UpdateBaseArgs)"/></summary>
+        /// <summary>Should only be invoked via <see cref="KeyboardTracker.UpdateHandlers"/></summary>
         internal void AutoUpdate()
         {
             if (IsManualUpdate)

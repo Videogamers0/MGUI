@@ -58,7 +58,7 @@ namespace MGUI.Shared.Input
         }
 
         /// <summary>Should be invoked exactly once per Update tick, at the very start of your Game's Update method.<para/>
-        /// This method will detect changes to the mouse/keyboard states but won't fire the events until <see cref="MouseTracker.UpdateHandlers(UpdateBaseArgs)"/> or <see cref="KeyboardTracker.UpdateHandlers(UpdateBaseArgs)"/> are called.</summary>
+        /// This method will detect changes to the mouse/keyboard states but won't fire the events until <see cref="MouseTracker.UpdateHandlers"/> or <see cref="KeyboardTracker.UpdateHandlers"/> are called.</summary>
         public void Update(UpdateBaseArgs BA)
         {
             Mouse.Update(BA);

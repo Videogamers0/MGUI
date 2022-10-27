@@ -74,7 +74,7 @@ namespace MGUI.Core.UI
         }
 
         /// <summary>True if this <see cref="MGContextMenu"/> is currently being shown. To open this <see cref="MGContextMenu"/>, use <see cref="Host"/>'s <see cref="IContextMenuHost.TryOpenContextMenu(MGContextMenu, Point)"/>.<para/>
-        /// See also: <see cref="MGDesktop.ActiveContextMenu"/>, <see cref="MGContextMenu.ActiveSubmenu"/></summary>
+        /// See also: <see cref="MGDesktop.ActiveContextMenu"/>,  <see cref="MGContextMenu.ActiveContextMenu"/></summary>
         public bool IsContextMenuOpen { get => Host.ActiveContextMenu == this; }
 
         /// <summary>See also: <see cref="IContextMenuHost.TryOpenContextMenu(MGContextMenu, Point)"/><br/>(<see cref="MGContextMenu"/> and <see cref="MGDesktop"/> are implementations of <see cref="IContextMenuHost"/>)</summary>

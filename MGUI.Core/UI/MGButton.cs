@@ -9,6 +9,7 @@ using MonoGame.Extended;
 using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Shared.Input.Mouse;
+using MGUI.Shared.Input;
 
 namespace MGUI.Core.UI
 {
@@ -33,14 +34,14 @@ namespace MGUI.Core.UI
         #endregion Border
 
         /// <param name="HandleLeftClick">An <see cref="Action"/> to invoke when this <see cref="MGButton"/> is left-clicked.<para/>
-        /// This handler will only be invoked if <see cref="HandledEventArgsWrapper.Handled"/> is false.<br/>This handler will also set <see cref="HandledEventArgsWrapper.Handled"/> to true after being invoked.<para/>
-        /// If you want to avoid this default behavior, manually subscribe to <see cref="OnLeftClicked"/><br/>or call <see cref="AddCommandHandler(Action{MGButton}, bool, bool)"/>.</param>
+        /// This handler will only be invoked if <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> is false.<br/>This handler will also set <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> to true after being invoked.<para/>
+        /// If you want to avoid this default behavior, manually subscribe to <see cref="OnLeftClicked"/><br/>or call <see cref="AddCommandHandler(Action{MGButton, BaseMouseReleasedEventArgs}, bool)"/>.</param>
         public MGButton(MGWindow Window, Action<MGButton> HandleLeftClick = null)
             : this(Window, new(1), MGUniformBorderBrush.Black, HandleLeftClick) { }
 
         /// <param name="HandleLeftClick">An <see cref="Action"/> to invoke when this <see cref="MGButton"/> is left-clicked.<para/>
-        /// This handler will only be invoked if <see cref="HandledEventArgsWrapper.Handled"/> is false.<br/>This handler will also set <see cref="HandledEventArgsWrapper.Handled"/> to true after being invoked.<para/>
-        /// If you want to avoid this default behavior, manually subscribe to <see cref="OnLeftClicked"/><br/>or call <see cref="AddCommandHandler(Action{MGButton}, bool, bool)"/>.</param>
+        /// This handler will only be invoked if <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> is false.<br/>This handler will also set <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> to true after being invoked.<para/>
+        /// If you want to avoid this default behavior, manually subscribe to <see cref="OnLeftClicked"/><br/>or call <see cref="AddCommandHandler(Action{MGButton, BaseMouseReleasedEventArgs}, bool)"/>.</param>
         public MGButton(MGWindow Window, Thickness BorderThickness, IBorderBrush BorderBrush, Action<MGButton> HandleLeftClick = null)
             : base(Window, MGElementType.Button)
         {
@@ -76,7 +77,7 @@ namespace MGUI.Core.UI
 
         /// <summary>Helper method to subscribe to <see cref="OnLeftClicked"/></summary>
         /// <param name="Command">The <see cref="Action"/> to invoke when this <see cref="MGButton"/> is left-clicked (more specifically, occurs when the left mouse button is released overtop of this <see cref="MGButton"/>)</param>
-        /// <param name="SetsHandledToTrue">If true, this <paramref name="Command"/> will set <see cref="HandledEventArgsWrapper.Handled"/> to true if it executes.</param>
+        /// <param name="SetsHandledToTrue">If true, this <paramref name="Command"/> will set <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> to true if it executes.</param>
         public void AddCommandHandler(Action<MGButton, BaseMouseReleasedEventArgs> Command, bool SetsHandledToTrue = true)
         {
             if (Command != null)
@@ -91,12 +92,12 @@ namespace MGUI.Core.UI
         }
 
         /// <summary>Invoked when the left mouse button is released overtop of this <see cref="MGButton"/>.<para/>
-        /// Consider checking <see cref="HandledEventArgsWrapper.Handled"/> at the start of this <see cref="EventHandler"/><br/>
-        /// or subscribing via <see cref="AddCommandHandler(Action{MGButton}, bool, bool)"/>.</summary>
+        /// Consider checking <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> at the start of this <see cref="EventHandler"/><br/>
+        /// or subscribing via <see cref="AddCommandHandler(Action{MGButton, BaseMouseReleasedEventArgs}, bool)"/>.</summary>
         public event EventHandler<BaseMouseReleasedEventArgs> OnLeftClicked;
         /// <summary>Invoked when the right mouse button is released overtop of this <see cref="MGButton"/>.<para/>
-        /// Consider checking <see cref="HandledEventArgsWrapper.Handled"/> at the start of this <see cref="EventHandler"/><br/>
-        /// or subscribing via <see cref="AddCommandHandler(Action{MGButton}, bool, bool)"/>.</summary>
+        /// Consider checking <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> at the start of this <see cref="EventHandler"/><br/>
+        /// or subscribing via <see cref="AddCommandHandler(Action{MGButton, BaseMouseReleasedEventArgs}, bool)"/>.</summary>
         public event EventHandler<BaseMouseReleasedEventArgs> OnRightClicked;
 
         public override MGBorder GetBorder() => BorderElement;

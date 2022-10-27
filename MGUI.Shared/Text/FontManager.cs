@@ -28,7 +28,6 @@ namespace MGUI.Shared.Text
                 return _FontsByFamily.Values.First();
         }
 
-        /// <summary>Should be initialized during <see cref="MainRenderer.Load"/></summary>
         public FontManager(ContentManager Content, string DefaultFontFamily)
         {
             this.DefaultFontFamily = DefaultFontFamily;
@@ -38,7 +37,7 @@ namespace MGUI.Shared.Text
 
         /// <param name="DesiredFontSize">The desired height, in points, of the returned <see cref="SpriteFont"/> <paramref name="SF"/></param>
         /// <param name="PreferDownsampled">If true, will attempt to retrieve a font size that is approximately twice as large as the <paramref name="DesiredFontSize"/>, and scale it down by approximately 0.5</param>
-        /// <param name="ExactScale">The scale factor that must be applied to the returned <see cref="SpriteFont"/> <paramref name="Result"/> to make it have the desired <paramref name="DesiredFontSize"/></param>
+        /// <param name="ExactScale">The scale factor that must be applied to the returned <see cref="SpriteFont"/> <paramref name="SF"/> to make it have the desired <paramref name="DesiredFontSize"/></param>
         /// <param name="SuggestedScale">Recommended scale factor that might not result in the exact value for <paramref name="DesiredFontSize"/>, but will result in sharper, less blurred text.</param>
         public bool TryGetFont(string Family, CustomFontStyles Style, int DesiredFontSize, bool PreferDownsampled, out FontSet FS, out SpriteFont SF, out int Size, out float ExactScale, out float SuggestedScale)
         {

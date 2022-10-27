@@ -19,14 +19,14 @@ namespace MGUI.Shared.Helpers
 
         /// <param name="PreviousValue">The value that <typeparamref name="TItem"/> will be reverted to when this object is disposed.</param>
         /// <param name="TemporaryValue">The value that <typeparamref name="TItem"/> will be temporarily changed to.</param>
-        /// <param name="SetValue">An action to invoke that changes <see cref="TItem"/> to the new, temporary value.</param>
+        /// <param name="SetValue">An action to invoke that changes <typeparamref name="TItem"/> to the new, temporary value.</param>
         public TemporaryChange(TItem PreviousValue, TItem TemporaryValue, Action<TItem> SetValue)
             : this(PreviousValue, TemporaryValue, SetValue, SetValue) { }
 
         /// <param name="PreviousValue">The value that <typeparamref name="TItem"/> will be reverted to when this object is disposed.</param>
         /// <param name="TemporaryValue">The value that <typeparamref name="TItem"/> will be temporarily changed to.</param>
-        /// <param name="SetValue">An action to invoke that changes <see cref="TItem"/> to the new, temporary value.</param>
-        /// <param name="RevertValue">An action to invoke that changes <see cref="TItem"/> back to its previous value.</param>
+        /// <param name="SetValue">An action to invoke that changes <typeparamref name="TItem"/> to the new, temporary value.</param>
+        /// <param name="RevertValue">An action to invoke that changes <typeparamref name="TItem"/> back to its previous value.</param>
         public TemporaryChange(TItem PreviousValue, TItem TemporaryValue, Action<TItem> SetValue, Action<TItem> RevertValue)
         {
             this.Previous = PreviousValue;
@@ -58,7 +58,7 @@ namespace MGUI.Shared.Helpers
         /// <param name="TemporaryValue">The value that <typeparamref name="TItem"/> will be temporarily changed to.</param>
         /// <param name="PreviousParameter">The parameter value to use when changing <typeparamref name="TItem"/> back to the <paramref name="PreviousValue"/></param>
         /// <param name="TemporaryParameter">The parameter value to use when changing <typeparamref name="TItem"/> to the temporary <paramref name="TemporaryValue"/></param>
-        /// <param name="SetValue">An action to invoke that changes <see cref="TItem"/> to a new value.</param>
+        /// <param name="SetValue">An action to invoke that changes <typeparamref name="TItem"/> to a new value.</param>
         public TemporaryChange(TItem PreviousValue, TItem TemporaryValue, TParameter PreviousParameter, TParameter TemporaryParameter, Action<TItem, TParameter> SetValue)
         {
             this.Previous = PreviousValue;

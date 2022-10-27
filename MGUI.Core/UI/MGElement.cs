@@ -583,9 +583,9 @@ namespace MGUI.Core.UI
         bool IMouseViewport.IsInside(Vector2 Position) => LayoutBounds.ContainsInclusive(Position);
 		Vector2 IMouseViewport.GetOffset() => BoundsOffset.ToVector2();
 
-        /// <summary>Applies the <see cref="IViewport.GetOffset"/> value to the given <paramref name="Position"/>. Typically used when comparing a real screen position to a Rectangle bounds that hasn't already accounted for <see cref="IViewport.GetOffset"/></summary>
+        /// <summary>Applies the <see cref="IMouseViewport.GetOffset"/> value to the given <paramref name="Position"/>. Typically used when comparing a real screen position to a Rectangle bounds that hasn't already accounted for <see cref="IMouseViewport.GetOffset"/></summary>
         protected Vector2 AdjustMousePosition(Point Position) => AdjustMousePosition(Position.ToVector2());
-		/// <summary>Applies the <see cref="IViewport.GetOffset"/> value to the given <paramref name="Position"/>. Typically used when comparing a real screen position to a Rectangle bounds that hasn't already accounted for <see cref="IViewport.GetOffset"/></summary>
+        /// <summary>Applies the <see cref="IMouseViewport.GetOffset"/> value to the given <paramref name="Position"/>. Typically used when comparing a real screen position to a Rectangle bounds that hasn't already accounted for <see cref="IMouseViewport.GetOffset"/></summary>
         protected Vector2 AdjustMousePosition(Vector2 Position) => Position + AsIViewport().GetOffset();
 
 		protected bool _CanReceiveMouseInput { get; private set; }
@@ -1191,7 +1191,7 @@ namespace MGUI.Core.UI
         /// See also: <see cref="AllocatedBounds"/>, <see cref="RenderBounds"/>, <see cref="LayoutBounds"/>, <see cref="StretchedContentBounds"/>, <see cref="ActualContentBounds"/></summary>
         public Rectangle RenderBounds { get; private set; }
         /// <summary>The screen space that this <see cref="MGElement"/> will render itself to, after accounting for <see cref="Margin"/>.<br/>
-        /// The <see cref="BackgroundOverride"/> color of this <see cref="MGElement"/> spans these bounds.<para/>
+        /// The <see cref="BackgroundBrush"/> of this <see cref="MGElement"/> spans these bounds.<para/>
 		/// This value does not account for <see cref="BoundsOffset"/> and thus might not match the exact screen bounds where this <see cref="MGElement"/> was drawn.<br/>
         /// See also: <see cref="AllocatedBounds"/>, <see cref="RenderBounds"/>, <see cref="LayoutBounds"/>, <see cref="StretchedContentBounds"/>, <see cref="ActualContentBounds"/></summary>
         public Rectangle LayoutBounds { get; private set; }

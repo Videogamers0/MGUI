@@ -149,9 +149,9 @@ namespace MGUI.Shared.Rendering
             this.Children = new();
         }
 
-        /// <summary>Invoked at the beginning of the <see cref="Update(TimeSpan, MouseState, KeyboardState)"/> method.</summary>
+        /// <summary>Invoked at the beginning of the <see cref="Update(UpdateBaseArgs)"/> method.</summary>
         public event EventHandler<UpdateBaseEventArgs> OnBeginUpdate;
-        /// <summary>Invoked at the end of the <see cref="Update(TimeSpan, MouseState, KeyboardState)"/> method.</summary>
+        /// <summary>Invoked at the end of the <see cref="Update(UpdateBaseArgs)"/> method.</summary>
         public event EventHandler<UpdateBaseEventArgs> OnEndUpdate;
 
         internal void Update(UpdateBaseArgs BA)

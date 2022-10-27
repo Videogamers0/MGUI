@@ -173,8 +173,8 @@ namespace MGUI.Core.UI
             }
         }
 
-        /// <param name="Value"><see cref="_RowItems"/> will be set to a copy of this <see cref="ICollection{T}"/> unless the collection is an <see cref="ObservableCollection{T}"/>.<br/>
-        /// If you want <see cref="_RowItems"/> to dynamically update as the collection changes, pass in an <see cref="ObservableCollection{T}"/></param>
+        /// <param name="Value"><see cref="ItemsSource"/> will be set to a copy of this <see cref="ICollection{T}"/> unless the collection is an <see cref="ObservableCollection{T}"/>.<br/>
+        /// If you want <see cref="ItemsSource"/> to dynamically update as the collection changes, pass in an <see cref="ObservableCollection{T}"/></param>
         public void SetItemsSource(ICollection<TItemType> Value)
         {
             if (Value is ObservableCollection<TItemType> Observable)

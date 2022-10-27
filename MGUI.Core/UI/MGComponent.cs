@@ -150,11 +150,11 @@ namespace MGUI.Core.UI
     public class MGComponent<TElementType> : MGComponentBase
         where TElementType : MGElement
     {
-        /// <summary>The underlying <see cref="MGElement"/> of this <see cref="MGComponent"/>.<para/>
+        /// <summary>The underlying <see cref="MGElement"/> of this <see cref="MGComponent{TElementType}"/>.<para/>
         /// Be careful editing properties of this element. Some changes could have unintended consequences to the parent element's layout. Modify at your own risk.<para/>
-        /// For example, if you set <see cref="MGWindow.TitleComponent"/>'s <see cref="MGElement.HorizontalAlignment"/> to <see cref="HorizontalAlignment.Center"/>,
+        /// For example, if you set <see cref="MGWindow.TitleBarComponent"/>'s <see cref="MGElement.HorizontalAlignment"/> to <see cref="HorizontalAlignment.Center"/>,
         /// the title wouldn't span the entire window width anymore, so the title bar's background color wouldn't stretch either.
-        /// On the other hand, if you set <see cref="MGWindow.TitleComponent"/>'s <see cref="MGTextBlock.TextAlignment"/> to <see cref="HorizontalAlignment.Center"/>, 
+        /// On the other hand, if you set <see cref="MGWindow.TitleBarTextBlockElement"/>'s <see cref="MGTextBlock.TextAlignment"/> to <see cref="HorizontalAlignment.Center"/>, 
         /// it would still look as intended.</summary>
         public readonly TElementType Element;
 

@@ -69,7 +69,7 @@ namespace MGUI.Core.UI.Text
         #region Navigation
         /// <summary>Moves the caret position to the given side of the given <paramref name="CharIndex"/>.<br/>
         /// If no character was found at the index, continually navigates left until finding one.</summary>
-        /// <paramref name="CharIndex"/>The index in the original text, before it was parsed into <see cref="MGTextLine"/>s.</summary>
+        /// <paramref name="CharIndex"/>The index in the original text, before it was parsed into <see cref="MGTextLine"/>s.<paramref/>
         public bool MoveToOriginalCharacterIndexOrLeft(int CharIndex, bool LeftSide)
         {
             Debug.WriteLine($"{nameof(MGTextCaret)}: Move to original index or left: {CharIndex} (Left={LeftSide})");
@@ -91,7 +91,7 @@ namespace MGUI.Core.UI.Text
 
         /// <summary>Moves the caret position to the given side of the given <paramref name="CharIndex"/>.<br/>
         /// If no character was found at the index, continually navigates right until finding one.</summary>
-        /// <paramref name="CharIndex"/>The index in the original text, before it was parsed into <see cref="MGTextLine"/>s.</summary>
+        /// <paramref name="CharIndex"/>The index in the original text, before it was parsed into <see cref="MGTextLine"/>s.<paramref/>
         public bool MoveToOriginalCharacterIndexOrRight(int CharIndex, bool LeftSide)
         {
             Debug.WriteLine($"{nameof(MGTextCaret)}: Move to original index or right: {CharIndex} (Left={LeftSide})");
@@ -168,7 +168,7 @@ namespace MGUI.Core.UI.Text
         }
 
         /// <summary>Moves the caret position to the given side of the given <paramref name="CharIndex"/>.<br/>
-        /// If no character was found at the index, navigates to the end of the text.
+        /// If no character was found at the index, navigates to the end of the text.</summary>
         /// <param name="CharIndex">The index in the parsed text (after it was converted into <see cref="MGTextLine"/>s)</param>
         public bool MoveToParsedCharacterIndexOrEnd(int CharIndex, bool LeftSide)
         {

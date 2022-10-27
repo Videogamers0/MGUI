@@ -50,7 +50,7 @@ namespace MGUI.Shared.Helpers
 
         /// <summary>Returns the distance from the given <paramref name="Point"/> to a line with the given <paramref name="LineDirection"/> and passing through the given <paramref name="LinePoint"/>.<para/>
         /// Returns a negative value if the <paramref name="Point"/> is below the line (I.E. on the side of the line that the <paramref name="Normal"/> does not point towards)</summary>
-        /// <param name="Normal">A <see cref="Vector2"/> that is orthogonal to the <paramref name="Axis"/>, and indicates which side of the <paramref name="Axis"/> is 'above'.</param>
+        /// <param name="Normal">A <see cref="Vector2"/> that is orthogonal to the <paramref name="LineDirection"/>, and indicates which side of the <paramref name="LineDirection"/> is 'above'.</param>
         public static double GetSignedDistance(Vector2 LineDirection, Vector2 LinePoint, Vector2 Normal, Vector2 Point)
         {
             //https://stackoverflow.com/questions/29444874/function-for-signed-distance-from-a-line-plane-with-a-front-vector

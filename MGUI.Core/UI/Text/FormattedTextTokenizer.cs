@@ -317,7 +317,7 @@ namespace MGUI.Core.UI.Text
             return Result.ToString();
         }
 
-        /// <param name="ShouldTokenizeLineBreaks">If true, '\n' will be tokenized as <see cref="FTTokenType.LineBreak"/>.<br/>
+        /// <param name="ShouldTokenizeLineBreak">If true, '\n' will be tokenized as <see cref="FTTokenType.LineBreak"/>.<br/>
         /// If false, '\n' will not be tokenized, and will instead remain as a substring inside a <see cref="FTTokenType.StringValue"/> token.<para/>
         /// Warning - A linebreak is treated as the character literal '\n', as opposed to the string @"\n". Be sure not to accidentally use a literal escape character '\\', such as if prefixing a hard-coded string with @.</param>
         public bool TryTokenize(string Text, bool ShouldTokenizeLineBreak, out List<FTTokenMatch> Result)

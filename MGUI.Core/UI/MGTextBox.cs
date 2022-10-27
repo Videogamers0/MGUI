@@ -679,7 +679,7 @@ namespace MGUI.Core.UI
         }
         #endregion Undo / Redo
 
-        /// <summary>Attempts to set this element as the value for <see cref="MGWindow.FocusedKeyboardHandler"/> at the end of the next update tick.</summary>
+        /// <summary>Attempts to set this element as the value for <see cref="MGDesktop.FocusedKeyboardHandler"/> at the end of the next update tick.</summary>
         public void RequestFocus() => GetDesktop().QueuedFocusedKeyboardHandler = this;
 
         private bool _IsReadonly;

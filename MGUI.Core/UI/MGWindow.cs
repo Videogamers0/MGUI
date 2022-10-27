@@ -130,7 +130,7 @@ namespace MGUI.Core.UI
         private int PreviousHeight;
 
         /// <summary>Fires the <see cref="OnWindowPositionChanged"/> and/or <see cref="OnWindowSizeChanged"/> events if necessary.<para/>
-        /// This method is automatically invoked at the beginning of <see cref="MGElement.Update(UpdateBaseArgs, bool, bool, Point)"/>,<br/>
+        /// This method is automatically invoked at the beginning of <see cref="MGElement.Update(ElementUpdateArgs)"/>,<br/>
         /// but in rare cases you may want to manually invoke this after changing <see cref="Left"/>, <see cref="Top"/>, <see cref="WindowWidth"/>, or <see cref="WindowHeight"/> to make changes take effect immediately.</summary>
         public void ValidateWindowSizeAndPosition()
         {
@@ -462,7 +462,7 @@ namespace MGUI.Core.UI
         public bool AllowsClickThrough { get; set; } = false;
 
         /// <summary>True if this <see cref="MGWindow"/> can be moved by dragging the title bar.<para/>
-        /// Warning: You may need to set <see cref="IsTitleVisible"/>=true to utilize this feature.</summary>
+        /// Warning: You may need to set <see cref="IsTitleBarVisible"/> to true to utilize this feature.</summary>
         public bool IsDraggable { get; set; } = true;
 
         #region Constructors

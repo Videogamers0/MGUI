@@ -202,7 +202,7 @@ namespace MGUI.Core.UI.Containers
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool HasContent => Content != null;
 
-        /// <returns>This <see cref="MGContentHost"/> (for convenience, to chain multiple <see cref="SetContent{THostType, TContentType}(TContentType)"/> calls. Such as:<para/>
+        /// <returns>This <see cref="MGContentHost"/> (for convenience, to chain multiple <see cref="SetContent{THostType}(MGElement)"/> calls. Such as:<para/>
         /// <code>new MGBorder(...).SetContent(new MGButton(...).SetContent(new MGTextBlock(...)))</code></returns>
         /// <exception cref="InvalidOperationException"></exception>
         public THostType SetContent<THostType>(MGElement Content)

@@ -11,6 +11,12 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <MonoGameContentReference Include="..\MGUI.Shared\Content\MGUI.Shared.Content.mgcb" Link="Content\MGUI.Shared.Content.mgcb" />
   </ItemGroup>

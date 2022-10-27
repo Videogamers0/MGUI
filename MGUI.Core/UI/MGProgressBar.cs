@@ -204,7 +204,7 @@ namespace MGUI.Core.UI
         /// <summary>The brush to use for the completed portion of this <see cref="MGProgressBar"/></summary>
         public IFillBrush CompletedBrush { get; set; }
 
-        /// <summary>The brush to use for the incomplete portion of this <see cref="MGProgressBar"/>. Can be null. This brush is rendered overtop of <see cref="MGElement.BackgroundOverride"/></summary>
+        /// <summary>The brush to use for the incomplete portion of this <see cref="MGProgressBar"/>. Can be null. This brush is rendered overtop of <see cref="MGElement.BackgroundBrush"/></summary>
         public IFillBrush IncompleteBrush { get; set; }
 
         private Orientation _Orientation;

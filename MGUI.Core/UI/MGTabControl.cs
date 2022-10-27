@@ -40,7 +40,7 @@ namespace MGUI.Core.UI
         public MGComponent<MGStackPanel> HeadersPanelComponent { get; }
         private MGStackPanel HeadersPanelElement { get; }
 
-        /// <summary>The background brush of the entire header region of this <see cref="TabControl"/>. This is rendered behind the tab headers.<para/>
+        /// <summary>The background brush of the entire header region of this <see cref="MGTabControl"/>. This is rendered behind the tab headers.<para/>
         /// To change the background of a specific tab, consider setting the <see cref="UnselectedTabHeaderTemplate"/> and <see cref="SelectedTabHeaderTemplate"/>.</summary>
         public VisualStateBrush HeaderAreaBackground
         {
@@ -162,8 +162,8 @@ namespace MGUI.Core.UI
 
         /// <summary>Attempts to set the given <paramref name="Tab"/> as the <see cref="SelectedTab"/>.<para/>
         /// To deselect a tab, use <see cref="TryDeselectTab(MGTabItem, bool)"/> rather than a null <paramref name="Tab"/> parameter.</summary>
-        /// <param name="Tab">Cannot be null, and should be a tab that belongs to this <see cref="TabControl"/> (I.E. it was created via <see cref="AddTab(MGElement, MGElement)"/>)</param>
-        /// <returns>False if unable to select the given <paramref name="Tab"/>, such as if the value was null, or it belongs to a different <see cref="TabControl"/>, or the action was cancelled by <see cref="SelectedTabChanging"/> event.</returns>
+        /// <param name="Tab">Cannot be null, and should be a tab that belongs to this <see cref="MGTabControl"/> (I.E. it was created via <see cref="AddTab(MGElement, MGElement)"/>)</param>
+        /// <returns>False if unable to select the given <paramref name="Tab"/>, such as if the value was null, or it belongs to a different <see cref="MGTabControl"/>, or the action was cancelled by <see cref="SelectedTabChanging"/> event.</returns>
         public bool TrySelectTab(MGTabItem Tab)
         {
             if (Tab != null && _Tabs.Contains(Tab) && Tab.TabControl == this && Tab != SelectedTab)

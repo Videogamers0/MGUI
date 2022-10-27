@@ -25,7 +25,7 @@ namespace MGUI.Shared.Input.Keyboard
         public static readonly ReadOnlyCollection<Keys> AllKeys = Enum.GetValues(typeof(Keys)).Cast<Keys>().ToList().AsReadOnly();
 
         /// <summary>The maximum amount of time that can pass between a key press and key release 
-        /// to still be registed as a Click event (<see cref="OnKeyClicked"/>)</summary>
+        /// to still be registed as a Click event (<see cref="KeyboardHandler.Clicked"/>)</summary>
         public TimeSpan ClickTimeThreshold { get; set; } = TimeSpan.FromMilliseconds(300);
 
         public InputTracker InputTracker { get; }
@@ -46,17 +46,17 @@ namespace MGUI.Shared.Input.Keyboard
         }
 
         /// <param name="UpdatePriority">The priority with which the handler receives keyboard events. A higher priority means this handler will have the first chance to receive and handle events.</param>
-        /// <param name="AlwaysHandlesEvents">If true, the handler will always set <see cref="HandledByEventArgs.HandledBy"/> to <paramref name="Owner"/> when receiving the keyboard event.</param>
-        /// <param name="InvokeEvenIfHandled">If true, the handler will still receive the keyboard event even if <see cref="HandledByEventArgs.IsHandled"/> is true.</param>
+        /// <param name="AlwaysHandlesEvents">If true, the handler will always set <see cref="HandledByEventArgs{THandlerType}.HandledBy"/> to <paramref name="Owner"/> when receiving the keyboard event.</param>
+        /// <param name="InvokeEvenIfHandled">If true, the handler will still receive the keyboard event even if <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> is true.</param>
         public KeyboardHandler CreateHandler<T>(T Owner, InputUpdatePriority UpdatePriority, bool AlwaysHandlesEvents = false, bool InvokeEvenIfHandled = false)
             where T : IKeyboardHandlerHost => CreateHandler(Owner, (int)UpdatePriority, AlwaysHandlesEvents, InvokeEvenIfHandled);
 
         /// <param name="UpdatePriority">The priority with which the handler receives keyboard events. A higher priority means this handler will have the first chance to receive and handle events.<para/>
-        /// If null, the caller is expected to manually call <see cref="KeyboardHandler.Update(UpdateBaseArgs)"/> themselves.<br/>
-        /// If not null, <see cref="KeyboardHandler.Update(UpdateBaseArgs)"/> will automatically be invoked when updating this <see cref="KeyboardTracker"/><para/>
+        /// If null, the caller is expected to manually call <see cref="KeyboardHandler.ManualUpdate"/> themselves.<br/>
+        /// If not null, <see cref="KeyboardHandler.AutoUpdate"/> will automatically be invoked when updating this <see cref="KeyboardTracker"/><para/>
         /// Minimum Value = 0. Maximum Value = 100. Recommended to use preset values from <see cref="InputUpdatePriority"/>.</param>
-        /// <param name="AlwaysHandlesEvents">If true, the handler will always set <see cref="HandledByEventArgs.HandledBy"/> to <paramref name="Owner"/> when receiving the keyboard event.</param>
-        /// <param name="InvokeEvenIfHandled">If true, the handler will still receive the keyboard event even if <see cref="HandledByEventArgs.IsHandled"/> is true.</param>
+        /// <param name="AlwaysHandlesEvents">If true, the handler will always set <see cref="HandledByEventArgs{THandlerType}.HandledBy"/> to <paramref name="Owner"/> when receiving the keyboard event.</param>
+        /// <param name="InvokeEvenIfHandled">If true, the handler will still receive the keyboard event even if <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> is true.</param>
         public KeyboardHandler CreateHandler<T>(T Owner, double? UpdatePriority, bool AlwaysHandlesEvents = false, bool InvokeEvenIfHandled = false)
             where T : IKeyboardHandlerHost
         {

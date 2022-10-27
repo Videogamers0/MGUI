@@ -239,8 +239,8 @@ namespace MGUI.Core.UI
             }
         }
 
-        /// <param name="Value"><see cref="_Items"/> will be set to a copy of this <see cref="ICollection{T}"/>.<br/>
-        /// If you want <see cref="_Items"/> to dynamically update as the collection changes, pass in an <see cref="ObservableCollection{T}"/></param>
+        /// <param name="Value"><see cref="ItemsSource"/> will be set to a copy of this <see cref="ICollection{T}"/>.<br/>
+        /// If you want <see cref="ItemsSource"/> to dynamically update as the collection changes, pass in an <see cref="ObservableCollection{T}"/></param>
         /// <exception cref="InvalidOperationException">Thrown if <see cref="IsDropdownOpen"/>=true.</exception>
         public void SetItemsSource(ICollection<TItemType> Value)
         {
@@ -256,8 +256,8 @@ namespace MGUI.Core.UI
         public static Thickness DefaultDropdownItemPadding = new(8, 5, 8, 5);
 
         private Func<TItemType, MGButton> _DropdownItemTemplate;
-        /// <param name="DropdownItemTemplate">The template to use for items inside the dropdown.<br/>
-        /// Highly recommend to use an <see cref="MGElement"/> with Padding, such as '8,5,8,5'. See also: <see cref="DefaultDropdownItemPadding"/></param>
+        /// <summary>The template to use for items inside the dropdown.<br/>
+        /// Highly recommend to use an <see cref="MGElement"/> with Padding, such as '8,5,8,5'. See also: <see cref="DefaultDropdownItemPadding"/></summary>
         public Func<TItemType, MGButton> DropdownItemTemplate
         {
             get => _DropdownItemTemplate;
@@ -280,7 +280,7 @@ namespace MGUI.Core.UI
         }
 
         private Func<TItemType, MGElement> _SelectedItemTemplate;
-        /// <param name="SelectedItemTemplate">The template to use for the selected item</param>
+        /// <summary>The template to use for the selected item</summary>
         public Func<TItemType, MGElement> SelectedItemTemplate
         {
             get => _SelectedItemTemplate;

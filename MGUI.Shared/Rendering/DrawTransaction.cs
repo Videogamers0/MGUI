@@ -65,7 +65,7 @@ namespace MGUI.Shared.Rendering
         }
 
         /// <summary>Should only be invoked if you intend to make a draw-related call that isn't already funneled through <see cref="DrawTransaction"/>.<para/>
-        /// Draw-related calls that are funneled through <see cref="DrawTransaction"/> (such as <see cref="DrawTransaction.DrawBorder(Rectangle, XNAColor, Thickness)"/>) will already call the begin methods if necessary.</summary>
+        /// Draw-related calls that are funneled through <see cref="DrawTransaction"/> (such as <see cref="DrawTransaction.StrokeRectangle(Vector2, RectangleF, Color, Thickness, DrawContext?)"/>) will already call the begin methods if necessary.</summary>
         public void ForceBeginDraw(DrawContext Context) => BeginDraw(Context);
         public void ForceEndDraw(DrawContext Context) => EndDraw(Context);
 

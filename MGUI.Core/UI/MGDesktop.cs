@@ -23,11 +23,11 @@ namespace MGUI.Core.UI
         public InputTracker InputTracker => Renderer.Input;
         public FontManager FontManager => Renderer.FontManager;
 
-        /// <summary>A <see cref="Input.MouseHandler"/> that is updated at the start of <see cref="Update(UpdateBaseArgs)"/>, before any <see cref="MGWindow"/>s in <see cref="Windows"/> are updated.<br/>
+        /// <summary>A <see cref="MouseHandler"/> that is updated at the start of <see cref="Update()"/>, before any <see cref="MGWindow"/>s in <see cref="Windows"/> are updated.<br/>
         /// Objects that subscribe to this handler's mouse events will be the very first to receive and handle the event.<para/>
         /// Highly recommended to avoid using this unless absolutely necessary, and if you do use it, you probably shouldn't call e.SetHandled(...) so other elements can still receive the input.</summary>
         public MouseHandler HighPriorityMouseHandler { get; }
-        /// <summary>A <see cref="Input.KeyboardHandler"/> that is updated at the start of <see cref="Update(UpdateBaseArgs)"/>, before any <see cref="MGWindow"/>s in <see cref="Windows"/> are updated.<br/>
+        /// <summary>A <see cref="KeyboardHandler"/> that is updated at the start of <see cref="Update()"/>, before any <see cref="MGWindow"/>s in <see cref="Windows"/> are updated.<br/>
         /// Objects that subscribe to this handler's keyboard events will be the very first to receive and handle the event.<para/>
         /// Highly recommended to avoid using this unless absolutely necessary, and if you do use it, you probably shouldn't call e.SetHandled(...) so other elements can still receive the input.</summary>
         public KeyboardHandler HighPriorityKeyboardHandler { get; }
@@ -109,7 +109,7 @@ namespace MGUI.Core.UI
 #region Context Menu
         private MGContextMenu _ActiveContextMenu;
         /// <summary>The currently open <see cref="MGContextMenu"/>.<para/>
-        /// To set this value, use <see cref="TryCloseActiveContextMenu"/> or <see cref="TryOpenContextMenu(MGContextMenu, Point, RelativePosition)"/></summary>
+        /// To set this value, use <see cref="TryCloseActiveContextMenu"/> or <see cref="TryOpenContextMenu(MGContextMenu, Point)"/></summary>
         public MGContextMenu ActiveContextMenu { get => _ActiveContextMenu; }
 
         /// <returns>True if there was no <see cref="ActiveContextMenu"/> or it was successfully closed.<br/>

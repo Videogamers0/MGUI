@@ -247,7 +247,7 @@ namespace MGUI.Core.UI
         private bool _DrawTicks;
         /// <summary>True if tick marks should be drawn at the given <see cref="TickFrequency"/> interval along the number line.<para/>
         /// Only relevant if <see cref="TickFrequency"/> is specified.<para/>
-        /// See also: <see cref="DrawTickMarkValues"/>, <see cref="TickWidth"/></summary>
+        /// See also: <see cref="CanDrawTickMarks"/>, <see cref="TickWidth"/></summary>
         public bool DrawTicks
         {
             get => _DrawTicks;
