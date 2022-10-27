@@ -1,0 +1,1095 @@
+﻿using Microsoft.Xna.Framework;
+using MonoGame.Extended;
+using MGUI.Shared.Helpers;
+using MGUI.Core.UI.Brushes.Fill_Brushes;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using MGUI.Shared.Input.Mouse;
+
+namespace MGUI.Core.UI.Containers.Grids
+{
+    [Flags]
+    public enum GridLinesVisibility : byte
+    {
+        None = 0b_0000_0000,
+
+        /// <summary>Indicates that horizontal gridlines should be rendered. Does not include horizontal gridlines at the top or bottom edge of the grid's border</summary>
+        InnerHorizontal = 0b_0000_0001,
+        /// <summary>Indicates that a horizontal gridline should be rendered at the top edge of the grid's border</summary>
+        TopEdge = 0b_0000_0010,
+        /// <summary>Indicates that a horizontal gridline should be rendered at the bottom edge of the grid's border</summary>
+        BottomEdge = 0b_0000_0100,
+
+        /// <summary>Indicates that vertical gridlines should be rendered. Does not include vertical gridlines at the left or right edge of the grid's border</summary>
+        InnerVertical = 0b_0000_1000,
+        /// <summary>Indicates that a vertical gridline should be rendered at the left edge of the grid's border</summary>
+        LeftEdge = 0b_0001_0000,
+        /// <summary>Indicates that a vertical gridline should be rendered at the right edge of the grid's border</summary>
+        RightEdge = 0b_0010_0000,
+
+        All = InnerHorizontal | TopEdge | BottomEdge | InnerVertical | LeftEdge | RightEdge,
+
+        AllHorizontal = InnerHorizontal | TopEdge | BottomEdge,
+        AllVertical = InnerVertical | LeftEdge | RightEdge,
+    }
+
+    public enum GridLineIntersection : byte
+    {
+#if NEVER // Not Implemented
+        /// <summary>Indicates that the intersections of the horizontal and vertical gridlines should not be filled with either gridline brush</summary>
+        None,
+        /// <summary>Indicates that the intersections of the horizontal and vertical gridlines should only be filled with the horizontal gridline brush</summary>
+        HorizontalOnly,
+        /// <summary>Indicates that the intersections of the horizontal and vertical gridlines should only be filled with the vertical gridline brush</summary>
+        VerticalOnly,
+#endif
+        /// <summary>Indicates that horizontal gridlines should be rendered first, then vertical gridlines.<br/>
+        /// This will result in the vertical gridline brush being drawn overtop of the horizontal gridline brush at their intersection points.</summary>
+        HorizontalThenVertical,
+        /// <summary>Indicates that vertical gridlines should be rendered first, then horizontal gridlines.<br/>
+        /// This will result in the horizontal gridline brush being drawn overtop of the vertical gridline brush at their intersection points.</summary>
+        VerticalThenHorizontal
+    }
+
+    public enum GridSelectionMode
+    {
+        /// <summary>Indicates that nothing in an <see cref="MGGrid"/> can be selected via left-clicking.</summary>
+        None,
+        /// <summary>Indicates that an entire row of content in an <see cref="MGGrid"/> can be selected by left-clicking on any cell in the <see cref="RowDefinition"/></summary>
+        Row,
+        /// <summary>Indicates that an entire column of content in an <see cref="MGGrid"/> can be selected by left-clicking on any cell in the <see cref="ColumnDefinition"/></summary>
+        Column,
+        /// <summary>Indicates that a cell in an <see cref="MGGrid"/> can be selected by left-clicking on it</summary>
+        Cell
+    }
+
+    public readonly record struct GridCell(RowDefinition Row, ColumnDefinition Column);
+
+    public readonly record struct GridSelection(MGGrid Grid, GridCell Cell, GridSelectionMode SelectionMode)
+        : IEnumerable<GridCell>
+    {
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public IEnumerator<GridCell> GetEnumerator() => GetCells().GetEnumerator();
+
+        private IEnumerable<GridCell> GetCells()
+        {
+            switch (SelectionMode)
+            {
+                case GridSelectionMode.None:
+                    yield break;
+                case GridSelectionMode.Row:
+                    if (Grid.Rows.Contains(Cell.Row))
+                    {
+                        foreach (ColumnDefinition Column in Grid.Columns)
+                            yield return new GridCell(Cell.Row, Column);
+                    }
+                    yield break;
+                case GridSelectionMode.Column:
+                    if (Grid.Columns.Contains(Cell.Column))
+                    {
+                        foreach (RowDefinition Row in Grid.Rows)
+                            yield return new GridCell(Row, Cell.Column);
+                    }
+                    yield break;
+                case GridSelectionMode.Cell:
+                    if (Grid.Rows.Contains(Cell.Row) && Grid.Columns.Contains(Cell.Column))
+                        yield return Cell;
+                    yield break;
+                default:
+                    throw new NotImplementedException($"Unrecognized {nameof(GridSelectionMode)}: {SelectionMode}");
+            }
+        }
+    }
+
+    public class MGGrid : MGMultiContentHost
+    {
+        #region Rows / Columns
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private ObservableCollection<ColumnDefinition> _Columns { get; }
+        public IReadOnlyList<ColumnDefinition> Columns => _Columns;
+        public int GetColumnIndex(ColumnDefinition Column) => _Columns.IndexOf(Column);
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private ObservableCollection<RowDefinition> _Rows { get; }
+        public IReadOnlyList<RowDefinition> Rows => _Rows;
+        public int GetRowIndex(RowDefinition Row) => _Rows.IndexOf(Row);
+
+        /// <param name="Lengths">The lengths of each <see cref="ColumnDefinition"/> to create.<para/>
+        /// Consider using <see cref="GridLength.ParseMultiple(string)"/> for a convenient way to generate the values</param>
+        /// <returns>The created <see cref="ColumnDefinition"/>s</returns>
+        public List<ColumnDefinition> AddColumns(IEnumerable<GridLength> Lengths) => Lengths.Select(x => AddColumn(x)).ToList();
+
+        /// <param name="Lengths">The lengths of each <see cref="RowDefinition"/> to create.<para/>
+        /// Consider using <see cref="GridLength.ParseMultiple(string)"/> for a convenient way to generate the values</param>
+        /// <returns>The created <see cref="RowDefinition"/>s</returns>
+        public List<RowDefinition> AddRows(IEnumerable<GridLength> Lengths) => Lengths.Select(x => AddRow(x)).ToList();
+
+        /// <summary>See also: <see cref="AddColumns(IEnumerable{GridLength})"/>, <see cref="GridLength.ParseMultiple(string)"/></summary>
+        /// <param name="Length">Warning - <see cref="GridUnitType.Weighted"/> is treated as <see cref="GridUnitType.Auto"/> 
+        /// when the column is inside of an <see cref="MGScrollViewer"/> with a horizontal scrollbar</param>
+        public ColumnDefinition AddColumn(GridLength Length)
+        {
+            ColumnDefinition Column = new(this, Length);
+            _Columns.Add(Column);
+            return Column;
+        }
+
+        public void RemoveColumn(ColumnDefinition Column)
+        {
+            if (!CanChangeContent)
+                return;
+
+            ClearColumnContent(Column);
+            _Columns.Remove(Column);
+        }
+
+        /// <summary>See also: <see cref="AddRows(IEnumerable{GridLength})"/>, <see cref="GridLength.ParseMultiple(string)"/></summary>
+        /// <param name="Length">Warning - <see cref="GridUnitType.Weighted"/> is treated as <see cref="GridUnitType.Auto"/> 
+        /// when the row is inside of an <see cref="MGScrollViewer"/> with a vertical scrollbar</param>
+        public RowDefinition AddRow(GridLength Length)
+        {
+            RowDefinition Row = new(this, Length);
+            _Rows.Add(Row);
+            return Row;
+        }
+
+        public RowDefinition InsertRow(int Index, GridLength Length)
+        {
+            RowDefinition Row = new(this, Length);
+            _Rows.Insert(Index, Row);
+            return Row;
+        }
+
+        public void RemoveRow(RowDefinition Row)
+        {
+            if (!CanChangeContent)
+                return;
+
+            ClearRowContent(Row);
+            _Rows.Remove(Row);
+        }
+
+        private Dictionary<GridCell, Rectangle> _CellBounds = new();
+        /// <summary>Warning - the <see cref="Rectangle"/>s in this dictionary do not account for <see cref="MGElement.BoundsOffset"/></summary>
+        public IReadOnlyDictionary<GridCell, Rectangle> CellBounds => _CellBounds;
+
+        private Dictionary<GridCell, Rectangle> GetCellBounds(bool IncludeGridLineMargin)
+        {
+            Dictionary<GridCell, Rectangle> CellBounds = new();
+
+            foreach (RowDefinition Row in _Rows)
+            {
+                foreach (ColumnDefinition Column in _Columns)
+                {
+                    GridCell Cell = new(Row, Column);
+                    Rectangle PaddedBounds = new(Column.Left, Row.Top, Column.Width, Row.Height);
+                    Rectangle ActualBounds = IncludeGridLineMargin ? PaddedBounds : PaddedBounds.GetExpanded(Math.Max(0, GridLineMargin));
+                    CellBounds.Add(Cell, ActualBounds);
+                }
+            }
+
+            return CellBounds;
+        }
+        #endregion Rows / Columns
+
+        #region Elements
+        /// <summary>All content in this <see cref="MGGrid"/>, indexed first by the <see cref="RowDefinition"/> it resides in, then by the <see cref="ColumnDefinition"/> it resides in.</summary>
+        private readonly Dictionary<RowDefinition, Dictionary<ColumnDefinition, List<MGElement>>> ChildrenByRC = new();
+        /// <summary>A lookup table that returns the <see cref="RowDefinition"/> and <see cref="ColumnDefinition"/> that a given <see cref="MGElement"/> resides in.</summary>
+        private readonly Dictionary<MGElement, GridCell> ChildCellLookup = new();
+
+        public IReadOnlyDictionary<ColumnDefinition, IReadOnlyList<MGElement>> GetRowContent(RowDefinition Row)
+        {
+            if (ChildrenByRC.TryGetValue(Row, out var RowContent))
+                return RowContent.ToDictionary(x => x.Key, x => x.Value as IReadOnlyList<MGElement>);
+            else
+                return new Dictionary<ColumnDefinition, IReadOnlyList<MGElement>>();
+        }
+
+        public IReadOnlyDictionary<RowDefinition, IReadOnlyList<MGElement>> GetColumnContent(ColumnDefinition Column)
+        {
+            Dictionary<RowDefinition, IReadOnlyList<MGElement>> ColumnContent = new();
+            foreach (var KVP in ChildrenByRC)
+            {
+                if (KVP.Value.TryGetValue(Column, out var CellContent) && CellContent.Any())
+                {
+                    ColumnContent.Add(KVP.Key, CellContent);
+                }
+            }
+            return ColumnContent;
+        }
+
+        public IReadOnlyList<MGElement> GetCellContent(GridCell Cell)
+            => GetCellContent(Cell.Row, Cell.Column);
+        public IReadOnlyList<MGElement> GetCellContent(RowDefinition Row, ColumnDefinition Column)
+        {
+            IReadOnlyDictionary<ColumnDefinition, IReadOnlyList<MGElement>> RowContent = GetRowContent(Row);
+            if (RowContent.TryGetValue(Column, out IReadOnlyList<MGElement> CellContent))
+                return CellContent;
+            else
+                return new List<MGElement>();
+        }
+
+        public bool TryAddChild(int RowIndex, int ColumnIndex, MGElement Item)
+        {
+            if (RowIndex >= 0 && RowIndex < _Rows.Count && ColumnIndex >= 0 && ColumnIndex < _Columns.Count)
+            {
+                RowDefinition Row = _Rows[RowIndex];
+                ColumnDefinition Column = _Columns[ColumnIndex];
+                return TryAddChild(Row, Column, Item);
+            }
+            else
+                return false;
+        }
+
+        /// <returns>True if the given <paramref name="Item"/> was successfully added.<br/>
+        /// False otherwise, such as if <see cref="MGContentHost.CanChangeContent"/> is false.</returns>
+        public bool TryAddChild(RowDefinition Row, ColumnDefinition Column, MGElement Item)
+        {
+            if (!CanChangeContent)
+                return false;
+            if (Row == null)
+                throw new ArgumentNullException(nameof(Row));
+            if (Column == null)
+                throw new ArgumentNullException(nameof(Column));
+            if (Item == null)
+                throw new ArgumentNullException(nameof(Item));
+            if (_Children.Contains(Item))
+                throw new InvalidOperationException($"{nameof(MGGrid)} does not support adding the same {nameof(MGElement)} multiple times.");
+
+            if (!ChildrenByRC.TryGetValue(Row, out var RowContent))
+            {
+                RowContent = new Dictionary<ColumnDefinition, List<MGElement>>();
+                ChildrenByRC.Add(Row, RowContent);
+            }
+
+            if (!RowContent.TryGetValue(Column, out var CellContent))
+            {
+                CellContent = new List<MGElement>();
+                RowContent.Add(Column, CellContent);
+            }
+
+            CellContent.Add(Item);
+            ChildCellLookup[Item] = new GridCell(Row, Column);
+
+            _Children.Add(Item);
+            return true;
+        }
+
+        /// <returns>True if the given <paramref name="Item"/> was found in <see cref="MGMultiContentHost.Children"/> and was successfully removed.<br/>
+        /// False otherwise, such as if <see cref="MGContentHost.CanChangeContent"/> is false.</returns>
+        public bool TryRemoveChild(MGElement Item)
+        {
+            if (!CanChangeContent)
+                return false;
+
+            if (_Children.Remove(Item))
+            {
+                GridCell Cell = ChildCellLookup[Item];
+                ChildrenByRC[Cell.Row][Cell.Column].Remove(Item);
+                ChildCellLookup.Remove(Item);
+                return true;
+            }
+            else
+                return false;
+        }
+
+        /// <summary>Removes all elements from every row/column of this grid</summary>
+        public bool TryRemoveAll()
+        {
+            if (!CanChangeContent)
+                return false;
+
+            _Children.Clear();
+            ChildrenByRC.Clear();
+            ChildCellLookup.Clear();
+            return true;
+        }
+
+        public List<MGElement> ClearCellContent(int RowIndex, int ColumnIndex)
+        {
+            if (RowIndex >= 0 && RowIndex < _Rows.Count && ColumnIndex >= 0 && ColumnIndex < _Columns.Count)
+            {
+                RowDefinition Row = _Rows[RowIndex];
+                ColumnDefinition Column = _Columns[ColumnIndex];
+                return ClearCellContent(Row, Column);
+            }
+            else
+                return new List<MGElement>();
+        }
+
+        public List<MGElement> ClearCellContent(RowDefinition Row, ColumnDefinition Column)
+        {
+            if (Row == null)
+                throw new ArgumentNullException(nameof(Row));
+            if (Column == null)
+                throw new ArgumentNullException(nameof(Column));
+
+            List<MGElement> Removed = new();
+            if (!CanChangeContent)
+                return Removed;
+
+            IReadOnlyList<MGElement> CellContent = GetCellContent(Row, Column);
+            foreach (MGElement Element in CellContent)
+            {
+                if (_Children.Remove(Element))
+                {
+                    Removed.Add(Element);
+                    ChildCellLookup.Remove(Element);
+                }
+            }
+
+            if (Removed.Any())
+            {
+                if (Removed.Count == CellContent.Count)
+                    ChildrenByRC[Row].Remove(Column);
+                else
+                {
+#if DEBUG
+                    throw new Exception($"{nameof(MGGrid)}.{nameof(ClearCellContent)}: failed to remove all elements in {Row},{Column}");
+#else
+                    ChildrenByRow[Row][Column].RemoveAll(x => Removed.Contains(x));
+#endif
+                }
+            }
+
+            return Removed;
+        }
+
+        public List<MGElement> ClearColumnContent(int ColumnIndex)
+        {
+            if (ColumnIndex >= 0 && ColumnIndex < _Columns.Count)
+            {
+                ColumnDefinition Column = _Columns[ColumnIndex];
+                return ClearColumnContent(Column);
+            }
+            else
+                return new List<MGElement>();
+        }
+
+        public List<MGElement> ClearColumnContent(ColumnDefinition Column)
+        {
+            if (Column == null)
+                throw new ArgumentNullException(nameof(Column));
+
+            List<MGElement> Removed = new();
+            if (!CanChangeContent)
+                return Removed;
+
+            foreach (RowDefinition Row in Rows)
+            {
+                if (ChildrenByRC.TryGetValue(Row, out Dictionary<ColumnDefinition, List<MGElement>> RowContent) && RowContent.TryGetValue(Column, out List<MGElement> CellContent))
+                {
+                    foreach (MGElement Element in CellContent)
+                    {
+                        if (_Children.Remove(Element))
+                        {
+                            Removed.Add(Element);
+                            ChildCellLookup.Remove(Element);
+                        }
+#if DEBUG
+                        else
+                        {
+                            throw new Exception($"{nameof(MGGrid)}.{nameof(ClearColumnContent)}: failed to remove all elements in {Row},{Column}");
+                        }
+#endif
+                    }
+
+                    ChildrenByRC[Row].Remove(Column);
+                }
+            }
+
+            return Removed;
+        }
+
+        public List<MGElement> ClearRowContent(int RowIndex)
+        {
+            if (RowIndex >= 0 && RowIndex < _Rows.Count)
+            {
+                RowDefinition Row = _Rows[RowIndex];
+                return ClearRowContent(Row);
+            }
+            else
+                return new List<MGElement>();
+        }
+
+        public List<MGElement> ClearRowContent(RowDefinition Row)
+        {
+            if (Row == null)
+                throw new ArgumentNullException(nameof(Row));
+
+            List<MGElement> Removed = new();
+            if (!CanChangeContent)
+                return Removed;
+
+            if (ChildrenByRC.TryGetValue(Row, out Dictionary<ColumnDefinition, List<MGElement>> RowContent))
+            {
+                foreach (var KVP in RowContent)
+                {
+                    ColumnDefinition Column = KVP.Key;
+                    foreach (MGElement Element in KVP.Value)
+                    {
+                        if (_Children.Remove(Element))
+                        {
+                            Removed.Add(Element);
+                            ChildCellLookup.Remove(Element);
+                        }
+#if DEBUG
+                        else
+                        {
+                            throw new Exception($"{nameof(MGGrid)}.{nameof(ClearRowContent)}: failed to remove all elements in {Row},{Column}");
+                        }
+#endif
+                    }
+                }
+
+                ChildrenByRC.Remove(Row);
+            }
+
+            return Removed;
+        }
+        #endregion Elements
+
+        #region Selection
+        private MouseHandler SelectionMouseHandler { get; }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private GridSelectionMode _SelectionMode;
+        public GridSelectionMode SelectionMode
+        {
+            get => _SelectionMode;
+            set
+            {
+                if (_SelectionMode != value)
+                {
+                    _SelectionMode = value;
+                    NPC(nameof(SelectionMode));
+                    CurrentSelection = HasSelection ? CurrentSelection.Value with { SelectionMode = SelectionMode } : CurrentSelection;
+                }
+            }
+        }
+
+        public bool CanDeselectByClickingSelectedCell { get; set; } = true;
+
+        private GridSelection? PreviousSelection = null;
+        public GridSelection? CurrentSelection = null;
+        public bool HasSelection => CurrentSelection.HasValue;
+
+        private void UpdateSelection(Point MousePosition, bool AllowDeselect)
+        {
+            AllowDeselect = AllowDeselect && CanDeselectByClickingSelectedCell;
+
+            Rectangle Viewport = LayoutBounds; // Does this also need to be translated by this.BoundsOffset?
+            if (TryFindParentOfType(out MGScrollViewer SV, false))
+            {
+                //TODO test this logic for ScrollViewers that are nested inside of another ScrollViewer
+                //  It might be: this.BoundsOffset + SV.BoundsOffset; Idk
+                Viewport = SV.ContentViewport.GetTranslated(BoundsOffset - SV.BoundsOffset);
+            }
+
+            GridCell? Cell = null;
+            foreach (var KVP in _CellBounds)
+            {
+                if (KVP.Value.ContainsInclusive(MousePosition) && Viewport.ContainsInclusive(MousePosition))
+                {
+                    Cell = KVP.Key;
+                    break;
+                }
+            }
+
+            if (Cell.HasValue)
+            {
+                bool ClickedExistingSelection = false;
+                if (HasSelection && PreviousSelection.HasValue)
+                {
+                    GridCell PreviousCell = PreviousSelection.Value.Cell;
+                    GridCell CurrentCell = CurrentSelection.Value.Cell;
+                    GridCell ClickedCell = Cell.Value;
+
+                    ClickedExistingSelection = SelectionMode switch
+                    {
+                        GridSelectionMode.None => false,
+                        GridSelectionMode.Row => PreviousCell.Row == ClickedCell.Row && CurrentCell.Row == ClickedCell.Row,
+                        GridSelectionMode.Column => PreviousCell.Column == ClickedCell.Column && CurrentCell.Column == ClickedCell.Column,
+                        GridSelectionMode.Cell => PreviousCell == ClickedCell && CurrentCell == ClickedCell,
+                        _ => throw new NotImplementedException($"Unrecognized {nameof(GridSelectionMode)}: {SelectionMode}")
+                    };
+                }
+
+                if (AllowDeselect && ClickedExistingSelection)
+                    CurrentSelection = null;
+                else
+                    CurrentSelection = new GridSelection(this, Cell.Value, SelectionMode);
+            }
+        }
+
+        public IFillBrush SelectionBackground { get; set; } = MGSolidFillBrush.Yellow * 0.5f;
+        public IFillBrush SelectionOverlay { get; set; } = new MGSolidFillBrush(Color.Yellow * 0.25f);
+        #endregion Selection
+
+        /// <summary>Default value: <see cref="GridLineIntersection.HorizontalThenVertical"/></summary>
+        public GridLineIntersection GridLineIntersectionHandling { get; set; }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private GridLinesVisibility _GridLinesVisibility;
+        /// <summary>Default value: <see cref="GridLinesVisibility.None"/></summary>
+        public GridLinesVisibility GridLinesVisibility
+        {
+            get => _GridLinesVisibility;
+            set
+            {
+                if (_GridLinesVisibility != value)
+                {
+                    _GridLinesVisibility = value;
+                    NPC(nameof(GridLinesVisibility));
+                    CheckIfOuterPaddingChanged();
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _GridLineMargin;
+        /// <summary>The amount of empty space around each gridline.<br/>
+        /// For example: If horizontal gridlines are visible, and <see cref="RowSpacing"/> = 6, and <see cref="GridLineMargin"/> = 1, 
+        /// then the horizontal gridline brush would fill the center 4 pixels of the 6 pixels between each row.<para/>
+        /// This value should be less than half the value of <see cref="RowSpacing"/>/<see cref="ColumnSpacing"/> or else the corresponding gridline brush won't have any space to fill.</summary>
+        public int GridLineMargin
+        {
+            get => _GridLineMargin;
+            set
+            {
+                if (_GridLineMargin != value)
+                {
+                    _GridLineMargin = value;
+                    NPC(nameof(GridLineMargin));
+                    CheckIfOuterPaddingChanged();
+                }
+            }
+        }
+
+        private void CheckIfOuterPaddingChanged()
+        {
+            if (RowSpacing > 0 && GridLineMargin < RowSpacing &&
+                (GridLinesVisibility.HasFlag(GridLinesVisibility.TopEdge) || GridLinesVisibility.HasFlag(GridLinesVisibility.BottomEdge)))
+            {
+                LayoutChanged(this, true);
+            }
+            else if (ColumnSpacing > 0 && GridLineMargin < ColumnSpacing &&
+                (GridLinesVisibility.HasFlag(GridLinesVisibility.LeftEdge) || GridLinesVisibility.HasFlag(GridLinesVisibility.RightEdge)))
+            {
+                LayoutChanged(this, true);
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _RowSpacing;
+        /// <summary>The amount of padding, in pixels, between each consecutive row.<para/>
+        /// Default value: 0<para/>
+        /// If horizontal gridlines are visible, this value should be at least more than twice as large as <see cref="GridLineMargin"/></summary>
+        public int RowSpacing
+        {
+            get => _RowSpacing;
+            set
+            {
+                if (_RowSpacing != value)
+                {
+                    _RowSpacing = value;
+                    NPC(nameof(RowSpacing));
+                    LayoutChanged(this, true);
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _ColumnSpacing;
+        /// <summary>The amount of padding, in pixels, between each consecutive column.<para/>
+        /// Default value: 0<para/>
+        /// If vertical gridlines are visible, this value should be at least more than twice as large as <see cref="GridLineMargin"/></summary>
+        public int ColumnSpacing
+        {
+            get => _ColumnSpacing;
+            set
+            {
+                if (_ColumnSpacing != value)
+                {
+                    _ColumnSpacing = value;
+                    NPC(nameof(ColumnSpacing));
+                    LayoutChanged(this, true);
+                }
+            }
+        }
+
+        public IFillBrush HorizontalGridLineBrush { get; set; }
+        public IFillBrush VerticalGridLineBrush { get; set; }
+
+        public MGGrid(MGWindow Window)
+            : base(Window, MGElementType.Grid)
+        {
+            using (BeginInitializing())
+            {
+                _Columns = new();
+                _Columns.CollectionChanged += (sender, e) =>
+                {
+                    if (e.Action is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Remove or NotifyCollectionChangedAction.Replace or NotifyCollectionChangedAction.Reset)
+                    {
+                        LayoutChanged(this, true);
+                    }
+
+                    if (e.Action is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Replace && e.NewItems != null)
+                    {
+                        foreach (ColumnDefinition Item in e.NewItems)
+                            Item.DimensionsChanged += RowColumn_DimensionsChanged;
+                    }
+
+                    if (e.Action is NotifyCollectionChangedAction.Remove or NotifyCollectionChangedAction.Replace or NotifyCollectionChangedAction.Reset && e.OldItems != null)
+                    {
+                        foreach (ColumnDefinition Item in e.OldItems)
+                            Item.DimensionsChanged -= RowColumn_DimensionsChanged;
+                    }
+                };
+
+                _Rows = new();
+                _Rows.CollectionChanged += (sender, e) =>
+                {
+                    if (e.Action is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Remove or NotifyCollectionChangedAction.Replace or NotifyCollectionChangedAction.Reset)
+                    {
+                        LayoutChanged(this, true);
+                    }
+
+                    if (e.Action is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Replace && e.NewItems != null)
+                    {
+                        foreach (RowDefinition Item in e.NewItems)
+                            Item.DimensionsChanged += RowColumn_DimensionsChanged;
+                    }
+
+                    if (e.Action is NotifyCollectionChangedAction.Remove or NotifyCollectionChangedAction.Replace or NotifyCollectionChangedAction.Reset && e.OldItems != null)
+                    {
+                        foreach (RowDefinition Item in e.OldItems)
+                            Item.DimensionsChanged -= RowColumn_DimensionsChanged;
+                    }
+                };
+
+                RowSpacing = 0;
+                ColumnSpacing = 0;
+
+                GridLineIntersectionHandling = GridLineIntersection.HorizontalThenVertical;
+
+                SelectionMouseHandler = InputTracker.Mouse.CreateHandler(this, null, false, true);
+                SelectionMouseHandler.LMBPressedInside += (sender, e) =>
+                {
+                    if (!ParentWindow.HasModalWindow)
+                    {
+                        PreviousSelection = CurrentSelection;
+                        Point Position = e.AdjustedPosition(this).ToPoint();
+                        UpdateSelection(Position, false);
+                    }
+                };
+                SelectionMouseHandler.LMBReleasedInside += (sender, e) =>
+                {
+                    if (!ParentWindow.HasModalWindow)
+                    {
+                        Point Position = e.AdjustedPosition(this).ToPoint();
+                        UpdateSelection(Position, true);
+                    }
+                };
+
+                OnEndDraw += (sender, e) =>
+                {
+                    //  Draw the selection overlay
+                    if (HasSelection && SelectionOverlay != null)
+                    {
+                        Rectangle? ScissorBounds = e.DA.DT.GD.RasterizerState.ScissorTestEnable ? e.DA.DT.GD.ScissorRectangle : null;
+                        foreach (GridCell Cell in CurrentSelection.Value)
+                        {
+                            if (_CellBounds.TryGetValue(Cell, out Rectangle Bounds))
+                            {
+                                if (ScissorBounds.HasValue && Bounds.GetTranslated(e.DA.Offset).Intersects(ScissorBounds.Value))
+                                    SelectionOverlay.Draw(e.DA, this, Bounds);
+                            }
+                        }
+                    }
+                };
+
+                SelectionMode = GridSelectionMode.None;
+                CurrentSelection = null;
+
+                Window.OnWindowPositionChanged += (sender, e) =>
+                {
+                    Point Offset = new(e.NewValue.Left - e.PreviousValue.Left, e.NewValue.Top - e.PreviousValue.Top);
+                    foreach (ColumnDefinition Column in Columns)
+                        Column.Left += Offset.X;
+                    foreach (RowDefinition Row in Rows)
+                        Row.Top += Offset.Y;
+                    foreach (var KVP in _CellBounds.ToList())
+                        _CellBounds[KVP.Key] = KVP.Value.GetTranslated(Offset);
+                };
+            }
+        }
+
+        private void RowColumn_DimensionsChanged(object sender, EventArgs e) => LayoutChanged(this, true);
+
+        public override void UpdateSelf(ElementUpdateArgs UA)
+        {
+            if (UA.IsHitTestVisible)
+            {
+                SelectionMouseHandler.ManualUpdate();
+            }
+
+            base.UpdateSelf(UA);
+        }
+
+        private readonly record struct GridDimensions(Dictionary<ColumnDefinition, int> ColumnWidths, Dictionary<RowDefinition, int> RowHeights, int TotalWidth, int TotalHeight);
+
+        /// <param name="IsMeasuring">True if measuring the grid's content (will result in * lengths being treated as Auto, so that this method can compute the minimally-required dimensions to show the content).<br/>
+        /// False if the bounds of this element have already been allocated (will allow * lengths to stretch all available space)</param>
+        private GridDimensions ComputeDimensions(Size AvailableSize, bool IsMeasuring)
+        {
+            Dictionary<ColumnDefinition, int> ColumnWidths = new();
+            Dictionary<RowDefinition, int> RowHeights = new();
+
+            //  If Width or Height is arbitrarily large, this element is being measured within a ScrollViewer.
+            //  Which means we can't just request all the AvailableSize, or we'd end up with infinitely-sized content inside the ScrollViewer.
+            bool IsPseudoInfiniteWidth = AvailableSize.Width >= 1000000;
+            bool IsPseduoInfiniteHeight = AvailableSize.Height >= 1000000;
+
+            double TotalColumnWeight = Columns.Select(x => x.Length).Where(x => x.IsWeightedLength).Sum(x => x.Weight);
+            double RemainingColumnWeight = TotalColumnWeight;
+            double TotalRowWeight = Rows.Select(x => x.Length).Where(x => x.IsWeightedLength).Sum(x => x.Weight);
+            double RemainingRowWeight = TotalRowWeight;
+
+            int TotalColumnSpacingWidth = (Columns.Count - 1) * ColumnSpacing;
+            if (GridLinesVisibility.HasFlag(GridLinesVisibility.LeftEdge))
+                TotalColumnSpacingWidth += Math.Max(0, ColumnSpacing - GridLineMargin);
+            if (GridLinesVisibility.HasFlag(GridLinesVisibility.RightEdge))
+                TotalColumnSpacingWidth += Math.Max(0, ColumnSpacing - GridLineMargin);
+
+            int TotalRowSpacingHeight = (Rows.Count - 1) * RowSpacing;
+            if (GridLinesVisibility.HasFlag(GridLinesVisibility.TopEdge))
+                TotalRowSpacingHeight += Math.Max(0, RowSpacing - GridLineMargin);
+            if (GridLinesVisibility.HasFlag(GridLinesVisibility.BottomEdge))
+                TotalRowSpacingHeight += Math.Max(0, RowSpacing - GridLineMargin);
+
+            //  Fill in the trivial column measurements where we know exactly how wide they are
+            int TotalWidth = TotalColumnSpacingWidth;
+            int RemainingColumnWidth = Math.Max(0, AvailableSize.Width - TotalColumnSpacingWidth);
+            foreach (ColumnDefinition Column in Columns)
+            {
+                int? ColumnWidth = null;
+                if (Column.Length.IsPixelLength)
+                    ColumnWidth = Column.Length.Pixels;
+                else if (Column.MinWidth.HasValue && Column.MaxWidth.HasValue && Column.MinWidth == Column.MaxWidth)
+                    ColumnWidth = Column.MinWidth.Value;
+
+                if (ColumnWidth.HasValue)
+                {
+                    int Width = GeneralUtils.Min(RemainingColumnWidth, ColumnWidth.Value, Column.MaxWidth ?? int.MaxValue);
+                    ColumnWidths.Add(Column, Width);
+                    TotalWidth += Width;
+                    RemainingColumnWidth -= Width;
+                }
+            }
+
+            //  Fill in the trival row measurements where we know exactly how tall they are
+            int TotalHeight = TotalRowSpacingHeight;
+            int RemainingRowHeight = Math.Max(0, AvailableSize.Height - TotalRowSpacingHeight);
+            foreach (RowDefinition Row in Rows)
+            {
+                int? RowHeight = null;
+                if (Row.Length.IsPixelLength)
+                    RowHeight = Row.Length.Pixels;
+                else if (Row.MinHeight.HasValue && Row.MaxHeight.HasValue && Row.MinHeight == Row.MaxHeight)
+                    RowHeight = Row.MinHeight.Value;
+
+                if (RowHeight.HasValue)
+                {
+                    int Height = GeneralUtils.Min(RemainingRowHeight, RowHeight.Value, Row.MaxHeight ?? int.MaxValue);
+                    RowHeights.Add(Row, Height);
+                    TotalHeight += Height;
+                    RemainingRowHeight -= Height;
+                }
+            }
+
+            //  Measure every remaining column, starting with Auto-length columns
+            IEnumerable<ColumnDefinition> RemainingColumns = Columns
+                .Where(x => !ColumnWidths.ContainsKey(x))
+                .OrderBy(x => x.Length.IsAutoLength || IsPseudoInfiniteWidth ? 0 : 1)
+                .ThenBy(x => x.MaxWidth.HasValue ? 0 : 1); // Try to handle columns with a MaxWidth first because if the column's width gets truncated, it might free up more width for the next weighted column to use
+            foreach (ColumnDefinition Column in RemainingColumns)
+            {
+                int ColumnWidth;
+                if (RemainingColumnWidth <= 0)
+                    ColumnWidth = 0;
+                else if (Column.MinWidth.HasValue && RemainingColumnWidth <= Column.MinWidth.Value)
+                    ColumnWidth = Column.MinWidth.Value;
+                else
+                {
+                    bool IsWeightedWidth = Column.Length.IsWeightedLength && !IsPseudoInfiniteWidth; // If measured inside a scrollviewer, * lengths are treated as Auto
+                    if (IsWeightedWidth && !IsMeasuring)
+                    {
+                        double ColumnWeight = Column.Length.Weight;
+#if DEBUG
+                        if (ColumnWeight > RemainingColumnWeight)
+                            throw new InvalidOperationException("Column weight should not exceed remaining weight");
+#endif
+                        ColumnWidth = Math.Clamp((int)(RemainingColumnWidth * (ColumnWeight / RemainingColumnWeight)), Column.MinWidth ?? 0, Column.MaxWidth ?? int.MaxValue);
+                        RemainingColumnWeight -= ColumnWeight;
+                    }
+                    else
+                    {
+                        //  Measure every element in this column and take the maximum width
+                        List<int> ColumnChildWidths = new();
+                        foreach (RowDefinition Row in Rows)
+                        {
+                            if (!RowHeights.TryGetValue(Row, out int RowHeight))
+                                RowHeight = RemainingRowHeight; // Lazy 'solution' because I'm too dumb to come up with the actual correct logic that avoids circular dependencies...
+
+                            Size CellAvailableSize = new(RemainingColumnWidth, RowHeight);
+                            foreach (MGElement Element in GetCellContent(Row, Column))
+                            {
+                                Element.UpdateMeasurement(CellAvailableSize, out _, out Thickness ElementSize, out _, out _);
+                                ColumnChildWidths.Add(ElementSize.Size.Width);
+                            }
+                        }
+
+                        ColumnWidth = Math.Max(Column.MinWidth ?? 0, ColumnChildWidths.DefaultIfEmpty(0).Max());
+                    }
+                }
+
+                ColumnWidth = GeneralUtils.Min(RemainingColumnWidth, ColumnWidth, Column.MaxWidth ?? int.MaxValue);
+                ColumnWidths.Add(Column, ColumnWidth);
+                TotalWidth += ColumnWidth;
+                RemainingColumnWidth -= ColumnWidth;
+            }
+
+            //  Measure every remaining row, starting with Auto-length rows
+            IEnumerable<RowDefinition> RemainingRows = Rows
+                .Where(x => !RowHeights.ContainsKey(x))
+                .OrderBy(x => x.Length.IsAutoLength || IsPseduoInfiniteHeight ? 0 : 1)
+                .ThenBy(x => x.MaxHeight.HasValue ? 0 : 1); // Try to handle rows with a MaxHeight first because if the row's height gets truncated, it might free up more height for the next weighted row to use
+            foreach (RowDefinition Row in RemainingRows)
+            {
+                int RowHeight;
+                if (RemainingRowHeight <= 0)
+                    RowHeight = 0;
+                else if (Row.MinHeight.HasValue && RemainingRowHeight <= Row.MinHeight.Value)
+                    RowHeight = Row.MinHeight.Value;
+                else
+                {
+                    bool IsWeightedHeight = Row.Length.IsWeightedLength && !IsPseduoInfiniteHeight; // If measured inside a scrollviewer, * lengths are treated as Auto
+                    if (IsWeightedHeight && !IsMeasuring)
+                    {
+                        double RowWeight = Row.Length.Weight;
+#if DEBUG
+                        if (RowWeight > RemainingRowWeight)
+                            throw new InvalidOperationException("Row weight should not exceed remaining weight");
+#endif
+                        RowHeight = Math.Clamp((int)(RemainingRowHeight * (RowWeight / RemainingRowWeight)), Row.MinHeight ?? 0, Row.MaxHeight ?? int.MaxValue);
+                        RemainingRowWeight -= RowWeight;
+                    }
+                    else
+                    {
+                        //  Measure every element in this row and take the maximum height
+                        List<int> RowChildHeights = new();
+                        foreach (ColumnDefinition Column in Columns)
+                        {
+                            int ColumnWidth = ColumnWidths[Column];
+
+                            Size CellAvailableSize = new(ColumnWidth, RemainingRowHeight);
+                            foreach (MGElement Element in GetCellContent(Row, Column))
+                            {
+                                Element.UpdateMeasurement(CellAvailableSize, out _, out Thickness ElementSize, out _, out _);
+                                RowChildHeights.Add(ElementSize.Size.Height);
+                            }
+                        }
+
+                        RowHeight = Math.Max(Row.MinHeight ?? 0, RowChildHeights.DefaultIfEmpty(0).Max());
+                    }
+                }
+
+                RowHeight = GeneralUtils.Min(RemainingRowHeight, RowHeight, Row.MaxHeight ?? int.MaxValue);
+                RowHeights.Add(Row, RowHeight);
+                TotalHeight += RowHeight;
+                RemainingRowHeight -= RowHeight;
+            }
+
+            return new GridDimensions(ColumnWidths, RowHeights, TotalWidth, TotalHeight);
+        }
+
+        protected override Thickness UpdateContentMeasurement(Size AvailableSize)
+        {
+            if (!HasContent)
+                return UpdateContentMeasurementBaseImplementation(AvailableSize);
+
+            GridDimensions Dimensions = ComputeDimensions(AvailableSize, true);
+            return new Thickness(Dimensions.TotalWidth, Dimensions.TotalHeight, 0, 0);
+        }
+
+        protected override void UpdateContentLayout(Rectangle Bounds)
+        {
+            Size AvailableSize = new(Bounds.Width, Bounds.Height);
+
+            GridDimensions Dimensions = ComputeDimensions(AvailableSize, false);
+            Dictionary<ColumnDefinition, int> ColumnWidths = Dimensions.ColumnWidths;
+            Dictionary<RowDefinition, int> RowHeights = Dimensions.RowHeights;
+            Size TotalContentSize = new(Dimensions.TotalWidth, Dimensions.TotalHeight);
+
+            //  Account for content alignment
+            int ConsumedWidth = HorizontalContentAlignment == HorizontalAlignment.Stretch ? AvailableSize.Width : Math.Min(AvailableSize.Width, TotalContentSize.Width);
+            Size ConsumedContentSize = new(ConsumedWidth, TotalContentSize.Height);
+            Rectangle AlignedBounds = ApplyAlignment(Bounds, HorizontalContentAlignment, VerticalContentAlignment, ConsumedContentSize);
+
+            int CurrentX = AlignedBounds.Left;
+            if (GridLinesVisibility.HasFlag(GridLinesVisibility.LeftEdge))
+                CurrentX += Math.Max(0, ColumnSpacing - GridLineMargin);
+
+            //  Allocate space for each child
+            foreach (ColumnDefinition Column in Columns)
+            {
+                int ColumnWidth = ColumnWidths[Column];
+                Column.Left = CurrentX;
+                Column.Width = ColumnWidth;
+
+                int CurrentY = AlignedBounds.Top;
+                if (GridLinesVisibility.HasFlag(GridLinesVisibility.TopEdge))
+                    CurrentY += Math.Max(0, RowSpacing - GridLineMargin);
+
+                foreach (RowDefinition Row in Rows)
+                {
+                    int RowHeight = RowHeights[Row];
+                    Row.Top = CurrentY;
+                    Row.Height = RowHeight;
+
+                    Rectangle CellBounds = Rectangle.Intersect(Bounds, new(CurrentX, CurrentY, ColumnWidth, RowHeight));
+                    foreach (MGElement Child in GetCellContent(Row, Column))
+                    {
+                        Child.UpdateLayout(CellBounds);
+                    }
+
+                    CurrentY += RowHeight + RowSpacing;
+                }
+
+                CurrentX += ColumnWidth + ColumnSpacing;
+            }
+
+            _CellBounds = GetCellBounds(false);
+        }
+
+        public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
+        {
+            //  Draw the selection background
+            if (HasSelection && SelectionBackground != null)
+            {
+                Rectangle? ScissorBounds = DA.DT.GD.RasterizerState.ScissorTestEnable ? DA.DT.GD.ScissorRectangle : null;
+                foreach (GridCell Cell in CurrentSelection.Value)
+                {
+                    if (_CellBounds.TryGetValue(Cell, out Rectangle Bounds))
+                    {
+                        if (ScissorBounds.HasValue && Bounds.GetTranslated(DA.Offset).Intersects(ScissorBounds.Value))
+                            SelectionBackground.Draw(DA, this, Bounds);
+                    }
+                }
+            }
+
+            bool HasHorizontalGridLines = (GridLinesVisibility & GridLinesVisibility.AllHorizontal) != 0;
+            bool HasVerticalGridLines = (GridLinesVisibility & GridLinesVisibility.AllVertical) != 0;
+
+            if (HasHorizontalGridLines && HasVerticalGridLines)
+            {
+                if (GridLineIntersectionHandling == GridLineIntersection.HorizontalThenVertical)
+                {
+                    DrawHorizontalGridLines(DA, LayoutBounds);
+                    DrawVerticalGridLines(DA, LayoutBounds);
+                }
+                else if (GridLineIntersectionHandling == GridLineIntersection.VerticalThenHorizontal)
+                {
+                    DrawVerticalGridLines(DA, LayoutBounds);
+                    DrawHorizontalGridLines(DA, LayoutBounds);
+                }
+                else
+                {
+                    throw new NotImplementedException($"Unrecognized {nameof(GridLineIntersection)}: {GridLineIntersectionHandling}");
+                }
+            }
+            else if (HasHorizontalGridLines)
+                DrawHorizontalGridLines(DA, LayoutBounds);
+            else if (HasVerticalGridLines)
+                DrawVerticalGridLines(DA, LayoutBounds);
+        }
+
+        private void DrawHorizontalGridLines(ElementDrawArgs DA, Rectangle LayoutBounds)
+        {
+            if (DA.Opacity <= 0 || DA.Opacity.IsAlmostZero() || HorizontalGridLineBrush == null || Rows.Count == 0)
+                return;
+
+            int FilledHeight = RowSpacing - GridLineMargin * 2;
+
+            if (GridLinesVisibility.HasFlag(GridLinesVisibility.TopEdge))
+            {
+                Rectangle TopGridLineBounds = new(LayoutBounds.Left, LayoutBounds.Top, LayoutBounds.Width, FilledHeight);
+                HorizontalGridLineBrush.Draw(DA, this, TopGridLineBounds);
+            }
+
+            if (GridLinesVisibility.HasFlag(GridLinesVisibility.BottomEdge))
+            {
+                Rectangle BottomGridLineBounds = new(LayoutBounds.Left, LayoutBounds.Bottom - FilledHeight, LayoutBounds.Width, FilledHeight);
+                HorizontalGridLineBrush.Draw(DA, this, BottomGridLineBounds);
+            }
+
+            if (GridLinesVisibility.HasFlag(GridLinesVisibility.InnerHorizontal))
+            {
+                for (int i = 0; i < Rows.Count; i++)
+                {
+                    RowDefinition Row = Rows[i];
+
+                    if (i != Rows.Count - 1)
+                    {
+                        Rectangle GridLineBounds = new(LayoutBounds.Left, Row.Top + Row.Height + GridLineMargin, LayoutBounds.Width, FilledHeight);
+                        HorizontalGridLineBrush.Draw(DA, this, GridLineBounds);
+                    }
+                }
+            }
+        }
+
+        private void DrawVerticalGridLines(ElementDrawArgs DA, Rectangle LayoutBounds)
+        {
+            if (DA.Opacity <= 0 || DA.Opacity.IsAlmostZero() || VerticalGridLineBrush == null || Columns.Count == 0)
+                return;
+
+            int FilledWidth = ColumnSpacing - GridLineMargin * 2;
+
+            if (GridLinesVisibility.HasFlag(GridLinesVisibility.LeftEdge))
+            {
+                Rectangle LeftGridLineBounds = new(LayoutBounds.Left, LayoutBounds.Top, FilledWidth, LayoutBounds.Height);
+                VerticalGridLineBrush.Draw(DA, this, LeftGridLineBounds);
+            }
+
+            if (GridLinesVisibility.HasFlag(GridLinesVisibility.RightEdge))
+            {
+                Rectangle RightGridLineBounds = new(LayoutBounds.Right - FilledWidth, LayoutBounds.Top, FilledWidth, LayoutBounds.Height);
+                VerticalGridLineBrush.Draw(DA, this, RightGridLineBounds);
+            }
+
+            if (GridLinesVisibility.HasFlag(GridLinesVisibility.InnerVertical))
+            {
+                for (int i = 0; i < Columns.Count; i++)
+                {
+                    ColumnDefinition Column = Columns[i];
+
+                    if (i != Columns.Count - 1)
+                    {
+                        Rectangle GridLineBounds = new(Column.Left + Column.Width + GridLineMargin, LayoutBounds.Top, FilledWidth, LayoutBounds.Height);
+                        VerticalGridLineBrush.Draw(DA, this, GridLineBounds);
+                    }
+                }
+            }
+        }
+    }
+}
