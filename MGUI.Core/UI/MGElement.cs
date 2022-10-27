@@ -95,7 +95,7 @@ namespace MGUI.Core.UI
     //      which is used by the XAMLParser (instead of passing in the dictionary to XAMLParser.Parse, XAMLParser.Parse retrieves it from MGDesktop)
     //          actually dont even need it as parameter. XAMLImage can retrieve it from Window.GetDesktop().NamedTextures
     //      maybe it actually stores some record struct like TextureRegion (Texture2D, Rectangle? SourceRect)
-    //      TextureRegion could even be wrapped in another struct: TextureTargetedRegion(TextureRegion, Size? DestinationSize) idk
+    //      TextureRegion could even be wrapped in another struct: TextureTargetedRegion(TextureRegion, Size? DestinationSize) idk Color?
     //
     //Add support for in-line images in TextBlocks? Uses the NamedTextures to retrieve and draw them. Markup could be:
     //      "Hello World [img=Name Width Height SourceRect]" such as: "Hello World [img=HelloImg 16 16 50 50 16 16]" means we take the sourcerect of 50,50->66,66, draw it with size=16,16
@@ -109,8 +109,6 @@ namespace MGUI.Core.UI
     //maybe AttachedElement, has MGElement Element, MGElement Host, handles things like updating layout when host updates layout, handles drawing self when host ends draw etc
     //		could even be like component, with updatepriority/drawpriority
     //
-    //window title bar could also have minimize and maximize buttons?
-    //      instead of docking close button to right, dock a stackpanel to right with the close button inside it
     //
     //Themes?
     //ThemeDefinition
@@ -156,6 +154,7 @@ namespace MGUI.Core.UI
         public string UniqueId { get; }
 
 		public MGDesktop GetDesktop() => SelfOrParentWindow.Desktop;
+        public MGTheme GetTheme() => GetDesktop().Theme;
 
 		/// <summary>The <see cref="MGWindow"/> that this <see cref="MGElement"/> belongs to. This value is only null if this <see cref="MGElement"/> is an <see cref="MGWindow"/> with no parent.</summary>
 		public MGWindow ParentWindow { get; }
@@ -742,15 +741,15 @@ namespace MGUI.Core.UI
 
 		}
 
-        protected MGElement(MGDesktop UI, MGWindow ParentWindow, MGElementType ElementType)
+        protected MGElement(MGDesktop Desktop, MGWindow ParentWindow, MGElementType ElementType)
 		{
 			this.InitializationManager = new(() => { LayoutChanged(this, true); });
 			using (BeginInitializing())
 			{
 				this.UniqueId = Guid.NewGuid().ToString();
 
-                this.MouseHandler = UI.InputTracker.Mouse.CreateHandler(this, null);
-                this.KeyboardHandler = UI.InputTracker.Keyboard.CreateHandler(this, null);
+                this.MouseHandler = Desktop.InputTracker.Mouse.CreateHandler(this, null);
+                this.KeyboardHandler = Desktop.InputTracker.Keyboard.CreateHandler(this, null);
 
                 this.ParentWindow = ParentWindow;
 				this.ElementType = ElementType;
@@ -763,9 +762,9 @@ namespace MGUI.Core.UI
 				this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
 				this.VerticalContentAlignment = VerticalAlignment.Stretch;
 
-                this.BackgroundBrush = new(null);
+                this.BackgroundBrush = Desktop.Theme.GetBackgroundBrush(ElementType);
 
-				this.Visibility = Visibility.Visible;
+                this.Visibility = Visibility.Visible;
                 this.IsEnabled = true;
                 this.IsSelected = false;
 				this.IsHitTestVisible = true;

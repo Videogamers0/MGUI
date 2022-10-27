@@ -215,7 +215,7 @@ namespace MGUI.Core.UI
 
         public MGContextMenuSeparator AddSeparator(int Height = 4)
         {
-            MGContextMenuSeparator Separator = new(this, Height, MGSolidFillBrush.SemiBlack);
+            MGContextMenuSeparator Separator = new(this, Height);
             _Items.Add(Separator);
             return Separator;
         }
@@ -468,7 +468,6 @@ namespace MGUI.Core.UI
                 this.Padding = new(1);
                 this.BorderBrush = MGUniformBorderBrush.Gray;
                 this.BorderThickness = new(1);
-                this.BackgroundBrush = new VisualStateBrush(new MGSolidFillBrush(new Color(233, 238, 255))); //MGSolidFillBrush.White;
                 this.DefaultTextForeground = Color.Black;
 
                 this.IsUserResizable = false;
@@ -555,7 +554,7 @@ namespace MGUI.Core.UI
                     Button.HorizontalAlignment = HorizontalAlignment.Stretch;
                     Button.VerticalAlignment = VerticalAlignment.Stretch;
 
-                    Button.BackgroundBrush = new(null, new Color(165, 230, 255)); // Color.LightSkyBlue
+                    Button.BackgroundBrush = GetTheme().GetDropdownItemBackgroundBrush();
                     Button.DefaultTextForeground = null;
 
                     //Button.HoveredItemForeground = new(40, 40, 40);

@@ -124,7 +124,6 @@ namespace MGUI.Core.UI
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
 
-                this.BackgroundBrush = new VisualStateBrush(VisualStateBrush.DefaultNormalBackground, VisualStateBrush.DefaultSelectedBackground, VisualStateBrush.DefaultNormalBackground, VisualStateBrush.DefaultHoveredColor); ;
                 this.UseAlternateTextForegroundWhenChecked = true;
                 this.CheckedTextForeground = Color.LightGray;
 

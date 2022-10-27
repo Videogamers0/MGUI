@@ -277,7 +277,7 @@ namespace MGUI.Core.UI
                 HeaderGrid.GridLineMargin = GridLineMargin;
                 HeaderGrid.HorizontalGridLineBrush = GridLineBrush;
                 HeaderGrid.VerticalGridLineBrush = GridLineBrush;
-                HeaderGrid.BackgroundBrush = new VisualStateBrush(MGSolidFillBrush.SemiBlack);
+                HeaderGrid.BackgroundBrush = GetTheme().GetTitleBackgroundBrush();
                 HeaderGrid.DefaultTextForeground = Color.White;
                 HeaderGrid.CanChangeContent = false;
 
@@ -309,7 +309,6 @@ namespace MGUI.Core.UI
                 DockPanelElement.ComponentParent = this;
 
                 this.VerticalAlignment = VerticalAlignment.Top;
-                this.BackgroundBrush = new VisualStateBrush(MGSolidFillBrush.White);
 
                 this.RowHeight = null;
                 this.RowLength = GridLength.Auto;

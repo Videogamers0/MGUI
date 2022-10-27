@@ -63,7 +63,6 @@ namespace MGUI.Core.UI
                 this.Orientation = Orientation;
                 this.Margin = AutoMargin;
                 this.Size = Size;
-                this.BackgroundBrush = new VisualStateBrush(MGSolidFillBrush.Black);
             }
         }
 

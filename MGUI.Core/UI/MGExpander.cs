@@ -210,7 +210,6 @@ namespace MGUI.Core.UI
 
                 this.ExpanderToggleButton = new(Window, IsExpanded);
                 ExpanderToggleButton.VerticalAlignment = VerticalAlignment.Center;
-                ExpanderToggleButton.BackgroundBrush = new(VisualStateBrush.DefaultNormalBackground, VisualStateBrush.DefaultHoveredColor);
                 ExpanderToggleButton.ComponentParent = this;
 
                 this.ExpanderButtonSize = DefaultExpanderButtonSize;

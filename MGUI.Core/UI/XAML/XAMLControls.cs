@@ -612,7 +612,7 @@ namespace MGUI.Core.UI.XAML
         public bool? AcceptsMouseScrollWheel { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures)
-            => new MGSlider(Window, Minimum ?? 0, Maximum ?? 100, Value ?? Minimum ?? 0, DrawTicks ?? false, TickFrequency, Orientation ?? UI.Orientation.Horizontal);
+            => new MGSlider(Window, Minimum ?? 0, Maximum ?? 100, Value ?? Minimum ?? 0);
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
         {
@@ -764,7 +764,8 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLTabControl : XAMLMultiContentHost
+    [ContentProperty(nameof(Tabs))]
+    public class XAMLTabControl : XAMLElement
     {
         public XAMLBorder Border { get; set; } = new();
 
@@ -781,6 +782,8 @@ namespace MGUI.Core.UI.XAML
         public XAMLStackPanel HeadersPanel { get; set; } = new();
         public XAMLFillBrush HeaderAreaBackground { get; set; }
 
+        public List<XAMLTabItem> Tabs { get; set; } = new();
+
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGTabControl(Window);
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
@@ -791,6 +794,13 @@ namespace MGUI.Core.UI.XAML
 
             if (HeaderAreaBackground != null)
                 TabControl.HeaderAreaBackground.NormalValue = HeaderAreaBackground.ToFillBrush();
+
+            foreach (XAMLTabItem Child in Tabs)
+            {
+                MGElement Header = Child.HeaderContent?.ToElement<MGElement>(TabControl.ParentWindow, TabControl, NamedTextures);
+                MGElement Content = Child.Content?.ToElement<MGElement>(TabControl.ParentWindow, TabControl, NamedTextures);
+                TabControl.AddTab(Header, Content);
+            }
         }
     }
 

@@ -177,9 +177,9 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
-                this.HoveredHighlightColor = Color.White * 0.4f;
+                this.HoveredHighlightColor = GetTheme().HoveredColor * 2;
                 this.PressedBrightenIntensity = 0.2f;
-                this.Foreground = Color.Black;
+                this.Foreground = GetTheme().ResizeGripForeground;
 
                 this.Margin = new(2);
 

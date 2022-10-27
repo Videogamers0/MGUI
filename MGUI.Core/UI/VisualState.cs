@@ -85,21 +85,11 @@ namespace MGUI.Core.UI
     /// <summary>A container class for multiple <see cref="IFillBrush"/>es, where a specific one is chosen based on an <see cref="MGElement"/>'s <see cref="VisualState"/></summary>
     public class VisualStateBrush : VisualStateSetting<IFillBrush>
     {
-        /// <summary>The default background brush to use on clickable controls like <see cref="MGButton"/>, <see cref="MGToggleButton"/>, <see cref="MGComboBox{TItemType}"/><br/>
-        /// when their <see cref="PrimaryVisualState"/> is <see cref="PrimaryVisualState.Normal"/></summary>
-        public static IFillBrush DefaultNormalBackground = MGSolidFillBrush.LightGray;
-
-        public static IFillBrush DefaultSelectedBackground = Color.Green.AsFillBrush();
-
-        public static Color DefaultHoveredColor = Color.White * 0.18f;
-        public static float DefaultPressedDarkenModifier = 0.06f;
-        public static float DefaultPressedBrightenModifier = 0.06f;
-
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Color? _HoveredColor;
         /// <summary>An overlay color that is drawn overtop of <see cref="IFillBrush"/> if the mouse is currently hovering the <see cref="MGElement"/>.<br/>
         /// Recommended to use a transparent color.<para/>
-        /// Default Value: <see cref="DefaultHoveredColor"/></summary>
+        /// Default Value: <see cref="MGTheme.HoveredColor"/></summary>
         public Color? HoveredColor
         {
             get => _HoveredColor;
@@ -119,7 +109,7 @@ namespace MGUI.Core.UI
         private float _PressedModifier;
         /// <summary>A percentage to darken or brighten (depending on <see cref="PressedModifierType"/>) the <see cref="HoveredColor"/> by 
         /// when the mouse is currently pressed, but not yet released, overtop of the <see cref="MGElement"/>.<br/>
-        /// Default value: <see cref="DefaultPressedDarkenModifier"/></summary>
+        /// Default value: <see cref="MGTheme.PressedDarkenModifier"/></summary>
         public float PressedModifier
         {
             get => _PressedModifier;
@@ -209,24 +199,34 @@ namespace MGUI.Core.UI
             };
 
         /// <param name="Brush">See also: <see cref="MGSolidFillBrush"/>, <see cref="MGCompositedFillBrush"/>, <see cref="MGTextureFillBrush"/>, <see cref="MGGradientFillBrush"/>, <see cref="MGDiagonalGradientFillBrush"/></param>
-        public VisualStateBrush(IFillBrush Brush)
-            : this(Brush, null) { }
+        public VisualStateBrush(MGTheme Theme, IFillBrush Brush)
+            : this(Theme, Brush, null) { }
 
         /// <param name="Brush">See also: <see cref="MGSolidFillBrush"/>, <see cref="MGCompositedFillBrush"/>, <see cref="MGTextureFillBrush"/>, <see cref="MGGradientFillBrush"/>, <see cref="MGDiagonalGradientFillBrush"/></param>
-        public VisualStateBrush(IFillBrush Brush, Color? HoveredColor)
-            : this(Brush, Brush, Brush, HoveredColor) { }
+        public VisualStateBrush(MGTheme Theme, IFillBrush Brush, Color? HoveredColor)
+            : this(Theme, Brush, Brush, Brush, HoveredColor) { }
 
-        public VisualStateBrush(IFillBrush NormalBrush, IFillBrush SelectedBrush, IFillBrush DisabledBrush, Color? HoveredColor)
+        public VisualStateBrush(MGTheme Theme, IFillBrush NormalBrush, IFillBrush SelectedBrush, IFillBrush DisabledBrush, Color? HoveredColor)
             : base(NormalBrush, SelectedBrush, DisabledBrush)
         {
             this.HoveredColor = HoveredColor;
             this.PressedModifierType = PressedModifierType.Darken;
             this.PressedModifier = PressedModifierType switch
             {
-                PressedModifierType.Darken => DefaultPressedDarkenModifier,
-                PressedModifierType.Brighten => DefaultPressedBrightenModifier,
+                PressedModifierType.Darken => Theme.PressedDarkenModifier,
+                PressedModifierType.Brighten => Theme.PressedBrightenModifier,
                 _ => throw new NotImplementedException($"Unrecognized {nameof(PressedModifierType)}: {PressedModifierType}")
             };
         }
+
+        private VisualStateBrush(VisualStateBrush InheritFrom)
+            : base(InheritFrom.NormalValue, InheritFrom.SelectedValue, InheritFrom.DisabledValue)
+        {
+            this.HoveredColor = InheritFrom.HoveredColor;
+            this.PressedModifierType = InheritFrom._PressedModifierType;
+            this.PressedModifier = InheritFrom.PressedModifier;
+        }
+
+        public VisualStateBrush GetCopy() => new(this);
     }
 }

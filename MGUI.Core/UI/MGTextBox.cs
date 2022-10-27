@@ -815,7 +815,6 @@ namespace MGUI.Core.UI
                 this.TextRenderInfo = new(this, TextBlockElement);
 
                 this.Padding = new(6, 2, 6, 2);
-                this.BackgroundBrush = new VisualStateBrush(VisualStateBrush.DefaultNormalBackground, VisualStateBrush.DefaultHoveredColor * 0.4f) { PressedModifier = 0f };
 
                 this.MinHeight = 26;
 

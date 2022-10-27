@@ -427,8 +427,6 @@ namespace MGUI.Core.UI
                     e.DA.DT.FillPolygon(e.DA.Offset.ToVector2(), ArrowVertices, this.DropdownArrowColor * e.DA.Opacity);
                 };
 
-                this.BackgroundBrush = new(VisualStateBrush.DefaultNormalBackground, VisualStateBrush.DefaultHoveredColor);
-
                 this.HorizontalContentAlignment = HorizontalAlignment.Center;
                 this.VerticalContentAlignment = VerticalAlignment.Center;
                 this.Padding = new(4, 2, 4, 2);
@@ -465,7 +463,7 @@ namespace MGUI.Core.UI
 
                 Dropdown.BorderThickness = new(1);
                 Dropdown.BorderBrush = MGUniformBorderBrush.Gray;
-                Dropdown.BackgroundBrush = new(MGSolidFillBrush.White);
+                Dropdown.BackgroundBrush = GetTheme().GetComboBoxDropdownBackgroundBrush();
                 Dropdown.Padding = new(0);
 
                 DropdownSP = new(Dropdown, Orientation.Vertical);
@@ -485,7 +483,7 @@ namespace MGUI.Core.UI
                     MGButton Button = new(Dropdown, new(0), null);
                     Button.Padding = DefaultDropdownItemPadding;
                     Button.Margin = 0;
-                    Button.BackgroundBrush = new(null, (Color.Yellow * 0.65f).AsFillBrush(), null, Color.LightBlue * 0.8f);
+                    Button.BackgroundBrush = GetTheme().GetDropdownItemBackgroundBrush();
                     Button.HorizontalAlignment = HorizontalAlignment.Stretch;
                     Button.HorizontalContentAlignment = HorizontalAlignment.Left;
                     Button.VerticalAlignment = VerticalAlignment.Stretch;

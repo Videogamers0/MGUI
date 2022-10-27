@@ -54,8 +54,6 @@ namespace MGUI.Core.UI
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
 
-                this.BackgroundBrush = new(VisualStateBrush.DefaultNormalBackground, VisualStateBrush.DefaultHoveredColor);
-
                 this.HorizontalContentAlignment = HorizontalAlignment.Center;
                 this.VerticalContentAlignment = VerticalAlignment.Center;
                 this.Padding = new(4,2,4,2);

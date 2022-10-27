@@ -506,49 +506,42 @@ namespace MGUI.Core.UI
 
         //TODO maybe add an option to show the value in a bordered textblock to the right of the slider portion?
 
-        public MGSlider(MGWindow Window, float Minimum, float Maximum, float Value, bool DrawTicks, float? TickFrequency, Orientation Orientation)
-            : this(Window, Minimum, Maximum, Value, DrawTicks, TickFrequency, VisualStateBrush.DefaultNormalBackground, MGUniformBorderBrush.Black, 
-                  ((MGSolidFillBrush)VisualStateBrush.DefaultNormalBackground).Color.Darken(0.1f).AsFillBrush(), MGUniformBorderBrush.Black, Orientation) { }
+        public MGSlider(MGWindow Window, float Minimum, float Maximum, float Value)
+            : this(Window, Minimum, Maximum, Value, false, null, MGUniformBorderBrush.Black, Orientation.Horizontal) { }
 
         public MGSlider(MGWindow Window, float Minimum, float Maximum, float Value, bool DrawTicks, float? TickFrequency,
-            IFillBrush Foreground, IBorderBrush BorderBrush, IFillBrush ThumbFillBrush, IBorderBrush ThumbBorderBrush, Orientation Orientation)
-            : this(Window, Minimum, Maximum, Value, DrawTicks, TickFrequency, Foreground, null, BorderBrush, new(1), null, BorderBrush, new(0), ThumbFillBrush, ThumbBorderBrush, new(1), Orientation) { }
-
-        private MGSlider(MGWindow Window, float Minimum, float Maximum, float Value, bool DrawTickMarks, float? TickFrequency, IFillBrush Foreground,
-            IFillBrush NumberLineFillBrush, IBorderBrush NumberLineBorderBrush, Thickness NumberLineBorderThickness,
-            IFillBrush TickFillBrush, IBorderBrush TickBorderBrush, Thickness TickBorderThickness,
-            IFillBrush ThumbFillBrush, IBorderBrush ThumbBorderBrush, Thickness ThumbBorderThickness,
-            Orientation Orientation)
+            IBorderBrush BorderBrush, Orientation Orientation)
             : base(Window, MGElementType.Slider)
         {
             using (BeginInitializing())
             {
-                this.HoveredHighlightColor = VisualStateBrush.DefaultHoveredColor;
-                this.PressedDarkenIntensity = VisualStateBrush.DefaultPressedDarkenModifier;
+                MGTheme Theme = GetTheme();
+
+                this.HoveredHighlightColor = Theme.HoveredColor;
+                this.PressedDarkenIntensity = Theme.PressedDarkenModifier;
 
                 SetRange(Minimum, Maximum);
                 SetValue(Value);
 
-                BackgroundBrush = new VisualStateBrush(null);
-                this.Foreground = Foreground;
+                this.Foreground = Theme.SliderForeground;
 
                 this.NumberLineSize = 8;
-                this.NumberLineFillBrush = NumberLineFillBrush;
-                this.NumberLineBorderBrush = NumberLineBorderBrush;
-                this.NumberLineBorderThickness = NumberLineBorderThickness;
+                this.NumberLineFillBrush = null;
+                this.NumberLineBorderBrush = BorderBrush;
+                this.NumberLineBorderThickness = new(1);
 
-                this.DrawTicks = DrawTickMarks;
+                this.DrawTicks = DrawTicks;
                 this.TickFrequency = TickFrequency;
-                this.UseDiscreteValues = DrawTickMarks;
+                this.UseDiscreteValues = DrawTicks;
                 this.DiscreteValueInterval = TickFrequency;
 
-                this.TickFillBrush = TickFillBrush;
-                this.TickBorderBrush = TickBorderBrush;
-                this.TickBorderThickness = TickBorderThickness;
+                this.TickFillBrush = null;
+                this.TickBorderBrush = BorderBrush;
+                this.TickBorderThickness = new(0);
 
-                this.ThumbFillBrush = ThumbFillBrush;
-                this.ThumbBorderBrush = ThumbBorderBrush;
-                this.ThumbBorderThickness = ThumbBorderThickness;
+                this.ThumbFillBrush = Theme.SliderThumbFillBrush;
+                this.ThumbBorderBrush = BorderBrush;
+                this.ThumbBorderThickness = new(1);
 
                 this.Orientation = Orientation;
                 if (Orientation == Orientation.Horizontal)

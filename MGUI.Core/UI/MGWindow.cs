@@ -492,6 +492,8 @@ namespace MGUI.Core.UI
             {
                 this.Desktop = Desktop ?? throw new ArgumentNullException(nameof(Desktop));
 
+                MGTheme Theme = GetTheme();
+
                 this.WindowMouseHandler = InputTracker.Mouse.CreateHandler(this, null);
                 this.WindowKeyboardHandler = InputTracker.Keyboard.CreateHandler(this, null);
                 this.MouseHandler.DragStartCondition = DragStartCondition.Both;
@@ -517,8 +519,6 @@ namespace MGUI.Core.UI
 
                 this.Padding = new(5);
 
-                this.BackgroundBrush = new VisualStateBrush(MGSolidFillBrush.LightGray);
-
                 this.BorderElement = new(this, new Thickness(2), MGUniformBorderBrush.Black);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
@@ -530,7 +530,7 @@ namespace MGUI.Core.UI
                 TitleBarElement.HorizontalContentAlignment = HorizontalAlignment.Stretch;
                 TitleBarElement.VerticalAlignment = VerticalAlignment.Stretch;
                 TitleBarElement.VerticalContentAlignment = VerticalAlignment.Stretch;
-                TitleBarElement.BackgroundBrush = new VisualStateBrush(MGSolidFillBrush.SemiBlack, VisualStateBrush.DefaultHoveredColor * 0.35f);
+                TitleBarElement.BackgroundBrush = Theme.GetTitleBackgroundBrush();
 
                 this.TitleBarComponent = new(TitleBarElement, true, false, true, true, false, false, false,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Top, ComponentSize.Size));
@@ -548,7 +548,7 @@ namespace MGUI.Core.UI
                 this.CloseButtonElement = new(this, x => { TryCloseWindow(); });
                 CloseButtonElement.MinWidth = 12;
                 CloseButtonElement.MinHeight = 12;
-                CloseButtonElement.BackgroundBrush = new(MGSolidFillBrush.White * 0.5f, VisualStateBrush.DefaultHoveredColor);
+                CloseButtonElement.BackgroundBrush = new(Theme, MGSolidFillBrush.White * 0.5f, Theme.HoveredColor);
                 CloseButtonElement.BorderBrush = MGUniformBorderBrush.Black;
                 CloseButtonElement.BorderThickness = new(1);
                 CloseButtonElement.Margin = new(1, 1, 1, 1 + BorderElement.BorderThickness.Bottom);
@@ -566,7 +566,6 @@ namespace MGUI.Core.UI
                     HorizontalAlignment = HorizontalAlignment.Stretch,
                     VerticalAlignment = VerticalAlignment.Center,
                     TextAlignment = HorizontalAlignment.Left,
-                    BackgroundBrush = new VisualStateBrush(null),
                     DefaultTextForeground = Color.White
                 };
                 TitleText = null;

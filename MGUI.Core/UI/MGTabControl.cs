@@ -241,7 +241,6 @@ namespace MGUI.Core.UI
                 AddComponent(BorderComponent);
 
                 this.Padding = new(12);
-                this.BackgroundBrush = new VisualStateBrush(MGSolidFillBrush.White);
 
                 this.ActualTabHeaders = new();
 
@@ -275,7 +274,7 @@ namespace MGUI.Core.UI
                 {
                     MGButton Button = new(Window, new(1, 1, 1, 0), MGUniformBorderBrush.Black, x => TabItem.IsTabSelected = true);
                     Button.Padding = new(8, 5, 8, 5);
-                    Button.BackgroundBrush = new VisualStateBrush(MGSolidFillBrush.White, VisualStateBrush.DefaultHoveredColor);
+                    Button.BackgroundBrush = GetTheme().GetSelectedTabHeaderBackgroundBrush();
                     Button.DefaultTextForeground = Color.Black;
                     Button.VerticalAlignment = VerticalAlignment.Bottom;
                     return Button;
@@ -285,7 +284,7 @@ namespace MGUI.Core.UI
                 {
                     MGButton Button = new(Window, new(1, 1, 1, 0), MGUniformBorderBrush.Gray, x => TabItem.IsTabSelected = true);
                     Button.Padding = new(8, 3, 8, 3);
-                    Button.BackgroundBrush = new VisualStateBrush(new Color(224, 224, 224).AsFillBrush(), VisualStateBrush.DefaultHoveredColor);
+                    Button.BackgroundBrush = GetTheme().GetUnselectedTabHeaderBackgroundBrush();
                     Button.DefaultTextForeground = Color.Black;
                     Button.Opacity = 0.9f;
                     Button.VerticalAlignment = VerticalAlignment.Bottom;
@@ -363,7 +362,7 @@ namespace MGUI.Core.UI
         }
 
         internal MGTabItem(MGTabControl TabControl, MGElement HeaderContent, MGElement TabContent)
-            : base(TabContent.ParentWindow, MGElementType.TabItem)
+            : base(TabControl.ParentWindow, MGElementType.TabItem)
         {
             using (BeginInitializing())
             {

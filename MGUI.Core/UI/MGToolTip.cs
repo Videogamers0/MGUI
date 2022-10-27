@@ -39,7 +39,6 @@ namespace MGUI.Core.UI
                 this.Host = Host;
                 this.BorderBrush = Color.Black.AsFillBrush().AsUniformBorderBrush();
                 this.BorderThickness = new(2);
-                this.BackgroundBrush = new VisualStateBrush((new Color(255, 255, 210) * 0.75f).AsFillBrush());
                 //this.DefaultTextForeground = Color.White;
                 this.ShowOnDisabled = false;
                 this.Padding = new(10);

@@ -233,7 +233,7 @@ namespace MGUI.Core.UI
             HeaderPresenter.PreferredWidth = Menu.HeaderSize.Width;
             HeaderPresenter.PreferredHeight = Menu.HeaderSize.Height;
             HeaderPresenter.Margin = new(0);
-            HeaderPresenter.BackgroundBrush = new(null);
+            HeaderPresenter.BackgroundBrush = new(GetTheme(), null);
             HeaderPresenter.ComponentParent = this;
 
             Menu.HeaderSizeChanged += (sender, e) =>
@@ -405,11 +405,10 @@ namespace MGUI.Core.UI
             set => SeparatorElement.Size = value;
         }
 
-        internal MGContextMenuSeparator(MGContextMenu Menu, int Height, IFillBrush Fill)
+        internal MGContextMenuSeparator(MGContextMenu Menu, int Height)
             : base(Menu, ContextMenuItemType.Separator)
         {
             this.SeparatorElement = new(Menu, Orientation.Horizontal, Height);
-            this.SeparatorElement.BackgroundBrush = new(Fill);
             this.SeparatorElement.Margin = new(0);
 
             this.SeparatorComponent = new(SeparatorElement, false, false, true, true, false, false, true,

@@ -12,6 +12,7 @@ using MGUI.Shared.Input.Keyboard;
 using MGUI.Shared.Input;
 using MGUI.Shared.Text;
 using MGUI.Shared.Rendering;
+using MGUI.Core.UI.Brushes.Fill_Brushes;
 
 namespace MGUI.Core.UI
 {
@@ -252,7 +253,7 @@ namespace MGUI.Core.UI
                 return true;
             }
         }
-#endregion Windows
+        #endregion Windows
 
         internal MGElement QueuedFocusedKeyboardHandler { get; set; } = null;
 
@@ -296,10 +297,13 @@ namespace MGUI.Core.UI
         /// For example, an <see cref="MGContextMenu"/> will attempt to position itself such that it is not rendered outside of these bounds.</summary>
         public Rectangle ValidScreenBounds => Renderer.Host.GetBounds();
 
+        public MGTheme Theme { get; }
+
         public MGDesktop(MainRenderer Renderer)
         {
             this.Renderer = Renderer;
             this.Windows = new();
+            this.Theme = new();
 
             this.ToolTipShowDelay = DefaultToolTipShowDelay;
 

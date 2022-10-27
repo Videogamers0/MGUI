@@ -296,13 +296,13 @@ namespace MGUI.Core.UI
                 this.BubbleComponentSize = DefaultBubbleSize;
                 this.BubbleComponentBorderColor = Color.Black;
                 this.BubbleComponentBorderThickness = 1;
-                this.BubbleComponentFillColor = VisualStateBrush.DefaultNormalBackground is MGSolidFillBrush ? ((MGSolidFillBrush)VisualStateBrush.DefaultNormalBackground).Color : Color.LightGray;
+                this.BubbleComponentFillColor = GetTheme().RadioButtonBubbleFillColor;
                 this.BubbleCheckedColor = Color.Green;
 
                 this.SpacingWidth = DefaultBubbleSpacingWidth;
 
-                this.HoveredHighlightColor = VisualStateBrush.DefaultHoveredColor;
-                this.PressedDarkenIntensity = VisualStateBrush.DefaultPressedDarkenModifier;
+                this.HoveredHighlightColor = GetTheme().HoveredColor;
+                this.PressedDarkenIntensity = GetTheme().PressedDarkenModifier;
             }
         }
 

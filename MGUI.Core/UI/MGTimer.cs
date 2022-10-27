@@ -193,8 +193,6 @@ namespace MGUI.Core.UI
                 this.VerticalContentAlignment = VerticalAlignment.Center;
                 this.Padding = new(4, 2, 4, 2);
 
-                this.BackgroundBrush = new VisualStateBrush(MGSolidFillBrush.SemiBlack);
-
                 this.RemainingDurationToString = (TimeSpan Elapsed) => Elapsed.ToString(@"m\:ss\.%f");
                 this.ValueDisplayFormat = DefaultValueDisplayFormat;
             }
