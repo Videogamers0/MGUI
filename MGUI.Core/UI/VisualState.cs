@@ -220,7 +220,7 @@ namespace MGUI.Core.UI
         }
 
         private VisualStateBrush(VisualStateBrush InheritFrom)
-            : base(InheritFrom.NormalValue, InheritFrom.SelectedValue, InheritFrom.DisabledValue)
+            : base(InheritFrom.NormalValue?.Copy(), InheritFrom.SelectedValue?.Copy(), InheritFrom.DisabledValue?.Copy())
         {
             this.HoveredColor = InheritFrom.HoveredColor;
             this.PressedModifierType = InheritFrom._PressedModifierType;

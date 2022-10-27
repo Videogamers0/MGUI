@@ -37,6 +37,8 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
                     Bounds.BottomLeft().ToVector2(), BottomLeftColor * Opacity);
             }
         }
+
+        public IFillBrush Copy() => new MGGradientFillBrush(TopLeftColor, TopRightColor, BottomRightColor, BottomLeftColor);
     }
 
     /// <summary>A simplified version of <see cref="MGGradientFillBrush"/> that only requires 2 <see cref="Color"/>s for opposite corners of the bounds.</summary>
@@ -85,5 +87,7 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
                     Bounds.BottomLeft().ToVector2(), GetColor(CornerType.BottomLeft) * Opacity);
             }
         }
+
+        public IFillBrush Copy() => new MGDiagonalGradientFillBrush(Color1, Color2, Color1Position);
     }
 }

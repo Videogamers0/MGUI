@@ -47,53 +47,63 @@ namespace MGUI.Core.UI
 
         public Color ResizeGripForeground { get; set; }
 
-        public VisualStateBrush GetSelectedTabHeaderBackgroundBrush() => new(this, ClickableSelectedBackground, HoveredColor);
-        public VisualStateBrush GetUnselectedTabHeaderBackgroundBrush() => new(this, BrightNeutralBackground, HoveredColor);
+        public VisualStateBrush GetSelectedTabHeaderBackgroundBrush() => new(this, BrightNeutralBackground.Copy(), HoveredColor);
+        public VisualStateBrush GetUnselectedTabHeaderBackgroundBrush() => new(this, DimNeutralBackground.Copy(), HoveredColor);
 
-        public VisualStateBrush GetComboBoxDropdownBackgroundBrush() => new(this, BrightNeutralBackground);
+        public VisualStateBrush GetComboBoxDropdownBackgroundBrush() => new(this, BrightNeutralBackground.Copy());
 
         /// <summary>The default background brush to use on items in an <see cref="MGComboBox{TItemType}"/>'s dropdown.</summary>
         public VisualStateBrush DropdownItemBackgroundBrush { get; set; }
         public VisualStateBrush GetDropdownItemBackgroundBrush() => DropdownItemBackgroundBrush.GetCopy();
 
-        public VisualStateBrush GetTitleBackgroundBrush() => new(this, TitleBackground, HoveredColor * 0.35f);
-        public VisualStateBrush GetSpoilerUnspoiledBackgroundBrush() => new(this, AccentBackground, HoveredColor);
+        public VisualStateBrush GetTitleBackgroundBrush() => new(this, TitleBackground.Copy(), HoveredColor * 0.35f);
+        public VisualStateBrush GetSpoilerUnspoiledBackgroundBrush() => new(this, AccentBackground.Copy(), HoveredColor);
 
         public VisualStateBrush GetBackgroundBrush(MGElementType ElementType)
         {
             return ElementType switch
             {
-                MGElementType.Border => new(this, null),
-                MGElementType.Button => new(this, ClickableNormalBackground, HoveredColor),
-                MGElementType.CheckBox => new(this, null),
-                MGElementType.ComboBox => new(this, ClickableNormalBackground, HoveredColor),
-                MGElementType.ContentPresenter => new(this, null),
-                MGElementType.ContextMenu => new(this, ContextMenuBackground),
-                MGElementType.ContextMenuItem => new(this, null),
-                MGElementType.Expander => new(this, null),
-                MGElementType.GroupBox => new(this, BrightNeutralBackground),
-                MGElementType.Image => new(this, null),
-                MGElementType.ListView => new(this, BrightNeutralBackground),
-                MGElementType.PasswordBox => new(this, ClickableNormalBackground, HoveredColor * 0.4f) { PressedModifier = 0f },
-                MGElementType.ProgressBar => new(this, BrightNeutralBackground),
-                MGElementType.RadioButton => new(this, null),
-                MGElementType.RatingControl => new(this, null),
-                MGElementType.Rectangle => new(this, null),
-                MGElementType.ResizeGrip => new(this, null),
-                MGElementType.ScrollViewer => new(this, null),
-                MGElementType.Separator => new(this, AccentBackground),
-                MGElementType.Slider => new(this, null),
-                MGElementType.Spacer => new(this, null),
-                MGElementType.Spoiler => new(this, null),
-                MGElementType.Stopwatch => new(this, AccentBackground),
-                MGElementType.TabControl => new(this, BrightNeutralBackground),
-                MGElementType.TabItem => new(this, null),
-                MGElementType.TextBlock => new(this, null),
-                MGElementType.TextBox => new(this, ClickableNormalBackground, HoveredColor * 0.4f) { PressedModifier = 0f },
-                MGElementType.Timer => new(this, AccentBackground),
-                MGElementType.ToggleButton => new(this, ClickableNormalBackground, ClickableSelectedBackground, ClickableNormalBackground, HoveredColor),
-                MGElementType.ToolTip => new(this, ToolTipBackground),
-                MGElementType.Window => new(this, DimNeutralBackground),
+                MGElementType.Border or 
+                MGElementType.CheckBox or 
+                MGElementType.ContentPresenter or
+                MGElementType.ContextMenuItem or
+                MGElementType.Expander or
+                MGElementType.Image or
+                MGElementType.RadioButton or
+                MGElementType.RatingControl or
+                MGElementType.Rectangle or
+                MGElementType.ResizeGrip or
+                MGElementType.ScrollViewer or
+                MGElementType.Slider or
+                MGElementType.Spacer or
+                MGElementType.Spoiler or
+                MGElementType.TabItem or
+                MGElementType.TextBlock
+                => new(this, null),
+
+                MGElementType.Button or
+                MGElementType.ComboBox
+                => new(this, ClickableNormalBackground.Copy(), HoveredColor),
+
+                MGElementType.ContextMenu => new(this, ContextMenuBackground.Copy()),
+
+                MGElementType.GroupBox or
+                MGElementType.ListView or
+                MGElementType.ProgressBar or
+                MGElementType.TabControl => new(this, BrightNeutralBackground.Copy()),
+
+                MGElementType.PasswordBox or 
+                MGElementType.TextBox => new(this, ClickableNormalBackground.Copy(), HoveredColor * 0.4f) { PressedModifier = 0f },
+
+                MGElementType.Separator or
+                MGElementType.Stopwatch or
+                MGElementType.Timer => new(this, AccentBackground.Copy()),
+
+                MGElementType.ToggleButton => new(this, ClickableNormalBackground.Copy(), ClickableSelectedBackground.Copy(), ClickableNormalBackground.Copy(), HoveredColor),
+
+                MGElementType.ToolTip => new(this, ToolTipBackground.Copy()),
+
+                MGElementType.Window => new(this, DimNeutralBackground.Copy()),
 
                 MGElementType.DockPanel or 
                 MGElementType.Grid or 
@@ -103,6 +113,7 @@ namespace MGUI.Core.UI
 
                 MGElementType.Misc or 
                 MGElementType.Custom => new(this, null),
+
                 _ => new(this, null)
             };
         }

@@ -74,6 +74,8 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
                 DA.DT.DrawTextureTo(Texture, SourceRect, Destination.GetTranslated(DA.Offset), Color.White * DA.Opacity * this.Opacity);
             }
         }
+
+        public IFillBrush Copy() => new MGTextureFillBrush(Texture, SourceRect, Stretch, Opacity);
     }
 
 }

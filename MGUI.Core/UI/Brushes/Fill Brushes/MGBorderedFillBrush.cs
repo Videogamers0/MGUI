@@ -27,6 +27,7 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
             this.BorderThickness = BorderThickness;
             this.BorderBrush = BorderBrush;
             this.FillBrush = FillBrush;
+            this.PadFillBoundsByBorderThickness = PadFillBoundsByBorderThickness;
         }
 
         public void Draw(ElementDrawArgs DA, MGElement Element, Rectangle Bounds)
@@ -43,5 +44,7 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
                 BorderBrush?.Draw(DA, Element, Bounds, BorderThickness);
             }
         }
+
+        public IFillBrush Copy() => new MGBorderedFillBrush(BorderThickness, BorderBrush?.Copy(), FillBrush?.Copy(), PadFillBoundsByBorderThickness);
     }
 }

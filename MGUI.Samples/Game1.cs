@@ -81,6 +81,14 @@ namespace MGUI.Samples
                             </ListViewColumn>
                             <ListViewColumn HeaderContent=""Test"" Width=""*"" />
                         </ListView>
+
+                        <TabControl Name=""TC1"" Dock=""Left"" MinWidth=""150"" VA=""Top"">
+                            <TabItem HeaderContent=""Tab1"">
+                                <Button Content=""Test"" />
+                            </TabItem>
+                            <TabItem HeaderContent=""Tab2"" />
+                        </TabControl>
+
                         <Grid RowLengths=""Auto,1.5*,2*,60"" ColumnLengths=""Auto,*"">
                             <Button BG=""Red"" GridRow=""0"" GridColumn=""0"" MinWidth=""26"" MinHeight=""30"" />
                             <Button BG=""Orange"" GridRow=""1"" GridColumn=""0"" MinWidth=""36"" />

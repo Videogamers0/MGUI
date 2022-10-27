@@ -56,6 +56,8 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
         public IFillBrush GetRight() => Brush;
         public IFillBrush GetBottom() => Brush;
 
+        public IBorderBrush Copy() => new MGUniformBorderBrush(Brush.Copy());
+
         public static explicit operator MGUniformBorderBrush(Color color) => new(color);
     }
 }

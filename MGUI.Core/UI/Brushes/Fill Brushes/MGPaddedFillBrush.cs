@@ -65,6 +65,7 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
                 Brush.Draw(DA, Element, ActualBounds);
             }
         }
-    }
 
+        public IFillBrush Copy() => new MGPaddedFillBrush(Brush?.Copy(), Padding, Scale, MinWidth, MinHeight, MaxWidth, MaxHeight, HorizontalAlignment, VerticalAlignment);
+    }
 }

@@ -18,5 +18,7 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
         public IFillBrush GetBottom();
 
         public void Draw(ElementDrawArgs DA, MGElement Element, Rectangle Bounds, Thickness BT);
+
+        public IBorderBrush Copy();
     }
 }

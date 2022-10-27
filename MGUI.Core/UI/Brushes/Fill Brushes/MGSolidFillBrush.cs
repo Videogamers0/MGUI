@@ -44,6 +44,8 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
 
         public MGUniformBorderBrush AsUniformBorderBrush() => new(this);
 
+        public IFillBrush Copy() => new MGSolidFillBrush(Color);
+
         public static explicit operator MGSolidFillBrush(Color color) => new(color);
         public static explicit operator Color(MGSolidFillBrush brush) => brush.Color;
 

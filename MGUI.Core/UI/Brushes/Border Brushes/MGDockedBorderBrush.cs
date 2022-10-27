@@ -108,6 +108,12 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
         public IFillBrush GetRight() => Right;
         public IFillBrush GetBottom() => Bottom;
 
+        public IBorderBrush Copy() => new MGDockedBorderBrush(
+            Left?.Copy() ?? MGSolidFillBrush.Transparent, 
+            Top?.Copy() ?? MGSolidFillBrush.Transparent, 
+            Right?.Copy() ?? MGSolidFillBrush.Transparent, 
+            Bottom?.Copy() ?? MGSolidFillBrush.Transparent);
+
         public static explicit operator MGDockedBorderBrush(MGUniformBorderBrush uniform) => new(uniform.Brush, uniform.Brush, uniform.Brush, uniform.Brush);
     }
 

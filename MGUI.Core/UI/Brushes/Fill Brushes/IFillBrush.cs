@@ -19,6 +19,7 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
     public interface IFillBrush
     {
         public void Draw(ElementDrawArgs DA, MGElement Element, Rectangle Bounds);
+        public IFillBrush Copy();
         public MGUniformBorderBrush AsUniformBorderBrush() => new MGUniformBorderBrush(this);
     }
 }

@@ -23,5 +23,7 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
             foreach (IFillBrush Brush in Brushes)
                 Brush.Draw(DA, Element, Bounds);
         }
+
+        public IFillBrush Copy() => new MGCompositedFillBrush(Brushes.Select(x => x.Copy()).ToArray());
     }
 }
