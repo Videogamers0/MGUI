@@ -82,6 +82,7 @@ namespace MGUI.Core.UI
         /// <summary>The screen bounds that the horizontal scrollbar will be rendered to, after applying the <see cref="ScrollBarPadding"/></summary>
         public Rectangle? PaddedHSBBounds => HSBBounds?.GetCompressed(ScrollBarPadding);
 
+        #region Offset
         private float _VerticalOffset;
         /// <summary>See also: <see cref="MaxVerticalOffset"/></summary>
         public float VerticalOffset
@@ -147,6 +148,7 @@ namespace MGUI.Core.UI
                 }
             }
         }
+        #endregion Offset
 
         private bool IsHoveringVSB { get; set; }
         private bool IsDraggingVSB { get; set; }

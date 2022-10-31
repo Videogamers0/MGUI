@@ -199,5 +199,16 @@ namespace MGUI.Shared.Helpers
         private static readonly ReadOnlyCollection<int> UnixPlatformIds = new List<int>() { 4, 6, 128, (int)PlatformID.Unix }.AsReadOnly();
         //Adapted from: https://mono.fandom.com/wiki/Detecting_the_execution_platform
         public static bool IsPlatformUnix => UnixPlatformIds.Contains((int)Environment.OSVersion.Platform);
+
+        /// <summary>This method is intended to replace the usage of <see cref="Collection{T}.Clear"/> on <see cref="ObservableCollection{T}"/>s<br/> 
+        /// because Clear does not include the old items that were removed in the <see cref="ObservableCollection{T}.CollectionChanged"/> event args.<para/>
+        /// See also: <see href="https://stackoverflow.com/questions/224155/when-clearing-an-observablecollection-there-are-no-items-in-e-olditems"/></summary>
+        public static void ClearOneByOne<T>(this ObservableCollection<T> @this)
+        {
+            while (@this.Count > 0)
+            {
+                @this.RemoveAt(@this.Count - 1);
+            }
+        }
     }
 }

@@ -122,6 +122,55 @@ namespace MGUI.Core.UI.Containers.Grids
         public IReadOnlyList<RowDefinition> Rows => _Rows;
         public int GetRowIndex(RowDefinition Row) => _Rows.IndexOf(Row);
 
+        private bool SuppressDimensionChanged = false;
+        /// <summary>Converts all weighted row/column lengths to integral values that are clamped between the Min/Max size of the row/column.<para/>
+        /// For example, if the columns are:<para/>
+        /// <code>
+        /// Index       Length      MinWidth        MaxWidth        ActualWidth
+        /// 0           <b>1*</b>          20              50              50
+        /// 1           25px        null            null            25
+        /// 2           <b>1.2*</b>        30              100             80
+        /// 
+        /// Grid total width: 155
+        /// </code>
+        /// Normalizing the weights would convert the columns to:<para/>
+        /// <code>
+        /// Index       Length      MinWidth        MaxWidth        ActualWidth
+        /// 0           <b>50*</b>         20              50              50
+        /// 1           25px        null            null            25
+        /// 2           <b>80*</b>         30              100             80
+        /// 
+        /// Grid total width: 155
+        /// </code><para/>
+        /// This method is typically only used when simplifying the row/column definitions before applying resizing logic, such as in <see cref="MGGridSplitter"/>.</summary>
+        public void NormalizeWeightedLengths()
+        {
+            bool WasSuppressingDimensionChanged = SuppressDimensionChanged;
+            try
+            {
+                SuppressDimensionChanged = true;
+
+                foreach (ColumnDefinition Column in _Columns)
+                {
+                    if (Column.Length.IsWeightedLength)
+                    {
+                        int NormalizedWeight = Math.Clamp(Column.Width, Column.MinWidth ?? 0, Column.MaxWidth ?? int.MaxValue);
+                        Column.Length = GridLength.CreateWeightedLength(NormalizedWeight);
+                    }
+                }
+
+                foreach (RowDefinition Row in _Rows)
+                {
+                    if (Row.Length.IsWeightedLength)
+                    {
+                        int NormalizedWeight = Math.Clamp(Row.Height, Row.MinHeight ?? 0, Row.MaxHeight ?? int.MaxValue);
+                        Row.Length = GridLength.CreateWeightedLength(NormalizedWeight);
+                    }
+                }
+            }
+            finally { SuppressDimensionChanged = WasSuppressingDimensionChanged; }
+        }
+
         /// <param name="Lengths">The lengths of each <see cref="ColumnDefinition"/> to create.<para/>
         /// Consider using <see cref="GridLength.ParseMultiple(string)"/> for a convenient way to generate the values</param>
         /// <returns>The created <see cref="ColumnDefinition"/>s</returns>
@@ -205,6 +254,9 @@ namespace MGUI.Core.UI.Containers.Grids
         private readonly Dictionary<RowDefinition, Dictionary<ColumnDefinition, List<MGElement>>> ChildrenByRC = new();
         /// <summary>A lookup table that returns the <see cref="RowDefinition"/> and <see cref="ColumnDefinition"/> that a given <see cref="MGElement"/> resides in.</summary>
         private readonly Dictionary<MGElement, GridCell> ChildCellLookup = new();
+
+        /// <summary>Retrieves the <see cref="GridCell"/> that the given <paramref name="Element"/> belongs to.</summary>
+        public bool TryGetCell(MGElement Element, out GridCell Cell) => ChildCellLookup.TryGetValue(Element, out Cell);
 
         public IReadOnlyDictionary<ColumnDefinition, IReadOnlyList<MGElement>> GetRowContent(RowDefinition Row)
         {
@@ -308,7 +360,7 @@ namespace MGUI.Core.UI.Containers.Grids
             if (!CanChangeContent)
                 return false;
 
-            _Children.Clear();
+            _Children.ClearOneByOne();
             ChildrenByRC.Clear();
             ChildCellLookup.Clear();
             return true;
@@ -734,7 +786,11 @@ namespace MGUI.Core.UI.Containers.Grids
             }
         }
 
-        private void RowColumn_DimensionsChanged(object sender, EventArgs e) => LayoutChanged(this, true);
+        private void RowColumn_DimensionsChanged(object sender, EventArgs e)
+        {
+            if (!SuppressDimensionChanged)
+                LayoutChanged(this, true);
+        }
 
         public override void UpdateSelf(ElementUpdateArgs UA)
         {
@@ -821,7 +877,7 @@ namespace MGUI.Core.UI.Containers.Grids
             IEnumerable<ColumnDefinition> RemainingColumns = Columns
                 .Where(x => !ColumnWidths.ContainsKey(x))
                 .OrderBy(x => x.Length.IsAutoLength || IsPseudoInfiniteWidth ? 0 : 1)
-                .ThenBy(x => x.MaxWidth.HasValue ? 0 : 1); // Try to handle columns with a MaxWidth first because if the column's width gets truncated, it might free up more width for the next weighted column to use
+                .ThenBy(x => x.MaxWidth ?? int.MaxValue); // Try to handle columns with a MaxWidth first because if the column's width gets truncated, it might free up more width for the next weighted column to use
             foreach (ColumnDefinition Column in RemainingColumns)
             {
                 int ColumnWidth;
@@ -839,7 +895,7 @@ namespace MGUI.Core.UI.Containers.Grids
                         if (ColumnWeight > RemainingColumnWeight)
                             throw new InvalidOperationException("Column weight should not exceed remaining weight");
 #endif
-                        ColumnWidth = Math.Clamp((int)(RemainingColumnWidth * (ColumnWeight / RemainingColumnWeight)), Column.MinWidth ?? 0, Column.MaxWidth ?? int.MaxValue);
+                        ColumnWidth = Math.Clamp((int)Math.Round(RemainingColumnWidth * (ColumnWeight / RemainingColumnWeight), MidpointRounding.ToEven), Column.MinWidth ?? 0, Column.MaxWidth ?? int.MaxValue);
                         RemainingColumnWeight -= ColumnWeight;
                     }
                     else
@@ -873,7 +929,7 @@ namespace MGUI.Core.UI.Containers.Grids
             IEnumerable<RowDefinition> RemainingRows = Rows
                 .Where(x => !RowHeights.ContainsKey(x))
                 .OrderBy(x => x.Length.IsAutoLength || IsPseduoInfiniteHeight ? 0 : 1)
-                .ThenBy(x => x.MaxHeight.HasValue ? 0 : 1); // Try to handle rows with a MaxHeight first because if the row's height gets truncated, it might free up more height for the next weighted row to use
+                .ThenBy(x => x.MaxHeight ?? int.MaxValue); // Try to handle rows with a MaxHeight first because if the row's height gets truncated, it might free up more height for the next weighted row to use
             foreach (RowDefinition Row in RemainingRows)
             {
                 int RowHeight;
@@ -891,7 +947,7 @@ namespace MGUI.Core.UI.Containers.Grids
                         if (RowWeight > RemainingRowWeight)
                             throw new InvalidOperationException("Row weight should not exceed remaining weight");
 #endif
-                        RowHeight = Math.Clamp((int)(RemainingRowHeight * (RowWeight / RemainingRowWeight)), Row.MinHeight ?? 0, Row.MaxHeight ?? int.MaxValue);
+                        RowHeight = Math.Clamp((int)Math.Round(RemainingRowHeight * (RowWeight / RemainingRowWeight), MidpointRounding.ToEven), Row.MinHeight ?? 0, Row.MaxHeight ?? int.MaxValue);
                         RemainingRowWeight -= RowWeight;
                     }
                     else

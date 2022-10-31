@@ -54,7 +54,7 @@ namespace MGUI.Core.UI
             }
             else
             {
-                ValueElement.SetTextSilently(ValueDisplayString);
+                ValueElement.SetText(ValueDisplayString, true);
             }
         }
 

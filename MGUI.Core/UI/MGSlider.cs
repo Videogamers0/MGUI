@@ -20,7 +20,7 @@ namespace MGUI.Core.UI
         private Color _HoveredHighlightColor;
         /// <summary>An overlay color that is drawn overtop of this <see cref="MGSlider"/>'s graphics if the mouse is currently hovering it.<br/>
         /// Recommended to use a transparent color.<para/>
-        /// Default Value: <see cref="MGElement.DefaultHoveredHighlightColor"/></summary>
+        /// Default Value: <see cref="MGTheme.HoveredColor"/></summary>
         public Color HoveredHighlightColor
         {
             get => _HoveredHighlightColor;
@@ -41,7 +41,7 @@ namespace MGUI.Core.UI
         private float _PressedDarkenIntensity;
         /// <summary>A percentage to darken this <see cref="MGSlider"/>'s graphics by when the mouse is currently pressed, but not yet released, overtop of this <see cref="MGElement"/>.<br/>
         /// Use a larger value to apply a more obvious background overlay while this <see cref="MGElement"/> is pressed. Use a smaller value for a more subtle change.<para/>
-        /// Default value: <see cref="MGElement.DefaultPressedDarkenIntensity"/></summary>
+        /// Default value: <see cref="MGTheme.PressedDarkenModifier"/></summary>
         public float PressedDarkenIntensity
         {
             get => _PressedDarkenIntensity;
@@ -523,7 +523,7 @@ namespace MGUI.Core.UI
                 SetRange(Minimum, Maximum);
                 SetValue(Value);
 
-                this.Foreground = Theme.SliderForeground;
+                this.Foreground = Theme.SliderForeground.GetValue(true);
 
                 this.NumberLineSize = 8;
                 this.NumberLineFillBrush = null;
@@ -539,7 +539,7 @@ namespace MGUI.Core.UI
                 this.TickBorderBrush = BorderBrush;
                 this.TickBorderThickness = new(0);
 
-                this.ThumbFillBrush = Theme.SliderThumbFillBrush;
+                this.ThumbFillBrush = Theme.SliderThumbFillBrush.GetValue(true);
                 this.ThumbBorderBrush = BorderBrush;
                 this.ThumbBorderThickness = new(1);
 

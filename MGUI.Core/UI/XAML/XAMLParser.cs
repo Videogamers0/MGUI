@@ -69,6 +69,7 @@ namespace MGUI.Core.UI.XAML
 
             { "RowDefinition", nameof(XAMLRowDefinition) },
             { "ColumnDefinition", nameof(XAMLColumnDefinition) },
+            { "GridSplitter", nameof(XAMLGridSplitter) },
             { "Grid", nameof(XAMLGrid) },
             { "DockPanel", nameof(XAMLDockPanel) },
             { "StackPanel", nameof(XAMLStackPanel) },

@@ -137,29 +137,23 @@ namespace MGUI.Core.UI
         public string Text
         {
             get => _Text;
-            set
-            {
-                if (_Text != value)
-                {
-                    _Text = value;
-                    NPC(nameof(Text));
-                    Runs = MGTextRun.ParseRuns(Text, new(false)).ToList().AsReadOnly();
-                    InvokeLayoutChanged();
-                }
-            }
+            set => SetText(value, false);
         }
 
-        /// <summary>Sets <see cref="Text"/> without calling <see cref="InvokeLayoutChanged"/>.<para/>
+        /// <param name="SuppressLayoutChanged">If true, the <see cref="Text"/> will be set without calling <see cref="InvokeLayoutChanged"/><para/>
         /// Intended to be used for performance purposes when changing the text value, without actually changing the text layout.<br/>
-        /// For example, changing text from: "Hello World" to "Hello [bg=Red]World[/bg]" does not affect the rendered text's layout/size.</summary>
-        internal void SetTextSilently(string Value)
+        /// For example, changing text from: "Hello World" to "Hello [bg=Red]World[/bg]" does not affect the rendered text's layout/size.</param>
+        public void SetText(string Value, bool SuppressLayoutChanged = false)
         {
-            if (Text != Value)
+            if (_Text != Value)
             {
                 _Text = Value;
                 NPC(nameof(Text));
                 Runs = MGTextRun.ParseRuns(Text, new(false)).ToList().AsReadOnly();
-                UpdateLines();
+                if (!SuppressLayoutChanged)
+                    InvokeLayoutChanged();
+                else
+                    UpdateLines();
             }
         }
 

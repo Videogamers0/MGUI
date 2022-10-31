@@ -275,8 +275,8 @@ namespace MGUI.Core.UI
                 this.ValueElement.Padding = new(3);
                 AddComponent(ValueComponent);
 
-                this.CompletedBrush = GetTheme().ProgressBarCompletedBrush;
-                this.IncompleteBrush = GetTheme().AccentBackground;
+                this.CompletedBrush = GetTheme().ProgressBarCompletedBrush.GetValue(true);
+                this.IncompleteBrush = GetTheme().AccentBackground.GetValue(true);
 
                 this.ShowValue = ShowValue;
                 this.ValueDisplayFormat = RecommendedPercentageValueDisplayFormat;

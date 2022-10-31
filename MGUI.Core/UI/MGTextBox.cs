@@ -127,7 +127,7 @@ namespace MGUI.Core.UI
                 _FormattedText = Value;
 
                 if (Silent)
-                    TextBlockElement.SetTextSilently(FormattedText);
+                    TextBlockElement.SetText(FormattedText, true);
                 else
                     TextBlockElement.Text = FormattedText;
             }

@@ -84,12 +84,38 @@ namespace MGUI.Core.UI
     //      also things like gridline size, spacing, gridline brush, cell background brush
     //      then there's things like Action<GridCell> RenderCell, event CellEntered, CellExited, CellLeftCLicked, CellRightClicked, CellDragStart etc
     //listbox, statusbar, menubar/menuitems, popup?
+    //      messagebox
+    //          has icon docked left
+    //          button choices like YesNoCancel, OKCancel, or even custom where you can call AddButton(mgelement content) and they are appended in order etc
     //		dialogbox (a transparent window with a bordered img docked on 1 side, and a textblock taking up rest of space)
     //			could have dialog options like yesnocancel or custom "commandlinks" like taskdialog
     //maybe a subclass of MGImage for showing animations? Automatically cycles through a set list of textures/sourcerects without invoking LayoutChanged each time
     //		under the assumption each frame of the animation is same size. MGAnimatedImage(bool IsUniform) (if !IsUniform, has to invoke LayoutChanged)
     //chatbox
     //IconedTextBlock - just a textblock that has an image on the left of it, so you don't need to make a horizontal stackpanel and add both elements to it
+    //
+    //BasicXAMLDesigner : MGwindow
+    //      Content is Grid with 3 rows 1 column
+    //      top row is the parsed XAML element (height=*)
+    //      middle is horizontal gridsplitter (height= maybe 15)
+    //      bottom is a textbox and refresh button (height=*)
+    //      click refresh tries to parse the xaml from the textbox's text
+    //      if failed, top row's content is a textblock with the exception message
+    //      if success, top row's content = result of XAMLParser.Load
+    //      override the functionality of the textbox
+    //          typing an enter key should add a new line, but also add prepend enough spaces to set cursor near where previous line's text begins + 1 tab
+    //          "<Window>
+    //          "    <Window.Resources>
+    //          "        <...>
+    //          so if cursor is on line2, line2's text starts at index=4
+    //              pushing enter prepends (4/TabSize + 1)*TabSize = 8 spaces
+    //              or maybe just PreviousLineIndex+TabSize ? that seems to be what WPF designer does.
+    //      could also try to have basic syntax highlighting like coloring specific keyboards "Grid","Button","CheckBox" etc...
+    //              quoted values in blue, comments in green, property names in red, element names in brown
+    //      maybe option to load from a file instead. so u just use your own text editor instead of a shitty built-in one.
+    //      when the file path is set, the code listens for changes to the file, autorefresh on save
+    //
+    //Grid should have basic support for RowSpan/ColumnSpan even if the spanning elements don't affect the measurements since that might be too complex
     //
     //maybe MGDesktop should store a Dictionary<string, Texture2D> NamedTextures
     //      which is used by the XAMLParser (instead of passing in the dictionary to XAMLParser.Parse, XAMLParser.Parse retrieves it from MGDesktop)

@@ -29,6 +29,7 @@ namespace MGUI.Core.UI
         TabControl,
         TabItem,
         ContentPresenter,
+        GridSplitter,
 
         //  Buttons and Selection
         Button,

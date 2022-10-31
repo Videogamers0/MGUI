@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
+using MGUI.Core.UI.Brushes.Border_Brushes;
 
 namespace MGUI.Core.UI.XAML
 {
@@ -47,6 +48,27 @@ namespace MGUI.Core.UI.XAML
         public int? MinHeight { get; set; }
         public int? MaxHeight { get; set; }
         public override string ToString() => $"{nameof(XAMLRowDefinition)}: {Length}";
+    }
+
+    public class XAMLGridSplitter : XAMLElement
+    {
+        public int? Size { get; set; }
+        public XAMLSize? TickSize { get; set; }
+        public XAMLFillBrush Foreground { get; set; }
+
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGGridSplitter(Window);
+
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        {
+            MGGridSplitter GridSplitter = Element as MGGridSplitter;
+
+            if (Size.HasValue)
+                GridSplitter.Size = Size.Value;
+            if (TickSize.HasValue)
+                GridSplitter.TickSize = TickSize.Value.ToSize();
+            if (Foreground != null)
+                GridSplitter.Foreground = Foreground.ToFillBrush();
+        }
     }
 
     public class XAMLGrid : XAMLMultiContentHost
