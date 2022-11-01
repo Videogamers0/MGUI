@@ -110,9 +110,15 @@ namespace MGUI.Core.UI.Containers.Grids
         /// Default value: <see cref="DefaultTickSize"/></summary>
         public Size TickSize { get; set; }
 
+
+
+
         //TODO make this a VisualStateBrush. then we can get rid of the focusvisualstyle crap
         /// <summary>The brush to use when drawing the thumb tick marks in the center of this element's bounds.</summary>
         public IFillBrush Foreground { get; set; }
+
+
+
 
         public Orientation Orientation => LayoutBounds.Width > LayoutBounds.Height ? Orientation.Horizontal : Orientation.Vertical;
 

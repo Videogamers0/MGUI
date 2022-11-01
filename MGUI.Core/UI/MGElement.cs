@@ -79,11 +79,6 @@ namespace MGUI.Core.UI
     }
 
     //TODO
-    //Grid should have basic support for RowSpan/ColumnSpan even if the spanning elements don't affect the measurements since that might be too complex
-    //      measure logic will just treat it as if it's in the row/column it was explicitly added to? maybe an option like 'AffectsMeasure' to ignore the cell content in the measure logic
-    //      and when computingdimensions. or even a 'MeasureRowIndex'/'MeasureColumnIndex' in case you add a spanning element to, say, row=0, column=1, but want it measured as if its
-    //      in row=0, column=2 (requires ColumnSpan=2 or greater in this case, so the element must intersect the cell you apply its measurement to)
-    //      GridSpan record: int RowSpan, int ColumnSpan, bool AffectsMeasure, int? MeasureRow, int? MeasureColumn (if null, uses the row/column it was added to assuming AffectsMeasure=true)
     //UniformGrid?
     //StaticGrid - user specifies # of rows and columns, and the size of each cell
     //      also things like gridline size, spacing, gridline brush, cell background brush

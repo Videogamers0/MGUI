@@ -72,6 +72,12 @@ namespace MGUI.Core.UI.XAML
         public int GridRow { get; set; } = 0;
         /// <summary>Used by <see cref="XAMLGrid"/>'s children</summary>
         public int GridColumn { get; set; } = 0;
+        /// <summary>Used by <see cref="XAMLGrid"/>'s children</summary>
+        public int GridRowSpan { get; set; } = 1;
+        /// <summary>Used by <see cref="XAMLGrid"/>'s children</summary>
+        public int GridColumnSpan { get; set; } = 1;
+        /// <summary>Used by <see cref="XAMLGrid"/>'s children</summary>
+        public bool GridAffectsMeasure { get; set; } = true;
         /// <summary>Used by <see cref="XAMLOverlayPanel"/>'s children</summary>
         public XAMLThickness Offset { get; set; } = new();
 

@@ -110,8 +110,8 @@ namespace MGUI.Samples
             <TextBlock BG=""Cyan"" GridRow=""0"" GridColumn=""2"" />
             <TextBlock BG=""Crimson"" GridRow=""2"" GridColumn=""3"" />
 
-            <GridSplitter GridRow=""1"" GridColumn=""1"" />
-            <GridSplitter GridRow=""1"" GridColumn=""0"" />
+            <GridSplitter GridRow=""0"" GridColumn=""1"" GridRowSpan=""3""  />
+            <GridSplitter GridRow=""1"" GridColumn=""0"" GridColumnSpan=""4"" />
         </Grid>
     </DockPanel>
 </Window>

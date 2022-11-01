@@ -148,7 +148,7 @@ namespace MGUI.Core.UI.XAML
             foreach (XAMLElement Child in Children)
             {
                 MGElement ChildElement = Child.ToElement<MGElement>(Grid.SelfOrParentWindow, Grid, NamedTextures);
-                Grid.TryAddChild(Child.GridRow, Child.GridColumn, ChildElement);
+                Grid.TryAddChild(Child.GridRow, Child.GridColumn, new GridSpan(Child.GridRowSpan, Child.GridColumnSpan, Child.GridAffectsMeasure), ChildElement);
             }
         }
     }

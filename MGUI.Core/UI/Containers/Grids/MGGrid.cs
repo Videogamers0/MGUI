@@ -71,13 +71,19 @@ namespace MGUI.Core.UI.Containers.Grids
         Cell
     }
 
-    public readonly record struct GridCell(RowDefinition Row, ColumnDefinition Column);
+    public readonly record struct GridCell(RowDefinition Row, ColumnDefinition Column)
+    {
+        public RowDefinition Row { get; init; } = Row ?? throw new ArgumentNullException(nameof(Row));
+        public ColumnDefinition Column { get; init; } = Column ?? throw new ArgumentNullException(nameof(Column));
+    }
 
     public readonly record struct GridSelection(MGGrid Grid, GridCell Cell, GridSelectionMode SelectionMode)
         : IEnumerable<GridCell>
     {
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         public IEnumerator<GridCell> GetEnumerator() => GetCells().GetEnumerator();
+
+        public MGGrid Grid { get; init; } = Grid ?? throw new ArgumentNullException(nameof(Grid));
 
         private IEnumerable<GridCell> GetCells()
         {
@@ -107,6 +113,16 @@ namespace MGUI.Core.UI.Containers.Grids
                     throw new NotImplementedException($"Unrecognized {nameof(GridSelectionMode)}: {SelectionMode}");
             }
         }
+    }
+
+    public readonly record struct GridSpan(int RowSpan = 1, int ColumnSpan = 1, bool AffectsMeasure = true)
+    {
+        public static readonly GridSpan Default = new(1, 1, true);
+
+        public int RowSpan { get; init; } = RowSpan > 0 ? RowSpan : throw new ArgumentOutOfRangeException(nameof(RowSpan));
+        public int ColumnSpan { get; init; } = ColumnSpan > 0 ? ColumnSpan : throw new ArgumentOutOfRangeException(nameof(ColumnSpan));
+
+        public GridSpan() : this(Default.RowSpan, Default.ColumnSpan) { }
     }
 
     public class MGGrid : MGMultiContentHost
@@ -274,6 +290,8 @@ namespace MGUI.Core.UI.Containers.Grids
         private readonly Dictionary<RowDefinition, Dictionary<ColumnDefinition, List<MGElement>>> ChildrenByRC = new();
         /// <summary>A lookup table that returns the <see cref="RowDefinition"/> and <see cref="ColumnDefinition"/> that a given <see cref="MGElement"/> resides in.</summary>
         private readonly Dictionary<MGElement, GridCell> ChildCellLookup = new();
+        /// <summary>A lookup table that returns the <see cref="GridSpan"/> settings associated with a given <see cref="MGElement"/></summary>
+        private readonly Dictionary<MGElement, GridSpan> ChildSpanLookup = new();
 
         /// <summary>Retrieves the <see cref="GridCell"/> that the given <paramref name="Element"/> belongs to.</summary>
         public bool TryGetCell(MGElement Element, out GridCell Cell) => ChildCellLookup.TryGetValue(Element, out Cell);
@@ -299,58 +317,62 @@ namespace MGUI.Core.UI.Containers.Grids
             return ColumnContent;
         }
 
+        public IReadOnlyList<MGElement> GetCellContent(RowDefinition Row, ColumnDefinition Column) => GetCellContent(new GridCell(Row, Column));
         public IReadOnlyList<MGElement> GetCellContent(GridCell Cell)
-            => GetCellContent(Cell.Row, Cell.Column);
-        public IReadOnlyList<MGElement> GetCellContent(RowDefinition Row, ColumnDefinition Column)
         {
-            IReadOnlyDictionary<ColumnDefinition, IReadOnlyList<MGElement>> RowContent = GetRowContent(Row);
-            if (RowContent.TryGetValue(Column, out IReadOnlyList<MGElement> CellContent))
+            IReadOnlyDictionary<ColumnDefinition, IReadOnlyList<MGElement>> RowContent = GetRowContent(Cell.Row);
+            if (RowContent.TryGetValue(Cell.Column, out IReadOnlyList<MGElement> CellContent))
                 return CellContent;
             else
                 return new List<MGElement>();
         }
 
-        public bool TryAddChild(int RowIndex, int ColumnIndex, MGElement Item)
+        private IReadOnlyList<MGElement> GetMeasurableCellContent(RowDefinition Row, ColumnDefinition Column) => GetMeasurableCellContent(new GridCell(Row, Column));
+        private IReadOnlyList<MGElement> GetMeasurableCellContent(GridCell Cell) => GetCellContent(Cell).Where(x => ChildSpanLookup[x].AffectsMeasure).ToList();
+
+        public bool TryAddChild(int RowIndex, int ColumnIndex, MGElement Item) => TryAddChild(RowIndex, ColumnIndex, GridSpan.Default, Item);
+        public bool TryAddChild(int RowIndex, int ColumnIndex, GridSpan Span, MGElement Item)
         {
             if (RowIndex >= 0 && RowIndex < _Rows.Count && ColumnIndex >= 0 && ColumnIndex < _Columns.Count)
             {
                 RowDefinition Row = _Rows[RowIndex];
                 ColumnDefinition Column = _Columns[ColumnIndex];
-                return TryAddChild(Row, Column, Item);
+                return TryAddChild(Row, Column, Span, Item);
             }
             else
                 return false;
         }
 
+        public bool TryAddChild(RowDefinition Row, ColumnDefinition Column, MGElement Item) => TryAddChild(Row, Column, GridSpan.Default, Item);
+        public bool TryAddChild(RowDefinition Row, ColumnDefinition Column, GridSpan Span, MGElement Item) => TryAddChild(new GridCell(Row, Column), Span, Item);
+        public bool TryAddChild(GridCell Cell, MGElement Item) => TryAddChild(Cell, GridSpan.Default, Item);
+
         /// <returns>True if the given <paramref name="Item"/> was successfully added.<br/>
         /// False otherwise, such as if <see cref="MGContentHost.CanChangeContent"/> is false.</returns>
-        public bool TryAddChild(RowDefinition Row, ColumnDefinition Column, MGElement Item)
+        public bool TryAddChild(GridCell Cell, GridSpan Span, MGElement Item)
         {
             if (!CanChangeContent)
                 return false;
-            if (Row == null)
-                throw new ArgumentNullException(nameof(Row));
-            if (Column == null)
-                throw new ArgumentNullException(nameof(Column));
             if (Item == null)
                 throw new ArgumentNullException(nameof(Item));
             if (_Children.Contains(Item))
                 throw new InvalidOperationException($"{nameof(MGGrid)} does not support adding the same {nameof(MGElement)} multiple times.");
 
-            if (!ChildrenByRC.TryGetValue(Row, out var RowContent))
+            if (!ChildrenByRC.TryGetValue(Cell.Row, out var RowContent))
             {
                 RowContent = new Dictionary<ColumnDefinition, List<MGElement>>();
-                ChildrenByRC.Add(Row, RowContent);
+                ChildrenByRC.Add(Cell.Row, RowContent);
             }
 
-            if (!RowContent.TryGetValue(Column, out var CellContent))
+            if (!RowContent.TryGetValue(Cell.Column, out var CellContent))
             {
                 CellContent = new List<MGElement>();
-                RowContent.Add(Column, CellContent);
+                RowContent.Add(Cell.Column, CellContent);
             }
 
             CellContent.Add(Item);
-            ChildCellLookup[Item] = new GridCell(Row, Column);
+            ChildCellLookup[Item] = Cell;
+            ChildSpanLookup[Item] = Span;
 
             _Children.Add(Item);
             return true;
@@ -368,6 +390,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 GridCell Cell = ChildCellLookup[Item];
                 ChildrenByRC[Cell.Row][Cell.Column].Remove(Item);
                 ChildCellLookup.Remove(Item);
+                ChildSpanLookup.Remove(Item);
                 return true;
             }
             else
@@ -383,6 +406,7 @@ namespace MGUI.Core.UI.Containers.Grids
             _Children.ClearOneByOne();
             ChildrenByRC.Clear();
             ChildCellLookup.Clear();
+            ChildSpanLookup.Clear();
             return true;
         }
 
@@ -416,6 +440,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     Removed.Add(Element);
                     ChildCellLookup.Remove(Element);
+                    ChildSpanLookup.Remove(Element);
                 }
             }
 
@@ -466,6 +491,7 @@ namespace MGUI.Core.UI.Containers.Grids
                         {
                             Removed.Add(Element);
                             ChildCellLookup.Remove(Element);
+                            ChildSpanLookup.Remove(Element);
                         }
 #if DEBUG
                         else
@@ -513,6 +539,7 @@ namespace MGUI.Core.UI.Containers.Grids
                         {
                             Removed.Add(Element);
                             ChildCellLookup.Remove(Element);
+                            ChildSpanLookup.Remove(Element);
                         }
 #if DEBUG
                         else
@@ -924,11 +951,12 @@ namespace MGUI.Core.UI.Containers.Grids
                         List<int> ColumnChildWidths = new();
                         foreach (RowDefinition Row in Rows)
                         {
+                            GridCell Cell = new(Row, Column);
                             if (!RowHeights.TryGetValue(Row, out int RowHeight))
                                 RowHeight = RemainingRowHeight; // Lazy 'solution' because I'm too dumb to come up with the actual correct logic that avoids circular dependencies...
 
                             Size CellAvailableSize = new(RemainingColumnWidth, RowHeight);
-                            foreach (MGElement Element in GetCellContent(Row, Column))
+                            foreach (MGElement Element in GetMeasurableCellContent(Cell))
                             {
                                 Element.UpdateMeasurement(CellAvailableSize, out _, out Thickness ElementSize, out _, out _);
                                 ColumnChildWidths.Add(ElementSize.Size.Width);
@@ -976,10 +1004,11 @@ namespace MGUI.Core.UI.Containers.Grids
                         List<int> RowChildHeights = new();
                         foreach (ColumnDefinition Column in Columns)
                         {
+                            GridCell Cell = new(Row, Column);
                             int ColumnWidth = ColumnWidths[Column];
 
                             Size CellAvailableSize = new(ColumnWidth, RemainingRowHeight);
-                            foreach (MGElement Element in GetCellContent(Row, Column))
+                            foreach (MGElement Element in GetMeasurableCellContent(Cell))
                             {
                                 Element.UpdateMeasurement(CellAvailableSize, out _, out Thickness ElementSize, out _, out _);
                                 RowChildHeights.Add(ElementSize.Size.Height);
@@ -1026,7 +1055,7 @@ namespace MGUI.Core.UI.Containers.Grids
             if (GridLinesVisibility.HasFlag(GridLinesVisibility.LeftEdge))
                 CurrentX += Math.Max(0, ColumnSpacing - GridLineMargin);
 
-            //  Allocate space for each child
+            //  Set the bounds of each cell
             foreach (ColumnDefinition Column in Columns)
             {
                 int ColumnWidth = ColumnWidths[Column];
@@ -1043,12 +1072,6 @@ namespace MGUI.Core.UI.Containers.Grids
                     Row.Top = CurrentY;
                     Row.Height = RowHeight;
 
-                    Rectangle CellBounds = Rectangle.Intersect(Bounds, new(CurrentX, CurrentY, ColumnWidth, RowHeight));
-                    foreach (MGElement Child in GetCellContent(Row, Column))
-                    {
-                        Child.UpdateLayout(CellBounds);
-                    }
-
                     CurrentY += RowHeight + RowSpacing;
                 }
 
@@ -1056,6 +1079,37 @@ namespace MGUI.Core.UI.Containers.Grids
             }
 
             _CellBounds = GetCellBounds(false);
+
+            //  Allocate space for each child
+            for (int ColumnIndex = 0; ColumnIndex < Columns.Count; ColumnIndex++)
+            {
+                ColumnDefinition Column = Columns[ColumnIndex];
+                for (int RowIndex = 0; RowIndex < Rows.Count; RowIndex++)
+                {
+                    RowDefinition Row = Rows[RowIndex];
+
+                    GridCell Cell = new(Row, Column);
+                    foreach (MGElement Child in GetCellContent(Cell))
+                    {
+                        GridSpan Span = ChildSpanLookup[Child];
+
+                        //  Get the bounds of each cell this element spans
+                        List<Rectangle> SpannedCellBounds = new();
+                        for (int ColumnOffset = 0; ColumnOffset < Span.ColumnSpan; ColumnOffset++)
+                        {
+                            for (int RowOffset = 0; RowOffset < Span.RowSpan; RowOffset++)
+                            {
+                                GridCell SpannedCell = new(_Rows[RowIndex + RowOffset], _Columns[ColumnIndex + ColumnOffset]);
+                                SpannedCellBounds.Add(_CellBounds[SpannedCell]);
+                            }
+                        }
+
+                        Rectangle ElementBounds = Rectangle.Intersect(Bounds, RectangleUtils.Union(SpannedCellBounds));
+                        Child.UpdateLayout(ElementBounds);
+                    }
+                }
+            }
+
         }
 
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
