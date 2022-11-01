@@ -8,6 +8,8 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DrawingColor = System.Drawing.Color;
+using ColorTranslator = System.Drawing.ColorTranslator;
 
 namespace MGUI.Core.UI.XAML
 {
@@ -30,6 +32,11 @@ namespace MGUI.Core.UI.XAML
             this.A = A;
         }
 
+        public static XAMLColor operator *(XAMLColor value, float scale) =>
+            new((byte)(value.R * scale), (byte)(value.G * scale), (byte)(value.B * scale), (byte)(value.A * scale));
+        public static XAMLColor operator *(float scale, XAMLColor value) =>
+            new((byte)(value.R * scale), (byte)(value.G * scale), (byte)(value.B * scale), (byte)(value.A * scale));
+
         public override string ToString() => $"({R},{G},{B}|{A})";
 
         public Color ToXNAColor() => new(R, G, B, A);
@@ -48,8 +55,22 @@ namespace MGUI.Core.UI.XAML
         {
             if (value is string stringValue)
             {
-                var color = System.Drawing.ColorTranslator.FromHtml(stringValue);
-                return new XAMLColor(color.R, color.G, color.B, color.A);
+                int asteriskIndex = stringValue.IndexOf('*');
+                if (asteriskIndex > 0)
+                {
+                    string colorName = stringValue.Substring(0, asteriskIndex).Trim();
+                    DrawingColor color = ColorTranslator.FromHtml(colorName);
+
+                    string opacityScalarString = stringValue.Substring(asteriskIndex + 1).Trim();
+                    float opacityScalar = float.Parse(opacityScalarString);
+
+                    return new XAMLColor(color.R, color.G, color.B, color.A) * opacityScalar;
+                }
+                else
+                {
+                    DrawingColor color = ColorTranslator.FromHtml(stringValue);
+                    return new XAMLColor(color.R, color.G, color.B, color.A);
+                }
             }
 
             return base.ConvertFrom(context, culture, value);

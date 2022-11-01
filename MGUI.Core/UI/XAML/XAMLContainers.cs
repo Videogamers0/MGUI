@@ -100,12 +100,12 @@ namespace MGUI.Core.UI.XAML
 
             if (RowLengths != null)
             {
-                Grid.AddRows(GridLength.ParseMultiple(RowLengths));
+                Grid.AddRows(ConstrainedGridLength.ParseMultiple(RowLengths));
             }
 
             if (ColumnLengths != null)
             {
-                Grid.AddColumns(GridLength.ParseMultiple(ColumnLengths));
+                Grid.AddColumns(ConstrainedGridLength.ParseMultiple(ColumnLengths));
             }
 
             foreach (XAMLRowDefinition RowDefinition in RowDefinitions)

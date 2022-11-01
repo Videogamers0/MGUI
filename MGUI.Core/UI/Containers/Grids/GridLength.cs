@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MGUI.Core.UI.Containers.Grids
@@ -89,35 +90,59 @@ namespace MGUI.Core.UI.Containers.Grids
                 _ => throw new NotImplementedException($"Unrecognized {nameof(GridUnitType)}: {UnitType}")
             };
 
-        /// <param name="Dimensions">To represent a <see cref="GridUnitType.Auto"/> dimension: "Auto" (case-insensitive)<br/>
+        private const string AutoLengthPattern = @"(?<AutoLength>(?i)auto(?-i))";
+        private const string PixelLengthPattern = @"(?<PixelLength>(?<PixelValue>\d+)((?i)px(?-i))?)";
+        private const string WeightedLengthPattern = @"(?<WeightedLength>(?<WeightValue>(\d+(\.\d+)?)?)\*)";
+        private const string DimensionLengthPattern = $@"({AutoLengthPattern}|{WeightedLengthPattern}|{PixelLengthPattern})";
+
+        /// <summary>A <see cref="Regex"/> that parses <see cref="GridLength"/>s from strings.<br/>
+        /// Does not include start of string ('^') or end of string ('$') regex anchors.<para/>
+        /// See also: <see cref="AnchoredParser"/><para/>
+        /// EX: "Auto,16px,25,*,1.5*,Auto" would contain 6 Matches</summary>
+        public static readonly Regex UnanchoredParser = new(DimensionLengthPattern);
+        /// <summary>A <see cref="Regex"/> that parses <see cref="GridLength"/>s from strings.<br/>
+        /// Include start of string ('^') and end of string ('$') regex anchors.<para/>
+        /// See also: <see cref="UnanchoredParser"/><para/>
+        /// EX: "1.5*" would result in a weighted <see cref="GridLength"/> with Weight=1.5.<br/>
+        /// But "1.5*,1.2*" would not match because the start of string and end of string anchors only allow 1 <see cref="GridLength"/> match within the string.</summary>
+        public static readonly Regex AnchoredParser = new($@"^{DimensionLengthPattern}$");
+
+        /// <param name="Length">To represent a <see cref="GridUnitType.Auto"/> dimension: "Auto" (case-insensitive)<br/>
         /// To represent a <see cref="GridUnitType.Pixel"/> dimension: A positive integral value. EX: "50"<br/>
         /// To represent a <see cref="GridUnitType.Weighted"/> dimension: A positive numeric value, suffixed with '*'. EX: "1.5*". If no numeric value is present, it is assumed to be "1*"</param>
-        public static GridLength Parse(string Dimensions)
+        public static GridLength Parse(string Length)
         {
-            if (Dimensions.Equals("Auto", StringComparison.CurrentCultureIgnoreCase))
-                return Auto;
-            else if (Dimensions.EndsWith('*'))
+            Match Match = AnchoredParser.Match(Length);
+            if (Match.Groups["AutoLength"].Success)
             {
-                double Weight = Dimensions.Length == 1 ? 1.0 : double.Parse(Dimensions[..^1]);
+                return Auto;
+            }
+            else if (Match.Groups["PixelLength"].Success)
+            {
+                string PixelValueString = Match.Groups["PixelValue"].Value;
+                int Pixels = int.Parse(PixelValueString);
+                return CreatePixelLength(Pixels);
+            }
+            else if (Match.Groups["WeightedLength"].Success)
+            {
+                string WeightValueString = Match.Groups["WeightValue"].Value;
+                double Weight = WeightValueString == string.Empty ? 1.0 : double.Parse(WeightValueString);
                 return CreateWeightedLength(Weight);
             }
             else
-            {
-                int Pixels = int.Parse(Dimensions);
-                return CreatePixelLength(Pixels);
-            }
+                throw new NotImplementedException($"Unrecognized {nameof(GridLength)} value: {Length}");
         }
 
-        /// <param name="CommaSeparatedDimensions">A comma-separated list of dimensions, where each value is either:<para/>
+        /// <param name="CommaSeparatedValues">A comma-separated list of dimensions, where each value is either:<para/>
         /// To represent a <see cref="GridUnitType.Auto"/> dimension: "Auto" (case-insensitive)<br/>
         /// To represent a <see cref="GridUnitType.Pixel"/> dimension: A positive integral value. EX: "50"<br/>
         /// To represent a <see cref="GridUnitType.Weighted"/> dimension: A positive numeric value, suffixed with '*'. EX: "1.5*". If no numeric value is present, it is assumed to be "1*"<para/>
         /// EX: "1.25*,1*,200,Auto" would yield 4 <see cref="GridLength"/>s.</param>
-        public static IEnumerable<GridLength> ParseMultiple(string CommaSeparatedDimensions)
+        public static IEnumerable<GridLength> ParseMultiple(string CommaSeparatedValues)
         {
-            if (!string.IsNullOrEmpty(CommaSeparatedDimensions))
+            if (!string.IsNullOrEmpty(CommaSeparatedValues))
             {
-                foreach (string Item in CommaSeparatedDimensions.Split(','))
+                foreach (string Item in CommaSeparatedValues.Split(','))
                     yield return Parse(Item);
             }
         }

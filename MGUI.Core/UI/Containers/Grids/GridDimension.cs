@@ -4,10 +4,49 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MGUI.Core.UI.Containers.Grids
 {
+    /// <summary>A <see cref="GridLength"/> that is also associated with a minimum and maximum size.</summary>
+    /// <param name="MinSize">Represents either <see cref="ColumnDefinition.MinWidth"/> or <see cref="RowDefinition.MinHeight"/></param>
+    /// <param name="MaxSize">Represents either <see cref="ColumnDefinition.MaxWidth"/> or <see cref="RowDefinition.MaxHeight"/></param>
+    public readonly record struct ConstrainedGridLength(GridLength Length, int? MinSize, int? MaxSize)
+    {
+        private static readonly string SizeConstraintsPattern = @"(\[(?<MinSize>\d*),(?<MaxSize>\d*)\])?";
+        private static readonly Regex UnanchoredParser = new($@"((?<Length>{GridLength.UnanchoredParser}){SizeConstraintsPattern})");
+        private static readonly Regex AnchoredParser = new($@"^(?<Length>{GridLength.UnanchoredParser}){SizeConstraintsPattern}$");
+
+        public static ConstrainedGridLength Parse(string Value)
+        {
+            Match Match = AnchoredParser.Match(Value);
+            GridLength Length = GridLength.Parse(Match.Groups["Length"].Value);
+            string MinSizeString = Match.Groups["MinSize"].Value;
+            int? MinSize = MinSizeString == "" ? null : int.Parse(MinSizeString);
+            string MaxSizeString = Match.Groups["MaxSize"].Value;
+            int? MaxSize = MaxSizeString == "" ? null : int.Parse(MaxSizeString);
+            return new(Length, MinSize, MaxSize);
+        }
+
+        /// <param name="CommaSeparatedValues">A comma-separated list of <see cref="GridLength"/>s with optional size constraints at the end of each one.<para/>
+        /// Example:
+        /// <code>1.5*[,100],Auto[50,200],250</code><para/>
+        /// Parses to 3 results:<br/>
+        /// 1.5*[,100] = Weighted <see cref="GridLength"/>: Weight=1.5. MinSize=null, MaxSize=100<br/>
+        /// Auto[50,200] = <see cref="GridLength.Auto"/>: MinSize=50, MaxSize=200<br/>
+        /// 250 = Pixel <see cref="GridLength"/>: Pixels=250, MinSize=null, MaxSize=null</param>
+        public static IEnumerable<ConstrainedGridLength> ParseMultiple(string CommaSeparatedValues)
+        {
+            if (!string.IsNullOrEmpty(CommaSeparatedValues))
+            {
+                MatchCollection Matches = UnanchoredParser.Matches(CommaSeparatedValues);
+                foreach (Match Match in Matches.Cast<Match>())
+                    yield return Parse(Match.Value);
+            }
+        }
+    }
+
     /// <summary>Base class for <see cref="RowDefinition"/> and <see cref="ColumnDefinition"/></summary>
     public abstract class GridDimensionDefinition : ViewModelBase
     {

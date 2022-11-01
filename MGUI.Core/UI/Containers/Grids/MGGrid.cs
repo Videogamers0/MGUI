@@ -172,21 +172,26 @@ namespace MGUI.Core.UI.Containers.Grids
         }
 
         /// <param name="Lengths">The lengths of each <see cref="ColumnDefinition"/> to create.<para/>
-        /// Consider using <see cref="GridLength.ParseMultiple(string)"/> for a convenient way to generate the values</param>
+        /// Consider using <see cref="GridLength.ParseMultiple(string)"/> for a convenient/concise way to generate the values</param>
         /// <returns>The created <see cref="ColumnDefinition"/>s</returns>
         public List<ColumnDefinition> AddColumns(IEnumerable<GridLength> Lengths) => Lengths.Select(x => AddColumn(x)).ToList();
 
-        /// <param name="Lengths">The lengths of each <see cref="RowDefinition"/> to create.<para/>
-        /// Consider using <see cref="GridLength.ParseMultiple(string)"/> for a convenient way to generate the values</param>
-        /// <returns>The created <see cref="RowDefinition"/>s</returns>
-        public List<RowDefinition> AddRows(IEnumerable<GridLength> Lengths) => Lengths.Select(x => AddRow(x)).ToList();
+        /// <param name="Lengths">The lengths of each <see cref="ColumnDefinition"/> to create.<para/>
+        /// Consider using <see cref="ConstrainedGridLength.ParseMultiple(string)"/> for a convenient/concise way to generate the values</param>
+        /// <returns>The created <see cref="ColumnDefinition"/>s</returns>
+        public List<ColumnDefinition> AddColumns(IEnumerable<ConstrainedGridLength> Lengths) => Lengths.Select(x => AddColumn(x)).ToList();
 
         /// <summary>See also: <see cref="AddColumns(IEnumerable{GridLength})"/>, <see cref="GridLength.ParseMultiple(string)"/></summary>
         /// <param name="Length">Warning - <see cref="GridUnitType.Weighted"/> is treated as <see cref="GridUnitType.Auto"/> 
         /// when the column is inside of an <see cref="MGScrollViewer"/> with a horizontal scrollbar</param>
-        public ColumnDefinition AddColumn(GridLength Length)
+        public ColumnDefinition AddColumn(GridLength Length) => AddColumn(new ConstrainedGridLength(Length, null, null));
+
+        /// <summary>See also: <see cref="AddColumns(IEnumerable{ConstrainedGridLength})"/>, <see cref="ConstrainedGridLength.ParseMultiple(string)"/></summary>
+        /// <param name="Length">Warning - <see cref="GridUnitType.Weighted"/> is treated as <see cref="GridUnitType.Auto"/> 
+        /// when the column is inside of an <see cref="MGScrollViewer"/> with a horizontal scrollbar</param>
+        public ColumnDefinition AddColumn(ConstrainedGridLength Length)
         {
-            ColumnDefinition Column = new(this, Length);
+            ColumnDefinition Column = new(this, Length.Length, Length.MinSize, Length.MaxSize);
             _Columns.Add(Column);
             return Column;
         }
@@ -200,12 +205,27 @@ namespace MGUI.Core.UI.Containers.Grids
             _Columns.Remove(Column);
         }
 
+        /// <param name="Lengths">The lengths of each <see cref="RowDefinition"/> to create.<para/>
+        /// Consider using <see cref="GridLength.ParseMultiple(string)"/> for a convenient/concise way to generate the values</param>
+        /// <returns>The created <see cref="RowDefinition"/>s</returns>
+        public List<RowDefinition> AddRows(IEnumerable<GridLength> Lengths) => Lengths.Select(x => AddRow(x)).ToList();
+
+        /// <param name="Lengths">The lengths of each <see cref="RowDefinition"/> to create.<para/>
+        /// Consider using <see cref="ConstrainedGridLength.ParseMultiple(string)"/> for a convenient/concise way to generate the values</param>
+        /// <returns>The created <see cref="RowDefinition"/>s</returns>
+        public List<RowDefinition> AddRows(IEnumerable<ConstrainedGridLength> Lengths) => Lengths.Select(x => AddRow(x)).ToList();
+
         /// <summary>See also: <see cref="AddRows(IEnumerable{GridLength})"/>, <see cref="GridLength.ParseMultiple(string)"/></summary>
         /// <param name="Length">Warning - <see cref="GridUnitType.Weighted"/> is treated as <see cref="GridUnitType.Auto"/> 
         /// when the row is inside of an <see cref="MGScrollViewer"/> with a vertical scrollbar</param>
-        public RowDefinition AddRow(GridLength Length)
+        public RowDefinition AddRow(GridLength Length) => AddRow(new ConstrainedGridLength(Length, null, null));
+
+        /// <summary>See also: <see cref="AddRows(IEnumerable{ConstrainedGridLength})"/>, <see cref="ConstrainedGridLength.ParseMultiple(string)"/></summary>
+        /// <param name="Length">Warning - <see cref="GridUnitType.Weighted"/> is treated as <see cref="GridUnitType.Auto"/> 
+        /// when the row is inside of an <see cref="MGScrollViewer"/> with a vertical scrollbar</param>
+        public RowDefinition AddRow(ConstrainedGridLength Length)
         {
-            RowDefinition Row = new(this, Length);
+            RowDefinition Row = new(this, Length.Length, Length.MinSize, Length.MaxSize);
             _Rows.Add(Row);
             return Row;
         }

@@ -102,29 +102,20 @@ namespace MGUI.Samples
             <GridSplitter GridRow=""0"" GridColumn=""1"" />
         </Grid>-->
 
-        <Grid Name=""TestGrid"" RowLengths=""100,*"" Width=""296"" BG=""White"" HA=""Center"">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Length=""1*"" MinWidth=""50"" MaxWidth=""150"" />
-                <ColumnDefinition Length=""16"" />
-                <ColumnDefinition Length=""1.5*"" MinWidth=""50"" MaxWidth=""60"" />
-                <ColumnDefinition Length=""1.2*"" />
-            </Grid.ColumnDefinitions>
-
+        <Grid Name=""TestGrid"" RowLengths=""100[50,],16,*[80,]"" ColumnLengths=""1*[50,150],16,1.5*[50,60],1.2*"" Width=""296"" BG=""White * 0.8"" HA=""Center"">
             <TextBlock BG=""Red"" GridRow=""0"" GridColumn=""0"" />
-            <TextBlock BG=""Yellow"" GridRow=""1"" GridColumn=""2"" />
+            <TextBlock BG=""Yellow"" GridRow=""2"" GridColumn=""2"" />
             <TextBlock BG=""Purple"" GridRow=""0"" GridColumn=""3"" />
-            <TextBlock BG=""Green"" GridRow=""1"" GridColumn=""0"" />
+            <TextBlock BG=""Green"" GridRow=""2"" GridColumn=""0"" />
             <TextBlock BG=""Cyan"" GridRow=""0"" GridColumn=""2"" />
-            <TextBlock BG=""Crimson"" GridRow=""1"" GridColumn=""3"" />
+            <TextBlock BG=""Crimson"" GridRow=""2"" GridColumn=""3"" />
 
             <GridSplitter GridRow=""1"" GridColumn=""1"" />
+            <GridSplitter GridRow=""1"" GridColumn=""0"" />
         </Grid>
     </DockPanel>
 </Window>
             ";
-
-            //TODO add support for '*X' suffix in XAMLColorConverter: EX "White*0.5"
-            //      converter checks for * char. if found, parses everything after the color name as a double, cast to float, multiply by the html color.
 
             MGWindow XAMLWindow = XAMLParser.LoadRootWindow(Desktop, xaml);
             this.Desktop.Windows.Add(XAMLWindow);

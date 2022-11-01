@@ -17,6 +17,7 @@ namespace MGUI.Core.UI.Containers.Grids
     public class MGGridSplitter : MGElement
     {
         #region Focus Visual Style
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Color _HoveredHighlightColor;
         /// <summary>An overlay color that is drawn overtop of this <see cref="MGGridSplitter"/>'s graphics if the mouse is currently hovering it.<br/>
         /// Recommended to use a transparent color.<para/>
@@ -36,6 +37,7 @@ namespace MGUI.Core.UI.Containers.Grids
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _PressedDarkenIntensity;
         /// <summary>A percentage to darken this <see cref="MGGridSplitter"/>'s graphics by when the mouse is currently pressed, but not yet released, overtop of this <see cref="MGElement"/>.<br/>
         /// Use a larger value to apply a more obvious background overlay while this <see cref="MGElement"/> is pressed. Use a smaller value for a more subtle change.<para/>
@@ -76,6 +78,7 @@ namespace MGUI.Core.UI.Containers.Grids
         }
         #endregion Border
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _Size;
         /// <summary>For a Vertical <see cref="MGGridSplitter"/>, this represents the Width.<br/>
         /// For a Horizontal <see cref="MGGridSplitter"/>, this represents the Height.<para/>
@@ -98,12 +101,16 @@ namespace MGUI.Core.UI.Containers.Grids
             }
         }
 
+        /// <summary>The default value for <see cref="TickSize"/>: (22,2)</summary>
+        public static readonly Size DefaultTickSize = new(22, 2);
         /// <summary>The size to use when drawing the small grip thumb graphics in the center of this element's bounds.<para/>
         /// <see cref="TickSize"/>.Width represents the size of the larger dimension (The height of a vertical <see cref="MGGridSplitter"/>, the width of a horizontal <see cref="MGGridSplitter"/>)<br/>
         /// <see cref="TickSize"/>.Height represents the size of the smaller dimension.<para/>
-        /// See also: <see cref="Orientation"/></summary>
+        /// See also: <see cref="Orientation"/><para/>
+        /// Default value: <see cref="DefaultTickSize"/></summary>
         public Size TickSize { get; set; }
 
+        //TODO make this a VisualStateBrush. then we can get rid of the focusvisualstyle crap
         /// <summary>The brush to use when drawing the thumb tick marks in the center of this element's bounds.</summary>
         public IFillBrush Foreground { get; set; }
 
@@ -153,8 +160,8 @@ namespace MGUI.Core.UI.Containers.Grids
             /// <summary>Key = Original column. Value = Actual row</summary>
             public IReadOnlyDictionary<RowDefinition, RowDefinition> OriginalToActualRow => _OriginalToActualRow;
 
-            public bool IsValid => GridSplitter != null && GridSplitterCell.Column != null && GridSplitterCell.Row != null && OwnerGrid != null && 
-                (ActualColumns?.Count ?? 0) > 0 && (ActualRows?.Count ?? 0) > 0;
+            public bool IsValid => GridSplitter != null && GridSplitterCell.Column != null && GridSplitterCell.Row != null && 
+                OwnerGrid != null && OwnerGrid.IsLayoutValid && (ActualColumns?.Count ?? 0) > 0 && (ActualRows?.Count ?? 0) > 0;
 
             internal GridDragData(GridDragData InheritFrom)
             {
@@ -236,7 +243,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 this.VerticalAlignment = VerticalAlignment.Stretch;
                 this.HorizontalAlignment = HorizontalAlignment.Stretch;
                 this.Size = 12;
-                this.TickSize = new(20, 2);
+                this.TickSize = DefaultTickSize;
 
                 this.Foreground = GetTheme().GridSplitterForeground.GetValue(true);
 
@@ -265,7 +272,7 @@ namespace MGUI.Core.UI.Containers.Grids
         }
 
         /// <summary>Represents the order of precedence that resizing operations will be applied to rows/columns in.<para/>
-        /// For example, if columns left of a <see cref="MGGridSplitter"/> are reduced in width, it will attempt to reduce weighted columns first.<br/>
+        /// For example, if columns to the left of a <see cref="MGGridSplitter"/> are reduced in width, it will attempt to reduce weighted columns first.<br/>
         /// If there are no weighted columns or the weighted column couldn't fully be reduced by the desired amount (such as if it had a MinWidth), then next the resize logic will look for pixel-length columns.</summary>
         private static readonly ReadOnlyCollection<GridUnitType> OrderedGridUnitTypes = new List<GridUnitType>() {
             GridUnitType.Weighted, GridUnitType.Pixel, GridUnitType.Auto
@@ -277,7 +284,7 @@ namespace MGUI.Core.UI.Containers.Grids
             if (GridData?.IsValid != true)
                 return;
 
-            GridDragData Data = new(GridData.Value);
+            GridDragData Data = new(GridData.Value); // Make a copy of the data so we can iteratively adjust the row/column width/height values without affecting the original data used by these calculations
 
             //  Note: By the time we get to this point, the weighted lengths of the grid's rows/columns
             //  have already been normalized via MGGrid.NormalizeWeightedLengths()
@@ -290,17 +297,92 @@ namespace MGUI.Core.UI.Containers.Grids
                 case Orientation.Horizontal:
                     GridSplitterIndex = Data.GridSplitterCell.Row.Index;
                     Delta = PositionDelta.Y; // (Position is in client-space, so positive Y-axis is down)
-                    if (Delta < 0) // Dragged splitter up
+                    if (Delta != 0)
                     {
-                        //  Decrease height of previous row(s) and increase height of next row(s)
-                        //TODO
+                        List<RowDefinition> DecreasedRows;
+                        List<RowDefinition> IncreasedRows;
 
-                    }
-                    else if (Delta > 0) // Dragged splitter down
-                    {
-                        //  Decrease height of next row(s) and increase height of previous row(s)
-                        //TODO
+                        //  Prioritize removing/adding height to/from rows based on the row's length type and how close the row is to the gridsplitter's row
+                        List<RowDefinition> OrderedDecreasedRows;
+                        List<RowDefinition> OrderedIncreasedRows;
 
+                        if (Delta < 0) // Dragged splitter up: Decrease height of row(s) above the GridSplitter, increase height of row(s) below the GridSplitter
+                        {
+                            DecreasedRows = Data.OriginalRows.Take(GridSplitterIndex).ToList();
+                            OrderedDecreasedRows = DecreasedRows
+                                .OrderBy(x => OrderedGridUnitTypes.IndexOf(x.Length.UnitType))
+                                .ThenByDescending(x => DecreasedRows.IndexOf(x))
+                                .ToList();
+
+                            IncreasedRows = Data.OriginalRows.Skip(GridSplitterIndex + 1).ToList();
+                            OrderedIncreasedRows = IncreasedRows
+                                .OrderBy(x => OrderedGridUnitTypes.IndexOf(x.Length.UnitType))
+                                .ThenBy(x => IncreasedRows.IndexOf(x))
+                                .ToList();
+                        }
+                        else // Dragged splitter down: Decrease height of row(s) below the GridSplitter, increase height of row(s) above the GridSplitter
+                        {
+                            DecreasedRows = Data.OriginalRows.Skip(GridSplitterIndex + 1).ToList();
+                            OrderedDecreasedRows = DecreasedRows
+                                .OrderBy(x => OrderedGridUnitTypes.IndexOf(x.Length.UnitType))
+                                .ThenBy(x => DecreasedRows.IndexOf(x))
+                                .ToList();
+
+                            IncreasedRows = Data.OriginalRows.Take(GridSplitterIndex).ToList();
+                            OrderedIncreasedRows = IncreasedRows
+                                .OrderBy(x => OrderedGridUnitTypes.IndexOf(x.Length.UnitType))
+                                .ThenByDescending(x => IncreasedRows.IndexOf(x))
+                                .ToList();
+                        }
+
+                        int MaxReduction = DecreasedRows.Sum(x => Math.Max(0, x.Height - (x.MinHeight ?? 0))); // Maximum height that can be removed from the previous rows
+                        int MaxIncrease = IncreasedRows.Any(x => !x.MaxHeight.HasValue) ? int.MaxValue : IncreasedRows.Sum(x => Math.Max(0, x.MaxHeight.Value - x.Height)); // Maximum height that can be added to the next rows
+                        int ResizeAmount = GeneralUtils.Min(Math.Abs(Delta), MaxReduction, MaxIncrease);
+
+                        int TotalRemainingRemovedHeight = ResizeAmount; // The amount we still have to reduce previous rows by
+                        for (int i = 0; i < OrderedDecreasedRows.Count; i++)
+                        {
+                            RowDefinition Source = OrderedDecreasedRows[i];
+                            int CurrentRemovedHeight = GeneralUtils.Min(Source.Height - (Source.MinHeight ?? 0), TotalRemainingRemovedHeight);
+                            if (CurrentRemovedHeight > 0)
+                            {
+                                //  Reduce the height of the source row
+                                Data.OriginalToActualRow[Source].Length = Source.Length.UnitType switch
+                                {
+                                    GridUnitType.Auto or GridUnitType.Pixel => GridLength.CreatePixelLength(Source.Height - CurrentRemovedHeight),
+                                    GridUnitType.Weighted => GridLength.CreateWeightedLength(Source.Height - CurrentRemovedHeight),
+                                    _ => throw new NotImplementedException($"Unrecognized {nameof(GridUnitType)}: {Source.Length.UnitType}"),
+                                };
+
+                                int TotalRemainingAddedHeight = CurrentRemovedHeight;
+                                for (int j = 0; j < OrderedIncreasedRows.Count; j++)
+                                {
+                                    RowDefinition Target = OrderedIncreasedRows[j];
+                                    int CurrentAddedHeight = GeneralUtils.Min((Target.MaxHeight ?? int.MaxValue) - Target.Height, TotalRemainingAddedHeight);
+                                    if (CurrentAddedHeight > 0)
+                                    {
+                                        Data.OriginalToActualRow[Target].Length = Target.Length.UnitType switch
+                                        {
+                                            GridUnitType.Auto or GridUnitType.Pixel => GridLength.CreatePixelLength(Target.Height + CurrentAddedHeight),
+                                            GridUnitType.Weighted => GridLength.CreateWeightedLength(Target.Height + CurrentAddedHeight),
+                                            _ => throw new NotImplementedException($"Unrecognized {nameof(GridUnitType)}: {Source.Length.UnitType}"),
+                                        };
+
+                                        Target.Height += CurrentAddedHeight;
+
+                                        TotalRemainingAddedHeight -= CurrentAddedHeight;
+                                        if (TotalRemainingAddedHeight <= 0)
+                                            break;
+                                    }
+                                }
+
+                                Source.Height -= CurrentRemovedHeight;
+
+                                TotalRemainingRemovedHeight -= CurrentRemovedHeight;
+                                if (TotalRemainingRemovedHeight <= 0)
+                                    break;
+                            }
+                        }
                     }
                     break;
                 case Orientation.Vertical:
@@ -409,12 +491,14 @@ namespace MGUI.Core.UI.Containers.Grids
             bool IsHorizontal = Orientation == Orientation.Horizontal;
             bool IsVertical = Orientation == Orientation.Vertical;
 
+            Rectangle PaddedBounds = LayoutBounds.GetCompressed(Padding);
+
             List<Rectangle> TickBounds = new();
             if (Foreground != null)
             {
-                int TickWidth = IsHorizontal ? Math.Min(LayoutBounds.Width - 4, TickSize.Width) : TickSize.Height;
-                int TickHeight = IsVertical ? TickSize.Width : Math.Min(LayoutBounds.Height - 4, TickSize.Height);
-                int TickSpacing = Math.Min(Size - (TickSize.Height + 1) * 2, 3);
+                int TickWidth = IsHorizontal ? Math.Min(PaddedBounds.Width - 4, TickSize.Width) : TickSize.Height;
+                int TickHeight = IsVertical ? TickSize.Width : Math.Min(PaddedBounds.Height - 4, TickSize.Height);
+                int TickSpacing = Math.Min(Size - (TickSize.Height + 1) * 2, 2);
 
                 if (IsHorizontal)
                 {

@@ -78,6 +78,8 @@ namespace MGUI.Core.UI
         public VisualStateBrush GetTitleBackgroundBrush() => new(this, TitleBackground.GetValue(true), HoveredColor * 0.35f);
         public VisualStateBrush GetSpoilerUnspoiledBackgroundBrush() => new(this, AccentBackground.GetValue(true), HoveredColor);
 
+        public Color GetGridSplitterHoverColor() => HoveredColor.Brighten(0.1f);
+
         public VisualStateBrush GetBackgroundBrush(MGElementType ElementType)
         {
             return ElementType switch

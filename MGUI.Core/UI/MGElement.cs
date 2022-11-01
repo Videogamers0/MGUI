@@ -79,6 +79,11 @@ namespace MGUI.Core.UI
     }
 
     //TODO
+    //Grid should have basic support for RowSpan/ColumnSpan even if the spanning elements don't affect the measurements since that might be too complex
+    //      measure logic will just treat it as if it's in the row/column it was explicitly added to? maybe an option like 'AffectsMeasure' to ignore the cell content in the measure logic
+    //      and when computingdimensions. or even a 'MeasureRowIndex'/'MeasureColumnIndex' in case you add a spanning element to, say, row=0, column=1, but want it measured as if its
+    //      in row=0, column=2 (requires ColumnSpan=2 or greater in this case, so the element must intersect the cell you apply its measurement to)
+    //      GridSpan record: int RowSpan, int ColumnSpan, bool AffectsMeasure, int? MeasureRow, int? MeasureColumn (if null, uses the row/column it was added to assuming AffectsMeasure=true)
     //UniformGrid?
     //StaticGrid - user specifies # of rows and columns, and the size of each cell
     //      also things like gridline size, spacing, gridline brush, cell background brush
@@ -115,7 +120,6 @@ namespace MGUI.Core.UI
     //      maybe option to load from a file instead. so u just use your own text editor instead of a shitty built-in one.
     //      when the file path is set, the code listens for changes to the file, autorefresh on save
     //
-    //Grid should have basic support for RowSpan/ColumnSpan even if the spanning elements don't affect the measurements since that might be too complex
     //
     //maybe MGDesktop should store a Dictionary<string, Texture2D> NamedTextures
     //      which is used by the XAMLParser (instead of passing in the dictionary to XAMLParser.Parse, XAMLParser.Parse retrieves it from MGDesktop)
@@ -1063,7 +1067,7 @@ namespace MGUI.Core.UI
         }
 
         /// <summary>If true, indicates that the layout will be re-calculated during the next update tick. This also invalidates any cached measurements.</summary>
-        protected bool IsLayoutValid { get; private set; }
+        public bool IsLayoutValid { get; private set; }
 
 #region Arrange
         internal protected void UpdateLayout(Rectangle Bounds)
