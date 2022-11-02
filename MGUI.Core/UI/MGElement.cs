@@ -174,7 +174,7 @@ namespace MGUI.Core.UI
     //		note: don't auto-apply the style if there's another style further down the visual tree. or maybe theyd applied in a specific order so later ones overwrite earlier ones
 
     /// <summary>Base class for all UI elements.</summary>
-    public abstract class MGElement : ViewModelBase, IMouseHandlerHost, IKeyboardHandlerHost
+    public abstract class MGElement : IMouseHandlerHost, IKeyboardHandlerHost
     {
         public string UniqueId { get; }
 
@@ -201,7 +201,6 @@ namespace MGUI.Core.UI
             {
                 MGElement Previous = Parent;
                 _Parent = Value;
-                NPC(nameof(Parent));
                 OnParentChanged?.Invoke(this, new(Previous, Parent));
             }
         }
@@ -235,7 +234,6 @@ namespace MGUI.Core.UI
 				{
 					string Previous = Name;
 					_Name = value;
-					NPC(nameof(Name));
 					OnNameChanged?.Invoke(this, new(Previous, Name));
 				}
 			}
@@ -254,7 +252,6 @@ namespace MGUI.Core.UI
 				if (!_Margin.Equals(value))
 				{
 					_Margin = value;
-					NPC(nameof(Margin));
                     LayoutChanged(this, true);
                 }
 			}
@@ -270,7 +267,6 @@ namespace MGUI.Core.UI
 				if (!_Padding.Equals(value))
 				{
 					_Padding = value;
-					NPC(nameof(Padding));
                     LayoutChanged(this, true);
                 }
 			}
@@ -348,7 +344,6 @@ namespace MGUI.Core.UI
 				{
 					HorizontalAlignment Previous = HorizontalAlignment;
 					_HorizontalAlignment = value;
-					NPC(nameof(HorizontalAlignment));
 					OnHorizontalAlignmentChanged?.Invoke(this, new(Previous, HorizontalAlignment));
                     LayoutChanged(this, true);
                 }
@@ -368,7 +363,6 @@ namespace MGUI.Core.UI
 				{
 					VerticalAlignment Previous = VerticalAlignment;
                     _VerticalAlignment = value;
-					NPC(nameof(VerticalAlignment));
                     OnVerticalAlignmentChanged?.Invoke(this, new(Previous, VerticalAlignment));
                     LayoutChanged(this, true);
                 }
@@ -387,7 +381,6 @@ namespace MGUI.Core.UI
 				if (_HorizontalContentAlignment != value)
 				{
 					_HorizontalContentAlignment = value;
-					NPC(nameof(HorizontalContentAlignment));
                     LayoutChanged(this, true);
                 }
 			}
@@ -403,7 +396,6 @@ namespace MGUI.Core.UI
 				if (_VerticalContentAlignment != value)
 				{
 					_VerticalContentAlignment = value;
-					NPC(nameof(VerticalContentAlignment));
                     LayoutChanged(this, true);
                 }
 			}
@@ -422,7 +414,6 @@ namespace MGUI.Core.UI
 				if (_MinWidth != value)
 				{
 					_MinWidth = value;
-					NPC(nameof(MinWidth));
                     LayoutChanged(this, true);
                 }
 			}
@@ -438,7 +429,6 @@ namespace MGUI.Core.UI
                 if (_MinHeight != value)
                 {
                     _MinHeight = value;
-                    NPC(nameof(MinHeight));
                     LayoutChanged(this, true);
                 }
             }
@@ -454,7 +444,6 @@ namespace MGUI.Core.UI
                 if (_MaxWidth != value)
                 {
                     _MaxWidth = value;
-                    NPC(nameof(MaxWidth));
                     LayoutChanged(this, true);
                 }
             }
@@ -470,7 +459,6 @@ namespace MGUI.Core.UI
 				if (_MaxHeight != value)
 				{
 					_MaxHeight = value;
-					NPC(nameof(MaxHeight));
                     LayoutChanged(this, true);
                 }
 			}
@@ -501,7 +489,6 @@ namespace MGUI.Core.UI
 						throw new ArgumentOutOfRangeException($"{nameof(MGElement)}.{nameof(PreferredWidth)} cannot be negative.");
 
 					_PreferredWidth = value;
-					NPC(nameof(PreferredWidth));
                     LayoutChanged(this, true);
                 }
 			}
@@ -524,7 +511,6 @@ namespace MGUI.Core.UI
                         throw new ArgumentOutOfRangeException($"{nameof(MGElement)}.{nameof(PreferredHeight)} cannot be negative.");
 
                     _PreferredHeight = value;
-					NPC(nameof(PreferredHeight));
                     LayoutChanged(this, true);
                 }
 			}
@@ -557,7 +543,6 @@ namespace MGUI.Core.UI
 				{
 					MGToolTip Previous = ToolTip;
 					_ToolTip = value;
-					NPC(nameof(ToolTip));
 					ToolTipChanged?.Invoke(this, new(Previous, ToolTip));
 				}
 			}
@@ -580,7 +565,6 @@ namespace MGUI.Core.UI
 				{
 					MGContextMenu Previous = ContextMenu;
 					_ContextMenu = value;
-					NPC(nameof(ContextMenu));
 					ContextMenuChanged?.Invoke(this, new(Previous, ContextMenu));
 				}
 			}
@@ -630,14 +614,7 @@ namespace MGUI.Core.UI
         public bool IsHitTestVisible
         {
             get => _IsHitTestVisible && (Visibility == Visibility.Visible || (CanHandleInputsWhileHidden && Visibility == Visibility.Hidden));
-            set
-            {
-                if (_IsHitTestVisible != value)
-                {
-                    _IsHitTestVisible = value;
-                    NPC(nameof(IsHitTestVisible));
-                }
-            }
+            set => _IsHitTestVisible = value;
         }
         /// <summary>True if this <see cref="MGElement"/> should be allowed to detect and handle mouse and keyboard inputs.<para/>
         /// This property is only true if both this <see cref="MGElement"/> and every parent along the visual tree have <see cref="IsHitTestVisible"/>==true.</summary>
@@ -694,19 +671,7 @@ namespace MGUI.Core.UI
         /// <summary>The default foreground color to use when rendering text on this <see cref="MGElement"/> or any of its child elements.<br/>
         /// For a value that accounts for the parent's <see cref="DefaultTextForeground"/>, use <see cref="DerivedDefaultTextForeground"/> instead.<para/>
         /// See also: <see cref="DerivedDefaultTextForeground"/></summary>
-        public Color? DefaultTextForeground
-        {
-            get => _DefaultTextForeground;
-            set
-            {
-                if (_DefaultTextForeground != value)
-                {
-                    _DefaultTextForeground = value;
-                    NPC(nameof(DefaultTextForeground));
-                    NPC(nameof(DerivedDefaultTextForeground));
-                }
-            }
-        }
+        public Color? DefaultTextForeground { get; set; }
 
         /// <summary>This property prioritizes <see cref="DefaultTextForeground"/> if it has a value.<br/>
         /// Else traverses up the visual tree until finding the first non-null <see cref="DefaultTextForeground"/>.</summary>
@@ -730,8 +695,6 @@ namespace MGUI.Core.UI
                 {
                     Visibility Previous = Visibility;
                     _Visibility = value;
-                    NPC(nameof(Visibility));
-                    NPC(nameof(IsHitTestVisible));
                     if (Previous == Visibility.Collapsed || Visibility == Visibility.Collapsed)
                         LayoutChanged(this, true);
                 }

@@ -70,17 +70,8 @@ namespace MGUI.Core.UI
                 if (!GetDesktop().FontManager.TryGetFont(FontFamily, CustomFontStyles.Normal, FontSize, true, out FontSet FS, out SpriteFont Font, out int Size, out float ExactScale, out float SuggestedScale))
                     return false;
 
-                if (this.FontFamily != FontFamily)
-                {
-                    _FontFamily = FontFamily;
-                    NPC(nameof(this.FontFamily));
-                }
-
-                if (this.FontSize != FontSize)
-                {
-                    _FontSize = FontSize;
-                    NPC(nameof(this.FontSize));
-                }
+                this._FontFamily = FontFamily;
+                this._FontSize = FontSize;
 
                 this.SF_Regular = Font;
                 this.FontScale = SuggestedScale;
@@ -118,18 +109,7 @@ namespace MGUI.Core.UI
         /// If the text is formatted with color codes (such as '[color=Red]Hello World[/color]'), the color specified in the <see cref="MGTextRun"/> will take precedence.<para/>
         /// If the value for the current <see cref="MGElement.VisualState"/> is null, will attempt to resolve the value from <see cref="MGElement.DerivedDefaultTextForeground"/>, or <see cref="Color.Black"/> as a fallback value.<para/>
         /// See also: <see cref="MGElement.DefaultTextForeground"/>, <see cref="MGElement.DerivedDefaultTextForeground"/>, <see cref="ActualForeground"/></summary>
-        public VisualStateSetting<Color?> Foreground
-        {
-            get => _Foreground;
-            set
-            {
-                if (_Foreground != value)
-                {
-                    _Foreground = value;
-                    NPC(nameof(Foreground));
-                }
-            }
-        }
+        public VisualStateSetting<Color?> Foreground { get; set; }
 
         public Color ActualForeground => Foreground.GetValue(VisualState.Primary) ?? DerivedDefaultTextForeground ?? Color.Black;
 
@@ -148,7 +128,6 @@ namespace MGUI.Core.UI
             if (_Text != Value)
             {
                 _Text = Value;
-                NPC(nameof(Text));
                 Runs = MGTextRun.ParseRuns(Text, new(false)).ToList().AsReadOnly();
                 if (!SuppressLayoutChanged)
                     InvokeLayoutChanged();
@@ -157,33 +136,8 @@ namespace MGUI.Core.UI
             }
         }
 
-        private ReadOnlyCollection<MGTextRun> _Runs;
-        public ReadOnlyCollection<MGTextRun> Runs
-        {
-            get => _Runs;
-            private set
-            {
-                if (_Runs != value)
-                {
-                    _Runs = value;
-                    NPC(nameof(Runs));
-                }
-            }
-        }
-
-        private ReadOnlyCollection<MGTextLine> _Lines;
-        public ReadOnlyCollection<MGTextLine> Lines
-        {
-            get => _Lines;
-            private set
-            {
-                if (_Lines != value)
-                {
-                    _Lines = value;
-                    NPC(nameof(Lines));
-                }
-            }
-        }
+        public ReadOnlyCollection<MGTextRun> Runs { get; private set; }
+        public ReadOnlyCollection<MGTextLine> Lines { get; private set; }
 
         internal void UpdateLines()
         {
@@ -199,7 +153,6 @@ namespace MGUI.Core.UI
                 if (_WrapText != value)
                 {
                     _WrapText = value;
-                    NPC(nameof(WrapText));
                     InvokeLayoutChanged();
                 }
             }
@@ -215,25 +168,12 @@ namespace MGUI.Core.UI
                 if (_LinePadding != value)
                 {
                     _LinePadding = value;
-                    NPC(nameof(LinePadding));
                     InvokeLayoutChanged();
                 }
             }
         }
 
-        private HorizontalAlignment _TextAlignment;
-        public HorizontalAlignment TextAlignment
-        {
-            get => _TextAlignment;
-            set
-            {
-                if (_TextAlignment != value)
-                {
-                    _TextAlignment = value;
-                    NPC(nameof(TextAlignment));
-                }
-            }
-        }
+        public HorizontalAlignment TextAlignment { get; set; }
 
         /// <param name="Foreground">Defaults to <see cref="Color.Black"/></param>
         /// <exception cref="ArgumentException"></exception>

@@ -82,20 +82,12 @@ namespace MGUI.Core.UI
                 if (_TemplatedItems != value)
                 {
                     if (TemplatedItems != null)
-                    {
                         TemplatedItems.CollectionChanged -= TemplatedItems_CollectionChanged;
-                    }
-
                     _TemplatedItems = value;
-                    NPC(nameof(TemplatedItems));
-                    
                     if (TemplatedItems != null)
-                    {
                         TemplatedItems.CollectionChanged += TemplatedItems_CollectionChanged;
-                    }
 
                     DropdownContentChanged();
-
                     HoveredItem = null;
                 }
             }
@@ -117,11 +109,8 @@ namespace MGUI.Core.UI
                 {
                     if (SelectedItem != null)
                         SelectedItem.Element.IsSelected = false;
-
                     _SelectedItem = value;
-                    NPC(nameof(SelectedItem));
                     UpdateSelectedContent();
-
                     if (SelectedItem != null)
                         SelectedItem.Element.IsSelected = true;
                 }
@@ -136,20 +125,8 @@ namespace MGUI.Core.UI
         #endregion Selected Item
 
         #region Hovered Item
-        private TemplatedElement<TItemType, MGButton> _HoveredItem;
         /// <summary>The item within the dropdown that is currently hovered by the mouse, if any.</summary>
-        public TemplatedElement<TItemType, MGButton> HoveredItem
-        {
-            get => _HoveredItem;
-            private set
-            {
-                if (_HoveredItem != value)
-                {
-                    _HoveredItem = value;
-                    NPC(nameof(HoveredItem));
-                }
-            }
-        }
+        public TemplatedElement<TItemType, MGButton> HoveredItem { get; private set; }
 
         private void UpdateHoveredDropdownItem()
         {
@@ -171,17 +148,10 @@ namespace MGUI.Core.UI
                 if (_ItemsSource != value)
                 {
                     if (ItemsSource != null)
-                    {
                         ItemsSource.CollectionChanged -= ItemsSource_CollectionChanged;
-                    }
-
                     _ItemsSource = value;
-                    NPC(nameof(ItemsSource));
-
                     if (ItemsSource != null)
-                    {
                         ItemsSource.CollectionChanged += ItemsSource_CollectionChanged;
-                    }
 
                     if (ItemsSource == null || DropdownItemTemplate == null)
                         TemplatedItems = null;
@@ -266,7 +236,6 @@ namespace MGUI.Core.UI
                 if (_DropdownItemTemplate != value)
                 {
                     _DropdownItemTemplate = value;
-                    NPC(nameof(DropdownItemTemplate));
 
                     if (ItemsSource == null || DropdownItemTemplate == null)
                         TemplatedItems = null;
@@ -289,7 +258,6 @@ namespace MGUI.Core.UI
                 if (_SelectedItemTemplate != value)
                 {
                     _SelectedItemTemplate = value;
-                    NPC(nameof(SelectedItemTemplate));
                     UpdateSelectedContent();
                 }
             }
@@ -350,7 +318,6 @@ namespace MGUI.Core.UI
                         return;
 
                     _IsDropdownOpen = value;
-                    NPC(nameof(IsDropdownOpen));
 
                     if (IsDropdownOpen)
                     {
@@ -374,21 +341,9 @@ namespace MGUI.Core.UI
 
         public static Color DefaultDropdownArrowColor = Color.Black;
 
-        private Color _DropdownArrowColor;
         /// <summary>The color of the inverted triangle on the right-side of this <see cref="MGComboBox{TItemType}"/>.<para/>
         /// Default value: <see cref="DefaultDropdownArrowColor"/></summary>
-        public Color DropdownArrowColor
-        {
-            get => _DropdownArrowColor;
-            set
-            {
-                if (_DropdownArrowColor != value)
-                {
-                    _DropdownArrowColor = value;
-                    NPC(nameof(DropdownArrowColor));
-                }
-            }
-        }
+        public Color DropdownArrowColor { get; set; }
 
         private void ManagedSetContent(MGElement Content)
         {

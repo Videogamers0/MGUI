@@ -90,7 +90,6 @@ namespace MGUI.Core.UI
                 string Previous = Text;
 
                 _Text = Value;
-                NPC(nameof(Text));
 
                 if (!IsExecutingUndoRedo)
                     ClearRedoStack();
@@ -125,11 +124,7 @@ namespace MGUI.Core.UI
             if (_FormattedText != Value)
             {
                 _FormattedText = Value;
-
-                if (Silent)
-                    TextBlockElement.SetText(FormattedText, true);
-                else
-                    TextBlockElement.Text = FormattedText;
+                TextBlockElement.SetText(FormattedText, Silent);
             }
         }
 
@@ -188,7 +183,6 @@ namespace MGUI.Core.UI
                 if (_PlaceholderText != value)
                 {
                     _PlaceholderText = value;
-                    NPC(nameof(PlaceholderText));
                     PlaceholderTextBlockElement.Text = PlaceholderText;
                     UpdatePlaceholderVisibility();
                 }
@@ -223,7 +217,6 @@ namespace MGUI.Core.UI
                 if (_CharacterLimit != value)
                 {
                     _CharacterLimit = value;
-                    NPC(nameof(CharacterLimit));
                     if (CharacterLimit.HasValue && Text.Length > CharacterLimit)
                     {
                         SetText(GetTextBackingField().Substring(0, CharacterLimit.Value));
@@ -265,7 +258,6 @@ namespace MGUI.Core.UI
                 if (_LimitedCharacterCountFormatString != value)
                 {
                     _LimitedCharacterCountFormatString = value;
-                    NPC(nameof(LimitedCharacterCountFormatString));
                     if (CharacterLimit.HasValue)
                         UpdateCharacterCountText();
                 }
@@ -287,7 +279,6 @@ namespace MGUI.Core.UI
                 if (_LimitlessCharacterCountFormatString != value)
                 {
                     _LimitlessCharacterCountFormatString = value;
-                    NPC(nameof(LimitlessCharacterCountFormatString));
                     if (!CharacterLimit.HasValue)
                         UpdateCharacterCountText();
                 }
@@ -377,7 +368,6 @@ namespace MGUI.Core.UI
                 if (_FocusedSelectionForegroundColor != value)
                 {
                     _FocusedSelectionForegroundColor = value;
-                    NPC(nameof(FocusedSelectionForegroundColor));
                     FocusedSelectionForegroundColorString = ColorTranslator.ToHtml(FocusedSelectionForegroundColor.AsDrawingColor());
                 }
             }
@@ -410,7 +400,6 @@ namespace MGUI.Core.UI
                 if (_FocusedSelectedBackgroundColor != value)
                 {
                     _FocusedSelectedBackgroundColor = value;
-                    NPC(nameof(FocusedSelectionBackgroundColor));
                     FocusedSelectionBackgroundColorString = ColorTranslator.ToHtml(FocusedSelectionBackgroundColor.AsDrawingColor());
                 }
             }
@@ -607,7 +596,6 @@ namespace MGUI.Core.UI
                 if (_UndoRedoHistorySize != value)
                 {
                     _UndoRedoHistorySize = value;
-                    NPC(nameof(UndoRedoHistorySize));
                     UndoStack.SetLimit(UndoRedoHistorySize);
                     RedoStack.SetLimit(UndoRedoHistorySize);
                 }
@@ -755,11 +743,7 @@ namespace MGUI.Core.UI
             get => _IsUserResizable;
             set
             {
-                if (_IsUserResizable != value)
-                {
-                    _IsUserResizable = value;
-                    NPC(nameof(IsUserResizable));
-                }
+                _IsUserResizable = value;
                 ResizeGripElement.Visibility = IsUserResizable ? Visibility.Visible : Visibility.Collapsed;
             }
         }

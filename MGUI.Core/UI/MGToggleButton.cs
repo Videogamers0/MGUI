@@ -49,7 +49,6 @@ namespace MGUI.Core.UI
                 if (_UseAlternateTextForegroundWhenChecked != value)
                 {
                     _UseAlternateTextForegroundWhenChecked = value;
-                    NPC(nameof(UseAlternateTextForegroundWhenChecked));
                     DefaultTextForeground = IsChecked ? CheckedTextForeground : null;
                 }
             }
@@ -67,8 +66,6 @@ namespace MGUI.Core.UI
                 if (_CheckedTextForeground != value)
                 {
                     _CheckedTextForeground = value;
-                    NPC(nameof(CheckedTextForeground));
-
                     if (UseAlternateTextForegroundWhenChecked && IsChecked)
                     {
                         DefaultTextForeground = CheckedTextForeground;
@@ -87,7 +84,6 @@ namespace MGUI.Core.UI
                 {
                     bool Previous = IsChecked;
                     _IsChecked = value;
-                    NPC(nameof(IsChecked));
                     OnCheckStateChanged?.Invoke(this, new(Previous, IsChecked));
 
                     IsSelected = IsChecked;

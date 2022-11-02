@@ -55,8 +55,6 @@ namespace MGUI.Core.UI
 
                 _Texture = Texture;
                 _SourceRect = SourceRect;
-                NPC(nameof(this.Texture));
-                NPC(nameof(this.SourceRect));
 
                 if (PreviousWidth != UnstretchedWidth || PreviousHeight != UnstretchedHeight)
                     LayoutChanged(this, true);
@@ -72,7 +70,6 @@ namespace MGUI.Core.UI
                 if (_Stretch != value)
                 {
                     _Stretch = value;
-                    NPC(nameof(Stretch));
                     LayoutChanged(this, true);
                 }
             }
@@ -88,7 +85,6 @@ namespace MGUI.Core.UI
                 if (_StretchDirection != value)
                 {
                     _StretchDirection = value;
-                    NPC(nameof(StretchDirection));
                     LayoutChanged(this, true);
                 }
             }

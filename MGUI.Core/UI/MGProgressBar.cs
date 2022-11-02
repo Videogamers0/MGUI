@@ -64,7 +64,6 @@ namespace MGUI.Core.UI
                 if (_ShowValue != value)
                 {
                     _ShowValue = value;
-                    NPC(nameof(ShowValue));
                     ValueElement.Visibility = ShowValue ? Visibility.Visible : Visibility.Collapsed;
                     UpdateDisplayedValue();
                 }
@@ -92,7 +91,6 @@ namespace MGUI.Core.UI
                 if (_ValueDisplayFormat != value)
                 {
                     _ValueDisplayFormat = value;
-                    NPC(nameof(ValueDisplayFormat));
                     UpdateDisplayedValue();
                 }
             }
@@ -139,8 +137,6 @@ namespace MGUI.Core.UI
                 if (_Minimum != value)
                 {
                     _Minimum = value;
-                    NPC(nameof(Minimum));
-                    NPC(nameof(ActualValue));
                     UpdateDisplayedValue();
                 }
             }
@@ -155,8 +151,6 @@ namespace MGUI.Core.UI
                 if (_Maximum != value)
                 {
                     _Maximum = value;
-                    NPC(nameof(Maximum));
-                    NPC(nameof(ActualValue));
                     UpdateDisplayedValue();
                 }
             }
@@ -171,8 +165,6 @@ namespace MGUI.Core.UI
                 if (_Value != value)
                 {
                     _Value = value;
-                    NPC(nameof(Value));
-                    NPC(nameof(ActualValue));
                     UpdateDisplayedValue();
                 }
             }
@@ -195,7 +187,6 @@ namespace MGUI.Core.UI
                 if (_Size != value)
                 {
                     _Size = value;
-                    NPC(nameof(Size));
                     LayoutChanged(this, true);
                 }
             }
@@ -219,7 +210,6 @@ namespace MGUI.Core.UI
                 if (_Orientation != value)
                 {
                     _Orientation = value;
-                    NPC(nameof(Orientation));
                     LayoutChanged(this, true);
                 }
             }
@@ -228,24 +218,12 @@ namespace MGUI.Core.UI
         public bool IsHorizontal => Orientation == Orientation.Horizontal;
         public bool IsVertical => Orientation == Orientation.Vertical;
 
-        private bool _IsReversed;
         /// <summary>If true, the bar will flow in the opposite direction.<para/>
         /// If <see cref="Orientation"/> is <see cref="Orientation.Horizontal"/>, progress bar starts on the right, and completes on the left.<br/>
         /// If <see cref="Orientation"/> is <see cref="Orientation.Vertical"/>, progress bar starts on the top, and completes on the bottom.<para/>
         /// This value also reverses the placement of the current value, if <see cref="ShowValue"/> is true.<para/>
         /// Default value: false</summary>
-        public bool IsReversed
-        {
-            get => _IsReversed;
-            set
-            {
-                if (_IsReversed != value)
-                {
-                    _IsReversed = value;
-                    NPC(nameof(IsReversed));
-                }
-            }
-        }
+        public bool IsReversed { get; set; }
 
         /// <param name="Value">The current value. This should be in the inclusive range [<paramref name="Minimum"/>, <paramref name="Maximum"/>]</param>
         /// <param name="Size">The size, in pixels, of the bar. If the orientation is <see cref="Orientation.Horizontal"/>, this represents the height of the bar.</param>

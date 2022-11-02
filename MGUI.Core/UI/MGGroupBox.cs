@@ -50,7 +50,6 @@ namespace MGUI.Core.UI
                 {
                     HeaderContent?.SetParent(null);
                     _HeaderContent = value;
-                    NPC(nameof(HeaderContent));
                     HeaderContent?.SetParent(this);
                     LayoutChanged(this, true);
                 }
@@ -69,7 +68,6 @@ namespace MGUI.Core.UI
                 if (_HeaderHorizontalMargin != value)
                 {
                     _HeaderHorizontalMargin = value;
-                    NPC(nameof(HeaderHorizontalMargin));
                     LayoutChanged(this, true);
                 }
             }
@@ -85,7 +83,6 @@ namespace MGUI.Core.UI
                 if (_HeaderHorizontalPadding != value)
                 {
                     _HeaderHorizontalPadding = value;
-                    NPC(nameof(HeaderHorizontalPadding));
                     LayoutChanged(this, true);
                 }
             }
@@ -104,8 +101,6 @@ namespace MGUI.Core.UI
                 BorderComponent.ComponentParent = this;
 
                 this.Padding = new(8,4,8,8);
-
-                //this.BackgroundOverride = DefaultBackgroundBrush;
 
                 this.HeaderContent = HeaderContent;
 

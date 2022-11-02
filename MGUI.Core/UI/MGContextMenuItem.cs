@@ -108,7 +108,6 @@ namespace MGUI.Core.UI
                 {
                     MGButton Previous = ContentWrapper;
                     _ContentWrapper = value;
-                    NPC(nameof(ContentWrapper));
 
                     //  Clear previous wrapper's content
                     if (Previous != null)
@@ -155,7 +154,6 @@ namespace MGUI.Core.UI
                 {
                     MGElement Previous = MenuItemContent;
                     _MenuItemContent = value;
-                    NPC(nameof(MenuItemContent));
 
                     using (Container.AllowChangingContentTemporarily())
                     {
@@ -201,7 +199,6 @@ namespace MGUI.Core.UI
                     }
 
                     _Submenu = value;
-                    NPC(nameof(Submenu));
 
                     if (Submenu != null)
                     {
@@ -304,7 +301,6 @@ namespace MGUI.Core.UI
                 if (_Icon != value)
                 {
                     _Icon = value;
-                    NPC(nameof(Icon));
 
                     using (HeaderPresenter.AllowChangingContentTemporarily())
                     {
@@ -356,7 +352,6 @@ namespace MGUI.Core.UI
                 if (_IsChecked != value)
                 {
                     _IsChecked = value;
-                    NPC(nameof(IsChecked));
                     OnToggled?.Invoke(this, IsChecked);
                 }
             }

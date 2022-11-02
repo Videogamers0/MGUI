@@ -24,7 +24,6 @@ namespace MGUI.Core.UI
                 if (_Width != value)
                 {
                     _Width = value;
-                    NPC(nameof(Width));
                     LayoutChanged(this, true);
                 }
             }
@@ -39,7 +38,6 @@ namespace MGUI.Core.UI
                 if (_Height != value)
                 {
                     _Height = value;
-                    NPC(nameof(Height));
                     LayoutChanged(this, true);
                 }
             }

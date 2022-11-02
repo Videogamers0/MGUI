@@ -62,19 +62,7 @@ namespace MGUI.Core.UI
             }
         };
 
-        private RatingItemShape _ItemShape;
-        public RatingItemShape ItemShape
-        {
-            get => _ItemShape;
-            set
-            {
-                if (_ItemShape != value)
-                {
-                    _ItemShape = value;
-                    NPC(nameof(ItemShape));
-                }
-            }
-        }
+        public RatingItemShape ItemShape { get; set; }
 
         private int _ItemSize;
         /// <summary>The dimensions, in pixels, of each item in this <see cref="MGRatingControl"/>.<para/>
@@ -88,7 +76,6 @@ namespace MGUI.Core.UI
                 if (_ItemSize != value)
                 {
                     _ItemSize = value;
-                    NPC(nameof(ItemSize));
                     LayoutChanged(this, true);
                 }
             }
@@ -105,7 +92,6 @@ namespace MGUI.Core.UI
                 if (_Spacing != value)
                 {
                     _Spacing = value;
-                    NPC(nameof(Spacing));
                     LayoutChanged(this, true);
                 }
             }
@@ -193,7 +179,6 @@ namespace MGUI.Core.UI
                 if (_UseDiscreteValues != value)
                 {
                     _UseDiscreteValues = value;
-                    NPC(nameof(UseDiscreteValues));
                     if (UseDiscreteValues)
                         _ = SetValue(Value);
                 }
@@ -210,7 +195,6 @@ namespace MGUI.Core.UI
                 if (_DiscreteValueInterval != value)
                 {
                     _DiscreteValueInterval = value;
-                    NPC(nameof(DiscreteValueInterval));
                     if (UseDiscreteValues)
                         _ = SetValue(Value);
                 }
@@ -256,7 +240,6 @@ namespace MGUI.Core.UI
                 if (_IsReadonly != value)
                 {
                     _IsReadonly = value;
-                    NPC(nameof(IsReadonly));
                     PreviewValue = null;
                 }
             }

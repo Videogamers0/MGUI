@@ -570,7 +570,6 @@ namespace MGUI.Core.UI.Containers.Grids
                 if (_SelectionMode != value)
                 {
                     _SelectionMode = value;
-                    NPC(nameof(SelectionMode));
                     CurrentSelection = HasSelection ? CurrentSelection.Value with { SelectionMode = SelectionMode } : CurrentSelection;
                 }
             }
@@ -648,7 +647,6 @@ namespace MGUI.Core.UI.Containers.Grids
                 if (_GridLinesVisibility != value)
                 {
                     _GridLinesVisibility = value;
-                    NPC(nameof(GridLinesVisibility));
                     CheckIfOuterPaddingChanged();
                 }
             }
@@ -668,7 +666,6 @@ namespace MGUI.Core.UI.Containers.Grids
                 if (_GridLineMargin != value)
                 {
                     _GridLineMargin = value;
-                    NPC(nameof(GridLineMargin));
                     CheckIfOuterPaddingChanged();
                 }
             }
@@ -701,7 +698,6 @@ namespace MGUI.Core.UI.Containers.Grids
                 if (_RowSpacing != value)
                 {
                     _RowSpacing = value;
-                    NPC(nameof(RowSpacing));
                     LayoutChanged(this, true);
                 }
             }
@@ -720,7 +716,6 @@ namespace MGUI.Core.UI.Containers.Grids
                 if (_ColumnSpacing != value)
                 {
                     _ColumnSpacing = value;
-                    NPC(nameof(ColumnSpacing));
                     LayoutChanged(this, true);
                 }
             }

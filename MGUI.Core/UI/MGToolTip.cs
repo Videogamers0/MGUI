@@ -15,21 +15,9 @@ namespace MGUI.Core.UI
     {
         public MGElement Host { get; }
 
-        private bool _ShowOnDisabled;
         /// <summary>True if this <see cref="MGToolTip"/> can be shown on an <see cref="MGElement"/> where <see cref="MGElement.IsEnabled"/>==false.<para/>
         /// Default value: false</summary>
-        public bool ShowOnDisabled
-        {
-            get => _ShowOnDisabled;
-            set
-            {
-                if (_ShowOnDisabled != value)
-                {
-                    _ShowOnDisabled = value;
-                    NPC(nameof(ShowOnDisabled));
-                }
-            }
-        }
+        public bool ShowOnDisabled { get; set; }
 
         public MGToolTip(MGWindow Window, MGElement Host, int Width, int Height)
             : base(Window.Desktop, Window, MGElementType.ToolTip, 0, 0, Width, Height)

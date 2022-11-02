@@ -75,8 +75,6 @@ namespace MGUI.Core.UI
                 if (_UnselectedTabHeaderTemplate != value)
                 {
                     _UnselectedTabHeaderTemplate = value;
-                    NPC(nameof(UnselectedTabHeaderTemplate));
-
                     foreach (KeyValuePair<MGTabItem, MGButton> KVP in ActualTabHeaders.ToList())
                     {
                         MGTabItem Tab = KVP.Key;
@@ -98,8 +96,6 @@ namespace MGUI.Core.UI
                 if (_SelectedTabHeaderTemplate != value)
                 {
                     _SelectedTabHeaderTemplate = value;
-                    NPC(nameof(SelectedTabHeaderTemplate));
-
                     foreach (KeyValuePair<MGTabItem, MGButton> KVP in ActualTabHeaders.ToList())
                     {
                         MGTabItem Tab = KVP.Key;
@@ -178,15 +174,11 @@ namespace MGUI.Core.UI
 
                 MGTabItem Previous = SelectedTab;
                 _SelectedTab = Tab;
-                NPC(nameof(SelectedTab));
 
                 UpdateHeaderWrapper(Previous);
                 UpdateHeaderWrapper(SelectedTab);
 
                 SetContent(SelectedTab);
-
-                Previous?.NPC(nameof(MGTabItem.IsTabSelected));
-                SelectedTab?.NPC(nameof(MGTabItem.IsTabSelected));
                 SelectedTabChanged?.Invoke(this, new(Previous, SelectedTab));
                 return true;
             }
@@ -337,7 +329,6 @@ namespace MGUI.Core.UI
                 {
                     MGElement Previous = HeaderContent;
                     _HeaderContent = value;
-                    NPC(nameof(HeaderContent));
                     HeaderContentChanged?.Invoke(this, new(Previous, HeaderContent));
                     LayoutChanged(this, true);
                 }

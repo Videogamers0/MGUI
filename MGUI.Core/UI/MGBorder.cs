@@ -14,19 +14,7 @@ namespace MGUI.Core.UI
 {
     public class MGBorder : MGSingleContentHost
     {
-        private IBorderBrush _BorderBrush;
-        public IBorderBrush BorderBrush
-        {
-            get => _BorderBrush;
-            set
-            {
-                if (_BorderBrush != value)
-                {
-                    _BorderBrush = value;
-                    NPC(nameof(BorderBrush));
-                }
-            }
-        }
+        public IBorderBrush BorderBrush { get; set; }
 
         private Thickness _BorderThickness;
         public Thickness BorderThickness
@@ -37,7 +25,6 @@ namespace MGUI.Core.UI
                 if (!_BorderThickness.Equals(value))
                 {
                     _BorderThickness = value;
-                    NPC(nameof(BorderThickness));
                     LayoutChanged(this, true);
                 }
             }

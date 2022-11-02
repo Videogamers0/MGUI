@@ -24,7 +24,6 @@ namespace MGUI.Core.UI
                 if (_Width != value)
                 {
                     _Width = value;
-                    NPC(nameof(Width));
                     LayoutChanged(this, true);
                 }
             }
@@ -39,59 +38,22 @@ namespace MGUI.Core.UI
                 if (_Height != value)
                 {
                     _Height = value;
-                    NPC(nameof(Height));
                     LayoutChanged(this, true);
                 }
             }
         }
 
-        private Color _Stroke;
         /// <summary>The <see cref="Color"/> to use for the border of this <see cref="MGRectangle"/>.<para/>
         /// See also: <see cref="StrokeThickness"/></summary>
-        public Color Stroke
-        {
-            get => _Stroke;
-            set
-            {
-                if (_Stroke != value)
-                {
-                    _Stroke = value;
-                    NPC(nameof(Stroke));
-                }
-            }
-        }
+        public Color Stroke { get; set; }
 
-        private int _StrokeThickness;
         /// <summary>The uniform thickness of each side of this <see cref="MGRectangle"/>'s border.<para/>
         /// See also: <see cref="Stroke"/></summary>
-        public int StrokeThickness
-        {
-            get => _StrokeThickness;
-            set
-            {
-                if (_StrokeThickness != value)
-                {
-                    _StrokeThickness = value;
-                    NPC(nameof(StrokeThickness));
-                }
-            }
-        }
+        public int StrokeThickness { get; set; }
 
-        private IFillBrush _Fill;
         /// <summary>The brush to use to fill the space occupied by this <see cref="MGRectangle"/>.<para/>
         /// See also: <see cref="Width"/>, <see cref="Height"/></summary>
-        public IFillBrush Fill
-        {
-            get => _Fill;
-            set
-            {
-                if (_Fill != value)
-                {
-                    _Fill = value;
-                    NPC(nameof(Fill));
-                }
-            }
-        }
+        public IFillBrush Fill { get; set; }
 
         public MGRectangle(MGWindow Window, int Width, int Height, Color Stroke, int StrokeThickness, Color Fill)
             : this(Window, Width, Height, Stroke, StrokeThickness, Fill.AsFillBrush()) { }

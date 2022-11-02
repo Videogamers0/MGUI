@@ -25,8 +25,6 @@ namespace MGUI.Core.UI
 				if (_PasswordCharacter != value)
 				{
 					_PasswordCharacter = value;
-					NPC(nameof(PasswordCharacter));
-
 					if (!string.IsNullOrEmpty(Text))
 						_ = base.SetText(ReplaceNormalCharactersWith(Text, PasswordCharacter));
 				}

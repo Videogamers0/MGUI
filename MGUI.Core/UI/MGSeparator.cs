@@ -24,7 +24,6 @@ namespace MGUI.Core.UI
                 if (_Orientation != value)
                 {
                     _Orientation = value;
-                    NPC(nameof(Orientation));
                     Margin = AutoMargin;
                     LayoutChanged(this, true);
                 }
@@ -40,7 +39,6 @@ namespace MGUI.Core.UI
                 if (_Size != value)
                 {
                     _Size = value;
-                    NPC(nameof(Size));
                     LayoutChanged(this, true);
                 }
             }

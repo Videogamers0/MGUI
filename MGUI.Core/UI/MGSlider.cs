@@ -86,7 +86,6 @@ namespace MGUI.Core.UI
                 if (_UseDiscreteValues != value)
                 {
                     _UseDiscreteValues = value;
-                    NPC(nameof(UseDiscreteValues));
                     if (UseDiscreteValues)
                         _ = SetValue(Value);
                 }
@@ -103,7 +102,6 @@ namespace MGUI.Core.UI
                 if (_DiscreteValueInterval != value)
                 {
                     _DiscreteValueInterval = value;
-                    NPC(nameof(DiscreteValueInterval));
                     if (UseDiscreteValues)
                         _ = SetValue(Value);
                 }
@@ -124,54 +122,14 @@ namespace MGUI.Core.UI
                 if (_NumberLineSize != value)
                 {
                     _NumberLineSize = value;
-                    NPC(nameof(NumberLineSize));
                     LayoutChanged(this, true);
                 }
             }
         }
 
-        private Thickness _NumberLineBorderThickness;
-        public Thickness NumberLineBorderThickness
-        {
-            get => _NumberLineBorderThickness;
-            set
-            {
-                if (!_NumberLineBorderThickness.Equals(value))
-                {
-                    _NumberLineBorderThickness = value;
-                    NPC(nameof(NumberLineBorderThickness));
-                }
-            }
-        }
-
-        private IBorderBrush _NumberLineBorderBrush;
-        public IBorderBrush NumberLineBorderBrush
-        {
-            get => _NumberLineBorderBrush;
-            set
-            {
-                if (_NumberLineBorderBrush != value)
-                {
-                    _NumberLineBorderBrush = value;
-                    NPC(nameof(NumberLineBorderBrush));
-                }
-            }
-        }
-
-        private IFillBrush _NumberLineFillBrush;
-        public IFillBrush NumberLineFillBrush
-        {
-            get => _NumberLineFillBrush;
-            set
-            {
-                if (_NumberLineFillBrush != value)
-                {
-                    _NumberLineFillBrush = value;
-                    NPC(nameof(NumberLineFillBrush));
-                }
-            }
-        }
-
+        public Thickness NumberLineBorderThickness { get; set; }
+        public IBorderBrush NumberLineBorderBrush { get; set; }
+        public IFillBrush NumberLineFillBrush { get; set; }
         public IFillBrush ActualNumberLineFillBrush => NumberLineFillBrush ?? Foreground;
         #endregion Number Line
 
@@ -183,19 +141,7 @@ namespace MGUI.Core.UI
         /// (Represents the Height if <see cref="Orientation"/>==<see cref="Orientation.Vertical"/>. Else represents the Width)</summary>
         private const int DefaultTickSecondarySize = 18;
 
-        private float? _TickFrequency;
-        public float? TickFrequency
-        {
-            get => _TickFrequency;
-            set
-            {
-                if (_TickFrequency != value)
-                {
-                    _TickFrequency = value;
-                    NPC(nameof(TickFrequency));
-                }
-            }
-        }
+        public float? TickFrequency { get; set; }
 
         private bool _DrawTicks;
         /// <summary>True if tick marks should be drawn at the given <see cref="TickFrequency"/> interval along the number line.<para/>
@@ -209,7 +155,6 @@ namespace MGUI.Core.UI
                 if (_DrawTicks != value)
                 {
                     _DrawTicks = value;
-                    NPC(nameof(DrawTicks));
                     LayoutChanged(this, true);
                 }
             }
@@ -230,7 +175,6 @@ namespace MGUI.Core.UI
                 if (_TickWidth != value)
                 {
                     _TickWidth = value;
-                    NPC(nameof(TickWidth));
                     if (DrawTicks)
                         LayoutChanged(this, true);
                 }
@@ -249,7 +193,6 @@ namespace MGUI.Core.UI
                 if (_TickHeight != value)
                 {
                     _TickHeight = value;
-                    NPC(nameof(TickHeight));
                     if (DrawTicks)
                         LayoutChanged(this, true);
                 }
@@ -259,64 +202,14 @@ namespace MGUI.Core.UI
         public int ActualTickWidth => TickWidth ?? (IsHorizontal ? DefaultTickPrimarySize : IsVertical ? DefaultTickSecondarySize : throw new NotImplementedException());
         public int ActualTickHeight => TickHeight ?? (IsHorizontal ? DefaultTickSecondarySize : IsVertical ? DefaultTickPrimarySize : throw new NotImplementedException());
 
-        /*private bool _DrawTickValues;
+        /*
         /// <summary>True if the numeric values should be drawn at the given <see cref="TickFrequency"/> interval under the number line.<para/>
         /// Only relevant if <see cref="TickFrequency"/> is specified.</summary>
-        public bool DrawTickValues
-        {
-            get => _DrawTickValues;
-            set
-            {
-                if (_DrawTickValues != value)
-                {
-                    _DrawTickValues = value;
-                    NPC(nameof(DrawTickValues));
-                }
-            }
-        }*/
+        public bool DrawTickValues { get; set; }*/
 
-        private Thickness _TickBorderThickness;
-        public Thickness TickBorderThickness
-        {
-            get => _TickBorderThickness;
-            set
-            {
-                if (!_TickBorderThickness.Equals(value))
-                {
-                    _TickBorderThickness = value;
-                    NPC(nameof(TickBorderThickness));
-                }
-            }
-        }
-
-        private IBorderBrush _TickBorderBrush;
-        public IBorderBrush TickBorderBrush
-        {
-            get => _TickBorderBrush;
-            set
-            {
-                if (_TickBorderBrush != value)
-                {
-                    _TickBorderBrush = value;
-                    NPC(nameof(TickBorderBrush));
-                }
-            }
-        }
-
-        private IFillBrush _TickFillBrush;
-        public IFillBrush TickFillBrush
-        {
-            get => _TickFillBrush;
-            set
-            {
-                if (_TickFillBrush != value)
-                {
-                    _TickFillBrush = value;
-                    NPC(nameof(TickFillBrush));
-                }
-            }
-        }
-
+        public Thickness TickBorderThickness { get; set; }
+        public IBorderBrush TickBorderBrush { get; set; }
+        public IFillBrush TickFillBrush { get; set; }
         public IFillBrush ActualTickFillBrush => TickFillBrush ?? Foreground;
         #endregion Ticks
 
@@ -343,7 +236,6 @@ namespace MGUI.Core.UI
                 if (_ThumbWidth != value)
                 {
                     _ThumbWidth = value;
-                    NPC(nameof(ThumbWidth));
                     LayoutChanged(this, true);
                 }
             }
@@ -361,7 +253,6 @@ namespace MGUI.Core.UI
                 if (_ThumbHeight != value)
                 {
                     _ThumbHeight = value;
-                    NPC(nameof(ThumbHeight));
                     LayoutChanged(this, true);
                 }
             }
@@ -370,48 +261,9 @@ namespace MGUI.Core.UI
         public int ActualThumbWidth => ThumbWidth ?? (IsHorizontal ? DefaultThumbPrimarySize : IsVertical ? DefaultThumbSecondarySize : throw new NotImplementedException());
         public int ActualThumbHeight => ThumbHeight ?? (IsHorizontal ? DefaultThumbSecondarySize : IsVertical ? DefaultThumbPrimarySize : throw new NotImplementedException());
 
-        private Thickness _ThumbBorderThickness;
-        public Thickness ThumbBorderThickness
-        {
-            get => _ThumbBorderThickness;
-            set
-            {
-                if (!_ThumbBorderThickness.Equals(value))
-                {
-                    _ThumbBorderThickness = value;
-                    NPC(nameof(ThumbBorderThickness));
-                }
-            }
-        }
-
-        private IBorderBrush _ThumbBorderBrush;
-        public IBorderBrush ThumbBorderBrush
-        {
-            get => _ThumbBorderBrush;
-            set
-            {
-                if (_ThumbBorderBrush != value)
-                {
-                    _ThumbBorderBrush = value;
-                    NPC(nameof(ThumbBorderBrush));
-                }
-            }
-        }
-
-        private IFillBrush _ThumbFillBrush;
-        public IFillBrush ThumbFillBrush
-        {
-            get => _ThumbFillBrush;
-            set
-            {
-                if (_ThumbFillBrush != value)
-                {
-                    _ThumbFillBrush = value;
-                    NPC(nameof(ThumbFillBrush));
-                }
-            }
-        }
-
+        public Thickness ThumbBorderThickness { get; set; }
+        public IBorderBrush ThumbBorderBrush { get; set; }
+        public IFillBrush ThumbFillBrush { get; set; }
         public IFillBrush ActualThumbFillBrush => ThumbFillBrush ?? Foreground;
         #endregion Thumb
 
@@ -425,9 +277,6 @@ namespace MGUI.Core.UI
                 if (_Orientation != value)
                 {
                     _Orientation = value;
-                    NPC(nameof(Orientation));
-                    NPC(nameof(IsHorizontal));
-                    NPC(nameof(IsVertical));
                     LayoutChanged(this, true);
                 }
             }

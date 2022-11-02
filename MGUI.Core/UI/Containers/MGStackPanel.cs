@@ -23,7 +23,6 @@ namespace MGUI.Core.UI.Containers
                 if (_Orientation != value)
                 {
                     _Orientation = value;
-                    NPC(nameof(Orientation));
                     LayoutChanged(this, true);
                 }
             }
@@ -38,7 +37,6 @@ namespace MGUI.Core.UI.Containers
                 if (_FlowDirection != value)
                 {
                     _FlowDirection = value;
-                    NPC(nameof(FlowDirection));
                     LayoutChanged(this, true);
                 }
             }
@@ -56,7 +54,6 @@ namespace MGUI.Core.UI.Containers
                 if (_Spacing != value)
                 {
                     _Spacing = value;
-                    NPC(nameof(Spacing));
                     LayoutChanged(this, true);
                 }
             }

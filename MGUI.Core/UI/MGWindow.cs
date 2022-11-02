@@ -46,37 +46,8 @@ namespace MGUI.Core.UI
             }
         }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private int _Left;
-        public int Left
-        {
-            get => _Left;
-            set
-            {
-                if (_Left != value)
-                {
-                    _Left = value;
-                    NPC(nameof(Left));
-                    NPC(nameof(TopLeft));
-                }
-            }
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private int _Top;
-        public int Top
-        {
-            get => _Top;
-            set
-            {
-                if (_Top != value)
-                {
-                    _Top = value;
-                    NPC(nameof(Top));
-                    NPC(nameof(TopLeft));
-                }
-            }
-        }
+        public int Left { get; set; }
+        public int Top { get; set; }
 
         /// <summary>Note: This event is not invoked immediately after <see cref="Left"/> or <see cref="Top"/> changes.<br/>
         /// It is invoked during the Update tick to improve performance by only allowing it to notify once per tick.</summary>
@@ -93,7 +64,6 @@ namespace MGUI.Core.UI
                 if (_WindowWidth != ActualValue)
                 {
                     _WindowWidth = ActualValue;
-                    NPC(nameof(WindowWidth));
                     LayoutChanged(this, true);
                 }
             }
@@ -110,7 +80,6 @@ namespace MGUI.Core.UI
                 if (_WindowHeight != ActualValue)
                 {
                     _WindowHeight = ActualValue;
-                    NPC(nameof(WindowHeight));
                     LayoutChanged(this, true);
                 }
             }
@@ -231,11 +200,7 @@ namespace MGUI.Core.UI
             get => _IsUserResizable;
             set
             {
-                if (_IsUserResizable != value)
-                {
-                    _IsUserResizable = value;
-                    NPC(nameof(IsUserResizable));
-                }
+                _IsUserResizable = value;
                 ResizeGripElement.Visibility = IsUserResizable ? Visibility.Visible : Visibility.Collapsed;
             }
         }
@@ -261,21 +226,8 @@ namespace MGUI.Core.UI
         #endregion Border
 
         #region Nested Windows
-        private MGWindow _ModalWindow;
         /// <summary>A child <see cref="MGWindow"/> of this <see cref="MGWindow"/>, which blocks all input handling on this <see cref="MGWindow"/></summary>
-        public MGWindow ModalWindow
-        {
-            get => _ModalWindow;
-            set
-            {
-                if (_ModalWindow != value)
-                {
-                    _ModalWindow = value;
-                    NPC(nameof(ModalWindow));
-                }
-            }
-        }
-
+        public MGWindow ModalWindow { get; set; }
         /// <summary>True if a modal window is being displayed overtop of this window.</summary>
         public bool HasModalWindow => ModalWindow != null;
         /// <summary>True if this window instance is the modal window of its parent window.</summary>

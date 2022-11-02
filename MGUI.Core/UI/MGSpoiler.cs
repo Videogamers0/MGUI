@@ -83,7 +83,6 @@ namespace MGUI.Core.UI
                     }
 
                     _IsRevealed = value;
-                    NPC(nameof(IsRevealed));
 
                     this.ButtonElement.Visibility = IsRevealed ? Visibility.Collapsed : Visibility.Visible;
                     UpdateContentVisibility();

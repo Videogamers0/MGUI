@@ -39,7 +39,6 @@ namespace MGUI.Core.UI
                 if (_VSBVisibility != value)
                 {
                     _VSBVisibility = value;
-                    NPC(nameof(VSBVisibility));
                     LayoutChanged(this, true);
                 }
             }
@@ -61,7 +60,6 @@ namespace MGUI.Core.UI
                 if (_HSBVisibility != value)
                 {
                     _HSBVisibility = value;
-                    NPC(nameof(HSBVisibility));
                     LayoutChanged(this, true);
                 }
             }
@@ -94,7 +92,6 @@ namespace MGUI.Core.UI
                 if (_VerticalOffset != ClampedValue)
                 {
                     _VerticalOffset = ClampedValue;
-                    NPC(nameof(VerticalOffset));
                 }
             }
         }
@@ -110,7 +107,6 @@ namespace MGUI.Core.UI
                 if (_MaxVerticalOffset != value)
                 {
                     _MaxVerticalOffset = value;
-                    NPC(nameof(MaxVerticalOffset));
                     VerticalOffset = Math.Clamp(VerticalOffset, 0, MaxVerticalOffset);
                 }
             }
@@ -127,7 +123,6 @@ namespace MGUI.Core.UI
                 if (_HorizontalOffset != ClampedValue)
                 {
                     _HorizontalOffset = ClampedValue;
-                    NPC(nameof(HorizontalOffset));
                 }
             }
         }
@@ -143,7 +138,6 @@ namespace MGUI.Core.UI
                 if (_MaxHorizontalOffset != value)
                 {
                     _MaxHorizontalOffset = value;
-                    NPC(nameof(MaxHorizontalOffset));
                     HorizontalOffset = Math.Clamp(HorizontalOffset, 0, MaxHorizontalOffset);
                 }
             }

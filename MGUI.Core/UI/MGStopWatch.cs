@@ -73,7 +73,6 @@ namespace MGUI.Core.UI
                 if (_ValueDisplayFormat != value)
                 {
                     _ValueDisplayFormat = value;
-                    NPC(nameof(ValueDisplayFormat));
                     UpdateDisplayedValue(true);
                 }
             }
@@ -89,7 +88,6 @@ namespace MGUI.Core.UI
                 {
                     TimeSpan Previous = Elapsed;
                     _Elapsed = value;
-                    NPC(nameof(Elapsed));
                     UpdateDisplayedValue(false);
                     ElapsedChanged?.Invoke(this, new(Previous, Elapsed));
                 }
@@ -119,7 +117,6 @@ namespace MGUI.Core.UI
                 if (_ElapsedToString != value)
                 {
                     _ElapsedToString = value;
-                    NPC(nameof(ElapsedToString));
                     UpdateDisplayedValue(true);
                 }
             }
@@ -135,8 +132,6 @@ namespace MGUI.Core.UI
                 if (_IsRunning != value)
                 {
                     _IsRunning = value;
-                    NPC(nameof(IsRunning));
-
                     if (IsRunning)
                         Started?.Invoke(this, EventArgs.Empty);
                     else

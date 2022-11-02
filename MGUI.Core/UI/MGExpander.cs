@@ -55,38 +55,14 @@ namespace MGUI.Core.UI
 
         public static Color DefaultDropdownArrowColor = Color.Black;
 
-        private Color _ExpanderDropdownArrowColor;
         /// <summary>The color to use when rendering the dropdown arrow icon inside the button part of this <see cref="MGExpander"/>'s header.<para/>
         /// Default value: <see cref="DefaultDropdownArrowColor"/></summary>
-        public Color ExpanderDropdownArrowColor
-        {
-            get => _ExpanderDropdownArrowColor;
-            set
-            {
-                if (_ExpanderDropdownArrowColor != value)
-                {
-                    _ExpanderDropdownArrowColor = value;
-                    NPC(nameof(ExpanderDropdownArrowColor));
-                }
-            }
-        }
+        public Color ExpanderDropdownArrowColor { get; set; }
 
-        private int _ExpanderDropdownArrowSize;
         /// <summary>The width of the dropdown arrow icon inside the button part of this <see cref="MGExpander"/>'s header.<para/>
         /// The height of the dropdown arrow icon is based on the width.<para/>
         /// Default value: <see cref="DefaultExpanderDropdownArrowSize"/></summary>
-        public int ExpanderDropdownArrowSize
-        {
-            get => _ExpanderDropdownArrowSize;
-            set
-            {
-                if (_ExpanderDropdownArrowSize != value)
-                {
-                    _ExpanderDropdownArrowSize = value;
-                    NPC(nameof(ExpanderDropdownArrowSize));
-                }
-            }
-        }
+        public int ExpanderDropdownArrowSize { get; set; }
         #endregion Expander Button
 
         #region Header Content
@@ -115,7 +91,6 @@ namespace MGUI.Core.UI
                     }
 
                     _HeaderContent = value;
-                    NPC(nameof(HeaderContent));
 
                     if (HeaderContent != null)
                     {
@@ -153,7 +128,6 @@ namespace MGUI.Core.UI
                         return;
 
                     _IsExpanded = value;
-                    NPC(nameof(IsExpanded));
 
                     foreach (MGElement Item in BoundItems)
                         Item.Visibility = IsExpanded ? ExpandedVisibility : CollapsedVisibility;

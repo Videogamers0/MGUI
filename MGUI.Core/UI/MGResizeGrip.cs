@@ -35,7 +35,6 @@ namespace MGUI.Core.UI
                 if (_MaxDots != value)
                 {
                     _MaxDots = value;
-                    NPC(nameof(MaxDots));
                     LayoutChanged(this, true);
                 }
             }
@@ -52,7 +51,6 @@ namespace MGUI.Core.UI
                 if (_Spacing != value)
                 {
                     _Spacing = value;
-                    NPC(nameof(Spacing));
                     LayoutChanged(this, true);
                 }
             }
@@ -77,7 +75,6 @@ namespace MGUI.Core.UI
                 }
 
                 _Host = Value;
-                NPC(nameof(Host));
                 SetParent(Host);
 
                 if (Host != null)

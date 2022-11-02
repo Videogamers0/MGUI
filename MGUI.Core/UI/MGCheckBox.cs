@@ -35,7 +35,6 @@ namespace MGUI.Core.UI
                 if (_CheckBoxComponentSize != value)
                 {
                     _CheckBoxComponentSize = value;
-                    NPC(nameof(CheckBoxComponentSize));
 
                     Size ButtonSize = new(CheckBoxComponentSize, CheckBoxComponentSize);
                     ButtonElement.PreferredWidth = ButtonSize.Width;
@@ -53,20 +52,8 @@ namespace MGUI.Core.UI
             set => ButtonElement.Margin = new(ButtonElement.Margin.Left, ButtonElement.Margin.Top, value, ButtonElement.Margin.Bottom);
         }
 
-        private Color _CheckMarkColor;
         /// <summary>The <see cref="Color"/> to use when stroking the check mark if <see cref="IsChecked"/> is true.</summary>
-        public Color CheckMarkColor
-        {
-            get => _CheckMarkColor;
-            set
-            {
-                if (_CheckMarkColor != value)
-                {
-                    _CheckMarkColor = value;
-                    NPC(nameof(CheckMarkColor));
-                }
-            }
-        }
+        public Color CheckMarkColor { get; set; }
 
         private bool _IsThreeState;
         /// <summary>True if 'null' is a valid value for <see cref="IsChecked"/><para/>
@@ -79,7 +66,6 @@ namespace MGUI.Core.UI
                 if (_IsThreeState != value)
                 {
                     _IsThreeState = value;
-                    NPC(nameof(IsThreeState));
                     if (!IsThreeState && !IsChecked.HasValue)
                         IsChecked = false;
                 }
@@ -100,7 +86,6 @@ namespace MGUI.Core.UI
 
                     bool? Previous = IsChecked;
                     _IsChecked = value;
-                    NPC(nameof(IsChecked));
                     OnCheckStateChanged?.Invoke(this, new(Previous, IsChecked));
 
                     if (IsChecked.HasValue)

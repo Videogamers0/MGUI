@@ -190,8 +190,6 @@ namespace MGUI.Core.UI.Containers
                     _Content?.SetParent(null);
                     InvokeContentRemoved(_Content);
                     _Content = value;
-                    NPC(nameof(Content));
-                    NPC(nameof(HasContent));
                     _Content?.SetParent(this);
                     LayoutChanged(this, true);
                     InvokeContentAdded(_Content);

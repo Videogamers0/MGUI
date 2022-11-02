@@ -51,7 +51,6 @@ namespace MGUI.Core.UI.Containers.Grids
                 if (_Size != value)
                 {
                     _Size = value;
-                    NPC(nameof(Size));
                     LayoutChanged(this, true);
                 }
             }

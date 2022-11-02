@@ -18,7 +18,7 @@ namespace MGUI.Core.UI
 {
     /// <summary>Represents a Rectanglular screen bounds that you can add or remove <see cref="MGWindow"/>s to/from, 
     /// and handles mutual exclusion with things like input handling or ensuring there is only 1 <see cref="MGToolTip"/> or <see cref="MGContextMenu"/> on the user interface at a time.</summary>
-    public class MGDesktop : ViewModelBase, IMouseHandlerHost, IKeyboardHandlerHost, IContextMenuHost
+    public class MGDesktop : IMouseHandlerHost, IKeyboardHandlerHost, IContextMenuHost
     {
         public MainRenderer Renderer { get; }
         public InputTracker InputTracker => Renderer.Input;
@@ -61,17 +61,14 @@ namespace MGUI.Core.UI
                     {
                         ToolTipClosed?.Invoke(this, ActiveToolTip);
                         ActiveToolTip.Host.ToolTipChanged -= Host_ToolTipChanged;
-                        ActiveToolTip.NPC(nameof(MGElement.IsToolTipShowing));
                     }
 
                     _ActiveToolTip = value;
-                    NPC(nameof(ActiveToolTip));
 
                     if (ActiveToolTip != null)
                     {
                         ToolTipOpened?.Invoke(this, ActiveToolTip);
                         ActiveToolTip.Host.ToolTipChanged += Host_ToolTipChanged;
-                        ActiveToolTip.NPC(nameof(MGElement.IsToolTipShowing));
                     }
                 }
             }
@@ -90,24 +87,12 @@ namespace MGUI.Core.UI
 
         public static TimeSpan DefaultToolTipShowDelay = TimeSpan.FromSeconds(0.40);
 
-        private TimeSpan _ToolTipShowDelay;
         /// <summary>The amount of time that the mouse must hover a particular <see cref="MGElement"/> before its <see cref="MGElement.ToolTip"/> can be shown.<para/>
         /// Default value: <see cref="DefaultToolTipShowDelay"/></summary>
-        public TimeSpan ToolTipShowDelay
-        {
-            get => _ToolTipShowDelay;
-            set
-            {
-                if (_ToolTipShowDelay != value)
-                {
-                    _ToolTipShowDelay = value;
-                    NPC(nameof(ToolTipShowDelay));
-                }
-            }
-        }
+        public TimeSpan ToolTipShowDelay { get; set; }
         #endregion ToolTip
 
-#region Context Menu
+        #region Context Menu
         private MGContextMenu _ActiveContextMenu;
         /// <summary>The currently open <see cref="MGContextMenu"/>.<para/>
         /// To set this value, use <see cref="TryCloseActiveContextMenu"/> or <see cref="TryOpenContextMenu(MGContextMenu, Point)"/></summary>
@@ -136,7 +121,6 @@ namespace MGUI.Core.UI
                 ActiveContextMenu.InvokeContextMenuClosing();
 
                 _ActiveContextMenu = null;
-                NPC(nameof(ActiveContextMenu));
 
                 Previous.InvokeContextMenuClosed();
                 ContextMenuClosed?.Invoke(this, Previous);
@@ -188,8 +172,6 @@ namespace MGUI.Core.UI
                 Menu.TopLeft = Position;
                 _ = Menu.ApplySizeToContent(SizeToContent.WidthAndHeight, MinWidth, MinHeight, MaxWidth, MaxHeight, true);
 
-                NPC(nameof(ActiveContextMenu));
-
                 ActiveContextMenu.InvokeContextMenuOpened();
                 ContextMenuOpened?.Invoke(this, Menu);
 
@@ -209,9 +191,9 @@ namespace MGUI.Core.UI
         public event EventHandler<ContextMenuOpeningClosingEventArgs> ContextMenuClosing;
         /// <summary>Invoked immediately after an <see cref="MGContextMenu"/> is closed.</summary>
         public event EventHandler<MGContextMenu> ContextMenuClosed;
-#endregion Context Menu
+        #endregion Context Menu
 
-#region Windows
+        #region Windows
         /// <summary>The last element represents the <see cref="MGWindow"/> that will be drawn last (I.E., rendered overtop of everything else), and 
         /// updated first (I.E., has the first chance to handle inputs)</summary>
         public List<MGWindow> Windows { get; }
@@ -275,7 +257,6 @@ namespace MGUI.Core.UI
                         PreviousTextBox.ReadonlyChanged -= TextBox_ReadonlyChanged;
 
                     _FocusedKeyboardHandler = value;
-                    NPC(nameof(FocusedKeyboardHandler));
 
                     if (FocusedKeyboardHandler is MGTextBox CurrentTextBox)
                         CurrentTextBox.ReadonlyChanged += TextBox_ReadonlyChanged;

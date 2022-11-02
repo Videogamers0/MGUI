@@ -36,10 +36,7 @@ namespace MGUI.Core.UI
                 {
                     if (InternalRowItems != null)
                         InternalRowItems.CollectionChanged += RowItems_CollectionChanged;
-
                     _InternalRowItems = value;
-                    NPC(nameof(InternalRowItems));
-
                     if (InternalRowItems != null)
                         InternalRowItems.CollectionChanged += RowItems_CollectionChanged;
 
@@ -101,10 +98,7 @@ namespace MGUI.Core.UI
                 {
                     if (ItemsSource != null)
                         ItemsSource.CollectionChanged -= ItemsSource_CollectionChanged;
-
                     _ItemsSource = value;
-                    NPC(nameof(ItemsSource));
-
                     if (ItemsSource != null)
                         ItemsSource.CollectionChanged += ItemsSource_CollectionChanged;
 
@@ -208,12 +202,7 @@ namespace MGUI.Core.UI
                 if (_RowHeight != value)
                 {
                     _RowHeight = value;
-                    NPC(nameof(RowHeight));
-
-                    if (RowHeight == null)
-                        RowLength = GridLength.Auto;
-                    else
-                        RowLength = GridLength.CreatePixelLength(RowHeight.Value);
+                    RowLength = RowHeight.HasValue ? GridLength.CreatePixelLength(RowHeight.Value) : GridLength.Auto;
                 }
             }
         }
@@ -228,7 +217,6 @@ namespace MGUI.Core.UI
                 if (_RowLength != value)
                 {
                     _RowLength = value;
-                    NPC(nameof(RowLength));
 
                     if (DataGrid != null)
                     {
