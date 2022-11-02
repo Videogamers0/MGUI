@@ -328,9 +328,9 @@ namespace MGUI.Core.UI.XAML
                 ProgressBar.Size = Size.Value;
 
             if (CompletedBrush != null)
-                ProgressBar.CompletedBrush = new VisualStateFillBrush(CompletedBrush.ToFillBrush());
+                ProgressBar.CompletedBrush.NormalValue = CompletedBrush.ToFillBrush();
             if (IncompleteBrush != null)
-                ProgressBar.IncompleteBrush = new VisualStateFillBrush(IncompleteBrush.ToFillBrush());
+                ProgressBar.IncompleteBrush.NormalValue = IncompleteBrush.ToFillBrush();
 
             if (Orientation.HasValue)
                 ProgressBar.Orientation = Orientation.Value;
@@ -835,7 +835,7 @@ namespace MGUI.Core.UI.XAML
             if (FontFamily != null || FontSize.HasValue)
                 TextBlock.TrySetFont(FontFamily ?? TextBlock.FontFamily, FontSize ?? TextBlock.FontSize);
             if (Foreground.HasValue)
-                TextBlock.Foreground = Foreground.Value.ToXNAColor();
+                TextBlock.Foreground.NormalValue = Foreground.Value.ToXNAColor();
             if (Text != null)
                 TextBlock.Text = Text;
             if (WrapText.HasValue)

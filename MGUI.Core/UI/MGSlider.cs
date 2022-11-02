@@ -437,35 +437,13 @@ namespace MGUI.Core.UI
         public bool IsVertical => Orientation == Orientation.Vertical;
         #endregion Orientation
 
-        private VisualStateFillBrush _FocusBrush;
-        public VisualStateFillBrush FocusBrush
-        {
-            get => _FocusBrush;
-            set
-            {
-                if (_FocusBrush != value)
-                {
-                    _FocusBrush = value;
-                    NPC(nameof(FocusBrush));
-                }
-            }
-        }
+        /// <summary>A brush that is rendered overtop of this <see cref="MGSlider"/> while hovering, dragging, or pressing it.<br/>
+        /// Only the <see cref="VisualStateBrush{TDataType}.HoveredColor"/>, <see cref="VisualStateBrush{TDataType}.PressedModifierType"/>, and <see cref="VisualStateBrush{TDataType}.PressedModifier"/> are used.</summary>
+        public VisualStateFillBrush FocusBrush { get; set; }
 
-        private IFillBrush _Foreground;
         /// <summary>The fallback <see cref="IFillBrush"/> for drawing the number line, ticks, or the thumb if they don't have an explicit <see cref="IFillBrush"/> specified.<para/>
         /// See also: <see cref="NumberLineFillBrush"/>, <see cref="TickFillBrush"/>, <see cref="ThumbFillBrush"/></summary>
-        public IFillBrush Foreground
-        {
-            get => _Foreground;
-            set
-            {
-                if (_Foreground != value)
-                {
-                    _Foreground = value;
-                    NPC(nameof(Foreground));
-                }
-            }
-        }
+        public IFillBrush Foreground { get; set; }
 
         /// <summary>If true, the slider value can be modified by using the mouse scroll wheel while hovering the number line portion.<para/>
         /// Default value: false</summary>
@@ -488,7 +466,6 @@ namespace MGUI.Core.UI
                 SetValue(Value);
 
                 this.FocusBrush = Theme.SliderOverlay.GetValue(true);
-
                 this.Foreground = Theme.SliderForeground.GetValue(true);
 
                 this.NumberLineSize = 8;

@@ -79,8 +79,6 @@ namespace MGUI.Core.UI
     }
 
     //TODO
-    //ComboBox: Fix the dropdown to prevent it from opening off-screen (outside the MGDesktop's bounds)
-    //GridSplitter: Allow dragging multiple at a time? like if a horiz/vertical gridpslitter were overlapping
     //UniformGrid?
     //StaticGrid - user specifies # of rows and columns, and the size of each cell
     //      also things like gridline size, spacing, gridline brush, cell background brush
@@ -646,24 +644,6 @@ namespace MGUI.Core.UI
         public bool DerivedIsHitTestVisible => IsHitTestVisible && (Parent?.IsHitTestVisible ?? IsHitTestVisible);
         #endregion Input
 
-
-
-        //TODO
-        //Maybe an IFillBrush Overlay property? Defaults to null. Is drawn immediately after drawing the contents, but before OnEndDraw?
-        //		Might need 2 events at end of Draw call, such as OnBeginDrawOverlay, OnEndDraw
-        //		since some controls like MGResizeGrip might want to draw near the end, but before the overlay	
-        //
-        //		Each element has a specific BackgroundBrush/ForegroundBrush/TextForeground for each PrimaryVisualState        //
-        //		MGElement has:
-        //			VisualStateSetting<IFillBrush> ForegroundBrush - Drawn after drawing itself and contents
-        //			VisualStateSetting<Color?> TextForegroundColor
-        //
-        //			ForegroundUnderlay => ForegroundBrush.GetUnderlay(CurrentVisualState)
-        //			ForegroundOverlay => ForegroundBrush.GetOverlay(CurrentVisualState)
-        //			TextForegroundColor => somehow needs to alphablend the underlay and overlay colors?
-        //				or fuck it, maybe color is different and doesnt have hovered/pressed
-        //
-
         public VisualState VisualState { get; private set; } = new(PrimaryVisualState.Normal, SecondaryVisualState.None);
 
         /// <summary>This property does not account for the parent's <see cref="IsSelected"/>. Consider using <see cref="DerivedIsSelected"/> instead.</summary>
@@ -692,7 +672,20 @@ namespace MGUI.Core.UI
         public IFillBrush BackgroundOverlay => BackgroundBrush.GetFillOverlay(VisualState.Secondary);
 
 
-
+        //TODO
+        //Maybe an IFillBrush Overlay property? Defaults to null. Is drawn immediately after drawing the contents, but before OnEndDraw?
+        //		Might need 2 events at end of Draw call, such as OnBeginDrawOverlay, OnEndDraw
+        //		since some controls like MGResizeGrip might want to draw near the end, but before the overlay	
+        //
+        //		Each element has a specific BackgroundBrush/ForegroundBrush/TextForeground for each PrimaryVisualState        //
+        //		MGElement has:
+        //			VisualStateSetting<IFillBrush> ForegroundBrush - Drawn after drawing itself and contents
+        //			VisualStateSetting<Color?> TextForegroundColor
+        //
+        //			ForegroundUnderlay => ForegroundBrush.GetUnderlay(CurrentVisualState)
+        //			ForegroundOverlay => ForegroundBrush.GetOverlay(CurrentVisualState)
+        //			TextForegroundColor => somehow needs to alphablend the underlay and overlay colors?
+        //				or fuck it, maybe color is different and doesnt have hovered/pressed
 
 
 
@@ -969,7 +962,6 @@ namespace MGUI.Core.UI
 
             if (!ClipToBounds || !DA.DT.CurrentSettings.RasterizerState.ScissorTestEnable || TargetBounds.Intersects(DA.DT.GD.ScissorRectangle))
 			{
-
 				using (ClipToBounds ? DA.DT.SetClipTargetTemporary(TargetBounds, true) : null)
 				{
                     foreach (MGElement Component in Components.Where(x => x.DrawBeforeBackground).Select(x => x.BaseElement))

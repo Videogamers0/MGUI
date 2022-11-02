@@ -113,12 +113,12 @@ namespace MGUI.Core.UI
                 return Default;
         }
 
-        private Color? _Foreground;
+        private VisualStateSetting<Color?> _Foreground;
         /// <summary>The foreground color to use when rendering the text.<br/>
         /// If the text is formatted with color codes (such as '[color=Red]Hello World[/color]'), the color specified in the <see cref="MGTextRun"/> will take precedence.<para/>
-        /// If this value is null, will attempt to resolve the value from <see cref="MGElement.DerivedDefaultTextForeground"/>, or <see cref="Color.Black"/> as a fallback value.<para/>
+        /// If the value for the current <see cref="MGElement.VisualState"/> is null, will attempt to resolve the value from <see cref="MGElement.DerivedDefaultTextForeground"/>, or <see cref="Color.Black"/> as a fallback value.<para/>
         /// See also: <see cref="MGElement.DefaultTextForeground"/>, <see cref="MGElement.DerivedDefaultTextForeground"/>, <see cref="ActualForeground"/></summary>
-        public Color? Foreground
+        public VisualStateSetting<Color?> Foreground
         {
             get => _Foreground;
             set
@@ -131,7 +131,7 @@ namespace MGUI.Core.UI
             }
         }
 
-        public Color ActualForeground => Foreground ?? DerivedDefaultTextForeground ?? Color.Black;
+        public Color ActualForeground => Foreground.GetValue(VisualState.Primary) ?? DerivedDefaultTextForeground ?? Color.Black;
 
         private string _Text;
         public string Text
@@ -246,7 +246,7 @@ namespace MGUI.Core.UI
                 if (!TrySetFont(GetDesktop().FontManager.DefaultFontFamily, FontSize))
                     throw new ArgumentException($"Default font not found.");
                 this.Text = Text;
-                this.Foreground = Foreground;
+                this.Foreground = new VisualStateSetting<Color?>(Foreground, Foreground, Foreground);
                 this.LinePadding = 2;
                 this.TextAlignment = HorizontalAlignment.Left;
                 this.Padding = new(1,2,1,1);

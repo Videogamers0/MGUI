@@ -221,8 +221,10 @@ namespace MGUI.Core.UI.Containers.Grids
 
                 MouseHandler.Dragged += (sender, e) =>
                 {
-                    if (e.IsLMB)
+                    if (e.IsLMB && IsDragging)
+                    {
                         ApplyResizing(e.PositionDelta);
+                    }
                 };
             }
         }

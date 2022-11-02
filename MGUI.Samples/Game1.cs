@@ -113,6 +113,20 @@ namespace MGUI.Samples
             <GridSplitter GridRow=""0"" GridColumn=""1"" GridRowSpan=""3""  />
             <GridSplitter GridRow=""1"" GridColumn=""0"" GridColumnSpan=""4"" />
         </Grid>
+
+        <!--<ScrollViewer>
+            <StackPanel Orientation=""Vertical"">
+                <Button Content=""Hello World"" />
+                <Button Content=""Hello World"" />
+                <Button Content=""Hello World"" />
+                <Button Content=""Hello World"" />
+                <Button Content=""Hello World"" />
+                <Button Content=""Hello World"" />
+                <Button Content=""Hello World"" />
+                <Button Content=""Hello World"" />
+                <ComboBox Name=""CB"" />
+            </StackPanel>
+        </ScrollViewer>-->
     </DockPanel>
 </Window>
             ";
@@ -138,6 +152,12 @@ namespace MGUI.Samples
                         }
                     }
                 };
+            }
+
+            if (XAMLWindow.TryGetElementByName("CB", out MGComboBox<string> TestComboBox))
+            {
+                List<string> Items = Enumerable.Range(0, 26).Select(x => ((char)(x + 'a')).ToString()).ToList();
+                TestComboBox.SetItemsSource(Items);
             }
 
             base.Initialize();

@@ -324,11 +324,16 @@ namespace MGUI.Core.UI
             {
                 foreach (MGElement Element in DropdownSP.Children.ToList())
                     DropdownSP.TryRemoveChild(Element);
-                foreach (TemplatedElement<TItemType, MGButton> UIItem in TemplatedItems)
-                    DropdownSP.TryAddChild(UIItem.Element);
+                if (TemplatedItems != null)
+                {
+                    foreach (TemplatedElement<TItemType, MGButton> UIItem in TemplatedItems)
+                        DropdownSP.TryAddChild(UIItem.Element);
+                }
             }
 
-            Dropdown.ApplySizeToContent(SizeToContent.WidthAndHeight, Math.Max(this.ActualWidth, MinDropdownWidth), MinDropdownHeight, MaxDropdownWidth, MaxDropdownHeight);
+            int ActualMinHeight = Math.Clamp(MinDropdownHeight, 0, GetDesktop().ValidScreenBounds.Bottom - Dropdown.Top);
+            int ActualMaxHeight = Math.Clamp(MaxDropdownHeight, 0, GetDesktop().ValidScreenBounds.Bottom - Dropdown.Top);
+            Dropdown.ApplySizeToContent(SizeToContent.WidthAndHeight, Math.Max(this.ActualWidth, MinDropdownWidth), ActualMinHeight, MaxDropdownWidth, ActualMaxHeight);
         }
 
         private bool _IsDropdownOpen;
@@ -509,6 +514,11 @@ namespace MGUI.Core.UI
             {
                 if (!IsDropdownContentValid)
                     UpdateDropdownContent();
+
+                //  Example scenario: ComboBox is inside a vertically-scrolling ScrollViewer
+                //  ComboBox is visible. User clicks it to open dropdown, then they scroll the ScrollViewer up until the ComboBox is no longer visible
+                //  Should we auto-hide (or close) the dropdown?
+                //Dropdown.Visibility = RecentDrawWasClipped ? Visibility.Collapsed : Visibility.Visible;
 
                 Dropdown.Left = RenderBounds.Left - BoundsOffset.X;
                 Dropdown.Top = RenderBounds.Bottom - BoundsOffset.Y;
