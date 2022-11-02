@@ -16,50 +16,6 @@ namespace MGUI.Core.UI.Containers.Grids
 {
     public class MGGridSplitter : MGElement
     {
-        #region Focus Visual Style
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Color _HoveredHighlightColor;
-        /// <summary>An overlay color that is drawn overtop of this <see cref="MGGridSplitter"/>'s graphics if the mouse is currently hovering it.<br/>
-        /// Recommended to use a transparent color.<para/>
-        /// Default Value: <see cref="MGTheme.HoveredColor"/></summary>
-        public Color HoveredHighlightColor
-        {
-            get => _HoveredHighlightColor;
-            set
-            {
-                if (_HoveredHighlightColor != value)
-                {
-                    _HoveredHighlightColor = value;
-                    NPC(nameof(HoveredHighlightColor));
-                    HoveredOverlay = new(HoveredHighlightColor);
-                    PressedOverlay = new(HoveredHighlightColor.Darken(PressedDarkenIntensity));
-                }
-            }
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private float _PressedDarkenIntensity;
-        /// <summary>A percentage to darken this <see cref="MGGridSplitter"/>'s graphics by when the mouse is currently pressed, but not yet released, overtop of this <see cref="MGElement"/>.<br/>
-        /// Use a larger value to apply a more obvious background overlay while this <see cref="MGElement"/> is pressed. Use a smaller value for a more subtle change.<para/>
-        /// Default value: <see cref="MGTheme.PressedDarkenModifier"/></summary>
-        public float PressedDarkenIntensity
-        {
-            get => _PressedDarkenIntensity;
-            set
-            {
-                if (_PressedDarkenIntensity != value)
-                {
-                    _PressedDarkenIntensity = value;
-                    NPC(nameof(PressedDarkenIntensity));
-                    PressedOverlay = new(HoveredHighlightColor.Darken(PressedDarkenIntensity));
-                }
-            }
-        }
-
-        private MGSolidFillBrush HoveredOverlay { get; set; }
-        private MGSolidFillBrush PressedOverlay { get; set; }
-        #endregion FocusVisualStyle
-
         #region Border
         /// <summary>Provides direct access to this element's border.</summary>
         public MGComponent<MGBorder> BorderComponent { get; }
@@ -101,8 +57,8 @@ namespace MGUI.Core.UI.Containers.Grids
             }
         }
 
-        /// <summary>The default value for <see cref="TickSize"/>: (22,2)</summary>
-        public static readonly Size DefaultTickSize = new(22, 2);
+        /// <summary>The default value for <see cref="TickSize"/>: (22,1)</summary>
+        public static readonly Size DefaultTickSize = new(22, 1);
         /// <summary>The size to use when drawing the small grip thumb graphics in the center of this element's bounds.<para/>
         /// <see cref="TickSize"/>.Width represents the size of the larger dimension (The height of a vertical <see cref="MGGridSplitter"/>, the width of a horizontal <see cref="MGGridSplitter"/>)<br/>
         /// <see cref="TickSize"/>.Height represents the size of the smaller dimension.<para/>
@@ -110,15 +66,8 @@ namespace MGUI.Core.UI.Containers.Grids
         /// Default value: <see cref="DefaultTickSize"/></summary>
         public Size TickSize { get; set; }
 
-
-
-
-        //TODO make this a VisualStateBrush. then we can get rid of the focusvisualstyle crap
         /// <summary>The brush to use when drawing the thumb tick marks in the center of this element's bounds.</summary>
-        public IFillBrush Foreground { get; set; }
-
-
-
+        public VisualStateFillBrush Foreground { get; set; }
 
         public Orientation Orientation => LayoutBounds.Width > LayoutBounds.Height ? Orientation.Horizontal : Orientation.Vertical;
 
@@ -243,15 +192,12 @@ namespace MGUI.Core.UI.Containers.Grids
 
                 MGTheme Theme = GetTheme();
 
-                this.HoveredHighlightColor = Theme.HoveredColor;
-                this.PressedDarkenIntensity = Theme.PressedDarkenModifier;
-
                 this.VerticalAlignment = VerticalAlignment.Stretch;
                 this.HorizontalAlignment = HorizontalAlignment.Stretch;
                 this.Size = 12;
                 this.TickSize = DefaultTickSize;
 
-                this.Foreground = GetTheme().GridSplitterForeground.GetValue(true);
+                this.Foreground = GetTheme().GetGridSplitterForegroundBrush();
 
                 MouseHandler.DragStart += (sender, e) =>
                 {
@@ -259,6 +205,7 @@ namespace MGUI.Core.UI.Containers.Grids
                     {
                         this.GridData = new(this, OwnerGrid, true);
                         IsDragging = true;
+                        SpoofIsPressedWhileDrawingBackground = true;
                         e.SetHandled(this, false);
                     }
                 };
@@ -266,7 +213,10 @@ namespace MGUI.Core.UI.Containers.Grids
                 MouseHandler.DragEnd += (sender, e) =>
                 {
                     if (e.IsLMB)
+                    {
                         IsDragging = false;
+                        SpoofIsPressedWhileDrawingBackground = false;
+                    }
                 };
 
                 MouseHandler.Dragged += (sender, e) =>
@@ -518,20 +468,23 @@ namespace MGUI.Core.UI.Containers.Grids
                     TickBounds.Add(new(FullTickBounds.Left, FullTickBounds.Top, TickWidth, FullTickBounds.Height));
                     TickBounds.Add(new(FullTickBounds.Left + TickWidth + TickSpacing, FullTickBounds.Top, TickWidth, FullTickBounds.Height));
                 }
-            }
 
-            foreach (Rectangle Tick in TickBounds)
-                Foreground.Draw(DA, this, Tick);
+                IFillBrush Underlay = Foreground.GetUnderlay(VisualState.Primary);
+                if (Underlay != null)
+                {
+                    foreach (Rectangle Tick in TickBounds)
+                        Underlay.Draw(DA, this, Tick);
+                }
 
-            if (IsLMBPressed || IsDragging)
-            {
-                foreach (Rectangle Tick in TickBounds)
-                    PressedOverlay.Draw(DA, this, Tick);
-            }
-            else if (IsHovered)
-            {
-                foreach (Rectangle Tick in TickBounds)
-                    HoveredOverlay.Draw(DA, this, Tick);
+                if (!ParentWindow.HasModalWindow)
+                {
+                    IFillBrush Overlay = Foreground.GetFillOverlay(VisualState.GetSecondaryState(IsDragging, false));
+                    if (Overlay != null)
+                    {
+                        foreach (Rectangle Tick in TickBounds)
+                            Overlay.Draw(DA, this, Tick);
+                    }
+                }
             }
 
             base.DrawSelf(DA, LayoutBounds);

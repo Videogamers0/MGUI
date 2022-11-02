@@ -204,8 +204,7 @@ namespace MGUI.Core.UI
 
         private Color _HoveredHighlightColor;
         /// <summary>An overlay color that is drawn overtop of checkable portion of this <see cref="MGRadioButton"/>'s Background if the mouse is currently hovering it.<br/>
-        /// Recommended to use a transparent color.<para/>
-        /// Default Value: <see cref="MGElement.DefaultHoveredHighlightColor"/></summary>
+        /// Recommended to use a transparent color.</summary>
         public Color HoveredHighlightColor
         {
             get => _HoveredHighlightColor;
@@ -225,8 +224,7 @@ namespace MGUI.Core.UI
 
         private float _PressedDarkenIntensity;
         /// <summary>A percentage to darken the background color by when the mouse is currently pressed, but not yet released, overtop of the checkable portion of this <see cref="MGCheckBox"/>.<br/>
-        /// Use a larger value to apply a more obvious background overlay while this <see cref="MGElement"/> is pressed. Use a smaller value for a more subtle change.<para/>
-        /// Default value: <see cref="MGElement.DefaultPressedDarkenIntensity"/></summary>
+        /// Use a larger value to apply a more obvious background overlay while this <see cref="MGElement"/> is pressed. Use a smaller value for a more subtle change.</summary>
         public float PressedDarkenIntensity
         {
             get => _PressedDarkenIntensity;
@@ -301,8 +299,8 @@ namespace MGUI.Core.UI
 
                 this.SpacingWidth = DefaultBubbleSpacingWidth;
 
-                this.HoveredHighlightColor = GetTheme().HoveredColor;
-                this.PressedDarkenIntensity = GetTheme().PressedDarkenModifier;
+                this.HoveredHighlightColor = GetTheme().ClickableHoveredColor;
+                this.PressedDarkenIntensity = GetTheme().ClickablePressedModifier;
             }
         }
 

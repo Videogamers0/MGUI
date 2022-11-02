@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace MGUI.Core.UI.Brushes.Border_Brushes
 {
     /// <summary>See also: <see cref="MGUniformBorderBrush"/>, <see cref="MGDockedBorderBrush"/></summary>
-    public interface IBorderBrush
+    public interface IBorderBrush : ICloneable
     {
         public IFillBrush GetLeft();
         public IFillBrush GetTop();
@@ -20,5 +20,6 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
         public void Draw(ElementDrawArgs DA, MGElement Element, Rectangle Bounds, Thickness BT);
 
         public IBorderBrush Copy();
+        object ICloneable.Clone() => Copy();
     }
 }

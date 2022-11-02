@@ -548,7 +548,7 @@ namespace MGUI.Core.UI
                 this.CloseButtonElement = new(this, x => { TryCloseWindow(); });
                 CloseButtonElement.MinWidth = 12;
                 CloseButtonElement.MinHeight = 12;
-                CloseButtonElement.BackgroundBrush = new(Theme, MGSolidFillBrush.White * 0.5f, Theme.HoveredColor);
+                CloseButtonElement.BackgroundBrush = new(Theme, MGSolidFillBrush.White * 0.5f, Theme.ClickableHoveredColor);
                 CloseButtonElement.BorderBrush = MGUniformBorderBrush.Black;
                 CloseButtonElement.BorderThickness = new(1);
                 CloseButtonElement.Margin = new(1, 1, 1, 1 + BorderElement.BorderThickness.Bottom);

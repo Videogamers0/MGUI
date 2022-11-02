@@ -9,78 +9,88 @@ using System.Threading.Tasks;
 
 namespace MGUI.Core.UI
 {
-    /// <summary>A wrapper class for <see cref="IFillBrush"/> that controls the getter function, typically to return a copy of the value (to mimic treating class implementations of <see cref="IFillBrush"/> as value-types)</summary>
-    public class ThemeFillBrush
+    /// <summary>A wrapper class for the given <typeparamref name="TDataType"/> that controls the getter function, typically to return a copy of the value (to mimic treating class implementations as value-types)</summary>
+    public class ThemeManagedGetter<TDataType>
+        where TDataType : class, ICloneable
     {
-        private IFillBrush _Value;
+        private TDataType _Value;
         /// <summary>This property intentionally has no getter. To get the value, use <see cref="GetValue(bool)"/></summary>
-        public IFillBrush Value { set => _Value = value; }
+        public TDataType Value { set => _Value = value; }
 
         /// <param name="Copy">If true, a copy of the underlying <see cref="Value"/> will be returned. If false, a direct reference to the underlying <see cref="Value"/> will be returned.<para/>
-        /// Some implementations of <see cref="IFillBrush"/> are structs (value-types) rather than classes (reference-types),<br/>
-        /// so for consistency, recommended to always retrieve a copy, essentially treating all brushes as value-types.</param>
-        public IFillBrush GetValue(bool Copy = true) => Copy ? _Value?.Copy() : _Value;
+        /// Some implementations of <typeparamref name="TDataType"/> are structs (value-types) rather than classes (reference-types),<br/>
+        /// so for consistency, recommended to always retrieve a copy, essentially treating all objects as value-types.</param>
+        public TDataType GetValue(bool Copy = true) => Copy ? _Value?.Clone() as TDataType : _Value;
 
-        public ThemeFillBrush() : this(null) { }
-        public ThemeFillBrush(IFillBrush Value) { this.Value = Value; }
+        public ThemeManagedGetter() : this(null) { }
+        public ThemeManagedGetter(TDataType Value) { this.Value = Value; }
+    }
+
+    public class ThemeManagedFillBrush : ThemeManagedGetter<IFillBrush>
+    {
+        public ThemeManagedFillBrush(IFillBrush Value) : base(Value) { }
+    }
+
+    public class ThemeManagedVisualStateFillBrush : ThemeManagedGetter<VisualStateFillBrush>
+    {
+        public ThemeManagedVisualStateFillBrush(VisualStateFillBrush Value) : base(Value) { }
+    }
+
+    public class ThemeManagedVisualStateColorBrush : ThemeManagedGetter<VisualStateColorBrush>
+    {
+        public ThemeManagedVisualStateColorBrush(VisualStateColorBrush Value) : base(Value) { }
     }
 
     public class MGTheme
     {
         /// <summary>The default overlay color to alpha-blend on top of element background brushes. This should always be a transparent <see cref="Color"/></summary>
-        public Color HoveredColor { get; set; }
-        /// <summary>The default percentage to darken the <see cref="HoveredColor"/> by when the element is both Pressed and Hovered.<para/>
-        /// Only used if the element's <see cref="VisualStateBrush.PressedModifierType"/> is <see cref="PressedModifierType.Darken"/></summary>
-        public float PressedDarkenModifier { get; set; }
-        /// <summary>The default percentage to brighten the <see cref="HoveredColor"/> by when the element is both Pressed and Hovered.<para/>
-        /// Only used if the element's <see cref="VisualStateBrush.PressedModifierType"/> is <see cref="PressedModifierType.Brighten"/></summary>
-        public float PressedBrightenModifier { get; set; }
+        public Color ClickableHoveredColor { get; set; }
+        /// <summary>The default percentage to darken the <see cref="ClickableHoveredColor"/> by when the element is both Pressed and Hovered.<para/>
+        /// Only used if the element's <see cref="VisualStateBrush{TDataType}.PressedModifierType"/> is <see cref="PressedModifierType.Darken"/></summary>
+        public float ClickablePressedModifier { get; set; }
 
         /// <summary>The default background brush to use on clickable controls like <see cref="MGButton"/>, <see cref="MGToggleButton"/>, <see cref="MGComboBox{TItemType}"/><br/>
         /// when their <see cref="PrimaryVisualState"/> is <see cref="PrimaryVisualState.Normal"/></summary>
-        public ThemeFillBrush ClickableNormalBackground { get; }
+        public ThemeManagedFillBrush ClickableNormalBackground { get; }
         /// <summary>The default background brush to use on clickable controls like <see cref="MGButton"/>, <see cref="MGToggleButton"/>, <see cref="MGComboBox{TItemType}"/><br/>
         /// when their <see cref="PrimaryVisualState"/> is <see cref="PrimaryVisualState.Selected"/></summary>
-        public ThemeFillBrush ClickableSelectedBackground { get; }
+        public ThemeManagedFillBrush ClickableSelectedBackground { get; }
 
-        public ThemeFillBrush DimNeutralBackground { get; }
-        public ThemeFillBrush BrightNeutralBackground { get; }
+        public ThemeManagedFillBrush DimNeutralBackground { get; }
+        public ThemeManagedFillBrush BrightNeutralBackground { get; }
 
-        public ThemeFillBrush ContextMenuBackground { get; }
-        public ThemeFillBrush ToolTipBackground { get; }
+        public ThemeManagedFillBrush ContextMenuBackground { get; }
+        public ThemeManagedFillBrush ToolTipBackground { get; }
 
         /// <summary>The default background brush to use on title/header content, like the title bar of a window or the header row of a listview</summary>
-        public ThemeFillBrush TitleBackground { get; }
+        public ThemeManagedFillBrush TitleBackground { get; }
 
-        public ThemeFillBrush AccentBackground { get; }
+        public ThemeManagedFillBrush AccentBackground { get; }
 
         public Color RadioButtonBubbleFillColor { get; set; }
 
-        public ThemeFillBrush SliderForeground { get; }
-        public ThemeFillBrush SliderThumbFillBrush { get; }
+        public ThemeManagedFillBrush SliderForeground { get; }
+        public ThemeManagedFillBrush SliderThumbFillBrush { get; }
 
-        public ThemeFillBrush ProgressBarCompletedBrush { get; }
+        public ThemeManagedFillBrush ProgressBarCompletedBrush { get; }
 
-        public ThemeFillBrush GridSplitterForeground { get; }
+        public ThemeManagedFillBrush GridSplitterForeground { get; }
+        public VisualStateFillBrush GetGridSplitterForegroundBrush() => new(this, GridSplitterForeground.GetValue(true), ClickableHoveredColor.Brighten(0.1f));
 
-        public Color ResizeGripForeground { get; set; }
+        public ThemeManagedVisualStateColorBrush ResizeGripForeground { get; }
 
-        public VisualStateBrush GetSelectedTabHeaderBackgroundBrush() => new(this, BrightNeutralBackground.GetValue(true), HoveredColor);
-        public VisualStateBrush GetUnselectedTabHeaderBackgroundBrush() => new(this, DimNeutralBackground.GetValue(true), HoveredColor);
+        public VisualStateFillBrush GetSelectedTabHeaderBackgroundBrush() => new(this, BrightNeutralBackground.GetValue(true), ClickableHoveredColor);
+        public VisualStateFillBrush GetUnselectedTabHeaderBackgroundBrush() => new(this, DimNeutralBackground.GetValue(true), ClickableHoveredColor);
 
-        public VisualStateBrush GetComboBoxDropdownBackgroundBrush() => new(this, BrightNeutralBackground.GetValue(true));
+        public VisualStateFillBrush GetComboBoxDropdownBackgroundBrush() => new(this, BrightNeutralBackground.GetValue(true));
 
-        private VisualStateBrush _DropdownItemBackgroundBrush;
         /// <summary>The default background brush to use on items in an <see cref="MGComboBox{TItemType}"/>'s dropdown.</summary>
-        public VisualStateBrush DropdownItemBackgroundBrush { set => _DropdownItemBackgroundBrush = value; }
-        public VisualStateBrush GetDropdownItemBackgroundBrush() => _DropdownItemBackgroundBrush?.GetCopy();
+        public ThemeManagedVisualStateFillBrush DropdownItemBackgroundBrush { get; }
 
-        public VisualStateBrush GetTitleBackgroundBrush() => new(this, TitleBackground.GetValue(true), HoveredColor * 0.35f);
-        public VisualStateBrush GetSpoilerUnspoiledBackgroundBrush() => new(this, AccentBackground.GetValue(true), HoveredColor);
+        public VisualStateFillBrush GetTitleBackgroundBrush() => new(this, TitleBackground.GetValue(true), ClickableHoveredColor * 0.35f);
+        public VisualStateFillBrush GetSpoilerUnspoiledBackgroundBrush() => new(this, AccentBackground.GetValue(true), ClickableHoveredColor);
 
-        public Color GetGridSplitterHoverColor() => HoveredColor.Brighten(0.1f);
-
-        public VisualStateBrush GetBackgroundBrush(MGElementType ElementType)
+        public VisualStateFillBrush GetBackgroundBrush(MGElementType ElementType)
         {
             return ElementType switch
             {
@@ -104,9 +114,11 @@ namespace MGUI.Core.UI
 
                 MGElementType.Button or
                 MGElementType.ComboBox
-                => new(this, ClickableNormalBackground.GetValue(true), HoveredColor),
+                => new(this, ClickableNormalBackground.GetValue(true), ClickableHoveredColor),
 
                 MGElementType.ContextMenu => new(this, ContextMenuBackground.GetValue(true)),
+
+                MGElementType.GridSplitter => new(this, null, ClickableHoveredColor),
 
                 MGElementType.GroupBox or
                 MGElementType.ListView or
@@ -114,13 +126,13 @@ namespace MGUI.Core.UI
                 MGElementType.TabControl => new(this, BrightNeutralBackground.GetValue(true)),
 
                 MGElementType.PasswordBox or 
-                MGElementType.TextBox => new(this, ClickableNormalBackground.GetValue(true), HoveredColor * 0.4f) { PressedModifier = 0f },
+                MGElementType.TextBox => new(this, ClickableNormalBackground.GetValue(true), ClickableHoveredColor * 0.4f) { PressedModifier = 0f },
 
                 MGElementType.Separator or
                 MGElementType.Stopwatch or
                 MGElementType.Timer => new(this, AccentBackground.GetValue(true)),
 
-                MGElementType.ToggleButton => new(this, ClickableNormalBackground.GetValue(true), ClickableSelectedBackground.GetValue(true), ClickableNormalBackground.GetValue(true), HoveredColor),
+                MGElementType.ToggleButton => new(this, ClickableNormalBackground.GetValue(true), ClickableSelectedBackground.GetValue(true), ClickableNormalBackground.GetValue(true), ClickableHoveredColor),
 
                 MGElementType.ToolTip => new(this, ToolTipBackground.GetValue(true)),
 
@@ -128,7 +140,6 @@ namespace MGUI.Core.UI
 
                 MGElementType.DockPanel or 
                 MGElementType.Grid or
-                MGElementType.GridSplitter or
                 MGElementType.OverlayPanel or 
                 MGElementType.StackPanel or 
                 MGElementType.UniformGrid => new(this, null),
@@ -142,9 +153,8 @@ namespace MGUI.Core.UI
 
         public MGTheme()
         {
-            this.HoveredColor = Color.White * 0.18f;
-            this.PressedDarkenModifier = 0.06f;
-            this.PressedBrightenModifier = 0.06f;
+            this.ClickableHoveredColor = Color.White * 0.18f;
+            this.ClickablePressedModifier = 0.06f;
 
             this.ClickableNormalBackground = new(MGSolidFillBrush.LightGray);
             this.ClickableSelectedBackground = new(Color.Green.AsFillBrush());
@@ -168,9 +178,15 @@ namespace MGUI.Core.UI
 
             this.ProgressBarCompletedBrush = new(Color.Green.AsFillBrush());
 
-            this.DropdownItemBackgroundBrush = new(this, null, (Color.Yellow * 0.65f).AsFillBrush(), null, Color.LightBlue * 0.8f);
+            this.DropdownItemBackgroundBrush = new ThemeManagedVisualStateFillBrush(
+                new VisualStateFillBrush(this, null, (Color.Yellow * 0.65f).AsFillBrush(), null, Color.LightBlue * 0.8f));
 
-            this.ResizeGripForeground = Color.Black;
+            this.ResizeGripForeground = new ThemeManagedVisualStateColorBrush(
+                new VisualStateColorBrush(this, Color.Black, Color.White * 0.36f) 
+                { 
+                    PressedModifierType = PressedModifierType.Brighten,
+                    PressedModifier = 0.2f
+                });
         }
     }
 }

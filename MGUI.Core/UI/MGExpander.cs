@@ -46,9 +46,8 @@ namespace MGUI.Core.UI
             set => ExpanderToggleButton.BorderThickness = value;
         }
 
-        /// <summary>Contains the <see cref="Brushes.Fill_Brushes.IFillBrush"/>es to use when drawing the background of the button part of this <see cref="MGExpander"/>'s header.<para/>
-        /// Default value: <see cref="VisualStateBrush.DefaultNormalBackground"/></summary>
-        public VisualStateBrush ExpanderButtonBackgroundBrush
+        /// <summary>Contains the <see cref="Brushes.Fill_Brushes.IFillBrush"/>es to use when drawing the background of the button part of this <see cref="MGExpander"/>'s header.</summary>
+        public VisualStateFillBrush ExpanderButtonBackgroundBrush
         {
             get => ExpanderToggleButton.BackgroundBrush;
             set => ExpanderToggleButton.BackgroundBrush = value;

@@ -82,14 +82,12 @@ namespace MGUI.Core.UI
         Brighten
     }
 
-    /// <summary>A container class for multiple <see cref="IFillBrush"/>es, where a specific one is chosen based on an <see cref="MGElement"/>'s <see cref="VisualState"/></summary>
-    public class VisualStateBrush : VisualStateSetting<IFillBrush>
+    public abstract class VisualStateBrush<TDataType> : VisualStateSetting<TDataType>, ICloneable
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Color? _HoveredColor;
-        /// <summary>An overlay color that is drawn overtop of <see cref="IFillBrush"/> if the mouse is currently hovering the <see cref="MGElement"/>.<br/>
-        /// Recommended to use a transparent color.<para/>
-        /// Default Value: <see cref="MGTheme.HoveredColor"/></summary>
+        /// <summary>An overlay color that is drawn overtop if the mouse is currently hovering the <see cref="MGElement"/>.<br/>
+        /// Recommended to use a transparent color.</summary>
         public Color? HoveredColor
         {
             get => _HoveredColor;
@@ -108,8 +106,7 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _PressedModifier;
         /// <summary>A percentage to darken or brighten (depending on <see cref="PressedModifierType"/>) the <see cref="HoveredColor"/> by 
-        /// when the mouse is currently pressed, but not yet released, overtop of the <see cref="MGElement"/>.<br/>
-        /// Default value: <see cref="MGTheme.PressedDarkenModifier"/></summary>
+        /// when the mouse is currently pressed, but not yet released, overtop of the <see cref="MGElement"/>.</summary>
         public float PressedModifier
         {
             get => _PressedModifier;
@@ -144,12 +141,12 @@ namespace MGUI.Core.UI
         {
             if (HoveredColor.HasValue)
             {
-                HoveredOverlay = new MGSolidFillBrush(HoveredColor.Value);
-                HoveredBorderOverlay = new(HoveredOverlay);
+                HoveredFillOverlay = new MGSolidFillBrush(HoveredColor.Value);
+                HoveredBorderOverlay = new(HoveredFillOverlay);
             }
             else
             {
-                HoveredOverlay = MGSolidFillBrush.Transparent;
+                HoveredFillOverlay = MGSolidFillBrush.Transparent;
                 HoveredBorderOverlay = MGUniformBorderBrush.Transparent;
             }
         }
@@ -158,38 +155,53 @@ namespace MGUI.Core.UI
         {
             if (HoveredColor.HasValue)
             {
-                PressedOverlay = PressedModifierType switch
+                PressedColorOverlay = PressedModifierType switch
                 {
-                    PressedModifierType.Darken => new MGSolidFillBrush(HoveredColor.Value.Darken(PressedModifier)),
-                    PressedModifierType.Brighten => new MGSolidFillBrush(HoveredColor.Value.Brighten(PressedModifier)),
+                    PressedModifierType.Darken => HoveredColor.Value.Darken(PressedModifier),
+                    PressedModifierType.Brighten => HoveredColor.Value.Brighten(PressedModifier),
                     _ => throw new NotImplementedException($"Unrecognized {nameof(PressedModifierType)}: {PressedModifierType}")
                 };
-                PressedBorderOverlay = new(PressedOverlay);
+                PressedFillOverlay = new(PressedColorOverlay.Value);
+                PressedBorderOverlay = new(PressedFillOverlay);
             }
             else
             {
-                PressedOverlay = MGSolidFillBrush.Transparent;
+                PressedColorOverlay = null;
+                PressedFillOverlay = MGSolidFillBrush.Transparent;
                 PressedBorderOverlay = MGUniformBorderBrush.Transparent;
             }
         }
 
-        public MGSolidFillBrush HoveredOverlay { get; private set; }
-        public MGSolidFillBrush PressedOverlay { get; private set; }
+        public Color? HoveredColorOverlay => HoveredColor;
+        public Color? PressedColorOverlay { get; private set; }
+
+        public MGSolidFillBrush HoveredFillOverlay { get; private set; }
+        public MGSolidFillBrush PressedFillOverlay { get; private set; }
 
         public MGUniformBorderBrush HoveredBorderOverlay { get; private set; }
         public MGUniformBorderBrush PressedBorderOverlay { get; private set; }
 
-        public IFillBrush GetUnderlay(PrimaryVisualState State) => GetValue(State);
-        public IFillBrush GetOverlay(SecondaryVisualState State) =>
+        public TDataType GetUnderlay(PrimaryVisualState State) => GetValue(State);
+
+        public Color? GetColorOverlay(SecondaryVisualState State) =>
             State switch
             {
-                SecondaryVisualState.Pressed => PressedOverlay,
-                SecondaryVisualState.Hovered => HoveredOverlay,
+                SecondaryVisualState.Pressed => PressedColorOverlay,
+                SecondaryVisualState.Hovered => HoveredColor,
                 SecondaryVisualState.None => null,
                 _ => throw new NotImplementedException($"Unrecognized {nameof(SecondaryVisualState)}: {State}")
             };
 
-        public IBorderBrush GetBorderOverlay(SecondaryVisualState State) =>
+        public MGSolidFillBrush? GetFillOverlay(SecondaryVisualState State) =>
+            State switch
+            {
+                SecondaryVisualState.Pressed => PressedFillOverlay,
+                SecondaryVisualState.Hovered => HoveredFillOverlay,
+                SecondaryVisualState.None => null,
+                _ => throw new NotImplementedException($"Unrecognized {nameof(SecondaryVisualState)}: {State}")
+            };
+
+        public MGUniformBorderBrush? GetBorderOverlay(SecondaryVisualState State) =>
             State switch
             {
                 SecondaryVisualState.Pressed => PressedBorderOverlay,
@@ -198,35 +210,63 @@ namespace MGUI.Core.UI
                 _ => throw new NotImplementedException($"Unrecognized {nameof(SecondaryVisualState)}: {State}")
             };
 
-        /// <param name="Brush">See also: <see cref="MGSolidFillBrush"/>, <see cref="MGCompositedFillBrush"/>, <see cref="MGTextureFillBrush"/>, <see cref="MGGradientFillBrush"/>, <see cref="MGDiagonalGradientFillBrush"/></param>
-        public VisualStateBrush(MGTheme Theme, IFillBrush Brush)
-            : this(Theme, Brush, null) { }
-
-        /// <param name="Brush">See also: <see cref="MGSolidFillBrush"/>, <see cref="MGCompositedFillBrush"/>, <see cref="MGTextureFillBrush"/>, <see cref="MGGradientFillBrush"/>, <see cref="MGDiagonalGradientFillBrush"/></param>
-        public VisualStateBrush(MGTheme Theme, IFillBrush Brush, Color? HoveredColor)
-            : this(Theme, Brush, Brush, Brush, HoveredColor) { }
-
-        public VisualStateBrush(MGTheme Theme, IFillBrush NormalBrush, IFillBrush SelectedBrush, IFillBrush DisabledBrush, Color? HoveredColor)
-            : base(NormalBrush, SelectedBrush, DisabledBrush)
+        protected VisualStateBrush(MGTheme Theme, TDataType NormalValue, TDataType SelectedValue, TDataType DisabledValue, Color? HoveredColor)
+            : base(NormalValue, SelectedValue, DisabledValue)
         {
             this.HoveredColor = HoveredColor;
             this.PressedModifierType = PressedModifierType.Darken;
-            this.PressedModifier = PressedModifierType switch
-            {
-                PressedModifierType.Darken => Theme.PressedDarkenModifier,
-                PressedModifierType.Brighten => Theme.PressedBrightenModifier,
-                _ => throw new NotImplementedException($"Unrecognized {nameof(PressedModifierType)}: {PressedModifierType}")
-            };
+            this.PressedModifier = Theme.ClickablePressedModifier;
         }
 
-        private VisualStateBrush(VisualStateBrush InheritFrom)
-            : base(InheritFrom.NormalValue?.Copy(), InheritFrom.SelectedValue?.Copy(), InheritFrom.DisabledValue?.Copy())
+        protected VisualStateBrush(TDataType NormalValue, TDataType SelectedValue, TDataType DisabledValue, 
+            Color? HoveredColor, PressedModifierType PressedModifierType, float PressedModifier)
+            : base(NormalValue, SelectedValue, DisabledValue)
         {
-            this.HoveredColor = InheritFrom.HoveredColor;
-            this.PressedModifierType = InheritFrom._PressedModifierType;
-            this.PressedModifier = InheritFrom.PressedModifier;
+            this.HoveredColor = HoveredColor;
+            this.PressedModifierType = PressedModifierType;
+            this.PressedModifier = PressedModifier;
         }
 
-        public VisualStateBrush GetCopy() => new(this);
+        public abstract object Clone();
+    }
+
+    /// <summary>A wrapper class for multiple <see cref="IFillBrush"/>es, where a specific one is chosen based on an <see cref="MGElement"/>'s <see cref="VisualState"/></summary>
+    public class VisualStateFillBrush : VisualStateBrush<IFillBrush>
+    {
+        public VisualStateFillBrush(MGTheme Theme, IFillBrush Brush)
+            : this(Theme, Brush, null) { }
+
+        public VisualStateFillBrush(MGTheme Theme, IFillBrush Brush, Color? HoveredColor)
+            : this(Theme, Brush, Brush, Brush, HoveredColor) { }
+
+        public VisualStateFillBrush(MGTheme Theme, IFillBrush NormalBrush, IFillBrush SelectedBrush, IFillBrush DisabledBrush, Color? HoveredColor)
+            : base(Theme, NormalBrush, SelectedBrush, DisabledBrush, HoveredColor) { }
+
+        private VisualStateFillBrush(VisualStateFillBrush InheritFrom)
+            : base(InheritFrom.NormalValue?.Copy(), InheritFrom.SelectedValue?.Copy(), InheritFrom.DisabledValue?.Copy(),
+                  InheritFrom.HoveredColor, InheritFrom.PressedModifierType, InheritFrom.PressedModifier) { }
+
+        public VisualStateFillBrush Copy() => new(this);
+        public override object Clone() => Copy();
+    }
+
+    /// <summary>A wrapper class for multiple <see cref="Color"/>s, where a specific one is chosen based on an <see cref="MGElement"/>'s <see cref="VisualState"/></summary>
+    public class VisualStateColorBrush : VisualStateBrush<Color>
+    {
+        public VisualStateColorBrush(MGTheme Theme, Color Color)
+            : this(Theme, Color, null) { }
+
+        public VisualStateColorBrush(MGTheme Theme, Color Color, Color? HoveredColor)
+            : this(Theme, Color, Color, Color, HoveredColor) { }
+
+        public VisualStateColorBrush(MGTheme Theme, Color NormalColor, Color SelectedColor, Color DisabledColor, Color? HoveredColor)
+            : base(Theme, NormalColor, SelectedColor, DisabledColor, HoveredColor) { }
+
+        private VisualStateColorBrush(VisualStateColorBrush InheritFrom)
+            : base(InheritFrom.NormalValue, InheritFrom.SelectedValue, InheritFrom.DisabledValue,
+                  InheritFrom.HoveredColor, InheritFrom.PressedModifierType, InheritFrom.PressedModifier) { }
+
+        public VisualStateColorBrush Copy() => new(this);
+        public override object Clone() => Copy();
     }
 }

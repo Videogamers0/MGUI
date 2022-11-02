@@ -8,55 +8,16 @@ using MonoGame.Extended;
 using MGUI.Shared.Helpers;
 using System.Diagnostics;
 using MGUI.Shared.Input.Mouse;
+using MGUI.Core.UI.Brushes.Fill_Brushes;
 
 namespace MGUI.Core.UI
 {
     /// <summary>Can be attached to another <see cref="MGElement"/> to allow resizing via dragging the mouse.</summary>
     public class MGResizeGrip : MGElement
     {
-        #region Focus Visual Style
-        private Color _HoveredHighlightColor;
-        /// <summary>An overlay color that is drawn overtop of the resizer dots if the mouse is currently hovering it.<br/>
-        /// Recommended to use a transparent color.<para/>
-        /// Default Value: <see cref="Color.White"/> * 0.4f</summary>
-        public Color HoveredHighlightColor
-        {
-            get => _HoveredHighlightColor;
-            set
-            {
-                if (_HoveredHighlightColor != value)
-                {
-                    _HoveredHighlightColor = value;
-                    NPC(nameof(HoveredHighlightColor));
-                    PressedOverlay = HoveredHighlightColor.Brighten(PressedBrightenIntensity);
-                }
-            }
-        }
-
-        private float _PressedBrightenIntensity;
-        /// <summary>A percentage to brighten the resizer dots by when the mouse is currently pressed, but not yet released, overtop of this <see cref="MGResizeGrip"/>.<br/>
-        /// Use a larger value to apply a more obvious background overlay while this <see cref="MGElement"/> is pressed. Use a smaller value for a more subtle change.<para/>
-        /// Default value: 0.2f</summary>
-        public float PressedBrightenIntensity
-        {
-            get => _PressedBrightenIntensity;
-            set
-            {
-                if (_PressedBrightenIntensity != value)
-                {
-                    _PressedBrightenIntensity = value;
-                    NPC(nameof(PressedBrightenIntensity));
-                    PressedOverlay = HoveredHighlightColor.Brighten(PressedBrightenIntensity);
-                }
-            }
-        }
-
-        private Color PressedOverlay { get; set; }
-        #endregion FocusVisualStyle
-
         /// <summary>The primary color to draw the resizer dots with.<para/>
         /// Default value: <see cref="Color.Black"/></summary>
-        public Color Foreground { get; set; }
+        public VisualStateColorBrush Foreground { get; set; }
 
         /// <summary>Determines how much width and height this element takes up. This value is derived from <see cref="MaxDots"/>, <see cref="Spacing"/>, and <see cref="MGElement.Margin"/>.<br/>
         /// Formula: 1 + (<see cref="MaxDots"/> - 1) * <see cref="Spacing"/> + <see cref="MGElement.Margin"/>.Right</summary>
@@ -99,7 +60,7 @@ namespace MGUI.Core.UI
 
         private MGElement _Host;
         /// <summary>To set this value, use <see cref="TrySetHost(MGElement)"/>. This value cannot be modified if <see cref="MGElement.IsComponent"/> is true.<para/>
-        /// See also: <see cref="ActualHost"/>, which accounts for <see cref="IsComponent"/></summary>
+        /// See also: <see cref="ActualHost"/>, which accounts for <see cref="MGElement.IsComponent"/></summary>
         public MGElement Host { get => _Host; }
         public MGElement ActualHost => IsComponent ? Parent : Host;
 
@@ -177,9 +138,7 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
-                this.HoveredHighlightColor = GetTheme().HoveredColor * 2;
-                this.PressedBrightenIntensity = 0.2f;
-                this.Foreground = GetTheme().ResizeGripForeground;
+                this.Foreground = GetTheme().ResizeGripForeground.GetValue(true);
 
                 this.Margin = new(2);
 
@@ -192,6 +151,7 @@ namespace MGUI.Core.UI
                     if (e.IsLMB && Parent != null)
                     {
                         IsDragging = true;
+                        SpoofIsPressedWhileDrawingBackground = false;
                         InitialWidth = Parent is MGWindow ? ParentWindow.WindowWidth : Parent.ActualWidth;
                         InitialHeight = Parent is MGWindow ? ParentWindow.WindowHeight : Parent.ActualHeight;
                         e.SetHandled(this, false);
@@ -218,7 +178,10 @@ namespace MGUI.Core.UI
                 MouseHandler.DragEnd += (sender, e) =>
                 {
                     if (e.IsLMB && IsDragging)
+                    {
                         IsDragging = false;
+                        SpoofIsPressedWhileDrawingBackground = true;
+                    }
                 };
             }
         }
@@ -253,11 +216,14 @@ namespace MGUI.Core.UI
                 }
             }
 
-            FillPoints(Foreground * DA.Opacity);
-            if (IsDragging)
-                FillPoints(PressedOverlay * DA.Opacity);
-            else if (IsHovered)
-                FillPoints(HoveredHighlightColor * DA.Opacity);
+            FillPoints(Foreground.GetUnderlay(this.VisualState.Primary) * DA.Opacity);
+
+            if (!ParentWindow.HasModalWindow)
+            {
+                Color? Overlay = Foreground.GetColorOverlay(VisualState.GetSecondaryState(IsDragging, false));
+                if (Overlay != null)
+                    FillPoints(Overlay.Value * DA.Opacity);
+            }
         }
     }
 }

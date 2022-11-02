@@ -16,10 +16,12 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
     /// <see cref="MGDiagonalGradientFillBrush"/><br/>
     /// <see cref="MGPaddedFillBrush"/><br/>
     /// <see cref="MGBorderedFillBrush"/></summary>
-    public interface IFillBrush
+    public interface IFillBrush : ICloneable
     {
         public void Draw(ElementDrawArgs DA, MGElement Element, Rectangle Bounds);
+        public MGUniformBorderBrush AsUniformBorderBrush() => new(this);
+
         public IFillBrush Copy();
-        public MGUniformBorderBrush AsUniformBorderBrush() => new MGUniformBorderBrush(this);
+        object ICloneable.Clone() => Copy();
     }
 }

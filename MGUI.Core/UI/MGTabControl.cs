@@ -42,7 +42,7 @@ namespace MGUI.Core.UI
 
         /// <summary>The background brush of the entire header region of this <see cref="MGTabControl"/>. This is rendered behind the tab headers.<para/>
         /// To change the background of a specific tab, consider setting the <see cref="UnselectedTabHeaderTemplate"/> and <see cref="SelectedTabHeaderTemplate"/>.</summary>
-        public VisualStateBrush HeaderAreaBackground
+        public VisualStateFillBrush HeaderAreaBackground
         {
             get => HeadersPanelElement.BackgroundBrush;
             set => HeadersPanelElement.BackgroundBrush = value;

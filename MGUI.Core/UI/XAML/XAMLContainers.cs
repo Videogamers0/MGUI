@@ -67,7 +67,7 @@ namespace MGUI.Core.UI.XAML
             if (TickSize.HasValue)
                 GridSplitter.TickSize = TickSize.Value.ToSize();
             if (Foreground != null)
-                GridSplitter.Foreground = Foreground.ToFillBrush();
+                GridSplitter.Foreground = new VisualStateFillBrush(GridSplitter.GetTheme(), Foreground.ToFillBrush());
         }
     }
 

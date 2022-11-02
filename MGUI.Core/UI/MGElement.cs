@@ -79,6 +79,8 @@ namespace MGUI.Core.UI
     }
 
     //TODO
+    //ComboBox: Fix the dropdown to prevent it from opening off-screen (outside the MGDesktop's bounds)
+    //
     //UniformGrid?
     //StaticGrid - user specifies # of rows and columns, and the size of each cell
     //      also things like gridline size, spacing, gridline brush, cell background brush
@@ -681,13 +683,13 @@ namespace MGUI.Core.UI
 
         /// <summary>The <see cref="IFillBrush"/>es to use for this <see cref="MGElement"/>'s background, depending on the current <see cref="VisualState"/>.<para/>
         /// See also: <see cref="BackgroundUnderlay"/>, <see cref="BackgroundOverlay"/></summary>
-        public VisualStateBrush BackgroundBrush { get; set; }
+        public VisualStateFillBrush BackgroundBrush { get; set; }
         /// <summary>The first <see cref="IFillBrush"/> used to draw this <see cref="MGElement"/>'s background. Drawn before <see cref="BackgroundOverlay"/></summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public IFillBrush BackgroundUnderlay => BackgroundBrush.GetUnderlay(VisualState.Primary);
         /// <summary>The second <see cref="IFillBrush"/> used to draw this <see cref="MGElement"/>'s background. Drawn after <see cref="BackgroundUnderlay"/></summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public IFillBrush BackgroundOverlay => BackgroundBrush.GetOverlay(VisualState.Secondary);
+        public IFillBrush BackgroundOverlay => BackgroundBrush.GetFillOverlay(VisualState.Secondary);
 
 
 
@@ -997,11 +999,6 @@ namespace MGUI.Core.UI
             TempTransform?.Dispose();
             TempScissorRect?.Dispose();
 
-#if false // Testing button scaling
-            TempTransform?.Dispose();
-            TempScissorRect?.Dispose();
-#endif
-
             OnEndDraw?.Invoke(this, DrawEventArgs);
 		}
 
@@ -1028,7 +1025,7 @@ namespace MGUI.Core.UI
             Rectangle BorderlessBounds = !HasBorder ? LayoutBounds : LayoutBounds.GetCompressed(GetBorder().BorderThickness);
             BackgroundBrush.GetUnderlay(DA.VisualState.Primary)?.Draw(DA, this, BorderlessBounds);
             SecondaryVisualState SecondaryState = DA.VisualState.GetSecondaryState(SpoofIsPressedWhileDrawingBackground, SpoofIsHoveredWhileDrawingBackground);
-            BackgroundBrush.GetOverlay(SecondaryState)?.Draw(DA, this, BorderlessBounds);
+            BackgroundBrush.GetFillOverlay(SecondaryState)?.Draw(DA, this, BorderlessBounds);
         }
 
         public virtual void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds) 

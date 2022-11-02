@@ -34,7 +34,7 @@ namespace MGUI.Core.UI
         }
 
         /// <summary>A background to use when this <see cref="MGSpoiler"/> is not revealed.</summary>
-        public VisualStateBrush UnspoiledBackgroundBrush
+        public VisualStateFillBrush UnspoiledBackgroundBrush
         {
             get => ButtonElement.BackgroundBrush;
             set => ButtonElement.BackgroundBrush = value;

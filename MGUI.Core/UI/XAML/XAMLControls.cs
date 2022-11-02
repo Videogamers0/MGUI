@@ -486,8 +486,6 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLResizeGrip : XAMLElement
     {
-        public XAMLColor? HoveredHighlightColor { get; set; }
-        public float? PressedBrightenIntensity { get; set; }
         public XAMLColor? Foreground { get; set; }
         public int? MaxDots { get; set; }
         public int? Spacing { get; set; }
@@ -499,12 +497,8 @@ namespace MGUI.Core.UI.XAML
         {
             MGResizeGrip ResizeGrip = Element as MGResizeGrip;
 
-            if (HoveredHighlightColor.HasValue)
-                ResizeGrip.HoveredHighlightColor = HoveredHighlightColor.Value.ToXNAColor();
-            if (PressedBrightenIntensity.HasValue)
-                ResizeGrip.PressedBrightenIntensity = PressedBrightenIntensity.Value;
             if (Foreground.HasValue)
-                ResizeGrip.Foreground = Foreground.Value.ToXNAColor();
+                ResizeGrip.Foreground = new(ResizeGrip.GetTheme(), Foreground.Value.ToXNAColor());
             if (MaxDots.HasValue)
                 ResizeGrip.MaxDots = MaxDots.Value;
             if (Spacing.HasValue)

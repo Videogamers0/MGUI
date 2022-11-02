@@ -554,10 +554,8 @@ namespace MGUI.Core.UI
                     Button.HorizontalAlignment = HorizontalAlignment.Stretch;
                     Button.VerticalAlignment = VerticalAlignment.Stretch;
 
-                    Button.BackgroundBrush = GetTheme().GetDropdownItemBackgroundBrush();
+                    Button.BackgroundBrush = GetTheme().DropdownItemBackgroundBrush.GetValue(true);
                     Button.DefaultTextForeground = null;
-
-                    //Button.HoveredItemForeground = new(40, 40, 40);
 
                     return Button;
                 };

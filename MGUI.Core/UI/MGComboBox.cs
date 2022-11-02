@@ -483,7 +483,7 @@ namespace MGUI.Core.UI
                     MGButton Button = new(Dropdown, new(0), null);
                     Button.Padding = DefaultDropdownItemPadding;
                     Button.Margin = 0;
-                    Button.BackgroundBrush = GetTheme().GetDropdownItemBackgroundBrush();
+                    Button.BackgroundBrush = GetTheme().DropdownItemBackgroundBrush.GetValue(true);
                     Button.HorizontalAlignment = HorizontalAlignment.Stretch;
                     Button.HorizontalContentAlignment = HorizontalAlignment.Left;
                     Button.VerticalAlignment = VerticalAlignment.Stretch;

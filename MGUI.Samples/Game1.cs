@@ -102,7 +102,7 @@ namespace MGUI.Samples
             <GridSplitter GridRow=""0"" GridColumn=""1"" />
         </Grid>-->
 
-        <Grid Name=""TestGrid"" RowLengths=""100[50,],16,*[80,]"" ColumnLengths=""1*[50,150],16,1.5*[50,60],1.2*"" Width=""296"" BG=""White * 0.8"" HA=""Center"">
+        <Grid Name=""TestGrid"" RowLengths=""100[50,],16,*[80,]"" ColumnLengths=""1*[50,150],16,1.5*[50,60],1.2*"" Width=""296"" HA=""Center"">
             <TextBlock BG=""Red"" GridRow=""0"" GridColumn=""0"" />
             <TextBlock BG=""Yellow"" GridRow=""2"" GridColumn=""2"" />
             <TextBlock BG=""Purple"" GridRow=""0"" GridColumn=""3"" />

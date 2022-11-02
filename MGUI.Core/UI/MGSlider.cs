@@ -20,7 +20,7 @@ namespace MGUI.Core.UI
         private Color _HoveredHighlightColor;
         /// <summary>An overlay color that is drawn overtop of this <see cref="MGSlider"/>'s graphics if the mouse is currently hovering it.<br/>
         /// Recommended to use a transparent color.<para/>
-        /// Default Value: <see cref="MGTheme.HoveredColor"/></summary>
+        /// Default Value: <see cref="MGTheme.ClickableHoveredColor"/></summary>
         public Color HoveredHighlightColor
         {
             get => _HoveredHighlightColor;
@@ -41,7 +41,7 @@ namespace MGUI.Core.UI
         private float _PressedDarkenIntensity;
         /// <summary>A percentage to darken this <see cref="MGSlider"/>'s graphics by when the mouse is currently pressed, but not yet released, overtop of this <see cref="MGElement"/>.<br/>
         /// Use a larger value to apply a more obvious background overlay while this <see cref="MGElement"/> is pressed. Use a smaller value for a more subtle change.<para/>
-        /// Default value: <see cref="MGTheme.PressedDarkenModifier"/></summary>
+        /// Default value: <see cref="MGTheme.ClickablePressedModifier"/></summary>
         public float PressedDarkenIntensity
         {
             get => _PressedDarkenIntensity;
@@ -517,8 +517,8 @@ namespace MGUI.Core.UI
             {
                 MGTheme Theme = GetTheme();
 
-                this.HoveredHighlightColor = Theme.HoveredColor;
-                this.PressedDarkenIntensity = Theme.PressedDarkenModifier;
+                this.HoveredHighlightColor = Theme.ClickableHoveredColor;
+                this.PressedDarkenIntensity = Theme.ClickablePressedModifier;
 
                 SetRange(Minimum, Maximum);
                 SetValue(Value);
