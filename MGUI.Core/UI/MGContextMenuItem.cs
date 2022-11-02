@@ -233,7 +233,7 @@ namespace MGUI.Core.UI
             HeaderPresenter.PreferredWidth = Menu.HeaderSize.Width;
             HeaderPresenter.PreferredHeight = Menu.HeaderSize.Height;
             HeaderPresenter.Margin = new(0);
-            HeaderPresenter.BackgroundBrush = new(GetTheme(), null);
+            HeaderPresenter.BackgroundBrush = new(null);
             HeaderPresenter.ComponentParent = this;
 
             Menu.HeaderSizeChanged += (sender, e) =>

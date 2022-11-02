@@ -274,7 +274,7 @@ namespace MGUI.Core.UI
                 {
                     MGButton Button = new(Window, new(1, 1, 1, 0), MGUniformBorderBrush.Black, x => TabItem.IsTabSelected = true);
                     Button.Padding = new(8, 5, 8, 5);
-                    Button.BackgroundBrush = GetTheme().GetSelectedTabHeaderBackgroundBrush();
+                    Button.BackgroundBrush = GetTheme().SelectedTabHeaderBackground.GetValue(true);
                     Button.DefaultTextForeground = Color.Black;
                     Button.VerticalAlignment = VerticalAlignment.Bottom;
                     return Button;
@@ -284,7 +284,7 @@ namespace MGUI.Core.UI
                 {
                     MGButton Button = new(Window, new(1, 1, 1, 0), MGUniformBorderBrush.Gray, x => TabItem.IsTabSelected = true);
                     Button.Padding = new(8, 3, 8, 3);
-                    Button.BackgroundBrush = GetTheme().GetUnselectedTabHeaderBackgroundBrush();
+                    Button.BackgroundBrush = GetTheme().UnselectedTabHeaderBackground.GetValue(true);
                     Button.DefaultTextForeground = Color.Black;
                     Button.Opacity = 0.9f;
                     Button.VerticalAlignment = VerticalAlignment.Bottom;

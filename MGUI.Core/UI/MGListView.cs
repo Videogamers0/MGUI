@@ -277,7 +277,7 @@ namespace MGUI.Core.UI
                 HeaderGrid.GridLineMargin = GridLineMargin;
                 HeaderGrid.HorizontalGridLineBrush = GridLineBrush;
                 HeaderGrid.VerticalGridLineBrush = GridLineBrush;
-                HeaderGrid.BackgroundBrush = GetTheme().GetTitleBackgroundBrush();
+                HeaderGrid.BackgroundBrush = GetTheme().TitleBackground.GetValue(true);
                 HeaderGrid.DefaultTextForeground = Color.White;
                 HeaderGrid.CanChangeContent = false;
 

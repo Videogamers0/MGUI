@@ -197,7 +197,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 this.Size = 12;
                 this.TickSize = DefaultTickSize;
 
-                this.Foreground = GetTheme().GetGridSplitterForegroundBrush();
+                this.Foreground = GetTheme().GridSplitterForeground.GetValue(true);
 
                 MouseHandler.DragStart += (sender, e) =>
                 {

@@ -16,53 +16,6 @@ namespace MGUI.Core.UI
 {
     public class MGSlider : MGElement
     {
-        #region Focus Visual Style
-        private Color _HoveredHighlightColor;
-        /// <summary>An overlay color that is drawn overtop of this <see cref="MGSlider"/>'s graphics if the mouse is currently hovering it.<br/>
-        /// Recommended to use a transparent color.<para/>
-        /// Default Value: <see cref="MGTheme.ClickableHoveredColor"/></summary>
-        public Color HoveredHighlightColor
-        {
-            get => _HoveredHighlightColor;
-            set
-            {
-                if (_HoveredHighlightColor != value)
-                {
-                    _HoveredHighlightColor = value;
-                    NPC(nameof(HoveredHighlightColor));
-                    HoveredOverlay = new(HoveredHighlightColor);
-                    PressedOverlay = new(HoveredHighlightColor.Darken(PressedDarkenIntensity));
-                    HoveredBorderOverlay = new(HoveredOverlay);
-                    PressedBorderOverlay = new(PressedOverlay);
-                }
-            }
-        }
-
-        private float _PressedDarkenIntensity;
-        /// <summary>A percentage to darken this <see cref="MGSlider"/>'s graphics by when the mouse is currently pressed, but not yet released, overtop of this <see cref="MGElement"/>.<br/>
-        /// Use a larger value to apply a more obvious background overlay while this <see cref="MGElement"/> is pressed. Use a smaller value for a more subtle change.<para/>
-        /// Default value: <see cref="MGTheme.ClickablePressedModifier"/></summary>
-        public float PressedDarkenIntensity
-        {
-            get => _PressedDarkenIntensity;
-            set
-            {
-                if (_PressedDarkenIntensity != value)
-                {
-                    _PressedDarkenIntensity = value;
-                    NPC(nameof(PressedDarkenIntensity));
-                    PressedOverlay = new(HoveredHighlightColor.Darken(PressedDarkenIntensity));
-                    PressedBorderOverlay = new(PressedOverlay);
-                }
-            }
-        }
-
-        private MGSolidFillBrush HoveredOverlay { get; set; }
-        private MGSolidFillBrush PressedOverlay { get; set; }
-        private MGUniformBorderBrush HoveredBorderOverlay { get; set; }
-        private MGUniformBorderBrush PressedBorderOverlay { get; set; }
-        #endregion FocusVisualStyle
-
         #region Value
         private float _Minimum;
         /// <summary>The inclusive minimum that <see cref="Value"/> can be set to.<para/>
@@ -484,6 +437,20 @@ namespace MGUI.Core.UI
         public bool IsVertical => Orientation == Orientation.Vertical;
         #endregion Orientation
 
+        private VisualStateFillBrush _FocusBrush;
+        public VisualStateFillBrush FocusBrush
+        {
+            get => _FocusBrush;
+            set
+            {
+                if (_FocusBrush != value)
+                {
+                    _FocusBrush = value;
+                    NPC(nameof(FocusBrush));
+                }
+            }
+        }
+
         private IFillBrush _Foreground;
         /// <summary>The fallback <see cref="IFillBrush"/> for drawing the number line, ticks, or the thumb if they don't have an explicit <see cref="IFillBrush"/> specified.<para/>
         /// See also: <see cref="NumberLineFillBrush"/>, <see cref="TickFillBrush"/>, <see cref="ThumbFillBrush"/></summary>
@@ -517,11 +484,10 @@ namespace MGUI.Core.UI
             {
                 MGTheme Theme = GetTheme();
 
-                this.HoveredHighlightColor = Theme.ClickableHoveredColor;
-                this.PressedDarkenIntensity = Theme.ClickablePressedModifier;
-
                 SetRange(Minimum, Maximum);
                 SetValue(Value);
+
+                this.FocusBrush = Theme.SliderOverlay.GetValue(true);
 
                 this.Foreground = Theme.SliderForeground.GetValue(true);
 
@@ -725,6 +691,10 @@ namespace MGUI.Core.UI
 
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
         {
+            SecondaryVisualState VisualState = IsLMBPressed || IsDraggingThumb ? SecondaryVisualState.Pressed : IsHovered || IsHoveringThumb ? SecondaryVisualState.Hovered : SecondaryVisualState.None;
+            IFillBrush OverlayFillBrush = FocusBrush.GetFillOverlay(VisualState);
+            IBorderBrush OverlayBorderBrush = FocusBrush.GetBorderOverlay(VisualState);
+
             //  Apply padding
             LayoutBounds = new(LayoutBounds.Left + Padding.Left, LayoutBounds.Top + Padding.Top, LayoutBounds.Width - Padding.Width, LayoutBounds.Height - Padding.Height);
 
@@ -791,26 +761,13 @@ namespace MGUI.Core.UI
                         RightNumberLine = new(ThumbBounds.Right, NumberLineBounds.Top, NumberLineBounds.Right - ThumbBounds.Right, NumberLineBounds.Height);
                     List<Rectangle> NumberLineChunks = new List<Rectangle>() { LeftNumberLine, RightNumberLine }.Where(x => x != Rectangle.Empty).ToList();
 
-                    if (IsLMBPressed || IsDraggingThumb)
+                    foreach (Rectangle Bounds in NumberLineChunks)
                     {
-                        foreach (Rectangle Bounds in NumberLineChunks)
-                        {
-                            PressedOverlay.Draw(DA, this, Bounds);
-                            PressedBorderOverlay.Draw(DA, this, Bounds, NumberLineBorderThickness);
-                        }
-                        PressedOverlay.Draw(DA, this, ThumbBounds);
-                        PressedBorderOverlay.Draw(DA, this, ThumbBounds, ThumbBorderThickness);
+                        OverlayFillBrush?.Draw(DA, this, Bounds);
+                        OverlayBorderBrush?.Draw(DA, this, Bounds, NumberLineBorderThickness);
                     }
-                    else if (IsHovered || IsHoveringThumb)
-                    {
-                        foreach (Rectangle Bounds in NumberLineChunks)
-                        {
-                            HoveredOverlay.Draw(DA, this, Bounds);
-                            HoveredBorderOverlay.Draw(DA, this, Bounds, NumberLineBorderThickness);
-                        }
-                        HoveredOverlay.Draw(DA, this, ThumbBounds);
-                        HoveredBorderOverlay.Draw(DA, this, ThumbBounds, ThumbBorderThickness);
-                    }
+                    OverlayFillBrush?.Draw(DA, this, ThumbBounds);
+                    OverlayBorderBrush?.Draw(DA, this, ThumbBounds, ThumbBorderThickness);
                 }
             }
             else if (Orientation == Orientation.Vertical)
@@ -872,26 +829,13 @@ namespace MGUI.Core.UI
                         BottomNumberLine = new(NumberLineBounds.Left, ThumbBounds.Bottom, NumberLineBounds.Width, NumberLineBounds.Bottom - ThumbBounds.Bottom);
                     List<Rectangle> NumberLineChunks = new List<Rectangle>() { TopNumberLine, BottomNumberLine }.Where(x => x != Rectangle.Empty).ToList();
 
-                    if (IsLMBPressed || IsDraggingThumb)
+                    foreach (Rectangle Bounds in NumberLineChunks)
                     {
-                        foreach (Rectangle Bounds in NumberLineChunks)
-                        {
-                            PressedOverlay.Draw(DA, this, Bounds);
-                            PressedBorderOverlay.Draw(DA, this, Bounds, NumberLineBorderThickness);
-                        }
-                        PressedOverlay.Draw(DA, this, ThumbBounds);
-                        PressedBorderOverlay.Draw(DA, this, ThumbBounds, ThumbBorderThickness);
+                        OverlayFillBrush?.Draw(DA, this, Bounds);
+                        OverlayBorderBrush?.Draw(DA, this, Bounds, NumberLineBorderThickness);
                     }
-                    else if (IsHovered || IsHoveringThumb)
-                    {
-                        foreach (Rectangle Bounds in NumberLineChunks)
-                        {
-                            HoveredOverlay.Draw(DA, this, Bounds);
-                            HoveredBorderOverlay.Draw(DA, this, Bounds, NumberLineBorderThickness);
-                        }
-                        HoveredOverlay.Draw(DA, this, ThumbBounds);
-                        HoveredBorderOverlay.Draw(DA, this, ThumbBounds, ThumbBorderThickness);
-                    }
+                    OverlayFillBrush?.Draw(DA, this, ThumbBounds);
+                    OverlayBorderBrush?.Draw(DA, this, ThumbBounds, ThumbBorderThickness);
                 }
             }
             else

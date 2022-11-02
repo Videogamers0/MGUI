@@ -210,14 +210,6 @@ namespace MGUI.Core.UI
                 _ => throw new NotImplementedException($"Unrecognized {nameof(SecondaryVisualState)}: {State}")
             };
 
-        protected VisualStateBrush(MGTheme Theme, TDataType NormalValue, TDataType SelectedValue, TDataType DisabledValue, Color? HoveredColor)
-            : base(NormalValue, SelectedValue, DisabledValue)
-        {
-            this.HoveredColor = HoveredColor;
-            this.PressedModifierType = PressedModifierType.Darken;
-            this.PressedModifier = Theme.ClickablePressedModifier;
-        }
-
         protected VisualStateBrush(TDataType NormalValue, TDataType SelectedValue, TDataType DisabledValue, 
             Color? HoveredColor, PressedModifierType PressedModifierType, float PressedModifier)
             : base(NormalValue, SelectedValue, DisabledValue)
@@ -233,14 +225,14 @@ namespace MGUI.Core.UI
     /// <summary>A wrapper class for multiple <see cref="IFillBrush"/>es, where a specific one is chosen based on an <see cref="MGElement"/>'s <see cref="VisualState"/></summary>
     public class VisualStateFillBrush : VisualStateBrush<IFillBrush>
     {
-        public VisualStateFillBrush(MGTheme Theme, IFillBrush Brush)
-            : this(Theme, Brush, null) { }
+        public VisualStateFillBrush(IFillBrush Brush)
+            : this(Brush, null, PressedModifierType.Darken, 0.06f) { }
 
-        public VisualStateFillBrush(MGTheme Theme, IFillBrush Brush, Color? HoveredColor)
-            : this(Theme, Brush, Brush, Brush, HoveredColor) { }
+        public VisualStateFillBrush(IFillBrush Brush, Color? HoveredColor, PressedModifierType PressedModifierType, float PressedModifier)
+            : this(Brush, Brush, Brush, HoveredColor, PressedModifierType, PressedModifier) { }
 
-        public VisualStateFillBrush(MGTheme Theme, IFillBrush NormalBrush, IFillBrush SelectedBrush, IFillBrush DisabledBrush, Color? HoveredColor)
-            : base(Theme, NormalBrush, SelectedBrush, DisabledBrush, HoveredColor) { }
+        public VisualStateFillBrush(IFillBrush NormalBrush, IFillBrush SelectedBrush, IFillBrush DisabledBrush, Color? HoveredColor, PressedModifierType PressedModifierType, float PressedModifier)
+            : base(NormalBrush, SelectedBrush, DisabledBrush, HoveredColor, PressedModifierType, PressedModifier) { }
 
         private VisualStateFillBrush(VisualStateFillBrush InheritFrom)
             : base(InheritFrom.NormalValue?.Copy(), InheritFrom.SelectedValue?.Copy(), InheritFrom.DisabledValue?.Copy(),
@@ -253,14 +245,14 @@ namespace MGUI.Core.UI
     /// <summary>A wrapper class for multiple <see cref="Color"/>s, where a specific one is chosen based on an <see cref="MGElement"/>'s <see cref="VisualState"/></summary>
     public class VisualStateColorBrush : VisualStateBrush<Color>
     {
-        public VisualStateColorBrush(MGTheme Theme, Color Color)
-            : this(Theme, Color, null) { }
+        public VisualStateColorBrush(Color Color)
+            : this(Color, null, PressedModifierType.Darken, 0.06f) { }
 
-        public VisualStateColorBrush(MGTheme Theme, Color Color, Color? HoveredColor)
-            : this(Theme, Color, Color, Color, HoveredColor) { }
+        public VisualStateColorBrush(Color Color, Color? HoveredColor, PressedModifierType PressedModifierType, float PressedModifier)
+            : this(Color, Color, Color, HoveredColor, PressedModifierType, PressedModifier) { }
 
-        public VisualStateColorBrush(MGTheme Theme, Color NormalColor, Color SelectedColor, Color DisabledColor, Color? HoveredColor)
-            : base(Theme, NormalColor, SelectedColor, DisabledColor, HoveredColor) { }
+        public VisualStateColorBrush(Color NormalColor, Color SelectedColor, Color DisabledColor, Color? HoveredColor, PressedModifierType PressedModifierType, float PressedModifier)
+            : base(NormalColor, SelectedColor, DisabledColor, HoveredColor, PressedModifierType, PressedModifier) { }
 
         private VisualStateColorBrush(VisualStateColorBrush InheritFrom)
             : base(InheritFrom.NormalValue, InheritFrom.SelectedValue, InheritFrom.DisabledValue,

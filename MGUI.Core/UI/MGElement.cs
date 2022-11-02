@@ -80,7 +80,7 @@ namespace MGUI.Core.UI
 
     //TODO
     //ComboBox: Fix the dropdown to prevent it from opening off-screen (outside the MGDesktop's bounds)
-    //
+    //GridSplitter: Allow dragging multiple at a time? like if a horiz/vertical gridpslitter were overlapping
     //UniformGrid?
     //StaticGrid - user specifies # of rows and columns, and the size of each cell
     //      also things like gridline size, spacing, gridline brush, cell background brush

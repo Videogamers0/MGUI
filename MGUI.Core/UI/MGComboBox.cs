@@ -463,7 +463,7 @@ namespace MGUI.Core.UI
 
                 Dropdown.BorderThickness = new(1);
                 Dropdown.BorderBrush = MGUniformBorderBrush.Gray;
-                Dropdown.BackgroundBrush = GetTheme().GetComboBoxDropdownBackgroundBrush();
+                Dropdown.BackgroundBrush = GetTheme().ComboBoxDropdownBackground.GetValue(true);
                 Dropdown.Padding = new(0);
 
                 DropdownSP = new(Dropdown, Orientation.Vertical);
@@ -483,7 +483,7 @@ namespace MGUI.Core.UI
                     MGButton Button = new(Dropdown, new(0), null);
                     Button.Padding = DefaultDropdownItemPadding;
                     Button.Margin = 0;
-                    Button.BackgroundBrush = GetTheme().DropdownItemBackgroundBrush.GetValue(true);
+                    Button.BackgroundBrush = GetTheme().ComboBoxDropdownItemBackground.GetValue(true);
                     Button.HorizontalAlignment = HorizontalAlignment.Stretch;
                     Button.HorizontalContentAlignment = HorizontalAlignment.Left;
                     Button.VerticalAlignment = VerticalAlignment.Stretch;

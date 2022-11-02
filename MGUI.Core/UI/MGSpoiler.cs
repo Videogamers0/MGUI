@@ -132,7 +132,7 @@ namespace MGUI.Core.UI
                 AddComponent(ButtonComponent);
 
                 this.UnspoiledTextAlignment = HorizontalAlignment.Center;
-                this.UnspoiledBackgroundBrush = GetTheme().GetSpoilerUnspoiledBackgroundBrush();
+                this.UnspoiledBackgroundBrush = GetTheme().SpoilerUnspoiledBackground.GetValue(true);
                 this.IsRevealed = false;
 
                 OnContentAdded += (sender, e) => { UpdateContentVisibility(); };

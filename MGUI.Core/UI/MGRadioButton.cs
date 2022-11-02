@@ -163,17 +163,17 @@ namespace MGUI.Core.UI
             }
         }
 
-        private Color _BubbleComponentFillColor;
-        /// <summary>The background <see cref="Color"/> to use when drawing the checkable part.</summary>
-        public Color BubbleComponentFillColor
+        private VisualStateColorBrush _BubbleComponentBackground;
+        /// <summary>The background to use when drawing the checkable part.</summary>
+        public VisualStateColorBrush BubbleComponentBackground
         {
-            get => _BubbleComponentFillColor;
+            get => _BubbleComponentBackground;
             set
             {
-                if (_BubbleComponentFillColor != value)
+                if (_BubbleComponentBackground != value)
                 {
-                    _BubbleComponentFillColor = value;
-                    NPC(nameof(BubbleComponentFillColor));
+                    _BubbleComponentBackground = value;
+                    NPC(nameof(BubbleComponentBackground));
                 }
             }
         }
@@ -201,49 +201,6 @@ namespace MGUI.Core.UI
             get => ButtonElement.Margin.Right;
             set => ButtonElement.Margin = new(ButtonElement.Margin.Left, ButtonElement.Margin.Top, value, ButtonElement.Margin.Bottom);
         }
-
-        private Color _HoveredHighlightColor;
-        /// <summary>An overlay color that is drawn overtop of checkable portion of this <see cref="MGRadioButton"/>'s Background if the mouse is currently hovering it.<br/>
-        /// Recommended to use a transparent color.</summary>
-        public Color HoveredHighlightColor
-        {
-            get => _HoveredHighlightColor;
-            set
-            {
-                if (_HoveredHighlightColor != value)
-                {
-                    _HoveredHighlightColor = value;
-                    NPC(nameof(HoveredHighlightColor));
-                    HoveredOverlay = HoveredHighlightColor;
-                    PressedOverlay = HoveredHighlightColor.Darken(PressedDarkenIntensity);
-                    HoveredBorderOverlay = HoveredOverlay;
-                    PressedBorderOverlay = PressedOverlay;
-                }
-            }
-        }
-
-        private float _PressedDarkenIntensity;
-        /// <summary>A percentage to darken the background color by when the mouse is currently pressed, but not yet released, overtop of the checkable portion of this <see cref="MGCheckBox"/>.<br/>
-        /// Use a larger value to apply a more obvious background overlay while this <see cref="MGElement"/> is pressed. Use a smaller value for a more subtle change.</summary>
-        public float PressedDarkenIntensity
-        {
-            get => _PressedDarkenIntensity;
-            set
-            {
-                if (_PressedDarkenIntensity != value)
-                {
-                    _PressedDarkenIntensity = value;
-                    NPC(nameof(PressedDarkenIntensity));
-                    PressedOverlay = HoveredHighlightColor.Darken(PressedDarkenIntensity);
-                    PressedBorderOverlay = PressedOverlay;
-                }
-            }
-        }
-
-        private Color HoveredOverlay { get; set; }
-        private Color PressedOverlay { get; set; }
-        private Color HoveredBorderOverlay { get; set; }
-        private Color PressedBorderOverlay { get; set; }
 
         public bool IsChecked
         {
@@ -294,13 +251,10 @@ namespace MGUI.Core.UI
                 this.BubbleComponentSize = DefaultBubbleSize;
                 this.BubbleComponentBorderColor = Color.Black;
                 this.BubbleComponentBorderThickness = 1;
-                this.BubbleComponentFillColor = GetTheme().RadioButtonBubbleFillColor;
+                this.BubbleComponentBackground = GetTheme().RadioButtonBubbleBackground.GetValue(true);
                 this.BubbleCheckedColor = Color.Green;
 
                 this.SpacingWidth = DefaultBubbleSpacingWidth;
-
-                this.HoveredHighlightColor = GetTheme().ClickableHoveredColor;
-                this.PressedDarkenIntensity = GetTheme().ClickablePressedModifier;
             }
         }
 
@@ -314,23 +268,22 @@ namespace MGUI.Core.UI
             float Opacity = DA.Opacity;
 
             Rectangle BubblePartBounds = ButtonElement.LayoutBounds;
-            bool IsBubblePartPressed = MouseHandler.Tracker.IsPressedInside(MouseButton.Left, BubblePartBounds, AsIViewport().GetOffset());
-            bool IsBubblePartHovered = BubblePartBounds.ContainsInclusive(MouseHandler.Tracker.CurrentPosition.ToVector2() + AsIViewport().GetOffset());
 
             Point BubbleCenter = BubblePartBounds.Center + DA.Offset;
             int BubbleRadius = BubblePartBounds.Width / 2;
 
+            Color BubbleComponentFillColor = BubbleComponentBackground.GetUnderlay(VisualState.Primary);
             DT.StrokeAndFillCircle(BubbleCenter.ToVector2(), BubbleComponentBorderColor * Opacity, BubbleComponentFillColor * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
 
             if (!ParentWindow.HasModalWindow)
             {
-                if (IsBubblePartPressed)
+                bool IsBubblePartPressed = MouseHandler.Tracker.IsPressedInside(MouseButton.Left, BubblePartBounds, AsIViewport().GetOffset());
+                bool IsBubblePartHovered = BubblePartBounds.ContainsInclusive(MouseHandler.Tracker.CurrentPosition.ToVector2() + AsIViewport().GetOffset());
+
+                Color? Overlay = BubbleComponentBackground.GetColorOverlay(IsBubblePartPressed ? SecondaryVisualState.Pressed : IsBubblePartHovered ? SecondaryVisualState.Hovered : SecondaryVisualState.None);
+                if (Overlay.HasValue)
                 {
-                    DT.StrokeAndFillCircle(BubbleCenter.ToVector2(), PressedBorderOverlay * Opacity, PressedOverlay * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
-                }
-                else if (IsBubblePartHovered)
-                {
-                    DT.StrokeAndFillCircle(BubbleCenter.ToVector2(), HoveredBorderOverlay * Opacity, HoveredOverlay * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
+                    DT.StrokeAndFillCircle(BubbleCenter.ToVector2(), Overlay.Value * Opacity, Overlay.Value * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
                 }
             }
 

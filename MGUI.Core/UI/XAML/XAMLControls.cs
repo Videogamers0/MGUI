@@ -328,9 +328,9 @@ namespace MGUI.Core.UI.XAML
                 ProgressBar.Size = Size.Value;
 
             if (CompletedBrush != null)
-                ProgressBar.CompletedBrush = CompletedBrush.ToFillBrush();
+                ProgressBar.CompletedBrush = new VisualStateFillBrush(CompletedBrush.ToFillBrush());
             if (IncompleteBrush != null)
-                ProgressBar.IncompleteBrush = IncompleteBrush.ToFillBrush();
+                ProgressBar.IncompleteBrush = new VisualStateFillBrush(IncompleteBrush.ToFillBrush());
 
             if (Orientation.HasValue)
                 ProgressBar.Orientation = Orientation.Value;
@@ -348,7 +348,7 @@ namespace MGUI.Core.UI.XAML
         public int? BubbleComponentSize { get; set; }
         public XAMLColor? BubbleComponentBorderColor { get; set; }
         public float? BubbleComponentBorderThickness { get; set; }
-        public XAMLColor? BubbleComponentFillColor { get; set; }
+        public XAMLColor? BubbleComponentBackground { get; set; }
         public XAMLColor? BubbleCheckedColor { get; set; }
 
         public int? SpacingWidth { get; set; }
@@ -371,16 +371,12 @@ namespace MGUI.Core.UI.XAML
                 RadioButton.BubbleComponentBorderColor = BubbleComponentBorderColor.Value.ToXNAColor();
             if (BubbleComponentBorderThickness.HasValue)
                 RadioButton.BubbleComponentBorderThickness = BubbleComponentBorderThickness.Value;
-            if (BubbleComponentFillColor.HasValue)
-                RadioButton.BubbleComponentFillColor = BubbleComponentFillColor.Value.ToXNAColor();
+            if (BubbleComponentBackground.HasValue)
+                RadioButton.BubbleComponentBackground = new VisualStateColorBrush(BubbleComponentBackground.Value.ToXNAColor());
             if (BubbleCheckedColor.HasValue)
                 RadioButton.BubbleCheckedColor = BubbleCheckedColor.Value.ToXNAColor();
             if (SpacingWidth.HasValue)
                 RadioButton.SpacingWidth = SpacingWidth.Value;
-            if (HoveredHighlightColor.HasValue)
-                RadioButton.HoveredHighlightColor = HoveredHighlightColor.Value.ToXNAColor();
-            if (PressedDarkenIntensity.HasValue)
-                RadioButton.PressedDarkenIntensity = PressedDarkenIntensity.Value;
             if (IsChecked.HasValue)
                 RadioButton.IsChecked = IsChecked.Value;
 
@@ -498,7 +494,7 @@ namespace MGUI.Core.UI.XAML
             MGResizeGrip ResizeGrip = Element as MGResizeGrip;
 
             if (Foreground.HasValue)
-                ResizeGrip.Foreground = new(ResizeGrip.GetTheme(), Foreground.Value.ToXNAColor());
+                ResizeGrip.Foreground = new(Foreground.Value.ToXNAColor());
             if (MaxDots.HasValue)
                 ResizeGrip.MaxDots = MaxDots.Value;
             if (Spacing.HasValue)
@@ -570,9 +566,6 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLSlider : XAMLElement
     {
-        public XAMLColor? HoveredHighlightColor { get; set; }
-        public float? PressedDarkenIntensity { get; set; }
-
         public float? Minimum { get; set; }
         public float? Maximum { get; set; }
         public float? Value { get; set; }
@@ -611,11 +604,6 @@ namespace MGUI.Core.UI.XAML
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
         {
             MGSlider Slider = Element as MGSlider;
-
-            if (HoveredHighlightColor.HasValue)
-                Slider.HoveredHighlightColor = HoveredHighlightColor.Value.ToXNAColor();
-            if (PressedDarkenIntensity.HasValue)
-                Slider.PressedDarkenIntensity = PressedDarkenIntensity.Value;
 
             if (Minimum.HasValue || MaxHeight.HasValue)
                 Slider.SetRange(Minimum ?? Slider.Minimum, Maximum ?? Slider.Maximum);

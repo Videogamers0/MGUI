@@ -43,150 +43,261 @@ namespace MGUI.Core.UI
 
     public class MGTheme
     {
-        /// <summary>The default overlay color to alpha-blend on top of element background brushes. This should always be a transparent <see cref="Color"/></summary>
-        public Color ClickableHoveredColor { get; set; }
-        /// <summary>The default percentage to darken the <see cref="ClickableHoveredColor"/> by when the element is both Pressed and Hovered.<para/>
-        /// Only used if the element's <see cref="VisualStateBrush{TDataType}.PressedModifierType"/> is <see cref="PressedModifierType.Darken"/></summary>
-        public float ClickablePressedModifier { get; set; }
+        #region Background
+        private Dictionary<MGElementType, ThemeManagedVisualStateFillBrush> _Backgrounds { get; }
 
-        /// <summary>The default background brush to use on clickable controls like <see cref="MGButton"/>, <see cref="MGToggleButton"/>, <see cref="MGComboBox{TItemType}"/><br/>
-        /// when their <see cref="PrimaryVisualState"/> is <see cref="PrimaryVisualState.Normal"/></summary>
-        public ThemeManagedFillBrush ClickableNormalBackground { get; }
-        /// <summary>The default background brush to use on clickable controls like <see cref="MGButton"/>, <see cref="MGToggleButton"/>, <see cref="MGComboBox{TItemType}"/><br/>
-        /// when their <see cref="PrimaryVisualState"/> is <see cref="PrimaryVisualState.Selected"/></summary>
-        public ThemeManagedFillBrush ClickableSelectedBackground { get; }
+        public VisualStateFillBrush GetBackgroundBrush(MGElementType Type)
+        {
+            if (_Backgrounds.TryGetValue(Type, out ThemeManagedVisualStateFillBrush Value))
+                return Value.GetValue(true);
+            else
+                return new VisualStateFillBrush(null);
+        }
 
-        public ThemeManagedFillBrush DimNeutralBackground { get; }
-        public ThemeManagedFillBrush BrightNeutralBackground { get; }
+        public void SetBackgroundBrush(MGElementType Type, VisualStateFillBrush Value)
+        {
+            if (!_Backgrounds.TryGetValue(Type, out ThemeManagedVisualStateFillBrush ManagedValue))
+            {
+                ManagedValue = new(Value);
+                _Backgrounds.Add(Type, ManagedValue);
+            }
+            else
+                ManagedValue.Value = Value;
+        }
+        #endregion Background
 
-        public ThemeManagedFillBrush ContextMenuBackground { get; }
-        public ThemeManagedFillBrush ToolTipBackground { get; }
+        public ThemeManagedVisualStateFillBrush ComboBoxDropdownBackground { get; }
+        /// <summary>The default background brush to use on items in an <see cref="MGComboBox{TItemType}"/>'s dropdown.</summary>
+        public ThemeManagedVisualStateFillBrush ComboBoxDropdownItemBackground { get; }
 
-        /// <summary>The default background brush to use on title/header content, like the title bar of a window or the header row of a listview</summary>
-        public ThemeManagedFillBrush TitleBackground { get; }
+        public ThemeManagedVisualStateFillBrush GridSplitterForeground { get; }
 
-        public ThemeManagedFillBrush AccentBackground { get; }
+        public ThemeManagedVisualStateFillBrush ProgressBarCompletedBrush { get; }
+        public ThemeManagedVisualStateFillBrush ProgressBarIncompleteBrush { get; }
 
-        public Color RadioButtonBubbleFillColor { get; set; }
-
-        public ThemeManagedFillBrush SliderForeground { get; }
-        public ThemeManagedFillBrush SliderThumbFillBrush { get; }
-
-        public ThemeManagedFillBrush ProgressBarCompletedBrush { get; }
-
-        public ThemeManagedFillBrush GridSplitterForeground { get; }
-        public VisualStateFillBrush GetGridSplitterForegroundBrush() => new(this, GridSplitterForeground.GetValue(true), ClickableHoveredColor.Brighten(0.1f));
+        public ThemeManagedVisualStateColorBrush RadioButtonBubbleBackground { get; set; }
 
         public ThemeManagedVisualStateColorBrush ResizeGripForeground { get; }
 
-        public VisualStateFillBrush GetSelectedTabHeaderBackgroundBrush() => new(this, BrightNeutralBackground.GetValue(true), ClickableHoveredColor);
-        public VisualStateFillBrush GetUnselectedTabHeaderBackgroundBrush() => new(this, DimNeutralBackground.GetValue(true), ClickableHoveredColor);
+        public ThemeManagedFillBrush SliderForeground { get; }
+        public ThemeManagedFillBrush SliderThumbFillBrush { get; }
+        public ThemeManagedVisualStateFillBrush SliderOverlay { get; }
 
-        public VisualStateFillBrush GetComboBoxDropdownBackgroundBrush() => new(this, BrightNeutralBackground.GetValue(true));
+        public ThemeManagedVisualStateFillBrush SpoilerUnspoiledBackground { get; }
 
-        /// <summary>The default background brush to use on items in an <see cref="MGComboBox{TItemType}"/>'s dropdown.</summary>
-        public ThemeManagedVisualStateFillBrush DropdownItemBackgroundBrush { get; }
+        public ThemeManagedVisualStateFillBrush SelectedTabHeaderBackground { get; }
+        public ThemeManagedVisualStateFillBrush UnselectedTabHeaderBackground { get; }
 
-        public VisualStateFillBrush GetTitleBackgroundBrush() => new(this, TitleBackground.GetValue(true), ClickableHoveredColor * 0.35f);
-        public VisualStateFillBrush GetSpoilerUnspoiledBackgroundBrush() => new(this, AccentBackground.GetValue(true), ClickableHoveredColor);
-
-        public VisualStateFillBrush GetBackgroundBrush(MGElementType ElementType)
-        {
-            return ElementType switch
-            {
-                MGElementType.Border or 
-                MGElementType.CheckBox or 
-                MGElementType.ContentPresenter or
-                MGElementType.ContextMenuItem or
-                MGElementType.Expander or
-                MGElementType.Image or
-                MGElementType.RadioButton or
-                MGElementType.RatingControl or
-                MGElementType.Rectangle or
-                MGElementType.ResizeGrip or
-                MGElementType.ScrollViewer or
-                MGElementType.Slider or
-                MGElementType.Spacer or
-                MGElementType.Spoiler or
-                MGElementType.TabItem or
-                MGElementType.TextBlock
-                => new(this, null),
-
-                MGElementType.Button or
-                MGElementType.ComboBox
-                => new(this, ClickableNormalBackground.GetValue(true), ClickableHoveredColor),
-
-                MGElementType.ContextMenu => new(this, ContextMenuBackground.GetValue(true)),
-
-                MGElementType.GridSplitter => new(this, null, ClickableHoveredColor),
-
-                MGElementType.GroupBox or
-                MGElementType.ListView or
-                MGElementType.ProgressBar or
-                MGElementType.TabControl => new(this, BrightNeutralBackground.GetValue(true)),
-
-                MGElementType.PasswordBox or 
-                MGElementType.TextBox => new(this, ClickableNormalBackground.GetValue(true), ClickableHoveredColor * 0.4f) { PressedModifier = 0f },
-
-                MGElementType.Separator or
-                MGElementType.Stopwatch or
-                MGElementType.Timer => new(this, AccentBackground.GetValue(true)),
-
-                MGElementType.ToggleButton => new(this, ClickableNormalBackground.GetValue(true), ClickableSelectedBackground.GetValue(true), ClickableNormalBackground.GetValue(true), ClickableHoveredColor),
-
-                MGElementType.ToolTip => new(this, ToolTipBackground.GetValue(true)),
-
-                MGElementType.Window => new(this, DimNeutralBackground.GetValue(true)),
-
-                MGElementType.DockPanel or 
-                MGElementType.Grid or
-                MGElementType.OverlayPanel or 
-                MGElementType.StackPanel or 
-                MGElementType.UniformGrid => new(this, null),
-
-                MGElementType.Misc or 
-                MGElementType.Custom => new(this, null),
-
-                _ => new(this, null)
-            };
-        }
+        public ThemeManagedVisualStateFillBrush TitleBackground { get; }
 
         public MGTheme()
         {
-            this.ClickableHoveredColor = Color.White * 0.18f;
-            this.ClickablePressedModifier = 0.06f;
+            _Backgrounds = new();
 
-            this.ClickableNormalBackground = new(MGSolidFillBrush.LightGray);
-            this.ClickableSelectedBackground = new(Color.Green.AsFillBrush());
+            List<MGElementType> TypesWithoutBackgrounds = new()
+            {
+                MGElementType.Border,
+                MGElementType.CheckBox,
+                MGElementType.ContentPresenter,
+                MGElementType.ContextMenuItem,
+                MGElementType.Custom,
+                MGElementType.DockPanel,
+                MGElementType.Expander,
+                MGElementType.Grid,
+                MGElementType.Image,
+                MGElementType.OverlayPanel,
+                MGElementType.Misc,
+                MGElementType.RadioButton,
+                MGElementType.RatingControl,
+                MGElementType.Rectangle,
+                MGElementType.ResizeGrip,
+                MGElementType.ScrollViewer,
+                MGElementType.Slider,
+                MGElementType.Spacer,
+                MGElementType.Spoiler,
+                MGElementType.StackPanel,
+                MGElementType.TabItem,
+                MGElementType.TextBlock,
+                MGElementType.UniformGrid
+            };
+            foreach (MGElementType Type in TypesWithoutBackgrounds)
+            {
+                _Backgrounds[Type] = new ThemeManagedVisualStateFillBrush(new VisualStateFillBrush(null));
+            }
 
-            this.DimNeutralBackground = new(MGSolidFillBrush.LightGray);
-            this.BrightNeutralBackground = new(MGSolidFillBrush.White);
+            //  Button/ComboBox
+            ThemeManagedVisualStateFillBrush ButtonBG =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        MGSolidFillBrush.LightGray, MGSolidFillBrush.LightGray, MGSolidFillBrush.LightGray * 0.5f,
+                        Color.White * 0.18f, PressedModifierType.Darken, 0.06f)
+                );
+            _Backgrounds[MGElementType.Button] = new ThemeManagedVisualStateFillBrush(ButtonBG.GetValue(true));
+            _Backgrounds[MGElementType.ComboBox] = new ThemeManagedVisualStateFillBrush(ButtonBG.GetValue(true));
 
-            this.ContextMenuBackground = new(new Color(233, 238, 255).AsFillBrush()); //MGSolidFillBrush.White;
-            this.ToolTipBackground = new((new Color(255, 255, 210) * 0.75f).AsFillBrush());
+            //  Context Menu
+            ThemeManagedVisualStateFillBrush ContextMenuBG =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        new Color(233, 238, 255).AsFillBrush(), // Maybe should just use MGSolidFillBrush.White
+                        null, PressedModifierType.Darken, 0.06f)
+                );
+            _Backgrounds[MGElementType.ContextMenu] = ContextMenuBG;
 
-            this.TitleBackground = new(MGSolidFillBrush.SemiBlack);
+            //  GridSplitter
+            ThemeManagedVisualStateFillBrush GridSplitterBG =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        null,
+                        Color.White * 0.18f, PressedModifierType.Darken, 0.06f)
+                );
+            _Backgrounds[MGElementType.GridSplitter] = GridSplitterBG;
 
-            this.AccentBackground = new(MGSolidFillBrush.SemiBlack);
+            //  GroupBox/ListView/ProgressBar/TabControl
+            IFillBrush BrightNeutralBrush = MGSolidFillBrush.White;
+            ThemeManagedVisualStateFillBrush BrightNeutralBG =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        BrightNeutralBrush,
+                        null, PressedModifierType.Darken, 0.06f)
+                );
+            _Backgrounds[MGElementType.GroupBox] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
+            _Backgrounds[MGElementType.ListView] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
+            _Backgrounds[MGElementType.ProgressBar] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
+            _Backgrounds[MGElementType.TabControl] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
 
-            this.RadioButtonBubbleFillColor = Color.LightGray;
+            //  PasswordBox/TextBox
+            ThemeManagedVisualStateFillBrush TextBoxBG =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        MGSolidFillBrush.LightGray,
+                        Color.White * 0.4f, PressedModifierType.Darken, 0f)
+                );
+            _Backgrounds[MGElementType.PasswordBox] = new ThemeManagedVisualStateFillBrush(TextBoxBG.GetValue(true));
+            _Backgrounds[MGElementType.TextBox] = new ThemeManagedVisualStateFillBrush(TextBoxBG.GetValue(true));
+
+            //  Separator/Stopwatch/Timer
+            IFillBrush AccentBrush = MGSolidFillBrush.SemiBlack;
+            ThemeManagedVisualStateFillBrush AccentBG =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        AccentBrush,
+                        Color.White * 0.04f, PressedModifierType.Darken, 0f)
+                );
+            _Backgrounds[MGElementType.Separator] = new ThemeManagedVisualStateFillBrush(AccentBG.GetValue(true));
+            _Backgrounds[MGElementType.Stopwatch] = new ThemeManagedVisualStateFillBrush(AccentBG.GetValue(true));
+            _Backgrounds[MGElementType.Timer] = new ThemeManagedVisualStateFillBrush(AccentBG.GetValue(true));
+
+            //  ToggleButton
+            ThemeManagedVisualStateFillBrush ToggleButtonBG =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        MGSolidFillBrush.LightGray, Color.Green.AsFillBrush(), MGSolidFillBrush.LightGray * 0.5f,
+                        Color.White * 0.18f, PressedModifierType.Darken, 0.06f)
+                );
+            _Backgrounds[MGElementType.ToggleButton] = new ThemeManagedVisualStateFillBrush(ToggleButtonBG.GetValue(true));
+
+            //  ToolTip
+            ThemeManagedVisualStateFillBrush ToolTipBG =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        (new Color(255, 255, 210) * 0.75f).AsFillBrush(),
+                        null, PressedModifierType.Darken, 0.06f)
+                );
+            _Backgrounds[MGElementType.ToggleButton] = new ThemeManagedVisualStateFillBrush(ToggleButtonBG.GetValue(true));
+
+            //  Window
+            IFillBrush DimNeutralBackground = MGSolidFillBrush.LightGray;
+            ThemeManagedVisualStateFillBrush WindowBG =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        DimNeutralBackground,
+                        null, PressedModifierType.Darken, 0.06f)
+                );
+            _Backgrounds[MGElementType.Window] = new ThemeManagedVisualStateFillBrush(WindowBG.GetValue(true));
+
+
+            this.ComboBoxDropdownBackground =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        MGSolidFillBrush.White,
+                        null, PressedModifierType.Darken, 0.06f)
+                );
+            this.ComboBoxDropdownItemBackground =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        null, Color.Yellow.AsFillBrush() * 0.65f, null,
+                        Color.LightBlue * 0.8f, PressedModifierType.Darken, 0.06f)
+                );
+
+            this.GridSplitterForeground =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        MGSolidFillBrush.SemiBlack,
+                        Color.White * 0.25f, PressedModifierType.Darken, 0.06f)
+                );
+
+            this.ProgressBarCompletedBrush =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        Color.Green.AsFillBrush(),
+                        Color.White * 0.02f, PressedModifierType.Darken, 0f)
+                );
+            this.ProgressBarIncompleteBrush =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        MGSolidFillBrush.SemiBlack,
+                        Color.White * 0.01f, PressedModifierType.Darken, 0f)
+                );
+
+            this.RadioButtonBubbleBackground =
+                new ThemeManagedVisualStateColorBrush(
+                    new VisualStateColorBrush(
+                        Color.LightGray,
+                        Color.White * 0.18f, PressedModifierType.Darken, 0.06f)
+                );
+
+            this.ResizeGripForeground =
+                new ThemeManagedVisualStateColorBrush(
+                    new VisualStateColorBrush(
+                        Color.Black, Color.White * 0.36f, PressedModifierType.Brighten, 0.2f)
+                );
 
             this.SliderForeground = new(MGSolidFillBrush.LightGray);
             this.SliderThumbFillBrush = new(Color.LightGray.Darken(0.1f).AsFillBrush());
+            this.SliderOverlay =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        null,
+                        Color.White * 0.18f, PressedModifierType.Darken, 0.06f)
+                );
 
-            this.GridSplitterForeground = new(MGSolidFillBrush.SemiBlack);
+            this.SelectedTabHeaderBackground =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        MGSolidFillBrush.White,
+                        Color.White * 0.18f, PressedModifierType.Darken, 0.06f)
+                );
+            this.UnselectedTabHeaderBackground =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        MGSolidFillBrush.LightGray,
+                        Color.White * 0.18f, PressedModifierType.Darken, 0.06f)
+                );
 
-            this.ProgressBarCompletedBrush = new(Color.Green.AsFillBrush());
+            this.SpoilerUnspoiledBackground =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        MGSolidFillBrush.SemiBlack,
+                        Color.White * 0.18f, PressedModifierType.Darken, 0.06f)
+                );
 
-            this.DropdownItemBackgroundBrush = new ThemeManagedVisualStateFillBrush(
-                new VisualStateFillBrush(this, null, (Color.Yellow * 0.65f).AsFillBrush(), null, Color.LightBlue * 0.8f));
-
-            this.ResizeGripForeground = new ThemeManagedVisualStateColorBrush(
-                new VisualStateColorBrush(this, Color.Black, Color.White * 0.36f) 
-                { 
-                    PressedModifierType = PressedModifierType.Brighten,
-                    PressedModifier = 0.2f
-                });
+            this.TitleBackground =
+                new ThemeManagedVisualStateFillBrush(
+                    new VisualStateFillBrush(
+                        MGSolidFillBrush.SemiBlack,
+                        Color.White * 0.05f, PressedModifierType.Darken, 0.06f)
+                );
         }
     }
 }

@@ -530,7 +530,7 @@ namespace MGUI.Core.UI
                 TitleBarElement.HorizontalContentAlignment = HorizontalAlignment.Stretch;
                 TitleBarElement.VerticalAlignment = VerticalAlignment.Stretch;
                 TitleBarElement.VerticalContentAlignment = VerticalAlignment.Stretch;
-                TitleBarElement.BackgroundBrush = Theme.GetTitleBackgroundBrush();
+                TitleBarElement.BackgroundBrush = Theme.TitleBackground.GetValue(true);
 
                 this.TitleBarComponent = new(TitleBarElement, true, false, true, true, false, false, false,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Top, ComponentSize.Size));
@@ -548,7 +548,7 @@ namespace MGUI.Core.UI
                 this.CloseButtonElement = new(this, x => { TryCloseWindow(); });
                 CloseButtonElement.MinWidth = 12;
                 CloseButtonElement.MinHeight = 12;
-                CloseButtonElement.BackgroundBrush = new(Theme, MGSolidFillBrush.White * 0.5f, Theme.ClickableHoveredColor);
+                CloseButtonElement.BackgroundBrush = new(MGSolidFillBrush.White * 0.5f, Color.White * 0.18f, PressedModifierType.Darken, 0.06f);
                 CloseButtonElement.BorderBrush = MGUniformBorderBrush.Black;
                 CloseButtonElement.BorderThickness = new(1);
                 CloseButtonElement.Margin = new(1, 1, 1, 1 + BorderElement.BorderThickness.Bottom);

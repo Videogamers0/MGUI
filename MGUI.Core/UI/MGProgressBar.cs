@@ -202,10 +202,9 @@ namespace MGUI.Core.UI
         }
 
         /// <summary>The brush to use for the completed portion of this <see cref="MGProgressBar"/></summary>
-        public IFillBrush CompletedBrush { get; set; }
-
+        public VisualStateFillBrush CompletedBrush { get; set; }
         /// <summary>The brush to use for the incomplete portion of this <see cref="MGProgressBar"/>. Can be null. This brush is rendered overtop of <see cref="MGElement.BackgroundBrush"/></summary>
-        public IFillBrush IncompleteBrush { get; set; }
+        public VisualStateFillBrush IncompleteBrush { get; set; }
 
         private Orientation _Orientation;
         /// <summary>If <see cref="Orientation.Horizontal"/>, the bar grows from left to right.<br/>
@@ -276,7 +275,7 @@ namespace MGUI.Core.UI
                 AddComponent(ValueComponent);
 
                 this.CompletedBrush = GetTheme().ProgressBarCompletedBrush.GetValue(true);
-                this.IncompleteBrush = GetTheme().AccentBackground.GetValue(true);
+                this.IncompleteBrush = GetTheme().ProgressBarIncompleteBrush.GetValue(true);
 
                 this.ShowValue = ShowValue;
                 this.ValueDisplayFormat = RecommendedPercentageValueDisplayFormat;
@@ -344,8 +343,10 @@ namespace MGUI.Core.UI
             else
                 throw new NotImplementedException($"Unrecognized {nameof(Orientation)}: {Orientation}");
 
-            IncompleteBrush?.Draw(DA, this, IncompleteBounds);
-            CompletedBrush?.Draw(DA, this, CompletedBounds);
+            IncompleteBrush.GetUnderlay(VisualState.Primary)?.Draw(DA, this, IncompleteBounds);
+            CompletedBrush.GetUnderlay(VisualState.Primary)?.Draw(DA, this, CompletedBounds);
+            IncompleteBrush.GetFillOverlay(VisualState.Secondary)?.Draw(DA, this, IncompleteBounds);
+            CompletedBrush.GetFillOverlay(VisualState.Secondary)?.Draw(DA, this, CompletedBounds);
 
             DrawSelfBaseImplementation(DA, LayoutBounds);
         }
