@@ -500,7 +500,7 @@ namespace MGUI.Core.UI
                 this.CloseButtonElement = new(this, x => { TryCloseWindow(); });
                 CloseButtonElement.MinWidth = 12;
                 CloseButtonElement.MinHeight = 12;
-                CloseButtonElement.BackgroundBrush = new(MGSolidFillBrush.White * 0.5f, Color.White * 0.18f, PressedModifierType.Darken, 0.06f);
+                CloseButtonElement.BackgroundBrush = new(Color.Crimson.AsFillBrush() * 0.5f, Color.White * 0.18f, PressedModifierType.Darken, 0.06f);
                 CloseButtonElement.BorderBrush = MGUniformBorderBrush.Black;
                 CloseButtonElement.BorderThickness = new(1);
                 CloseButtonElement.Margin = new(1, 1, 1, 1 + BorderElement.BorderThickness.Bottom);
@@ -508,7 +508,7 @@ namespace MGUI.Core.UI
                 CloseButtonElement.VerticalAlignment = VerticalAlignment.Center;
                 CloseButtonElement.VerticalContentAlignment = VerticalAlignment.Center;
                 CloseButtonElement.HorizontalContentAlignment = HorizontalAlignment.Center;
-                CloseButtonElement.SetContent(new MGTextBlock(this, "[b]x[/b]", Color.Crimson));
+                CloseButtonElement.SetContent(new MGTextBlock(this, "[b][shadow=Black 1 1]x[/shadow][/b]", Color.White));
                 //CloseButtonElement.CanChangeContent = false;
 
                 this.TitleBarTextBlockElement = new(this, null, Color.White)

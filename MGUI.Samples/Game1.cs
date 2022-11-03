@@ -194,8 +194,9 @@ namespace MGUI.Samples
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            Desktop.Draw();
             // TODO: Add your drawing code here
+
+            Desktop.Draw();
 
             base.Draw(gameTime);
         }
