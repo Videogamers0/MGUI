@@ -1025,7 +1025,6 @@ namespace MGUI.Core.UI.XAML
         public XAMLThickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
         public XAMLFillBrush CheckedBackgroundBrush { get; set; }
-        public bool? UseAlternateTextForegroundWhenChecked { get; set; }
         public XAMLColor? CheckedTextForeground { get; set; }
         public bool? IsChecked { get; set; }
 
@@ -1038,8 +1037,6 @@ namespace MGUI.Core.UI.XAML
 
             if (CheckedBackgroundBrush != null)
                 ToggleButton.CheckedBackgroundBrush = CheckedBackgroundBrush.ToFillBrush();
-            if (UseAlternateTextForegroundWhenChecked.HasValue)
-                ToggleButton.UseAlternateTextForegroundWhenChecked = UseAlternateTextForegroundWhenChecked.Value;
             if (CheckedTextForeground.HasValue)
                 ToggleButton.CheckedTextForeground = CheckedTextForeground.Value.ToXNAColor();
             if (IsChecked.HasValue)

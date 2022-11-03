@@ -115,7 +115,6 @@ namespace MGUI.Core.UI
     //      maybe option to load from a file instead. so u just use your own text editor instead of a shitty built-in one.
     //      when the file path is set, the code listens for changes to the file, autorefresh on save
     //
-    //
     //maybe MGDesktop should store a Dictionary<string, Texture2D> NamedTextures
     //      which is used by the XAMLParser (instead of passing in the dictionary to XAMLParser.Parse, XAMLParser.Parse retrieves it from MGDesktop)
     //          actually dont even need it as parameter. XAMLImage can retrieve it from Window.GetDesktop().NamedTextures
@@ -134,44 +133,7 @@ namespace MGUI.Core.UI
     //maybe AttachedElement, has MGElement Element, MGElement Host, handles things like updating layout when host updates layout, handles drawing self when host ends draw etc
     //		could even be like component, with updatepriority/drawpriority
     //
-    //
-    //Themes?
-    //ThemeDefinition
-    //		class ElementTheme
-    //			MGElementType ElementType
-    //			bool AffectsComponents - true if these settings can be applied to an MGElement that is a Component
-    //          VisualStyleState<IBorderBrush> BorderBrush
-    //			VisualStyleState<IFillBrush> BackgroundBrush
-    //			VisualStyleState<float?> Opacity
-    //			VisualStyleState<Color?> TextForeground
-    //			Thickness? BorderThickness
-    //			Thickness? Padding
-    //			Thickness? Margin
-    //			HorizontalAlignment? HorizontalAlignment
-    //			VerticalAlignment? VerticalAlignment
-    //			HorizontalAlignment? HorizontalContentAlignment
-    //			VerticalAlignment? VerticalContentAlignment
-    //			float? MinWidth, MaxWidth, MinHeight, MaxHeight, PreferredWidth, PreferredHeight
-    //			bool? IsEnabled
-    //          bool? IsSelected
-    //
-    //			bool TryApplyTo<T>(T Element) where T : MGElement
-    //				if Element.ElementType == this.ElementType...
-    //					//or maybe we make a virtual method in MGElement, virtual void ApplyTheme(Theme) ..., virtual void ApplyTheme(ElementTheme) ...
-    //					//EX: Button overrides it, calls base.ApplyTeheme. Then checks if ElementTheme is ButtonTheme, do additional stuff...
-    //					//Anything with components, has to manually call ApplyTheme after finishing its object initialization?
-    //		class CheckBoxTheme : ElementTheme
-    //			Color? CheckMarkColor etc...
-    //		stuff like Expander ComponentSize, Radiobutton BubbleSize/Spacing, StackPanel Spacing etc...
-    //
-    //		Dictionary<MGElementType, List<ElementTheme>> ThemesByElementType
-    //
-    //Theme : MGSingleContentHost
-    //		ThemeDefinition Definition { get; }
-    //		subscribes to ContentAdded and NestedContentAdded
-    //		when that happens, applies the theme settings that correspond to the new element's ElementType
-    //			and to all its components? maybe calls an ApplyTheme method that is defined in MGElement and overridden by each subclass
-    //		note: don't auto-apply the style if there's another style further down the visual tree. or maybe theyd applied in a specific order so later ones overwrite earlier ones
+    //MGTheme: Make a few presets. BuiltInTheme enum:
 
     /// <summary>Base class for all UI elements.</summary>
     public abstract class MGElement : IMouseHandlerHost, IKeyboardHandlerHost
@@ -648,39 +610,20 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public IFillBrush BackgroundOverlay => BackgroundBrush.GetFillOverlay(VisualState.Secondary);
 
-
-        //TODO
-        //Maybe an IFillBrush Overlay property? Defaults to null. Is drawn immediately after drawing the contents, but before OnEndDraw?
-        //		Might need 2 events at end of Draw call, such as OnBeginDrawOverlay, OnEndDraw
-        //		since some controls like MGResizeGrip might want to draw near the end, but before the overlay	
-        //
-        //		Each element has a specific BackgroundBrush/ForegroundBrush/TextForeground for each PrimaryVisualState        //
-        //		MGElement has:
-        //			VisualStateSetting<IFillBrush> ForegroundBrush - Drawn after drawing itself and contents
-        //			VisualStateSetting<Color?> TextForegroundColor
-        //
-        //			ForegroundUnderlay => ForegroundBrush.GetUnderlay(CurrentVisualState)
-        //			ForegroundOverlay => ForegroundBrush.GetOverlay(CurrentVisualState)
-        //			TextForegroundColor => somehow needs to alphablend the underlay and overlay colors?
-        //				or fuck it, maybe color is different and doesnt have hovered/pressed
-
-
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Color? _DefaultTextForeground;
         /// <summary>The default foreground color to use when rendering text on this <see cref="MGElement"/> or any of its child elements.<br/>
         /// For a value that accounts for the parent's <see cref="DefaultTextForeground"/>, use <see cref="DerivedDefaultTextForeground"/> instead.<para/>
-        /// See also: <see cref="DerivedDefaultTextForeground"/></summary>
-        public Color? DefaultTextForeground { get; set; }
+        /// See also: <see cref="DerivedDefaultTextForeground"/>, <see cref="CurrentDefaultTextForeground"/></summary>
+        public VisualStateSetting<Color?> DefaultTextForeground { get; set; }
+        /// <summary>The currently-active value from <see cref="DefaultTextForeground"/>, based on <see cref="VisualState"/></summary>
+        public Color? CurrentDefaultTextForeground => DefaultTextForeground.GetValue(VisualState.Primary);
+        /// <summary>This property prioritizes <see cref="CurrentDefaultTextForeground"/> if it has a value.<br/>
+        /// Else traverses up the visual tree until finding the first non-null <see cref="CurrentDefaultTextForeground"/>.</summary>
+        public Color? DerivedDefaultTextForeground => CurrentDefaultTextForeground ?? Parent?.DerivedDefaultTextForeground;
 
-        /// <summary>This property prioritizes <see cref="DefaultTextForeground"/> if it has a value.<br/>
-        /// Else traverses up the visual tree until finding the first non-null <see cref="DefaultTextForeground"/>.</summary>
-        public Color? DerivedDefaultTextForeground => DefaultTextForeground ?? Parent?.DerivedDefaultTextForeground;
-
-
-
-
-
+        //TODO VisualStateFillBrush OverlayBrush, drawn after DrawSelf and DrawContents
+        //When drawing the overlay, draws OverlayBrush?.GetUnderlay(VisualState.Primary), then OverlayBrush?.GetOverlay(VisualState.Secondary)
+        //Add a new event to Draw: OnBeginDrawOverlay. Look for anything that subscribes to OnEndDraw, probably change them all to OnBeginDrawOverlay
+        //in MGElement Constructor, set OverlayBrush = new(null, null, null, ...);
 
 
 
@@ -746,6 +689,7 @@ namespace MGUI.Core.UI
 				this.VerticalContentAlignment = VerticalAlignment.Stretch;
 
                 this.BackgroundBrush = Desktop.Theme.GetBackgroundBrush(ElementType);
+                this.DefaultTextForeground = new VisualStateSetting<Color?>(null, null, null);
 
                 this.Visibility = Visibility.Visible;
                 this.IsEnabled = true;

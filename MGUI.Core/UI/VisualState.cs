@@ -68,6 +68,13 @@ namespace MGUI.Core.UI
                 _ => throw new NotImplementedException($"Unrecognized {nameof(PrimaryVisualState)}: {State}")
             };
 
+        public void SetAll(TDataType Value)
+        {
+            this.DisabledValue = Value;
+            this.SelectedValue = Value;
+            this.NormalValue = Value;
+        }
+
         public VisualStateSetting(TDataType NormalValue, TDataType SelectedValue, TDataType DisabledValue)
         {
             this.NormalValue = NormalValue;
@@ -172,17 +179,18 @@ namespace MGUI.Core.UI
             }
         }
 
-        public Color? HoveredColorOverlay => HoveredColor;
-        public Color? PressedColorOverlay { get; private set; }
+        private Color? HoveredColorOverlay => HoveredColor;
+        private Color? PressedColorOverlay { get; set; }
 
-        public MGSolidFillBrush HoveredFillOverlay { get; private set; }
-        public MGSolidFillBrush PressedFillOverlay { get; private set; }
+        private MGSolidFillBrush HoveredFillOverlay { get; set; }
+        private MGSolidFillBrush PressedFillOverlay { get; set; }
 
-        public MGUniformBorderBrush HoveredBorderOverlay { get; private set; }
-        public MGUniformBorderBrush PressedBorderOverlay { get; private set; }
+        private MGUniformBorderBrush HoveredBorderOverlay { get; set; }
+        private MGUniformBorderBrush PressedBorderOverlay { get; set; }
 
         public TDataType GetUnderlay(PrimaryVisualState State) => GetValue(State);
 
+        /// <summary>Retrieves the <see cref="Color"/> used by <see cref="GetFillOverlay(SecondaryVisualState)"/> / <see cref="GetBorderOverlay(SecondaryVisualState)"/></summary>
         public Color? GetColorOverlay(SecondaryVisualState State) =>
             State switch
             {
@@ -192,6 +200,7 @@ namespace MGUI.Core.UI
                 _ => throw new NotImplementedException($"Unrecognized {nameof(SecondaryVisualState)}: {State}")
             };
 
+        /// <summary>Returns a <see cref="IFillBrush"/> that should be rendered overtop of the element's graphics, not including the border's bounds.</summary>
         public MGSolidFillBrush? GetFillOverlay(SecondaryVisualState State) =>
             State switch
             {
@@ -201,6 +210,7 @@ namespace MGUI.Core.UI
                 _ => throw new NotImplementedException($"Unrecognized {nameof(SecondaryVisualState)}: {State}")
             };
 
+        /// <summary>Returns a <see cref="IBorderBrush"/> that should be rendered overtop of the border portion of the element's graphics.</summary>
         public MGUniformBorderBrush? GetBorderOverlay(SecondaryVisualState State) =>
             State switch
             {

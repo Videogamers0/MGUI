@@ -152,7 +152,7 @@ namespace MGUI.Core.UI.XAML
                 if (Background != null)
                     Element.BackgroundBrush.NormalValue = Background.ToFillBrush();
                 if (TextForeground.HasValue)
-                    Element.DefaultTextForeground = TextForeground.Value.ToXNAColor();
+                    Element.DefaultTextForeground.NormalValue = TextForeground.Value.ToXNAColor();
 
                 if (Visibility.HasValue)
                     Element.Visibility = Visibility.Value;

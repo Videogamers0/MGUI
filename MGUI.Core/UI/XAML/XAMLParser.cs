@@ -110,11 +110,17 @@ namespace MGUI.Core.UI.XAML
         /// 1. Trim leading and trailing whitespace<br/>
         /// 2. Insert required XML namespaces (such as "xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation")<br/>
         /// 3. Replace aliased type names with their fully-qualified type names, such as "Button" -> "local:XAMLButton" where the "local" namespace prefix points to the URI defined by <see cref="XMLLocalNameSpaceUri"/></param>
-        public static T Load<T>(MGWindow Window, string XAMLString, Dictionary<string, Texture2D> NamedTextures = null, bool SanitizeXAMLString = true)
+        /// <param name="ReplaceLinebreakLiterals">If true, the literal string @"\n" will be replaced with "&#38;#x0a;", which is the XAML representation of the linebreak character '\n'.<br/>
+        /// If false, setting the text of an <see cref="MGTextBlock"/> requires encoding the '\n' character as ""&#38;#x0a;""<para/>
+        /// See also: <see href="https://stackoverflow.com/a/183435/11689514"/></param>
+        public static T Load<T>(MGWindow Window, string XAMLString, Dictionary<string, Texture2D> NamedTextures = null,
+            bool SanitizeXAMLString = true, bool ReplaceLinebreakLiterals = true)
             where T : MGElement
         {
             if (SanitizeXAMLString)
                 XAMLString = ValidateXAMLString(XAMLString);
+            if (ReplaceLinebreakLiterals)
+                XAMLString = XAMLString.Replace(@"\n", "&#x0a;");
             XAMLElement Parsed = (XAMLElement)XamlServices.Parse(XAMLString);
             return Parsed.ToElement<T>(Window, null, NamedTextures);
         }
@@ -126,10 +132,16 @@ namespace MGUI.Core.UI.XAML
         /// 1. Trim leading and trailing whitespace<br/>
         /// 2. Insert required XML namespaces (such as "xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation")<br/>
         /// 3. Replace aliased type names with their fully-qualified type names, such as "Button" -> "local:XAMLButton" where the "local" namespace prefix points to the URI defined by <see cref="XMLLocalNameSpaceUri"/></param>
-        public static MGWindow LoadRootWindow(MGDesktop Desktop, string XAMLString, Dictionary<string, Texture2D> NamedTextures = null, bool SanitizeXAMLString = true)
+        /// <param name="ReplaceLinebreakLiterals">If true, the literal string @"\n" will be replaced with the "v", which is the XAML representation of the linebreak character '\n'.<br/>
+        /// If false, setting the text of an <see cref="MGTextBlock"/> requires encoding the '\n' character as ""&#38;#x0a;""<para/>
+        /// See also: <see href="https://stackoverflow.com/a/183435/11689514"/></param>
+        public static MGWindow LoadRootWindow(MGDesktop Desktop, string XAMLString, Dictionary<string, Texture2D> NamedTextures = null,
+            bool SanitizeXAMLString = true, bool ReplaceLinebreakLiterals = true)
         {
             if (SanitizeXAMLString)
                 XAMLString = ValidateXAMLString(XAMLString);
+            if (ReplaceLinebreakLiterals)
+                XAMLString = XAMLString.Replace(@"\n", "&#x0a;");
             XAMLWindow Parsed = (XAMLWindow)XamlServices.Parse(XAMLString);
             return Parsed.ToElement(Desktop, NamedTextures);
         }

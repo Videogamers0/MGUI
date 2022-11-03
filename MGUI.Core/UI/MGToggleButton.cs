@@ -32,46 +32,20 @@ namespace MGUI.Core.UI
         }
         #endregion Border
 
-        /// <summary>The background brush to use for this <see cref="MGToggleButton"/> when <see cref="IsChecked"/> is true.</summary>
+        /// <summary>The background brush to use for this <see cref="MGToggleButton"/> when <see cref="IsChecked"/> is true.<para/>
+        /// Equivalent to <see cref="MGElement.BackgroundBrush"/>'s <see cref="VisualStateSetting{TDataType}.SelectedValue"/></summary>
         public IFillBrush CheckedBackgroundBrush
         {
             get => BackgroundBrush.SelectedValue;
             set => BackgroundBrush.SelectedValue = value;
         }
 
-        private bool _UseAlternateTextForegroundWhenChecked;
-        /// <summary>If true, <see cref="MGElement.DefaultTextForeground"/> will automatically be set to <see cref="CheckedTextForeground"/> when <see cref="IsChecked"/>=true.</summary>
-        public bool UseAlternateTextForegroundWhenChecked
-        {
-            get => _UseAlternateTextForegroundWhenChecked;
-            set
-            {
-                if (_UseAlternateTextForegroundWhenChecked != value)
-                {
-                    _UseAlternateTextForegroundWhenChecked = value;
-                    DefaultTextForeground = IsChecked ? CheckedTextForeground : null;
-                }
-            }
-        }
-
-        private Color? _CheckedTextForeground;
-        /// <summary>This value is only relevant if <see cref="UseAlternateTextForegroundWhenChecked"/>=true.<para/>
-        /// Default value: <see cref="Color.LightGray"/><para/>
-        /// See also: <see cref="UseAlternateTextForegroundWhenChecked"/></summary>
+        /// <summary>A foreground color to use on child content of this <see cref="MGToggleButton"/> when <see cref="IsChecked"/> is true.<para/>
+        /// Equivalent to <see cref="MGElement.DefaultTextForeground"/>'s <see cref="VisualStateSetting{TDataType}.SelectedValue"/></summary>
         public Color? CheckedTextForeground
         {
-            get => _CheckedTextForeground;
-            set
-            {
-                if (_CheckedTextForeground != value)
-                {
-                    _CheckedTextForeground = value;
-                    if (UseAlternateTextForegroundWhenChecked && IsChecked)
-                    {
-                        DefaultTextForeground = CheckedTextForeground;
-                    }
-                }
-            }
+            get => DefaultTextForeground.SelectedValue;
+            set => DefaultTextForeground.SelectedValue = value;
         }
 
         private bool _IsChecked;
@@ -91,11 +65,6 @@ namespace MGUI.Core.UI
                         OnChecked?.Invoke(this, EventArgs.Empty);
                     else
                         OnUnchecked?.Invoke(this, EventArgs.Empty);
-
-                    if (UseAlternateTextForegroundWhenChecked)
-                    {
-                        DefaultTextForeground = IsChecked ? CheckedTextForeground : null;
-                    }
                 }
             }
         }
@@ -119,9 +88,6 @@ namespace MGUI.Core.UI
                 this.BorderElement = new(Window, BorderThickness, BorderBrush);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
-
-                this.UseAlternateTextForegroundWhenChecked = true;
-                this.CheckedTextForeground = Color.LightGray;
 
                 this.HorizontalContentAlignment = HorizontalAlignment.Center;
                 this.VerticalContentAlignment = VerticalAlignment.Center;

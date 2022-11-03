@@ -114,6 +114,9 @@ namespace MGUI.Samples
             <GridSplitter GridRow=""1"" GridColumn=""0"" GridColumnSpan=""4"" />
 
             <TextBox GridRow=""2"" GridColumn=""3"" />
+<ToggleButton GridRow=""2"" GridColumn=""3"" Content=""Hello\nWorld"" CheckedTextForeground=""Red"">
+    
+</ToggleButton>
         </Grid>
 
         <!--<ScrollViewer>

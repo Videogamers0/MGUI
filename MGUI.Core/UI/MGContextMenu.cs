@@ -58,7 +58,6 @@ namespace MGUI.Core.UI
         }
 
         #region Open / Close
-        private bool _CanContextMenuOpen;
         /// <summary>True if this <see cref="MGContextMenu"/> can be shown.</summary>
         public bool CanContextMenuOpen { get; set; }
 
@@ -104,7 +103,6 @@ namespace MGUI.Core.UI
 
         public static float DefaultAutoCloseThreshold = 75;
 
-        private float? _AutoCloseThreshold;
         /// <summary>Only relevant if <see cref="IsSubmenu"/> is false.<br/>
         /// Determines how far away the mouse can move from <see cref="MGElement.LayoutBounds"/> before this menu is automatically closed.<para/>
         /// Warning - Closing this menu may be cancelled, such as via <see cref="MGDesktop.ContextMenuClosing"/>'s 'Cancel' property.<para/>
@@ -406,7 +404,8 @@ namespace MGUI.Core.UI
                 this.Padding = new(1);
                 this.BorderBrush = MGUniformBorderBrush.Gray;
                 this.BorderThickness = new(1);
-                this.DefaultTextForeground = Color.Black;
+
+                this.DefaultTextForeground.SetAll(Color.Black);
 
                 this.IsUserResizable = false;
 

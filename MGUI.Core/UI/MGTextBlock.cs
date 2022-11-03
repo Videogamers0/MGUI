@@ -67,6 +67,11 @@ namespace MGUI.Core.UI
         {
             if (this.FontFamily != FontFamily || this.FontSize != FontSize)
             {
+                if (FontSize == 22)
+                {
+                    string s = "";
+                }
+
                 if (!GetDesktop().FontManager.TryGetFont(FontFamily, CustomFontStyles.Normal, FontSize, true, out FontSet FS, out SpriteFont Font, out int Size, out float ExactScale, out float SuggestedScale))
                     return false;
 
@@ -104,7 +109,6 @@ namespace MGUI.Core.UI
                 return Default;
         }
 
-        private VisualStateSetting<Color?> _Foreground;
         /// <summary>The foreground color to use when rendering the text.<br/>
         /// If the text is formatted with color codes (such as '[color=Red]Hello World[/color]'), the color specified in the <see cref="MGTextRun"/> will take precedence.<para/>
         /// If the value for the current <see cref="MGElement.VisualState"/> is null, will attempt to resolve the value from <see cref="MGElement.DerivedDefaultTextForeground"/>, or <see cref="Color.Black"/> as a fallback value.<para/>

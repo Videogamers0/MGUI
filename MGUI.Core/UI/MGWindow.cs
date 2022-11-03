@@ -518,7 +518,7 @@ namespace MGUI.Core.UI
                     HorizontalAlignment = HorizontalAlignment.Stretch,
                     VerticalAlignment = VerticalAlignment.Center,
                     TextAlignment = HorizontalAlignment.Left,
-                    DefaultTextForeground = Color.White
+                    DefaultTextForeground = new VisualStateSetting<Color?>(Color.White, Color.White, Color.White)
                 };
                 TitleText = null;
 
