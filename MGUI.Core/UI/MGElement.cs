@@ -368,6 +368,7 @@ namespace MGUI.Core.UI
         #region Min / Max Size
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int? _MinWidth;
+        /// <summary>The minimum width of this <see cref="MGElement"/>, not including <see cref="HorizontalMargin"/>, or 0 if null.</summary>
 		public int? MinWidth
 		{
 			get => _MinWidth;
@@ -383,6 +384,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int? _MinHeight;
+        /// <summary>The minimum height of this <see cref="MGElement"/>, not including <see cref="VerticalMargin"/>, or 0 if null.</summary>
         public int? MinHeight
         {
             get => _MinHeight;
@@ -398,6 +400,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int? _MaxWidth;
+        /// <summary>The maximum width of this <see cref="MGElement"/>, not including <see cref="HorizontalMargin"/>, or <see cref="int.MaxValue"/> if null.</summary>
         public int? MaxWidth
         {
             get => _MaxWidth;
@@ -413,6 +416,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int? _MaxHeight;
+        /// <summary>The maximum height of this <see cref="MGElement"/>, not including <see cref="VerticalMargin"/>, or <see cref="int.MaxValue"/> if null.</summary>
 		public int? MaxHeight
 		{
 			get => _MaxHeight;
@@ -426,12 +430,28 @@ namespace MGUI.Core.UI
 			}
 		}
 
-        /// <summary>Combination of <see cref="MinWidth"/> and <see cref="MinHeight"/>. Uses 0 if value is not specified.</summary>
+        /// <summary>Combination of <see cref="MinWidth"/> and <see cref="MinHeight"/>. Uses 0 if value is not specified.<para/>
+        /// This value does not include <see cref="Margin"/>.<para/>
+        /// See also: <see cref="MinSizeIncludingMargin"/>, <see cref="MaxSize"/>, <see cref="MaxSizeIncludingMargin"/></summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Size MinSize => new(MinWidth ?? 0, MinHeight ?? 0);
-        /// <summary>Combination of <see cref="MinWidth"/> and <see cref="MinHeight"/>. Uses <see cref="int.MaxValue"/> if value is not specified.</summary>
+        /// <summary>Combination of <see cref="MinWidth"/> and <see cref="MinHeight"/>. Uses 0 if value is not specified.<para/>
+        /// This value includes <see cref="Margin"/>.<para/>
+        /// See also: <see cref="MinSize"/>, <see cref="MaxSize"/>, <see cref="MaxSizeIncludingMargin"/></summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public Size MinSizeIncludingMargin => new((MinWidth ?? 0) + HorizontalMargin, (MinHeight ?? 0) + VerticalMargin);
+
+        /// <summary>Combination of <see cref="MinWidth"/> and <see cref="MinHeight"/>. Uses <see cref="int.MaxValue"/> if value is not specified.<para/>
+        /// This value does not include <see cref="Margin"/>.<para/>
+        /// See also: <see cref="MaxSizeIncludingMargin"/>, <see cref="MinSize"/>, <see cref="MinSizeIncludingMargin"/></summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Size MaxSize => new(MaxWidth ?? int.MaxValue, MaxHeight ?? int.MaxValue);
+
+        /// <summary>Combination of <see cref="MinWidth"/> and <see cref="MinHeight"/>. Uses <see cref="int.MaxValue"/> if value is not specified.<para/>
+        /// This value includes <see cref="Margin"/>.<para/>
+        /// See also: <see cref="MaxSize"/>, <see cref="MinSize"/>, <see cref="MinSizeIncludingMargin"/></summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public Size MaxSizeIncludingMargin => new(MaxWidth.HasValue ? MaxWidth.Value + HorizontalMargin : int.MaxValue, MaxHeight.HasValue ? MaxHeight.Value + VerticalMargin : int.MaxValue);
         #endregion Min / Max Size
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -484,13 +504,6 @@ namespace MGUI.Core.UI
         /// <summary>Same as <see cref="PreferredHeight"/>, except this includes the <see cref="VerticalMargin"/></summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public int? ActualPreferredHeight => PreferredHeight.HasValue ? Math.Max(0, PreferredHeight.Value + VerticalMargin) : PreferredHeight;
-
-        /// <summary>The <see cref="ActualPreferredWidth"/>, clamped to <see cref="MinWidth"/> and <see cref="MaxWidth"/></summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public int? ClampedActualPreferredWidth => !PreferredWidth.HasValue ? PreferredWidth : Math.Clamp(PreferredWidth.Value, MinSize.Width, MaxSize.Width);
-        /// <summary>The <see cref="PreferredHeight"/>, clamped to <see cref="MinHeight"/> and <see cref="MaxHeight"/></summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public int? ClampedActualPreferredHeight => !PreferredHeight.HasValue ? PreferredHeight : Math.Clamp(PreferredHeight.Value, MinSize.Height, MaxSize.Height);
         #endregion Size
 
         #region ToolTip
@@ -1126,10 +1139,10 @@ namespace MGUI.Core.UI
         /// See also: <see cref="AllocatedBounds"/>, <see cref="RenderBounds"/>, <see cref="LayoutBounds"/>, <see cref="StretchedContentBounds"/>, <see cref="ActualContentBounds"/></summary>
         public Rectangle ActualContentBounds { get; private set; }
 
-        /// <summary>Note: This value includes <see cref="Margin"/>. For a value without <see cref="Margin"/>, consider using <see cref="LayoutBounds"/>.Width</summary>
-        public int ActualWidth => RenderBounds.Width;
-        /// <summary>Note: This value includes <see cref="Margin"/>. For a value without <see cref="Margin"/>, consider using <see cref="LayoutBounds"/>.Height</summary>
-        public int ActualHeight => RenderBounds.Height;
+        /// <summary>Note: This value does not include <see cref="Margin"/>. For a value with <see cref="Margin"/>, consider using <see cref="RenderBounds"/>.Width</summary>
+        public int ActualWidth => LayoutBounds.Width;
+        /// <summary>Note: This value does not include <see cref="Margin"/>. For a value with <see cref="Margin"/>, consider using <see cref="RenderBounds"/>.Height</summary>
+        public int ActualHeight => LayoutBounds.Height;
 #endregion Arrange
 
 #region Measure
@@ -1237,7 +1250,7 @@ namespace MGUI.Core.UI
 			}
 
 			//  Adjust width/height based on min/max sizes
-			FullSize = FullSize.Clamp(MinSize, MaxSize).Clamp(Size.Empty, AvailableSize);
+			FullSize = FullSize.Clamp(MinSizeIncludingMargin, MaxSizeIncludingMargin).Clamp(Size.Empty, AvailableSize);
 
 			if (FullSize.Width <= 0 || FullSize.Height <= 0)
 				FullSize = new(0);

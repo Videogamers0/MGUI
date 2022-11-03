@@ -102,6 +102,13 @@ namespace MGUI.Samples
             <GridSplitter GridRow=""0"" GridColumn=""1"" />
         </Grid>-->
 
+        <ScrollViewer Dock=""Top"">
+            <StackPanel Orientation=""Vertical"">
+                <Button Content=""Hello World"" />
+                <ComboBox Name=""CB"" />
+            </StackPanel>
+        </ScrollViewer>
+
         <Grid Name=""TestGrid"" RowLengths=""100[50,],16,*[80,]"" ColumnLengths=""1*[50,150],16,1.5*[50,60],1.2*"" Width=""296"" HA=""Center"">
             <TextBlock BG=""Red"" GridRow=""0"" GridColumn=""0"" />
             <TextBlock BG=""Yellow"" GridRow=""2"" GridColumn=""2"" />
@@ -114,24 +121,8 @@ namespace MGUI.Samples
             <GridSplitter GridRow=""1"" GridColumn=""0"" GridColumnSpan=""4"" />
 
             <TextBox GridRow=""2"" GridColumn=""3"" />
-<ToggleButton GridRow=""2"" GridColumn=""3"" Content=""Hello\nWorld"" CheckedTextForeground=""Red"">
-    
-</ToggleButton>
+            <ToggleButton GridRow=""2"" GridColumn=""3"" Content=""Hello\nWorld"" CheckedTextForeground=""Red"" />
         </Grid>
-
-        <!--<ScrollViewer>
-            <StackPanel Orientation=""Vertical"">
-                <Button Content=""Hello World"" />
-                <Button Content=""Hello World"" />
-                <Button Content=""Hello World"" />
-                <Button Content=""Hello World"" />
-                <Button Content=""Hello World"" />
-                <Button Content=""Hello World"" />
-                <Button Content=""Hello World"" />
-                <Button Content=""Hello World"" />
-                <ComboBox Name=""CB"" />
-            </StackPanel>
-        </ScrollViewer>-->
     </DockPanel>
 </Window>
             ";
@@ -163,6 +154,7 @@ namespace MGUI.Samples
             {
                 List<string> Items = Enumerable.Range(0, 26).Select(x => ((char)(x + 'a')).ToString()).ToList();
                 TestComboBox.SetItemsSource(Items);
+                TestComboBox.Margin = new(10, 30, 0, 0);
             }
 
             base.Initialize();

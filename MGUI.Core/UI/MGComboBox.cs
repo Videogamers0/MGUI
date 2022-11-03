@@ -321,8 +321,8 @@ namespace MGUI.Core.UI
 
                     if (IsDropdownOpen)
                     {
-                        Dropdown.Left = RenderBounds.Left - BoundsOffset.X;
-                        Dropdown.Top = RenderBounds.Bottom - BoundsOffset.Y;
+                        Dropdown.Left = LayoutBounds.Left - BoundsOffset.X;
+                        Dropdown.Top = LayoutBounds.Bottom - BoundsOffset.Y;
                         UpdateDropdownContent();
                         ParentWindow.AddNestedWindow(Dropdown);
                     }
@@ -475,8 +475,8 @@ namespace MGUI.Core.UI
                 //  Should we auto-hide (or close) the dropdown?
                 //Dropdown.Visibility = RecentDrawWasClipped ? Visibility.Collapsed : Visibility.Visible;
 
-                Dropdown.Left = RenderBounds.Left - BoundsOffset.X;
-                Dropdown.Top = RenderBounds.Bottom - BoundsOffset.Y;
+                Dropdown.Left = LayoutBounds.Left - BoundsOffset.X;
+                Dropdown.Top = LayoutBounds.Bottom - BoundsOffset.Y;
                 Dropdown.ValidateWindowSizeAndPosition();
             }
         }

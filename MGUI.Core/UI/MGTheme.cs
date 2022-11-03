@@ -171,7 +171,7 @@ namespace MGUI.Core.UI
                 new ThemeManagedVisualStateFillBrush(
                     new VisualStateFillBrush(
                         MGSolidFillBrush.LightGray,
-                        Color.White * 0.4f, PressedModifierType.Darken, 0f)
+                        Color.White * 0.25f, PressedModifierType.Darken, 0f)
                 );
             _Backgrounds[MGElementType.PasswordBox] = new ThemeManagedVisualStateFillBrush(TextBoxBG.GetValue(true));
             _Backgrounds[MGElementType.TextBox] = new ThemeManagedVisualStateFillBrush(TextBoxBG.GetValue(true));
