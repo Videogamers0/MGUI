@@ -124,7 +124,7 @@ namespace MGUI.Core.UI
             set => SetText(value, false);
         }
 
-        /// <param name="SuppressLayoutChanged">If true, the <see cref="Text"/> will be set without calling <see cref="InvokeLayoutChanged"/><para/>
+        /// <param name="SuppressLayoutChanged">If true, <see cref="Text"/> will be set without calling <see cref="InvokeLayoutChanged"/><para/>
         /// Intended to be used for performance purposes when changing the text value, without actually changing the text layout.<br/>
         /// For example, changing text from: "Hello World" to "Hello [bg=Red]World[/bg]" does not affect the rendered text's layout/size.</param>
         public void SetText(string Value, bool SuppressLayoutChanged = false)
@@ -179,8 +179,6 @@ namespace MGUI.Core.UI
 
         public HorizontalAlignment TextAlignment { get; set; }
 
-        /// <param name="Foreground">Defaults to <see cref="Color.Black"/></param>
-        /// <exception cref="ArgumentException"></exception>
         public MGTextBlock(MGWindow Window, string Text, Color? Foreground = null, int FontSize = 11)
             : base(Window, MGElementType.TextBlock)
         {

@@ -8,8 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Xaml;
-using DependencyProperty = System.Windows.DependencyProperty;
-using DependencyObject = System.Windows.DependencyObject;
 using Microsoft.Xna.Framework;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Core.UI.Brushes.Border_Brushes;
@@ -86,7 +84,13 @@ namespace MGUI.Core.UI.XAML
             {
                 //  Insert the required xml namespaces into the XAML string
                 int SpaceIndex = XAMLString.IndexOf(' ');
-                XAMLString = $"{XAMLString.Substring(0, SpaceIndex)} {XMLNameSpaces} {XAMLString.Substring(SpaceIndex + 1)}";
+                if (SpaceIndex >= 0)
+                    XAMLString = $"{XAMLString.Substring(0, SpaceIndex)} {XMLNameSpaces} {XAMLString.Substring(SpaceIndex + 1)}";
+                else
+                {
+                    int InsertionIndex = XAMLString.IndexOf('>');
+                    XAMLString = $"{XAMLString.Substring(0, InsertionIndex)} {XMLNameSpaces} {XAMLString.Substring(InsertionIndex)}";
+                }
             }
 
             StringBuilder SB = new(XAMLString);
