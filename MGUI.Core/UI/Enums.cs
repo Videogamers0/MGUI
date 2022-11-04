@@ -25,7 +25,6 @@ namespace MGUI.Core.UI
         Separator,
         Spacer,
         ResizeGrip,
-        //GridSplitter
         TabControl,
         TabItem,
         ContentPresenter,
