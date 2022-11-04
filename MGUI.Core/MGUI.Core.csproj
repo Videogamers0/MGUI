@@ -1,8 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0-windows</TargetFramework>
-	<UseWPF>true</UseWPF>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	<IsWindowsOS Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindowsOS>
+	<OutputType>Library</OutputType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" $(TargetFramework.EndsWith('windows')) ">
+    <UseWPF>True</UseWPF>
+    <DefineConstants>$(DefineConstants);UseWPF</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(IsWindowsOS)'=='true'">
+    <DefineConstants>$(DefineConstants);OS_WINDOWS</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <NoWarn>1701;1702;1573;1591</NoWarn>

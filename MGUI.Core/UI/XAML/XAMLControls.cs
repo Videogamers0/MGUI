@@ -12,7 +12,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+
+#if UseWPF
 using System.Windows.Markup;
+#endif
 
 namespace MGUI.Core.UI.XAML
 {
@@ -746,7 +749,9 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
+#if UseWPF
     [ContentProperty(nameof(Tabs))]
+#endif
     public class XAMLTabControl : XAMLElement
     {
         public XAMLBorder Border { get; set; } = new();

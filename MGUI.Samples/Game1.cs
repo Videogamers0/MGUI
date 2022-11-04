@@ -1,4 +1,5 @@
 ﻿using MGUI.Core.UI;
+using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Core.UI.Containers.Grids;
 using MGUI.Core.UI.XAML;
 using MGUI.Shared.Rendering;
@@ -175,6 +176,7 @@ namespace MGUI.Samples
             PreviewUpdate?.Invoke(this, gameTime.ElapsedGameTime);
 
             Desktop.Update();
+
             // TODO: Add your update logic here
 
             base.Update(gameTime);

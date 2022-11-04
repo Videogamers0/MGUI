@@ -4,11 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+#if UseWPF
 using System.Windows.Markup;
+#endif
 
 namespace MGUI.Core.UI.XAML
 {
+#if UseWPF
     [ContentProperty(nameof(Items))]
+#endif
     public class XAMLContextMenu : XAMLWindow
     {
         public bool? CanOpen { get; set; }

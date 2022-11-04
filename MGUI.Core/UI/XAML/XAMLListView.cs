@@ -8,11 +8,16 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+
+#if UseWPF
 using System.Windows.Markup;
+#endif
 
 namespace MGUI.Core.UI.XAML
 {
+#if UseWPF
     [ContentProperty(nameof(Columns))]
+#endif
     public class XAMLListView : XAMLMultiContentHost
     {
         /// <summary>The generic type that will be used when instantiating <see cref="MGListView{TItemType}"/>.<para/>
@@ -47,7 +52,9 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
+#if UseWPF
     [ContentProperty(nameof(HeaderContent))]
+#endif
     public class XAMLListViewColumn
     {
         public XAMLListViewColumnWidth Width { get; set; }

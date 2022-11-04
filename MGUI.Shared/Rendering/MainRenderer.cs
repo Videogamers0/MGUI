@@ -32,6 +32,7 @@ namespace MGUI.Shared.Rendering
         public event EventHandler<EventArgs> EndUpdate;
     }
 
+    /// <summary>For a concrete implementation, consider using <see cref="GameRenderHost{TObservableGame}"/></summary>
     public interface IRenderHost : IRenderViewport, IObservableUpdate, IServiceProvider
     {
         public GraphicsDevice GraphicsDevice { get; }
@@ -45,7 +46,7 @@ namespace MGUI.Shared.Rendering
         public TObservableGame Game { get; }
         public IObservableUpdate Test { get; }
 
-        public Rectangle GetBounds() => new Rectangle(0, 0, Game.Window.ClientBounds.Width, Game.Window.ClientBounds.Height);
+        public Rectangle GetBounds() => new(0, 0, Game.Window.ClientBounds.Width, Game.Window.ClientBounds.Height);
 
         public GraphicsDevice GraphicsDevice => Game.GraphicsDevice;
 

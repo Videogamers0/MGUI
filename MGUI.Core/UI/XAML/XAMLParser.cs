@@ -6,12 +6,15 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Markup;
-using System.Xaml;
 using Microsoft.Xna.Framework;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using Microsoft.Xna.Framework.Graphics;
+
+#if UseWPF
+using System.Xaml;
+using System.Windows.Markup;
+#endif
 
 namespace MGUI.Core.UI.XAML
 {
@@ -107,6 +110,7 @@ namespace MGUI.Core.UI.XAML
             return SB.ToString();
         }
 
+#if UseWPF
         /// <param name="NamedTextures">Can be null. This dictionary is used to resolve textures used by <see cref="MGImage"/>s, such as if the <paramref name="XAMLString"/> contained:
         /// <code>&lt;Image Texture='Sample1' /&gt;</code>
         /// Then this dictionary would be expected to contain a value for Key='Sample1'</param>
@@ -149,5 +153,6 @@ namespace MGUI.Core.UI.XAML
             XAMLWindow Parsed = (XAMLWindow)XamlServices.Parse(XAMLString);
             return Parsed.ToElement(Desktop, NamedTextures);
         }
+#endif
     }
 }

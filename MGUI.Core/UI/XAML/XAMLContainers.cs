@@ -8,18 +8,25 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Markup;
 using MGUI.Core.UI.Brushes.Border_Brushes;
+
+#if UseWPF
+using System.Windows.Markup;
+#endif
 
 namespace MGUI.Core.UI.XAML
 {
+#if UseWPF
     [ContentProperty(nameof(Children))]
+#endif
     public abstract class XAMLMultiContentHost : XAMLElement
     {
         public List<XAMLElement> Children { get; set; } = new();
     }
 
+#if UseWPF
     [ContentProperty(nameof(Content))]
+#endif
     public abstract class XAMLSingleContentHost : XAMLElement
     {
         public XAMLElement Content { get; set; }

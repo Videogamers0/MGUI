@@ -67,11 +67,6 @@ namespace MGUI.Core.UI
         {
             if (this.FontFamily != FontFamily || this.FontSize != FontSize)
             {
-                if (FontSize == 22)
-                {
-                    string s = "";
-                }
-
                 if (!GetDesktop().FontManager.TryGetFont(FontFamily, CustomFontStyles.Normal, FontSize, true, out FontSet FS, out SpriteFont Font, out int Size, out float ExactScale, out float SuggestedScale))
                     return false;
 
