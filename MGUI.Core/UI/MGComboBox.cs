@@ -339,10 +339,9 @@ namespace MGUI.Core.UI
         public event EventHandler<CancelEventArgs> DropdownOpening;
         public event EventHandler<EventArgs> DropdownOpened;
 
-        public static Color DefaultDropdownArrowColor = Color.Black;
-
         /// <summary>The color of the inverted triangle on the right-side of this <see cref="MGComboBox{TItemType}"/>.<para/>
-        /// Default value: <see cref="DefaultDropdownArrowColor"/></summary>
+        /// Default value: <see cref="MGTheme.DropdownArrowColor"/><para/>
+        /// See also: <see cref="MGDesktop.Theme"/></summary>
         public Color DropdownArrowColor { get; set; }
 
         private void ManagedSetContent(MGElement Content)
@@ -375,7 +374,7 @@ namespace MGUI.Core.UI
                 AddComponent(DropdownArrowComponent);
 
                 this.DropdownArrowElement.Margin = new(DefaultDropdownArrowLeftMargin, 5, DefaultDropdownArrowRightMargin, 5);
-                this.DropdownArrowColor = DefaultDropdownArrowColor;
+                this.DropdownArrowColor = GetTheme().DropdownArrowColor;
 
                 DropdownArrowElement.OnEndDraw += (sender, e) =>
                 {

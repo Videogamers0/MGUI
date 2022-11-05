@@ -761,6 +761,8 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
+                MGTheme Theme = GetTheme();
+
                 this.BorderElement = new(Window);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
@@ -770,7 +772,7 @@ namespace MGUI.Core.UI
                 AddComponent(ResizeGripComponent);
                 this.IsUserResizable = IsUserResizable;
 
-                this.PlaceholderTextBlockElement = new(Window, "", Color.Black);
+                this.PlaceholderTextBlockElement = new(Window, "");
                 this.PlaceholderTextBlockComponent = new(PlaceholderTextBlockElement, ComponentUpdatePriority.AfterContents, ComponentDrawPriority.BeforeSelf,
                     true, true, false, false, false, false, true,
                     (AvailableBounds, ComponentSize) => AvailableBounds.GetCompressed(Padding));
@@ -778,7 +780,7 @@ namespace MGUI.Core.UI
                 this.PlaceholderText = null;
                 this.PlaceholderTextBlockElement.Visibility = Visibility.Collapsed;
 
-                this.CharacterCountElement = new(Window, (Text?.Length ?? 0).ToString(), Color.Black);
+                this.CharacterCountElement = new(Window, (Text?.Length ?? 0).ToString());
                 this.CharacterCountElement.Margin = new(0, 0, 8, 4);
                 this.CharacterCountElement.TrySetFont(GetDesktop().FontManager.DefaultFontFamily, 9);
                 this.CharacterCountComponent = new(CharacterCountElement, ComponentUpdatePriority.AfterContents, ComponentDrawPriority.BeforeSelf,
@@ -790,7 +792,7 @@ namespace MGUI.Core.UI
                 this.LimitedCharacterCountFormatString = "[b]{{CharacterCount}}[/b] / [b]{{CharacterLimit}}[/b]";
                 this.LimitlessCharacterCountFormatString = "[b]{{CharacterCount}}[/b] character(s)";
 
-                this.TextBlockElement = new(Window, "", Color.Black);
+                this.TextBlockElement = new(Window, "");
                 this.TextBlockComponent = new(TextBlockElement, ComponentUpdatePriority.AfterContents, ComponentDrawPriority.BeforeSelf, 
                     false, false, true, true, false, false, true,
                     (AvailableBounds, ComponentSize) => AvailableBounds.GetCompressed(Padding));
@@ -807,10 +809,10 @@ namespace MGUI.Core.UI
 
                 this.Caret = new(this, TextBlockElement);
 
-                this.FocusedSelectionForegroundColor = Color.White;
-                this.FocusedSelectionBackgroundColor = new(60, 120, 255);
-                this.UnfocusedSelectionForegroundColor = Color.White;
-                this.UnfocusedSelectionBackgroundColor = new Color(210, 240, 255) * 0.4f;
+                this.FocusedSelectionForegroundColor = Theme.TextBoxFocusedSelectionForeground;
+                this.FocusedSelectionBackgroundColor = Theme.TextBoxFocusedSelectionBackground;
+                this.UnfocusedSelectionForegroundColor = Theme.TextBoxUnfocusedSelectionForeground;
+                this.UnfocusedSelectionBackgroundColor = Theme.TextBoxUnfocusedSelectionBackground;
 
                 MouseHandler.LMBPressedInside += (sender, e) =>
                 {

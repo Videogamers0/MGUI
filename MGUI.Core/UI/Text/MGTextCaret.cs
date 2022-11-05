@@ -43,7 +43,7 @@ namespace MGUI.Core.UI.Text
             this.TextBox = TextBox;
             this.TextBlockElement = TextBlockElement;
 
-            this.Color = Color.Black;
+            this.Color = TextBox.GetTheme().TextBlockFallbackForeground.GetValue(true).NormalValue;
             this.Position = null;
 
             this.TextBlockElement.OnLayoutBoundsChanged += (sender, e) =>

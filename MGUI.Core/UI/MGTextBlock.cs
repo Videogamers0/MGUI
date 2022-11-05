@@ -106,11 +106,12 @@ namespace MGUI.Core.UI
 
         /// <summary>The foreground color to use when rendering the text.<br/>
         /// If the text is formatted with color codes (such as '[color=Red]Hello World[/color]'), the color specified in the <see cref="MGTextRun"/> will take precedence.<para/>
-        /// If the value for the current <see cref="MGElement.VisualState"/> is null, will attempt to resolve the value from <see cref="MGElement.DerivedDefaultTextForeground"/>, or <see cref="Color.Black"/> as a fallback value.<para/>
-        /// See also: <see cref="MGElement.DefaultTextForeground"/>, <see cref="MGElement.DerivedDefaultTextForeground"/>, <see cref="ActualForeground"/></summary>
+        /// If the value for the current <see cref="MGElement.VisualState"/> is null, will attempt to resolve the value from <see cref="MGElement.DerivedDefaultTextForeground"/>, or <see cref="MGTheme.TextBlockFallbackForeground"/> if no value is specified.<para/>
+        /// See also:<br/><see cref="MGElement.DefaultTextForeground"/><br/><see cref="MGElement.DerivedDefaultTextForeground"/><br/><see cref="ActualForeground"/><br/>
+        /// <see cref="MGTheme.TextBlockFallbackForeground"/><br/><see cref="MGDesktop.Theme"/></summary>
         public VisualStateSetting<Color?> Foreground { get; set; }
 
-        public Color ActualForeground => Foreground.GetValue(VisualState.Primary) ?? DerivedDefaultTextForeground ?? Color.Black;
+        public Color ActualForeground => Foreground.GetValue(VisualState.Primary) ?? DerivedDefaultTextForeground ?? GetTheme().TextBlockFallbackForeground.GetValue(false).GetValue(VisualState.Primary);
 
         private string _Text;
         public string Text

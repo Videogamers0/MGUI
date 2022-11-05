@@ -94,8 +94,9 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Color? _HoveredColor;
         /// <summary>An overlay color that is drawn overtop if the mouse is currently hovering the <see cref="MGElement"/>.<br/>
-        /// Recommended to use a transparent color.</summary>
-        public Color? HoveredColor
+        /// Recommended to use a transparent color.<para/>
+        /// If the mouse is also pressed overtop of the <see cref="MGElement"/>, then this color is further adjusted based on <see cref="PressedModifierType"/> and <see cref="PressedModifier"/></summary>
+        public Color? FocusedColor
         {
             get => _HoveredColor;
             set
@@ -103,8 +104,8 @@ namespace MGUI.Core.UI
                 if (_HoveredColor != value)
                 {
                     _HoveredColor = value;
-                    NPC(nameof(HoveredColor));
-                    UpdateHoveredOverlay();
+                    NPC(nameof(FocusedColor));
+                    UpdateFocusedOverlay();
                     UpdatePressedOverlay();
                 }
             }
@@ -112,7 +113,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _PressedModifier;
-        /// <summary>A percentage to darken or brighten (depending on <see cref="PressedModifierType"/>) the <see cref="HoveredColor"/> by 
+        /// <summary>A percentage to darken or brighten (depending on <see cref="PressedModifierType"/>) the <see cref="FocusedColor"/> by 
         /// when the mouse is currently pressed, but not yet released, overtop of the <see cref="MGElement"/>.</summary>
         public float PressedModifier
         {
@@ -144,11 +145,11 @@ namespace MGUI.Core.UI
             }
         }
 
-        private void UpdateHoveredOverlay()
+        private void UpdateFocusedOverlay()
         {
-            if (HoveredColor.HasValue)
+            if (FocusedColor.HasValue)
             {
-                HoveredFillOverlay = new MGSolidFillBrush(HoveredColor.Value);
+                HoveredFillOverlay = new MGSolidFillBrush(FocusedColor.Value);
                 HoveredBorderOverlay = new(HoveredFillOverlay);
             }
             else
@@ -160,12 +161,12 @@ namespace MGUI.Core.UI
 
         private void UpdatePressedOverlay()
         {
-            if (HoveredColor.HasValue)
+            if (FocusedColor.HasValue)
             {
                 PressedColorOverlay = PressedModifierType switch
                 {
-                    PressedModifierType.Darken => HoveredColor.Value.Darken(PressedModifier),
-                    PressedModifierType.Brighten => HoveredColor.Value.Brighten(PressedModifier),
+                    PressedModifierType.Darken => FocusedColor.Value.Darken(PressedModifier),
+                    PressedModifierType.Brighten => FocusedColor.Value.Brighten(PressedModifier),
                     _ => throw new NotImplementedException($"Unrecognized {nameof(PressedModifierType)}: {PressedModifierType}")
                 };
                 PressedFillOverlay = new(PressedColorOverlay.Value);
@@ -179,7 +180,7 @@ namespace MGUI.Core.UI
             }
         }
 
-        private Color? HoveredColorOverlay => HoveredColor;
+        private Color? HoveredColorOverlay => FocusedColor;
         private Color? PressedColorOverlay { get; set; }
 
         private MGSolidFillBrush HoveredFillOverlay { get; set; }
@@ -195,7 +196,7 @@ namespace MGUI.Core.UI
             State switch
             {
                 SecondaryVisualState.Pressed => PressedColorOverlay,
-                SecondaryVisualState.Hovered => HoveredColor,
+                SecondaryVisualState.Hovered => FocusedColor,
                 SecondaryVisualState.None => null,
                 _ => throw new NotImplementedException($"Unrecognized {nameof(SecondaryVisualState)}: {State}")
             };
@@ -224,7 +225,7 @@ namespace MGUI.Core.UI
             Color? HoveredColor, PressedModifierType PressedModifierType, float PressedModifier)
             : base(NormalValue, SelectedValue, DisabledValue)
         {
-            this.HoveredColor = HoveredColor;
+            this.FocusedColor = HoveredColor;
             this.PressedModifierType = PressedModifierType;
             this.PressedModifier = PressedModifier;
         }
@@ -246,7 +247,7 @@ namespace MGUI.Core.UI
 
         private VisualStateFillBrush(VisualStateFillBrush InheritFrom)
             : base(InheritFrom.NormalValue?.Copy(), InheritFrom.SelectedValue?.Copy(), InheritFrom.DisabledValue?.Copy(),
-                  InheritFrom.HoveredColor, InheritFrom.PressedModifierType, InheritFrom.PressedModifier) { }
+                  InheritFrom.FocusedColor, InheritFrom.PressedModifierType, InheritFrom.PressedModifier) { }
 
         public VisualStateFillBrush Copy() => new(this);
         public override object Clone() => Copy();
@@ -266,7 +267,7 @@ namespace MGUI.Core.UI
 
         private VisualStateColorBrush(VisualStateColorBrush InheritFrom)
             : base(InheritFrom.NormalValue, InheritFrom.SelectedValue, InheritFrom.DisabledValue,
-                  InheritFrom.HoveredColor, InheritFrom.PressedModifierType, InheritFrom.PressedModifier) { }
+                  InheritFrom.FocusedColor, InheritFrom.PressedModifierType, InheritFrom.PressedModifier) { }
 
         public VisualStateColorBrush Copy() => new(this);
         public override object Clone() => Copy();

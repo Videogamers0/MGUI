@@ -15,8 +15,7 @@ namespace MGUI.Core.UI
     /// <summary>Can be attached to another <see cref="MGElement"/> to allow resizing via dragging the mouse.</summary>
     public class MGResizeGrip : MGElement
     {
-        /// <summary>The primary color to draw the resizer dots with.<para/>
-        /// Default value: <see cref="Color.Black"/></summary>
+        /// <summary>The primary color to draw the resizer dots with.</summary>
         public VisualStateColorBrush Foreground { get; set; }
 
         /// <summary>Determines how much width and height this element takes up. This value is derived from <see cref="MaxDots"/>, <see cref="Spacing"/>, and <see cref="MGElement.Margin"/>.<br/>

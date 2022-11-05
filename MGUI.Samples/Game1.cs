@@ -43,7 +43,7 @@ namespace MGUI.Samples
 
             string xaml =
             @"
-<Window Left=""500"" Top=""100"" Width=""400"" Height=""600"" BG=""Orange"" TitleText=""[b]Window Title Text[/b]"">
+<Window Left=""500"" Top=""100"" Width=""400"" Height=""600"" TitleText=""[b]Window Title Text[/b]"">
     <!--<Window.TitleBar>
         <DockPanel BG=""LightGreen"" Padding=""16,4"">
             <TextBlock Text=""ABC"" Dock=""Left"" />
@@ -107,6 +107,21 @@ namespace MGUI.Samples
             <StackPanel Orientation=""Vertical"">
                 <Button Content=""Hello World"" />
                 <ComboBox Name=""CB"" />
+                <ProgressBar Name=""TestProgressBar"">
+                    <ProgressBar.ContextMenu>
+                        <ContextMenu Name=""CM1"">
+                            <ContextMenuButton Name=""CMB1"" Content=""ABC"" />
+                            <ContextMenuButton>
+                                <ContextMenuButton.Submenu>
+                                    <ContextMenu>
+                                        <ContextMenuToggle Content=""Toggle Me"" />
+                                    </ContextMenu>
+                                </ContextMenuButton.Submenu>
+                                <Rectangle Width=""16"" VA=""Stretch"" Fill=""Blue"" />
+                            </ContextMenuButton>
+                        </ContextMenu>
+                    </ProgressBar.ContextMenu>
+                </ProgressBar>
             </StackPanel>
         </ScrollViewer>
 
@@ -123,7 +138,6 @@ namespace MGUI.Samples
 
             <TextBox GridRow=""2"" GridColumn=""3"" />
             <!--<ToggleButton GridRow=""2"" GridColumn=""3"" Content=""Hello\nWorld"" CheckedTextForeground=""Red"" />-->
-            <ProgressBar GridRow=""2"" GridColumn=""3"" Name=""TestProgressBar"" />
         </Grid>
     </DockPanel>
 </Window>
@@ -135,7 +149,7 @@ namespace MGUI.Samples
             if (XAMLWindow.TryGetElementByName("TestProgressBar", out MGProgressBar TestProgressBar))
             {
                 MGProgressBarGradientBrush Brush = new(TestProgressBar);
-                TestProgressBar.CompletedBrush.NormalValue = Brush;
+                //TestProgressBar.CompletedBrush.NormalValue = Brush;
                 TestProgressBar.OnEndUpdate += (sender, e) =>
                 {
                     TestProgressBar.Value = (TestProgressBar.Value - 0.25f + TestProgressBar.Maximum) % TestProgressBar.Maximum;

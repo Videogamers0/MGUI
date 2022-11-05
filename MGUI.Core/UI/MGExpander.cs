@@ -53,10 +53,9 @@ namespace MGUI.Core.UI
             set => ExpanderToggleButton.BackgroundBrush = value;
         }
 
-        public static Color DefaultDropdownArrowColor = Color.Black;
-
         /// <summary>The color to use when rendering the dropdown arrow icon inside the button part of this <see cref="MGExpander"/>'s header.<para/>
-        /// Default value: <see cref="DefaultDropdownArrowColor"/></summary>
+        /// Default value: <see cref="MGTheme.DropdownArrowColor"/><para/>
+        /// See also: <see cref="MGDesktop.Theme"/></summary>
         public Color ExpanderDropdownArrowColor { get; set; }
 
         /// <summary>The width of the dropdown arrow icon inside the button part of this <see cref="MGExpander"/>'s header.<para/>
@@ -190,7 +189,7 @@ namespace MGUI.Core.UI
                 HeadersPanelElement.TryAddChild(ExpanderToggleButton);
                 HeadersPanelElement.CanChangeContent = false;
 
-                this.ExpanderDropdownArrowColor = DefaultDropdownArrowColor;
+                this.ExpanderDropdownArrowColor = GetTheme().DropdownArrowColor;
                 this.ExpanderDropdownArrowSize = DefaultExpanderDropdownArrowSize;
 
                 ExpanderToggleButton.OnCheckStateChanged += (sender, e) =>

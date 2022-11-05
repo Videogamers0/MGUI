@@ -405,8 +405,6 @@ namespace MGUI.Core.UI
                 this.BorderBrush = MGUniformBorderBrush.Gray;
                 this.BorderThickness = new(1);
 
-                this.DefaultTextForeground.SetAll(Color.Black);
-
                 this.IsUserResizable = false;
 
                 this.MinWidth = 150;
@@ -492,7 +490,6 @@ namespace MGUI.Core.UI
                     Button.VerticalAlignment = VerticalAlignment.Stretch;
 
                     Button.BackgroundBrush = GetTheme().ComboBoxDropdownItemBackground.GetValue(true);
-                    Button.DefaultTextForeground = null;
 
                     return Button;
                 };

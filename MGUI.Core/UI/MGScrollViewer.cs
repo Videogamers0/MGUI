@@ -146,11 +146,11 @@ namespace MGUI.Core.UI
 
         private bool IsHoveringVSB { get; set; }
         private bool IsDraggingVSB { get; set; }
-        private bool IsVSBFocused => IsHoveringVSB || IsDraggingVSB;
+        private bool IsVSBFocused => !VisualState.IsDisabled && (IsHoveringVSB || IsDraggingVSB);
 
         private bool IsHoveringHSB { get; set; }
         private bool IsDraggingHSB { get; set; }
-        private bool IsHSBFocused => IsHoveringHSB || IsDraggingHSB;
+        private bool IsHSBFocused => !VisualState.IsDisabled && (IsHoveringHSB || IsDraggingHSB);
 
         /// <summary>Must always be true for <see cref="MGScrollViewer"/> to avoid content that is out of the <see cref="ContentViewport"/>'s bounds from being visible.</summary>
         public override bool ClipToBounds
@@ -167,15 +167,14 @@ namespace MGUI.Core.UI
             }
         }
 
-        /// <summary>The brush to use for the outer portion of the scrollbars. Defaults to an <see cref="MGBorderedFillBrush"/> with a 1px black border and a slightly lighter black fill.<para/>
-        /// See also: <see cref="ScrollBarUnfocusedBrush"/>, <see cref="ScrollBarFocusedBrush"/></summary>
-        public IFillBrush ScrollBarOuterBrush { get; set; }
-        /// <summary>The brush to use for the inner portion of the scrollbars when the scrollbar isn't focused (not hovered, not being dragged)<para/>
-        /// See also: <see cref="ScrollBarOuterBrush"/>, <see cref="ScrollBarFocusedBrush"/></summary>
-        public IFillBrush ScrollBarUnfocusedBrush { get; set; }
-        /// <summary>The brush to use for the inner portion of the scrollbars when the scrollbar is focused (hovered or being dragged)<para/>
-        /// See also: <see cref="ScrollBarOuterBrush"/>, <see cref="ScrollBarUnfocusedBrush"/></summary>
-        public IFillBrush ScrollBarFocusedBrush { get; set; }
+        /// <summary>The brush to use for the outer portion of the scrollbars.<br/>
+        /// Default value: <see cref="MGTheme.ScrollBarOuterBrush"/><para/>
+        /// See also: <see cref="MGDesktop.Theme"/></summary>
+        public VisualStateFillBrush ScrollBarOuterBrush { get; set; }
+        /// <summary>The brush to use for the inner portion of the scrollbars.<br/>
+        /// Default value: <see cref="MGTheme.ScrollBarInnerBrush"/><para/>
+        /// See also: <see cref="MGDesktop.Theme"/></summary>
+        public VisualStateFillBrush ScrollBarInnerBrush { get; set; }
 
         protected override bool CanCacheSelfMeasurement => false; // The self measurement depends on the measurement of the children, so it must be re-calculated each time it's requested
 
@@ -184,15 +183,16 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
+                MGTheme Theme = GetTheme();
+
                 this.VSBVisibility = VerticalScrollBarVisibility;
                 this.HSBVisibility = HorizontalScrollBarVisibility;
 
                 //Padding = new(0, 0, 5, 5);
                 Padding = new(0);
 
-                this.ScrollBarOuterBrush = new MGBorderedFillBrush(new Thickness(1), MGUniformBorderBrush.Black, new MGSolidFillBrush(new Color(88, 88, 88)), true);
-                this.ScrollBarUnfocusedBrush = new MGBorderedFillBrush(new Thickness(1), new MGUniformBorderBrush(Color.Black), new MGSolidFillBrush(new Color(204, 204, 204)), false);
-                this.ScrollBarFocusedBrush = new MGBorderedFillBrush(new Thickness(1), new MGUniformBorderBrush(Color.Black), new MGSolidFillBrush(new Color(232, 232, 232)), false);
+                this.ScrollBarOuterBrush = Theme.ScrollBarOuterBrush.GetValue(true);
+                this.ScrollBarInnerBrush = Theme.ScrollBarInnerBrush.GetValue(true);
 
                 OnLayoutBoundsChanged += (sender, e) =>
                 {
@@ -316,6 +316,23 @@ namespace MGUI.Core.UI
                         e.SetHandled(this, false);
                         HandleScrollBarInput(Orientation.Horizontal, e.Button, (int)e.AdjustedPosition(this).X);
                     }
+                };
+
+                //  Pre-emptively handle mouse release events if user was dragging a scrollbar
+                //  so that the child content doesn't also react to the mouse release
+                OnBeginUpdateContents += (sender, e) =>
+                {
+                    if (IsDraggingVSB || IsDraggingHSB)
+                    {
+                        MouseHandler.Tracker.CurrentButtonReleasedEvents[MouseButton.Left]?.SetHandled(this, false);
+                    }
+                };
+
+                //  This probably isn't needed
+                MouseHandler.ReleasedOutside += (sender, e) =>
+                {
+                    if (e.IsLMB && (IsDraggingVSB || IsDraggingHSB))
+                        e.SetHandled(this, false);
                 };
 
                 MouseHandler.Scrolled += (sender, e) =>
@@ -465,9 +482,6 @@ namespace MGUI.Core.UI
 
                 if (IsVSBRendered)
                 {
-                    //  Draw the outer rectangle of the scrollbar
-                    ScrollBarOuterBrush?.Draw(DA, this, VSBBounds.Value);
-
                     //  Calculate the coordinates of the inner rectangle of the scrollbar
                     Rectangle PaddedBounds = PaddedVSBBounds.Value;
                     float PercentInCurrentViewport = ContentViewport.Height * 1.0f / ContentSize.Height;
@@ -499,19 +513,21 @@ namespace MGUI.Core.UI
                             EndY = PaddedBounds.Right;
                     }
 
+                    PrimaryVisualState PrimaryState = IsVSBFocused ? PrimaryVisualState.Selected : VisualState.Primary;
+                    SecondaryVisualState SecondaryState = IsDraggingVSB ? SecondaryVisualState.Pressed : IsHoveringVSB ? SecondaryVisualState.Hovered : SecondaryVisualState.None;
+
+                    //  Draw the outer rectangle of the scrollbar
+                    ScrollBarOuterBrush.GetUnderlay(PrimaryState)?.Draw(DA, this, VSBBounds.Value);
+                    ScrollBarOuterBrush.GetFillOverlay(SecondaryState)?.Draw(DA, this, VSBBounds.Value);
+
                     //  Draw the inner rectangle of the scrollbar
-                    Rectangle ScrollBarVisibleBounds = new Rectangle(PaddedBounds.Left, (int)StartY, (PaddedBounds.Width), (int)(EndY - StartY + 1));
-                    if (IsVSBFocused)
-                        ScrollBarFocusedBrush?.Draw(DA, this, ScrollBarVisibleBounds);
-                    else
-                        ScrollBarUnfocusedBrush?.Draw(DA, this, ScrollBarVisibleBounds);
+                    Rectangle ScrollBarVisibleBounds = new(PaddedBounds.Left, (int)StartY, (PaddedBounds.Width), (int)(EndY - StartY + 1));
+                    ScrollBarInnerBrush.GetUnderlay(PrimaryState)?.Draw(DA, this, ScrollBarVisibleBounds);
+                    ScrollBarInnerBrush.GetFillOverlay(SecondaryState)?.Draw(DA, this, ScrollBarVisibleBounds);
                 }
 
                 if (IsHSBRendered)
                 {
-                    //  Draw the outer rectangle of the scrollbar
-                    ScrollBarOuterBrush?.Draw(DA, this, HSBBounds.Value);
-
                     //  Calculate the coordinates of the inner rectangle of the scrollbar
                     Rectangle PaddedBounds = PaddedHSBBounds.Value;
                     float PercentInCurrentViewport = ContentViewport.Width * 1.0f / ContentSize.Width;
@@ -543,12 +559,17 @@ namespace MGUI.Core.UI
                             EndX = PaddedBounds.Right;
                     }
 
+                    PrimaryVisualState PrimaryState = IsHSBFocused ? PrimaryVisualState.Selected : VisualState.Primary;
+                    SecondaryVisualState SecondaryState = IsDraggingHSB ? SecondaryVisualState.Pressed : IsHoveringHSB ? SecondaryVisualState.Hovered : SecondaryVisualState.None;
+
+                    //  Draw the outer rectangle of the scrollbar
+                    ScrollBarOuterBrush.GetUnderlay(PrimaryState)?.Draw(DA, this, HSBBounds.Value);
+                    ScrollBarOuterBrush.GetFillOverlay(SecondaryState)?.Draw(DA, this, HSBBounds.Value);
+
                     //  Draw the inner rectangle of the scrollbar
-                    Rectangle ScrollBarVisibleBounds = new Rectangle((int)StartX, PaddedBounds.Top, (int)(EndX - StartX + 1), PaddedBounds.Height);
-                    if (IsHSBFocused)
-                        ScrollBarFocusedBrush?.Draw(DA, this, ScrollBarVisibleBounds);
-                    else
-                        ScrollBarUnfocusedBrush?.Draw(DA, this, ScrollBarVisibleBounds);
+                    Rectangle ScrollBarVisibleBounds = new((int)StartX, PaddedBounds.Top, (int)(EndX - StartX + 1), PaddedBounds.Height);
+                    ScrollBarInnerBrush.GetUnderlay(PrimaryState)?.Draw(DA, this, ScrollBarVisibleBounds);
+                    ScrollBarInnerBrush.GetFillOverlay(SecondaryState)?.Draw(DA, this, ScrollBarVisibleBounds);
                 }
             }
         }

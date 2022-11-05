@@ -287,7 +287,7 @@ namespace MGUI.Core.UI
         #endregion Orientation
 
         /// <summary>A brush that is rendered overtop of this <see cref="MGSlider"/> while hovering, dragging, or pressing it.<br/>
-        /// Only the <see cref="VisualStateBrush{TDataType}.HoveredColor"/>, <see cref="VisualStateBrush{TDataType}.PressedModifierType"/>, and <see cref="VisualStateBrush{TDataType}.PressedModifier"/> are used.</summary>
+        /// Only the <see cref="VisualStateBrush{TDataType}.FocusedColor"/>, <see cref="VisualStateBrush{TDataType}.PressedModifierType"/>, and <see cref="VisualStateBrush{TDataType}.PressedModifier"/> are used.</summary>
         public VisualStateFillBrush FocusBrush { get; set; }
 
         /// <summary>The fallback <see cref="IFillBrush"/> for drawing the number line, ticks, or the thumb if they don't have an explicit <see cref="IFillBrush"/> specified.<para/>

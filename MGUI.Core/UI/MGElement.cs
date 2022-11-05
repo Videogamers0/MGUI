@@ -117,18 +117,17 @@ namespace MGUI.Core.UI
     //      when the file path is set, the code listens for changes to the file, autorefresh on save
     //
     //Add support for in-line images in TextBlocks? Uses the NamedTextures to retrieve and draw them. Markup could be:
-    //      "Hello World [img=Name Width Height SourceRect]" such as: "Hello World [img=HelloImg 16 16 50 50 16 16]" means we take the sourcerect of 50,50->66,66, draw it with size=16,16
-    //      Width/Height/SourceRect are optional. If not specified, uses the entire texture size
+    //      "[img=RegionName Width,Height]".
+    //      "Hello World [img=HelloImg 16,16]" means we take the sourcerect corresponding to regionname="HelloImg" and draw it with target size=16,16 (maybe we always vertically center in the line)
+    //      Width/Height are optional. If target width/height aren't specified, draws at 1:1 ratio of whatever the source rect was, or the entire texture size if no sourcerect specified.
     //      we'd need a new token in the formatted text parsing stuff. updated measuring logic in the textline parsing etc (it's basically the same as a word being measured, but has known size
-    //      new value in MGTextRun like MGTextRunImage record struct, which has string TextureName, Size? DestinationSize, Rectangle? SourceRect
+    //      new value in MGTextRun like MGTextRunImage record struct, which has: NamedTextureRegion Region, Size? DestinationSize
     //
     //maybe MGElement should have a: List<MGElement> AttachedElements { get; }
     //		This would specifically be for elements where the parent doesn't normally have a reference to the child, such as MGResizeGrip when using MGResizeGrip.Host to attach to
     //		The Visual Tree traversal logic should have an additional parameter, IncludeAttached
     //maybe AttachedElement, has MGElement Element, MGElement Host, handles things like updating layout when host updates layout, handles drawing self when host ends draw etc
     //		could even be like component, with updatepriority/drawpriority
-    //
-    //MGTheme: Make a few presets. BuiltInTheme enum:
 
     /// <summary>Base class for all UI elements.</summary>
     public abstract class MGElement : IMouseHandlerHost, IKeyboardHandlerHost

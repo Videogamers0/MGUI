@@ -535,9 +535,10 @@ namespace MGUI.Core.UI.XAML
         public float? VerticalOffset { get; set; }
         public float? HorizontalOffset { get; set; }
 
-        public XAMLFillBrush ScrollBarOuterBrush { get; set; }
-        public XAMLFillBrush ScrollBarUnfocusedBrush { get; set; }
-        public XAMLFillBrush ScrollBarFocusedBrush { get; set; }
+        public XAMLFillBrush ScrollBarUnfocusedOuterBrush { get; set; }
+        public XAMLFillBrush ScrollBarFocusedOuterBrush { get; set; }
+        public XAMLFillBrush ScrollBarUnfocusedInnerBrush { get; set; }
+        public XAMLFillBrush ScrollBarFocusedInnerBrush { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGScrollViewer(Window);
 
@@ -554,12 +555,15 @@ namespace MGUI.Core.UI.XAML
             if (HorizontalOffset.HasValue)
                 ScrollViewer.HorizontalOffset = HorizontalOffset.Value;
 
-            if (ScrollBarOuterBrush != null)
-                ScrollViewer.ScrollBarOuterBrush = ScrollBarOuterBrush.ToFillBrush();
-            if (ScrollBarUnfocusedBrush != null)
-                ScrollViewer.ScrollBarUnfocusedBrush = ScrollBarUnfocusedBrush.ToFillBrush();
-            if (ScrollBarFocusedBrush != null)
-                ScrollViewer.ScrollBarFocusedBrush = ScrollBarFocusedBrush.ToFillBrush();
+            if (ScrollBarUnfocusedOuterBrush != null)
+                ScrollViewer.ScrollBarOuterBrush.NormalValue = ScrollBarUnfocusedOuterBrush.ToFillBrush();
+            if (ScrollBarFocusedOuterBrush != null)
+                ScrollViewer.ScrollBarOuterBrush.SelectedValue = ScrollBarFocusedOuterBrush.ToFillBrush();
+
+            if (ScrollBarUnfocusedInnerBrush != null)
+                ScrollViewer.ScrollBarInnerBrush.NormalValue = ScrollBarUnfocusedInnerBrush.ToFillBrush();
+            if (ScrollBarFocusedInnerBrush != null)
+                ScrollViewer.ScrollBarInnerBrush.SelectedValue = ScrollBarFocusedInnerBrush.ToFillBrush();
 
             base.ApplyDerivedSettings(Parent, Element);
         }

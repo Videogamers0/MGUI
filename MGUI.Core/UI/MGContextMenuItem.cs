@@ -261,7 +261,7 @@ namespace MGUI.Core.UI
                 List<Vector2> ArrowVertices = new() {
                     ArrowPartBounds.TopLeft().ToVector2(), new(ArrowPartBounds.Right, ArrowPartBounds.Center.Y), ArrowPartBounds.BottomLeft().ToVector2()
                 };
-                e.DA.DT.FillPolygon(e.DA.Offset.ToVector2(), ArrowVertices, Color.Black * e.DA.Opacity);
+                e.DA.DT.FillPolygon(e.DA.Offset.ToVector2(), ArrowVertices, GetTheme().DropdownArrowColor * e.DA.Opacity);
             };
 
             this.Submenu = null;
