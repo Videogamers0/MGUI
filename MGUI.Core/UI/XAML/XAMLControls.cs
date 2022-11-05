@@ -21,8 +21,8 @@ namespace MGUI.Core.UI.XAML
 {
     public class XAMLContentPresenter : XAMLSingleContentHost
     {
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGContentPresenter(Window);
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures) => base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGContentPresenter(Window);
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element) => base.ApplyDerivedSettings(Parent, Element);
     }
 
     public class XAMLBorder : XAMLSingleContentHost
@@ -39,9 +39,9 @@ namespace MGUI.Core.UI.XAML
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public XAMLThickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGBorder(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGBorder(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGBorder Border = Element as MGBorder;
 
@@ -50,7 +50,7 @@ namespace MGUI.Core.UI.XAML
             if (BorderThickness.HasValue)
                 Border.BorderThickness = BorderThickness.Value.ToThickness();
 
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 
@@ -68,14 +68,14 @@ namespace MGUI.Core.UI.XAML
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public XAMLThickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGButton(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGButton(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGButton Button = Element as MGButton;
-            Border.ApplySettings(Button, Button.BorderComponent.Element, NamedTextures);
+            Border.ApplySettings(Button, Button.BorderComponent.Element);
 
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 
@@ -89,12 +89,12 @@ namespace MGUI.Core.UI.XAML
         public bool? IsThreeState { get; set; }
         public bool? IsChecked { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGCheckBox(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGCheckBox(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGCheckBox CheckBox = Element as MGCheckBox;
-            Button.ApplySettings(CheckBox, CheckBox.ButtonComponent.Element, NamedTextures);
+            Button.ApplySettings(CheckBox, CheckBox.ButtonComponent.Element);
 
             if (CheckBoxComponentSize.HasValue)
                 CheckBox.CheckBoxComponentSize = CheckBoxComponentSize.Value;
@@ -107,7 +107,7 @@ namespace MGUI.Core.UI.XAML
             if (IsChecked.HasValue)
                 CheckBox.IsChecked = IsChecked.Value;
 
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 
@@ -137,18 +137,18 @@ namespace MGUI.Core.UI.XAML
         public int? DropdownArrowRightMargin { get; set; }
         public XAMLColor? DropdownArrowColor { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures)
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
             Type GenericType = typeof(MGComboBox<>).MakeGenericType(new Type[] { ItemType });
             object Element = Activator.CreateInstance(GenericType, new object[] { Window });
             return Element as MGElement;
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             Type GenericType = typeof(MGComboBox<>).MakeGenericType(new Type[] { ItemType });
             MethodInfo Method = GenericType.GetMethod(nameof(MGComboBox<object>.LoadSettings), BindingFlags.Instance | BindingFlags.NonPublic);
-            Method.Invoke(Element, new object[] { this, NamedTextures });
+            Method.Invoke(Element, new object[] { this });
         }
     }
 
@@ -172,13 +172,13 @@ namespace MGUI.Core.UI.XAML
 
         public XAMLStackPanel HeadersPanel { get; set; } = new();
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGExpander(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGExpander(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGExpander Expander = Element as MGExpander;
-            ExpanderToggleButton.ApplySettings(Expander, Expander.ExpanderToggleButton, NamedTextures);
-            HeadersPanel.ApplySettings(Expander, Expander.HeadersPanelComponent.Element, NamedTextures);
+            ExpanderToggleButton.ApplySettings(Expander, Expander.ExpanderToggleButton);
+            HeadersPanel.ApplySettings(Expander, Expander.HeadersPanelComponent.Element);
 
             if (ExpanderButtonSize.HasValue)
                 Expander.ExpanderButtonSize = ExpanderButtonSize.Value;
@@ -196,7 +196,7 @@ namespace MGUI.Core.UI.XAML
             if (HeaderSpacingWidth.HasValue)
                 Expander.HeaderSpacingWidth = HeaderSpacingWidth.Value;
             if (HeaderContent != null)
-                Expander.HeaderContent = HeaderContent.ToElement<MGElement>(Element.SelfOrParentWindow, Parent, NamedTextures);
+                Expander.HeaderContent = HeaderContent.ToElement<MGElement>(Element.SelfOrParentWindow, Parent);
 
             if (IsExpanded.HasValue)
                 Expander.IsExpanded = IsExpanded.Value;
@@ -205,7 +205,7 @@ namespace MGUI.Core.UI.XAML
             if (CollapsedVisibility.HasValue)
                 Expander.CollapsedVisibility = CollapsedVisibility.Value;
 
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 
@@ -220,9 +220,9 @@ namespace MGUI.Core.UI.XAML
         public int? HeaderHorizontalMargin { get; set; }
         public int? HeaderHorizontalPadding { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGGroupBox(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGGroupBox(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGGroupBox GroupBox = Element as MGGroupBox;
 
@@ -231,28 +231,45 @@ namespace MGUI.Core.UI.XAML
             if (BorderThickness.HasValue)
                 GroupBox.BorderThickness = BorderThickness.Value.ToThickness();
             if (HeaderContent != null)
-                GroupBox.HeaderContent = HeaderContent.ToElement<MGElement>(Element.SelfOrParentWindow, Parent, NamedTextures);
+                GroupBox.HeaderContent = HeaderContent.ToElement<MGElement>(Element.SelfOrParentWindow, Parent);
             if (HeaderHorizontalMargin.HasValue)
                 GroupBox.HeaderHorizontalMargin = HeaderHorizontalMargin.Value;
             if (HeaderHorizontalPadding.HasValue)
                 GroupBox.HeaderHorizontalPadding = HeaderHorizontalPadding.Value;
 
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 
     public class XAMLImage : XAMLElement
     {
-        public string Texture { get; set; }
+        public string TextureName { get; set; }
+        public string RegionName { get; set; }
+
+        public XAMLColor? TextureColor { get; set; }
         public XAMLRectangle? SourceRect { get; set; }
         public Stretch? Stretch { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGImage(Window, Texture == null ? null : NamedTextures[Texture], SourceRect?.ToRectangle());
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
+        {
+            if (!string.IsNullOrEmpty(RegionName))
+                return new MGImage(Window, RegionName);
+            else
+            {
+                MGDesktop Desktop = Window.GetDesktop();
+                if (!string.IsNullOrEmpty(TextureName))
+                    return new MGImage(Window, Desktop.NamedTextures[TextureName], SourceRect?.ToRectangle());
+                else
+                    return new MGImage(Window, null as Texture2D);
+            }
+        }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGImage Image = Element as MGImage;
 
+            if (TextureColor.HasValue)
+                Image.TextureColor = TextureColor.Value.ToXNAColor();
             if (SourceRect.HasValue)
                 Image.SetTexture(Image.Texture, SourceRect.Value.ToRectangle());
             if (Stretch.HasValue)
@@ -264,16 +281,16 @@ namespace MGUI.Core.UI.XAML
     {
         public char? PasswordCharacter { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGProgressBar(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGProgressBar(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGPasswordBox PasswordBox = Element as MGPasswordBox;
 
             if (PasswordCharacter.HasValue)
                 PasswordBox.PasswordCharacter = PasswordCharacter.Value;
 
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 
@@ -307,13 +324,13 @@ namespace MGUI.Core.UI.XAML
         public Orientation? Orientation { get; set; }
         public bool? IsReversed { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGProgressBar(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGProgressBar(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGProgressBar ProgressBar = Element as MGProgressBar;
-            Border.ApplySettings(Parent, ProgressBar.BorderComponent.Element, NamedTextures);
-            ValueTextBlock.ApplySettings(Parent, ProgressBar.ValueComponent.Element, NamedTextures);
+            Border.ApplySettings(Parent, ProgressBar.BorderComponent.Element);
+            ValueTextBlock.ApplySettings(Parent, ProgressBar.ValueComponent.Element);
 
             if (ShowValue.HasValue)
                 ProgressBar.ShowValue = ShowValue.Value;
@@ -361,12 +378,12 @@ namespace MGUI.Core.UI.XAML
 
         public bool? IsChecked { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGRadioButton(Window, GroupName ?? "");
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGRadioButton(Window, GroupName ?? "");
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGRadioButton RadioButton = Element as MGRadioButton;
-            Button.ApplySettings(Parent, RadioButton.ButtonComponent.Element, NamedTextures);
+            Button.ApplySettings(Parent, RadioButton.ButtonComponent.Element);
 
             if (BubbleComponentSize.HasValue)
                 RadioButton.BubbleComponentSize = BubbleComponentSize.Value;
@@ -383,7 +400,7 @@ namespace MGUI.Core.UI.XAML
             if (IsChecked.HasValue)
                 RadioButton.IsChecked = IsChecked.Value;
 
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 
@@ -414,9 +431,9 @@ namespace MGUI.Core.UI.XAML
 
         public bool? IsReadonly { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGRatingControl(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGRatingControl(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGRatingControl RatingControl = Element as MGRatingControl;
 
@@ -467,10 +484,10 @@ namespace MGUI.Core.UI.XAML
         public int? StrokeThickness { get; set; }
         public XAMLFillBrush Fill { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures)
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
             => new MGRectangle(Window, Width ?? 16, Height ?? 16, Stroke?.ToXNAColor() ?? Color.Transparent, StrokeThickness ?? 1, Fill?.ToFillBrush());
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGRectangle Rectangle = Element as MGRectangle;
 
@@ -489,10 +506,10 @@ namespace MGUI.Core.UI.XAML
         public int? MaxDots { get; set; }
         public int? Spacing { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures)
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
             => throw new InvalidOperationException($"Unsupported feature - cannot instantiate {nameof(MGResizeGrip)} through XAML.");
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGResizeGrip ResizeGrip = Element as MGResizeGrip;
 
@@ -522,9 +539,9 @@ namespace MGUI.Core.UI.XAML
         public XAMLFillBrush ScrollBarUnfocusedBrush { get; set; }
         public XAMLFillBrush ScrollBarFocusedBrush { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGScrollViewer(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGScrollViewer(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGScrollViewer ScrollViewer = Element as MGScrollViewer;
 
@@ -544,7 +561,7 @@ namespace MGUI.Core.UI.XAML
             if (ScrollBarFocusedBrush != null)
                 ScrollViewer.ScrollBarFocusedBrush = ScrollBarFocusedBrush.ToFillBrush();
 
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 
@@ -553,10 +570,10 @@ namespace MGUI.Core.UI.XAML
         public Orientation? Orientation { get; set; }
         public int? Size { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures)
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
             => new MGSeparator(Window, Orientation ?? UI.Orientation.Horizontal);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGSeparator Separator = Element as MGSeparator;
 
@@ -601,10 +618,10 @@ namespace MGUI.Core.UI.XAML
 
         public bool? AcceptsMouseScrollWheel { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures)
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
             => new MGSlider(Window, Minimum ?? 0, Maximum ?? 100, Value ?? Minimum ?? 0);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGSlider Slider = Element as MGSlider;
 
@@ -666,8 +683,8 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLSpacer : XAMLElement
     {
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGSpacer(Window, Width ?? 0, Height ?? 0);
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures) { }
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGSpacer(Window, Width ?? 0, Height ?? 0);
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element) { }
     }
 
     public class XAMLSpoiler : XAMLSingleContentHost
@@ -686,12 +703,12 @@ namespace MGUI.Core.UI.XAML
 
         public bool? IsRevealed { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGSpoiler(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGSpoiler(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGSpoiler Spoiler = Element as MGSpoiler;
-            Button.ApplySettings(Parent, Spoiler.ButtonComponent.Element, NamedTextures);
+            Button.ApplySettings(Parent, Spoiler.ButtonComponent.Element);
 
             if (UnspoiledText != null)
                 Spoiler.UnspoiledText = UnspoiledText;
@@ -700,7 +717,7 @@ namespace MGUI.Core.UI.XAML
             if (IsRevealed.HasValue)
                 Spoiler.IsRevealed = IsRevealed.Value;
 
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 
@@ -725,13 +742,13 @@ namespace MGUI.Core.UI.XAML
         public double? TimeScale { get; set; }
         public bool? IsRunning { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGStopwatch(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGStopwatch(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGStopwatch StopWatch = Element as MGStopwatch;
-            Border.ApplySettings(Parent, StopWatch.BorderComponent.Element, NamedTextures);
-            Value.ApplySettings(Parent, StopWatch.ValueComponent.Element, NamedTextures);
+            Border.ApplySettings(Parent, StopWatch.BorderComponent.Element);
+            Value.ApplySettings(Parent, StopWatch.ValueComponent.Element);
 
             if (ValueDisplayFormat != null)
                 StopWatch.ValueDisplayFormat = ValueDisplayFormat;
@@ -771,21 +788,21 @@ namespace MGUI.Core.UI.XAML
 
         public List<XAMLTabItem> Tabs { get; set; } = new();
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGTabControl(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTabControl(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGTabControl TabControl = Element as MGTabControl;
-            Border.ApplySettings(Parent, TabControl.BorderComponent.Element, NamedTextures);
-            HeadersPanel.ApplySettings(TabControl, TabControl.HeadersPanelComponent.Element, NamedTextures);
+            Border.ApplySettings(Parent, TabControl.BorderComponent.Element);
+            HeadersPanel.ApplySettings(TabControl, TabControl.HeadersPanelComponent.Element);
 
             if (HeaderAreaBackground != null)
                 TabControl.HeaderAreaBackground.NormalValue = HeaderAreaBackground.ToFillBrush();
 
             foreach (XAMLTabItem Child in Tabs)
             {
-                MGElement Header = Child.HeaderContent?.ToElement<MGElement>(TabControl.ParentWindow, TabControl, NamedTextures);
-                MGElement Content = Child.Content?.ToElement<MGElement>(TabControl.ParentWindow, TabControl, NamedTextures);
+                MGElement Header = Child.HeaderContent?.ToElement<MGElement>(TabControl.ParentWindow, TabControl);
+                MGElement Content = Child.Content?.ToElement<MGElement>(TabControl.ParentWindow, TabControl);
                 TabControl.AddTab(Header, Content);
             }
         }
@@ -796,28 +813,28 @@ namespace MGUI.Core.UI.XAML
         public XAMLElement HeaderContent { get; set; }
         public bool? IsTabSelected { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures)
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
             if (Parent is MGTabControl TabControl)
             {
-                MGElement HeaderElement = HeaderContent?.ToElement<MGElement>(Window, null, NamedTextures);
-                MGElement ContentElement = Content?.ToElement<MGElement>(Window, null, NamedTextures);
+                MGElement HeaderElement = HeaderContent?.ToElement<MGElement>(Window, null);
+                MGElement ContentElement = Content?.ToElement<MGElement>(Window, null);
                 return TabControl.AddTab(HeaderElement, ContentElement);
             }
             else
                 throw new InvalidOperationException($"The {nameof(Parent)} {nameof(MGElement)} of an {nameof(MGTabItem)} should be of type {nameof(MGTabControl)}");
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGTabItem TabItem = Element as MGTabItem;
 
             //if (HeaderContent != null) // This is already handled in CreateElementInstance
-            //    TabItem.HeaderContent = HeaderContent.ToElement<MGElement>(Element.SelfOrParentWindow, null, NamedTextures);
+            //    TabItem.HeaderContent = HeaderContent.ToElement<MGElement>(Element.SelfOrParentWindow, null);
             if (IsTabSelected.HasValue)
                 TabItem.IsTabSelected = IsTabSelected.Value;
 
-            //base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            //base.ApplyDerivedSettings(Parent, Element);
         }
     }
 
@@ -831,9 +848,9 @@ namespace MGUI.Core.UI.XAML
         public float? LinePadding { get; set; }
         public HorizontalAlignment? TextAlignment { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGTextBlock(Window, Text, Foreground?.ToXNAColor());
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTextBlock(Window, Text, Foreground?.ToXNAColor());
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGTextBlock TextBlock = Element as MGTextBlock;
 
@@ -900,16 +917,16 @@ namespace MGUI.Core.UI.XAML
         public XAMLResizeGrip ResizeGrip { get; set; } = new();
         public bool? IsUserResizable { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGTextBox(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTextBox(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGTextBox TextBox = Element as MGTextBox;
-            Border.ApplySettings(Parent, TextBox.BorderComponent.Element, NamedTextures);
-            TextBlock.ApplySettings(Parent, TextBox.TextBlockComponent.Element, NamedTextures);
-            Placeholder.ApplySettings(Parent, TextBox.PlaceholderTextBlockComponent.Element, NamedTextures);
-            CharacterCounter.ApplySettings(Parent, TextBox.CharacterCountComponent.Element, NamedTextures);
-            ResizeGrip.ApplySettings(Parent, TextBox.ResizeGripComponent.Element, NamedTextures);
+            Border.ApplySettings(Parent, TextBox.BorderComponent.Element);
+            TextBlock.ApplySettings(Parent, TextBox.TextBlockComponent.Element);
+            Placeholder.ApplySettings(Parent, TextBox.PlaceholderTextBlockComponent.Element);
+            CharacterCounter.ApplySettings(Parent, TextBox.CharacterCountComponent.Element);
+            ResizeGrip.ApplySettings(Parent, TextBox.ResizeGripComponent.Element);
 
             if (Text != null)
                 TextBox.SetText(Text);
@@ -986,14 +1003,14 @@ namespace MGUI.Core.UI.XAML
 
         public bool? IsPaused { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures)
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
             => new MGTimer(Window, RemainingDuration ?? TimeSpan.FromSeconds(60.0), IsPaused ?? true, AllowsNegativeDuration ?? false);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGTimer Timer = Element as MGTimer;
-            Border.ApplySettings(Parent, Timer.BorderComponent.Element, NamedTextures);
-            Value.ApplySettings(Parent, Timer.ValueComponent.Element, NamedTextures);
+            Border.ApplySettings(Parent, Timer.BorderComponent.Element);
+            Value.ApplySettings(Parent, Timer.ValueComponent.Element);
 
             if (ValueDisplayFormat != null)
                 Timer.ValueDisplayFormat = ValueDisplayFormat;
@@ -1033,12 +1050,12 @@ namespace MGUI.Core.UI.XAML
         public XAMLColor? CheckedTextForeground { get; set; }
         public bool? IsChecked { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGToggleButton(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGToggleButton(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGToggleButton ToggleButton = Element as MGToggleButton;
-            Border.ApplySettings(Parent, ToggleButton.BorderComponent.Element, NamedTextures);
+            Border.ApplySettings(Parent, ToggleButton.BorderComponent.Element);
 
             if (CheckedBackgroundBrush != null)
                 ToggleButton.CheckedBackgroundBrush = CheckedBackgroundBrush.ToFillBrush();
@@ -1047,7 +1064,7 @@ namespace MGUI.Core.UI.XAML
             if (IsChecked.HasValue)
                 ToggleButton.IsChecked = IsChecked.Value;
 
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 
@@ -1055,17 +1072,17 @@ namespace MGUI.Core.UI.XAML
     {
         public bool? ShowOnDisabled { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures)
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
             => new MGToolTip(Window, Parent, Width ?? 0, Height ?? 0);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGToolTip ToolTip = Element as MGToolTip;
 
             if (ShowOnDisabled.HasValue)
                 ToolTip.ShowOnDisabled = ShowOnDisabled.Value;
 
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 
@@ -1106,35 +1123,35 @@ namespace MGUI.Core.UI.XAML
 
         public bool? IsDraggable { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures)
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
             MGWindow Instance = new(Window, Left ?? 0, Top ?? 0, Width ?? 0, Height ?? 0);
             foreach (XAMLWindow Nested in NestedWindows)
-                Instance.AddNestedWindow(Nested.ToElement<MGWindow>(Window, Window, NamedTextures));
+                Instance.AddNestedWindow(Nested.ToElement<MGWindow>(Window, Window));
             return Instance;
         }
 
-        public MGWindow ToElement(MGDesktop Desktop, Dictionary<string, Texture2D> NamedTextures)
+        public MGWindow ToElement(MGDesktop Desktop)
         {
             MGWindow Window = new(Desktop, Left ?? 0, Top ?? 0, Width ?? 0, Height ?? 0);
-            ApplySettings(null, Window, NamedTextures);
+            ApplySettings(null, Window);
             return Window;
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGWindow Window = Element as MGWindow;
-            ResizeGrip.ApplySettings(Window, Window.ResizeGripComponent.Element, NamedTextures);
-            Border.ApplySettings(Window, Window.BorderComponent.Element, NamedTextures);
-            TitleBar.ApplySettings(Window, Window.TitleBarComponent.Element, NamedTextures);
-            TitleBarTextBlock.ApplySettings(Window, Window.TitleBarTextBlockElement, NamedTextures);
-            CloseButton.ApplySettings(Window, Window.CloseButtonElement, NamedTextures);
+            ResizeGrip.ApplySettings(Window, Window.ResizeGripComponent.Element);
+            Border.ApplySettings(Window, Window.BorderComponent.Element);
+            TitleBar.ApplySettings(Window, Window.TitleBarComponent.Element);
+            TitleBarTextBlock.ApplySettings(Window, Window.TitleBarTextBlockElement);
+            CloseButton.ApplySettings(Window, Window.CloseButtonElement);
 
             if (IsUserResizable.HasValue)
                 Window.IsUserResizable = IsUserResizable.Value;
 
             if (ModalWindow != null)
-                Window.ModalWindow = ModalWindow.ToElement<MGWindow>(Window, Window, NamedTextures);
+                Window.ModalWindow = ModalWindow.ToElement<MGWindow>(Window, Window);
 
             if (TitleText != null)
                 Window.TitleText = TitleText;
@@ -1160,11 +1177,11 @@ namespace MGUI.Core.UI.XAML
                     foreach (MGElement Child in TitleBarDP.Children)
                         Child.Visibility = UI.Visibility.Collapsed;
                     foreach (XAMLElement Child in TitleBar.Children)
-                        TitleBarDP.TryAddChild(Child.ToElement<MGElement>(Window, TitleBarDP, NamedTextures), Child.Dock);
+                        TitleBarDP.TryAddChild(Child.ToElement<MGElement>(Window, TitleBarDP), Child.Dock);
                 }
             }
 
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 }

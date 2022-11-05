@@ -485,9 +485,9 @@ namespace MGUI.Core.UI
 
         //  This method is invoked via reflection in XAMLControls.XAMLComboBox.ApplyDerivedSettings.
         //  Do not modify the method signature.
-        internal void LoadSettings(XAMLComboBox Settings, Dictionary<string, Texture2D> NamedTextures)
+        internal void LoadSettings(XAMLComboBox Settings)
         {
-            Settings.Border.ApplySettings(this, BorderComponent.Element, NamedTextures);
+            Settings.Border.ApplySettings(this, BorderComponent.Element);
 
             if (Settings.DropdownArrowLeftMargin.HasValue)
                 DropdownArrowLeftMargin = Settings.DropdownArrowLeftMargin.Value;

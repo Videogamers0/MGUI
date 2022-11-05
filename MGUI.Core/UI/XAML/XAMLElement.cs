@@ -83,24 +83,24 @@ namespace MGUI.Core.UI.XAML
 
         public Dictionary<string, object> AttachedProperties { get; set; } = new();
 
-        public T ToElement<T>(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) 
+        public T ToElement<T>(MGWindow Window, MGElement Parent) 
             where T : MGElement
         {
-            MGElement Element = CreateElementInstance(Window, Parent, NamedTextures);
-            ApplySettings(Parent, Element, NamedTextures);
+            MGElement Element = CreateElementInstance(Window, Parent);
+            ApplySettings(Parent, Element);
             return Element as T;
         }
 
-        protected internal void ApplySettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal void ApplySettings(MGElement Parent, MGElement Element)
         {
             using (Element.BeginInitializing())
             {
-                ApplyBaseSettings(Parent, Element, NamedTextures);
-                ApplyDerivedSettings(Parent, Element, NamedTextures);
+                ApplyBaseSettings(Parent, Element);
+                ApplyDerivedSettings(Parent, Element);
             }
         }
 
-        private void ApplyBaseSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        private void ApplyBaseSettings(MGElement Parent, MGElement Element)
         {
             using (Element.BeginInitializing())
             {
@@ -136,9 +136,9 @@ namespace MGUI.Core.UI.XAML
                     Element.PreferredHeight = PreferredHeight.Value;
 
                 if (ToolTip != null)
-                    Element.ToolTip = ToolTip.ToElement<MGToolTip>(Element.SelfOrParentWindow, Element, NamedTextures);
+                    Element.ToolTip = ToolTip.ToElement<MGToolTip>(Element.SelfOrParentWindow, Element);
                 if (ContextMenu != null)
-                    Element.ContextMenu = ContextMenu.ToElement<MGContextMenu>(Element.SelfOrParentWindow, Element, NamedTextures);
+                    Element.ContextMenu = ContextMenu.ToElement<MGContextMenu>(Element.SelfOrParentWindow, Element);
 
                 if (CanHandleInputsWhileHidden.HasValue)
                     Element.CanHandleInputsWhileHidden = CanHandleInputsWhileHidden.Value;
@@ -165,8 +165,8 @@ namespace MGUI.Core.UI.XAML
             }
         }
 
-        protected abstract MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures);
-        protected internal abstract void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures);
+        protected abstract MGElement CreateElementInstance(MGWindow Window, MGElement Parent);
+        protected internal abstract void ApplyDerivedSettings(MGElement Parent, MGElement Element);
     }
 
     public class XAMLElementStringConverter : TypeConverter

@@ -83,6 +83,7 @@ namespace MGUI.Core.UI
     //StaticGrid - user specifies # of rows and columns, and the size of each cell
     //      also things like gridline size, spacing, gridline brush, cell background brush
     //      then there's things like Action<GridCell> RenderCell, event CellEntered, CellExited, CellLeftCLicked, CellRightClicked, CellDragStart etc
+    //      CellSize, int? RowHeaderHeight (default=null, if not null, overrides CellSize.Height for the first row). int? ColumnHeaderWidth
     //listbox, statusbar, menubar/menuitems, popup?
     //      messagebox
     //          has icon docked left
@@ -114,12 +115,6 @@ namespace MGUI.Core.UI
     //              quoted values in blue, comments in green, property names in red, element names in brown
     //      maybe option to load from a file instead. so u just use your own text editor instead of a shitty built-in one.
     //      when the file path is set, the code listens for changes to the file, autorefresh on save
-    //
-    //maybe MGDesktop should store a Dictionary<string, Texture2D> NamedTextures
-    //      which is used by the XAMLParser (instead of passing in the dictionary to XAMLParser.Parse, XAMLParser.Parse retrieves it from MGDesktop)
-    //          actually dont even need it as parameter. XAMLImage can retrieve it from Window.GetDesktop().NamedTextures
-    //      maybe it actually stores some record struct like TextureRegion (Texture2D, Rectangle? SourceRect)
-    //      TextureRegion could even be wrapped in another struct: TextureTargetedRegion(TextureRegion, Size? DestinationSize) idk Color?
     //
     //Add support for in-line images in TextBlocks? Uses the NamedTextures to retrieve and draw them. Markup could be:
     //      "Hello World [img=Name Width Height SourceRect]" such as: "Hello World [img=HelloImg 16 16 50 50 16 16]" means we take the sourcerect of 50,50->66,66, draw it with size=16,16

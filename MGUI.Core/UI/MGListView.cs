@@ -309,16 +309,16 @@ namespace MGUI.Core.UI
 
         //  This method is invoked via reflection in XAMLListView.ApplyDerivedSettings.
         //  Do not modify the method signature.
-        internal void LoadSettings(XAMLListView Settings, Dictionary<string, Texture2D> NamedTextures)
+        internal void LoadSettings(XAMLListView Settings)
         {
-            Settings.HeaderGrid.ApplySettings(this, HeaderGrid, NamedTextures);
-            Settings.ScrollViewer.ApplySettings(this, ScrollViewer, NamedTextures);
-            Settings.DataGrid.ApplySettings(this, DataGrid, NamedTextures);
+            Settings.HeaderGrid.ApplySettings(this, HeaderGrid);
+            Settings.ScrollViewer.ApplySettings(this, ScrollViewer);
+            Settings.DataGrid.ApplySettings(this, DataGrid);
 
             foreach (XAMLListViewColumn ColumnDefinition in Settings.Columns)
             {
                 ListViewColumnWidth Width = ColumnDefinition.Width.ToWidth();
-                MGElement Header = ColumnDefinition.HeaderContent.ToElement<MGElement>(SelfOrParentWindow, this, NamedTextures);
+                MGElement Header = ColumnDefinition.HeaderContent.ToElement<MGElement>(SelfOrParentWindow, this);
                 AddColumn(Width, Header, x => new MGTextBlock(SelfOrParentWindow, x.ToString()));
             }
 

@@ -29,7 +29,7 @@ namespace MGUI.Core.UI.XAML
         public int? HeaderWidth { get; set; }
         public int? HeaderHeight { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures)
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
             if (Parent is MGContextMenu ParentMenu)
                 return new MGContextMenu(ParentMenu);
@@ -39,11 +39,11 @@ namespace MGUI.Core.UI.XAML
                 return new MGContextMenu(Window);
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGContextMenu ContextMenu = Element as MGContextMenu;
-            ScrollViewer.ApplySettings(ContextMenu, ContextMenu.ScrollViewerElement, NamedTextures);
-            ItemsPanel.ApplySettings(ContextMenu, ContextMenu.ItemsPanel, NamedTextures);
+            ScrollViewer.ApplySettings(ContextMenu, ContextMenu.ScrollViewerElement);
+            ItemsPanel.ApplySettings(ContextMenu, ContextMenu.ItemsPanel);
 
             if (CanOpen.HasValue)
                 ContextMenu.CanContextMenuOpen = CanOpen.Value;
@@ -59,10 +59,10 @@ namespace MGUI.Core.UI.XAML
 
             foreach (XAMLContextMenuItem Item in Items)
             {
-                MGContextMenuItem CMI = Item.ToElement<MGContextMenuItem>(Element.SelfOrParentWindow, ContextMenu, NamedTextures);
+                MGContextMenuItem CMI = Item.ToElement<MGContextMenuItem>(Element.SelfOrParentWindow, ContextMenu);
             }
 
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 
@@ -75,12 +75,12 @@ namespace MGUI.Core.UI.XAML
     {
         public XAMLContextMenu Submenu { get; set; }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGWrappedContextMenuItem ContextMenuItem = Element as MGWrappedContextMenuItem;
 
             if (Submenu != null)
-                ContextMenuItem.Submenu = Submenu.ToElement<MGContextMenu>(ContextMenuItem.SelfOrParentWindow, ContextMenuItem, NamedTextures);
+                ContextMenuItem.Submenu = Submenu.ToElement<MGContextMenu>(ContextMenuItem.SelfOrParentWindow, ContextMenuItem);
 
             //base.ApplyDerivedSettings(Parent, Element, NamedTextures);
         }
@@ -90,25 +90,25 @@ namespace MGUI.Core.UI.XAML
     {
         public XAMLImage Icon { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures)
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
             if (Parent is MGContextMenu ContextMenu)
             {
-                MGElement ContentElement = Content?.ToElement<MGElement>(Window, null, NamedTextures) ?? new MGTextBlock(Window, "");
+                MGElement ContentElement = Content?.ToElement<MGElement>(Window, null) ?? new MGTextBlock(Window, "");
                 return ContextMenu.AddButton(ContentElement, null);
             }
             else
                 throw new InvalidOperationException($"The {nameof(Parent)} {nameof(MGElement)} of an {nameof(MGContextMenuButton)} should be of type {nameof(MGContextMenu)}");
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGContextMenuButton ContextMenuButton = Element as MGContextMenuButton;
 
             if (Icon != null)
-                ContextMenuButton.Icon = Icon.ToElement<MGImage>(ContextMenuButton.SelfOrParentWindow, ContextMenuButton, NamedTextures);
+                ContextMenuButton.Icon = Icon.ToElement<MGImage>(ContextMenuButton.SelfOrParentWindow, ContextMenuButton);
 
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 
@@ -116,25 +116,25 @@ namespace MGUI.Core.UI.XAML
     {
         public bool? IsChecked { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures)
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
             if (Parent is MGContextMenu ContextMenu)
             {
-                MGElement ContentElement = Content?.ToElement<MGElement>(Window, null, NamedTextures) ?? new MGTextBlock(Window, "");
+                MGElement ContentElement = Content?.ToElement<MGElement>(Window, null) ?? new MGTextBlock(Window, "");
                 return ContextMenu.AddToggle(ContentElement, IsChecked ?? default);
             }
             else
                 throw new InvalidOperationException($"The {nameof(Parent)} {nameof(MGElement)} of an {nameof(MGContextMenuButton)} should be of type {nameof(MGContextMenu)}");
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGContextMenuToggle ContextMenuToggle = Element as MGContextMenuToggle;
 
             if (IsChecked.HasValue)
                 ContextMenuToggle.IsChecked = IsChecked.Value;
 
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 
@@ -142,7 +142,7 @@ namespace MGUI.Core.UI.XAML
     {
         public XAMLSeparator Separator { get; set; } = new();
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures)
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
             if (Parent is MGContextMenu ContextMenu)
             {
@@ -152,11 +152,11 @@ namespace MGUI.Core.UI.XAML
                 throw new InvalidOperationException($"The {nameof(Parent)} {nameof(MGElement)} of an {nameof(MGContextMenuButton)} should be of type {nameof(MGContextMenu)}");
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGContextMenuSeparator ContextMenuSeparator = Element as MGContextMenuSeparator;
-            Separator.ApplySettings(Element, ContextMenuSeparator.SeparatorElement, NamedTextures);
-            base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            Separator.ApplySettings(Element, ContextMenuSeparator.SeparatorElement);
+            base.ApplyDerivedSettings(Parent, Element);
         }
     }
 }

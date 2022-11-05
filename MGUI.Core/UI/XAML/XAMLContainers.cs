@@ -31,12 +31,12 @@ namespace MGUI.Core.UI.XAML
     {
         public XAMLElement Content { get; set; }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             if (Content != null)
             {
                 MGSingleContentHost TypedElement = Element as MGSingleContentHost;
-                TypedElement.SetContent(Content.ToElement<MGElement>(Element.SelfOrParentWindow, Element, NamedTextures));
+                TypedElement.SetContent(Content.ToElement<MGElement>(Element.SelfOrParentWindow, Element));
             }
         }
     }
@@ -63,9 +63,9 @@ namespace MGUI.Core.UI.XAML
         public XAMLSize? TickSize { get; set; }
         public XAMLFillBrush Foreground { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGGridSplitter(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGGridSplitter(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGGridSplitter GridSplitter = Element as MGGridSplitter;
 
@@ -99,9 +99,9 @@ namespace MGUI.Core.UI.XAML
         public int? RowSpacing { get; set; }
         public int? ColumnSpacing { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGGrid(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGGrid(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGGrid Grid = Element as MGGrid;
 
@@ -154,7 +154,7 @@ namespace MGUI.Core.UI.XAML
 
             foreach (XAMLElement Child in Children)
             {
-                MGElement ChildElement = Child.ToElement<MGElement>(Grid.SelfOrParentWindow, Grid, NamedTextures);
+                MGElement ChildElement = Child.ToElement<MGElement>(Grid.SelfOrParentWindow, Grid);
                 Grid.TryAddChild(Child.GridRow, Child.GridColumn, new GridSpan(Child.GridRowSpan, Child.GridColumnSpan, Child.GridAffectsMeasure), ChildElement);
             }
         }
@@ -162,15 +162,15 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLDockPanel : XAMLMultiContentHost
     {
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGDockPanel(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGDockPanel(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGDockPanel DockPanel = Element as MGDockPanel;
 
             foreach (XAMLElement Child in Children)
             {
-                MGElement ChildElement = Child.ToElement<MGElement>(DockPanel.ParentWindow, DockPanel, NamedTextures);
+                MGElement ChildElement = Child.ToElement<MGElement>(DockPanel.ParentWindow, DockPanel);
                 DockPanel.TryAddChild(ChildElement, Child.Dock);
             }
         }
@@ -181,9 +181,9 @@ namespace MGUI.Core.UI.XAML
         public Orientation? Orientation { get; set; }
         public int? Spacing { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGStackPanel(Window, Orientation ?? UI.Orientation.Vertical);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGStackPanel(Window, Orientation ?? UI.Orientation.Vertical);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGStackPanel StackPanel = Element as MGStackPanel;
 
@@ -194,7 +194,7 @@ namespace MGUI.Core.UI.XAML
 
             foreach (XAMLElement Child in Children)
             {
-                MGElement ChildElement = Child.ToElement<MGElement>(StackPanel.ParentWindow, StackPanel, NamedTextures);
+                MGElement ChildElement = Child.ToElement<MGElement>(StackPanel.ParentWindow, StackPanel);
                 StackPanel.TryAddChild(ChildElement);
             }
         }
@@ -202,15 +202,15 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLOverlayPanel : XAMLMultiContentHost
     {
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures) => new MGOverlayPanel(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGOverlayPanel(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGOverlayPanel OverlayPanel = Element as MGOverlayPanel;
 
             foreach (XAMLElement Child in Children)
             {
-                MGElement ChildElement = Child.ToElement<MGElement>(OverlayPanel.ParentWindow, OverlayPanel, NamedTextures);
+                MGElement ChildElement = Child.ToElement<MGElement>(OverlayPanel.ParentWindow, OverlayPanel);
                 OverlayPanel.TryAddChild(ChildElement, Child.Offset.ToThickness());
             }
         }

@@ -37,18 +37,18 @@ namespace MGUI.Core.UI.XAML
 
         public GridSelectionMode? SelectionMode { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent, Dictionary<string, Texture2D> NamedTextures)
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
             Type GenericType = typeof(MGListView<>).MakeGenericType(new Type[] { ItemType });
             object Element = Activator.CreateInstance(GenericType, new object[] { Window });
             return Element as MGElement;
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, Dictionary<string, Texture2D> NamedTextures)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             Type GenericType = typeof(MGListView<>).MakeGenericType(new Type[] { ItemType });
             MethodInfo Method = GenericType.GetMethod(nameof(MGListView<object>.LoadSettings), BindingFlags.Instance | BindingFlags.NonPublic);
-            Method.Invoke(Element, new object[] { this, NamedTextures });
+            Method.Invoke(Element, new object[] { this });
         }
     }
 

@@ -13,9 +13,12 @@ using MGUI.Shared.Input;
 using MGUI.Shared.Text;
 using MGUI.Shared.Rendering;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MGUI.Core.UI
 {
+    public readonly record struct NamedTextureRegion(string TextureName, string RegionName, Rectangle? SourceRect, Color? Color);
+
     /// <summary>Represents a Rectanglular screen bounds that you can add or remove <see cref="MGWindow"/>s to/from, 
     /// and handles mutual exclusion with things like input handling or ensuring there is only 1 <see cref="MGToolTip"/> or <see cref="MGContextMenu"/> on the user interface at a time.</summary>
     public class MGDesktop : IMouseHandlerHost, IKeyboardHandlerHost, IContextMenuHost
@@ -280,11 +283,41 @@ namespace MGUI.Core.UI
 
         public MGTheme Theme { get; }
 
+        private Dictionary<string, Texture2D> _NamedTextures { get; }
+        /// <summary>This dictionary is commonly used by <see cref="MGImage"/> to reference textures by a string key value.<para/>
+        /// See also:<br/><see cref="AddNamedTexture(string, Texture2D)"/><br/><see cref="RemoveNamedTexture(string)"/><br/><see cref="NamedRegions"/></summary>
+        public IReadOnlyDictionary<string, Texture2D> NamedTextures => _NamedTextures;
+
+        public void AddNamedTexture(string Name, Texture2D Texture) => _NamedTextures.Add(Name, Texture);
+        public void RemoveNamedTexture(string Name)
+        {
+            _NamedTextures.Remove(Name);
+            List<NamedTextureRegion> DerivedRegions = _NamedRegions.Values.Where(x => x.TextureName == Name).ToList();
+            foreach (NamedTextureRegion Region in DerivedRegions)
+                RemoveNamedRegion(Region.RegionName);
+        }
+
+        private Dictionary<string, NamedTextureRegion> _NamedRegions { get; }
+        /// <summary>This dictionary is commonly used by <see cref="MGImage"/> to reference textures and various other texture settings by a string key value.<para/>
+        /// See also:<br/><see cref="AddNamedRegion(NamedTextureRegion)"/><br/><see cref="RemoveNamedRegion(string)"/><br/><see cref="NamedTextures"/></summary>
+        public IReadOnlyDictionary<string, NamedTextureRegion> NamedRegions => _NamedRegions;
+
+        public void AddNamedRegion(NamedTextureRegion Region)
+        {
+            if (!_NamedRegions.ContainsKey(Region.TextureName))
+                throw new InvalidOperationException($"{nameof(MGDesktop)}.{nameof(NamedTextures)} does not contain an entry for {nameof(NamedTextureRegion.TextureName)}={Region.TextureName}");
+            _NamedRegions.Add(Region.RegionName, Region);
+        }
+        public void RemoveNamedRegion(string RegionName) => _NamedRegions.Remove(RegionName);
+
         public MGDesktop(MainRenderer Renderer)
         {
             this.Renderer = Renderer;
             this.Windows = new();
             this.Theme = new();
+
+            this._NamedTextures = new();
+            this._NamedRegions = new();
 
             this.ToolTipShowDelay = DefaultToolTipShowDelay;
 

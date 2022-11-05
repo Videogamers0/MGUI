@@ -42,6 +42,9 @@ namespace MGUI.Core.UI
         private Rectangle? _SourceRect;
         public Rectangle? SourceRect { get => _SourceRect; }
 
+        /// <summary>A color to use when drawing the texture. Uses <see cref="Color.White"/> if null.</summary>
+        public Color? TextureColor { get; set; }
+
         private int UnstretchedWidth => SourceRect?.Width ?? Texture?.Width ?? 0;
         private int UnstretchedHeight => SourceRect?.Height ?? Texture?.Height ?? 0;
         private double UnstretchedAspectRatio => UnstretchedHeight == 0 ? 1.0 : UnstretchedWidth * 1.0 / UnstretchedHeight;
@@ -90,12 +93,29 @@ namespace MGUI.Core.UI
             }
         }*/
 
-        public MGImage(MGWindow Window, Texture2D Texture, Rectangle? SourceRect = null, Stretch Stretch = Stretch.Uniform)
+        /// <param name="RegionName">The name of the <see cref="NamedTextureRegion"/> used to reference the texture settings by. This name must exist in <see cref="MGDesktop.NamedRegions"/><para/>
+        /// See also: <see cref="MGDesktop.NamedTextures"/>, <see cref="MGDesktop.NamedRegions"/></param>
+        public MGImage(MGWindow Window, string RegionName, Stretch Stretch = Stretch.Uniform)
+            : base(Window, MGElementType.Image)
+        {
+            using (BeginInitializing())
+            {
+                MGDesktop Desktop = Window.GetDesktop();
+                NamedTextureRegion Region = Desktop.NamedRegions[RegionName];
+
+                SetTexture(Desktop.NamedTextures[Region.TextureName], Region.SourceRect);
+                this.TextureColor = Region.Color;
+                this.Stretch = Stretch;
+            }
+        }
+
+        public MGImage(MGWindow Window, Texture2D Texture, Rectangle? SourceRect = null, Color? TextureColor = null, Stretch Stretch = Stretch.Uniform)
             : base(Window, MGElementType.Image)
         {
             using (BeginInitializing())
             {
                 SetTexture(Texture, SourceRect);
+                this.TextureColor = TextureColor;
                 this.Stretch = Stretch;
             }
         }
@@ -245,7 +265,7 @@ namespace MGUI.Core.UI
                 throw new NotImplementedException($"Unrecognized {nameof(Stretch)}: {Stretch}");
             }
 
-            DA.DT.DrawTextureTo(Texture, SourceRect, Bounds.GetTranslated(DA.Offset), Color.White * DA.Opacity);
+            DA.DT.DrawTextureTo(Texture, SourceRect, Bounds.GetTranslated(DA.Offset), this.TextureColor ?? Color.White * DA.Opacity);
         }
     }
 }

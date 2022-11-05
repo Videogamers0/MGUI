@@ -111,9 +111,6 @@ namespace MGUI.Core.UI.XAML
         }
 
 #if UseWPF
-        /// <param name="NamedTextures">Can be null. This dictionary is used to resolve textures used by <see cref="MGImage"/>s, such as if the <paramref name="XAMLString"/> contained:
-        /// <code>&lt;Image Texture='Sample1' /&gt;</code>
-        /// Then this dictionary would be expected to contain a value for Key='Sample1'</param>
         /// <param name="SanitizeXAMLString">If true, the given <paramref name="XAMLString"/> will be pre-processed via the following logic:<para/>
         /// 1. Trim leading and trailing whitespace<br/>
         /// 2. Insert required XML namespaces (such as "xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation")<br/>
@@ -121,8 +118,7 @@ namespace MGUI.Core.UI.XAML
         /// <param name="ReplaceLinebreakLiterals">If true, the literal string @"\n" will be replaced with "&#38;#x0a;", which is the XAML representation of the linebreak character '\n'.<br/>
         /// If false, setting the text of an <see cref="MGTextBlock"/> requires encoding the '\n' character as ""&#38;#x0a;""<para/>
         /// See also: <see href="https://stackoverflow.com/a/183435/11689514"/></param>
-        public static T Load<T>(MGWindow Window, string XAMLString, Dictionary<string, Texture2D> NamedTextures = null,
-            bool SanitizeXAMLString = true, bool ReplaceLinebreakLiterals = true)
+        public static T Load<T>(MGWindow Window, string XAMLString, bool SanitizeXAMLString = true, bool ReplaceLinebreakLiterals = true)
             where T : MGElement
         {
             if (SanitizeXAMLString)
@@ -130,12 +126,9 @@ namespace MGUI.Core.UI.XAML
             if (ReplaceLinebreakLiterals)
                 XAMLString = XAMLString.Replace(@"\n", "&#x0a;");
             XAMLElement Parsed = (XAMLElement)XamlServices.Parse(XAMLString);
-            return Parsed.ToElement<T>(Window, null, NamedTextures);
+            return Parsed.ToElement<T>(Window, null);
         }
 
-        /// <param name="NamedTextures">Can be null. This dictionary is used to resolve textures used by <see cref="MGImage"/>s, such as if the <paramref name="XAMLString"/> contained:
-        /// <code>&lt;Image Texture='Sample1' /&gt;</code>
-        /// Then this dictionary would be expected to contain a value for Key='Sample1'</param>
         /// <param name="SanitizeXAMLString">If true, the given <paramref name="XAMLString"/> will be pre-processed via the following logic:<para/>
         /// 1. Trim leading and trailing whitespace<br/>
         /// 2. Insert required XML namespaces (such as "xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation")<br/>
@@ -143,15 +136,14 @@ namespace MGUI.Core.UI.XAML
         /// <param name="ReplaceLinebreakLiterals">If true, the literal string @"\n" will be replaced with the "v", which is the XAML representation of the linebreak character '\n'.<br/>
         /// If false, setting the text of an <see cref="MGTextBlock"/> requires encoding the '\n' character as ""&#38;#x0a;""<para/>
         /// See also: <see href="https://stackoverflow.com/a/183435/11689514"/></param>
-        public static MGWindow LoadRootWindow(MGDesktop Desktop, string XAMLString, Dictionary<string, Texture2D> NamedTextures = null,
-            bool SanitizeXAMLString = true, bool ReplaceLinebreakLiterals = true)
+        public static MGWindow LoadRootWindow(MGDesktop Desktop, string XAMLString, bool SanitizeXAMLString = true, bool ReplaceLinebreakLiterals = true)
         {
             if (SanitizeXAMLString)
                 XAMLString = ValidateXAMLString(XAMLString);
             if (ReplaceLinebreakLiterals)
                 XAMLString = XAMLString.Replace(@"\n", "&#x0a;");
             XAMLWindow Parsed = (XAMLWindow)XamlServices.Parse(XAMLString);
-            return Parsed.ToElement(Desktop, NamedTextures);
+            return Parsed.ToElement(Desktop);
         }
 #endif
     }
