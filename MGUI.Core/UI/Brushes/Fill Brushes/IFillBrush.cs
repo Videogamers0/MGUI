@@ -15,7 +15,8 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
     /// <see cref="MGGradientFillBrush"/><br/>
     /// <see cref="MGDiagonalGradientFillBrush"/><br/>
     /// <see cref="MGPaddedFillBrush"/><br/>
-    /// <see cref="MGBorderedFillBrush"/></summary>
+    /// <see cref="MGBorderedFillBrush"/><br/>
+    /// <see cref="MGProgressBarGradientBrush"/></summary>
     public interface IFillBrush : ICloneable
     {
         public void Draw(ElementDrawArgs DA, MGElement Element, Rectangle Bounds);

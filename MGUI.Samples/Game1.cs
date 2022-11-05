@@ -110,7 +110,7 @@ namespace MGUI.Samples
             </StackPanel>
         </ScrollViewer>
 
-        <Grid Name=""TestGrid"" RowLengths=""100[50,],16,*[80,]"" ColumnLengths=""1*[50,150],16,1.5*[50,60],1.2*"" Width=""296"" HA=""Center"">
+        <Grid Name=""TestGrid"" RowLengths=""100[50,],16,*[80,]"" ColumnLengths=""1*[50,150],16,1.5*[50,60],1.2*"">
             <TextBlock BG=""Red"" GridRow=""0"" GridColumn=""0"" />
             <TextBlock BG=""Yellow"" GridRow=""2"" GridColumn=""2"" />
             <TextBlock BG=""Purple"" GridRow=""0"" GridColumn=""3"" />
@@ -122,7 +122,8 @@ namespace MGUI.Samples
             <GridSplitter GridRow=""1"" GridColumn=""0"" GridColumnSpan=""4"" />
 
             <TextBox GridRow=""2"" GridColumn=""3"" />
-            <ToggleButton GridRow=""2"" GridColumn=""3"" Content=""Hello\nWorld"" CheckedTextForeground=""Red"" />
+            <!--<ToggleButton GridRow=""2"" GridColumn=""3"" Content=""Hello\nWorld"" CheckedTextForeground=""Red"" />-->
+            <ProgressBar GridRow=""2"" GridColumn=""3"" Name=""TestProgressBar"" />
         </Grid>
     </DockPanel>
 </Window>
@@ -130,6 +131,16 @@ namespace MGUI.Samples
 
             MGWindow XAMLWindow = XAMLParser.LoadRootWindow(Desktop, xaml);
             this.Desktop.Windows.Add(XAMLWindow);
+
+            if (XAMLWindow.TryGetElementByName("TestProgressBar", out MGProgressBar TestProgressBar))
+            {
+                MGProgressBarGradientBrush Brush = new(TestProgressBar);
+                TestProgressBar.CompletedBrush.NormalValue = Brush;
+                TestProgressBar.OnEndUpdate += (sender, e) =>
+                {
+                    TestProgressBar.Value = (TestProgressBar.Value - 0.25f + TestProgressBar.Maximum) % TestProgressBar.Maximum;
+                };
+            }
 
             if (XAMLWindow.TryGetElementByName("TestGrid", out MGGrid TestGrid))
             {
