@@ -149,7 +149,7 @@ namespace MGUI.Core.UI
                 MGElementType.Spacer,
                 MGElementType.Spoiler,
                 MGElementType.StackPanel,
-                MGElementType.StaticGrid,
+                MGElementType.UniformGrid,
                 MGElementType.TabItem,
                 MGElementType.TextBlock
             };

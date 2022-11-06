@@ -838,6 +838,17 @@ namespace MGUI.Core.UI
         }
         #endregion Indexed Elements
 
+        /// <summary>Removes all graphics from this window except its content. Such as hiding the title bar, resize grip, close button, removing padding, setting the border and background to transparent</summary>
+        public void MakeInvisible()
+        {
+            this.IsTitleBarVisible = false;
+            this.IsCloseButtonVisible = false;
+            this.IsUserResizable = false;
+            this.Padding = new(0);
+            this.BorderThickness = new(0);
+            this.BackgroundBrush.SetAll(MGSolidFillBrush.Transparent);
+        }
+
         public void Draw(DrawBaseArgs BA) => Draw(new ElementDrawArgs(BA, this.VisualState, Point.Zero));
 
         public override MGBorder GetBorder() => BorderElement;

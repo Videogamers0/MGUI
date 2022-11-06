@@ -45,13 +45,13 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool DrawAfterContents => DrawPriority == ComponentDrawPriority.AfterContents;
 
-        public readonly bool IsWidthSharedWithContent;
-        public readonly bool IsHeightSharedWithContent;
+        public bool IsWidthSharedWithContent { get; internal set; }
+        public bool IsHeightSharedWithContent { get; internal set; }
 
-        public readonly bool ConsumesLeftSpace;
-        public readonly bool ConsumesTopSpace;
-        public readonly bool ConsumesRightSpace;
-        public readonly bool ConsumesBottomSpace;
+        public bool ConsumesLeftSpace { get; internal set; }
+        public bool ConsumesTopSpace { get; internal set; }
+        public bool ConsumesRightSpace { get; internal set; }
+        public bool ConsumesBottomSpace { get; internal set; }
 
         public bool ConsumesAnySpace => ConsumesLeftSpace || ConsumesTopSpace || ConsumesRightSpace || ConsumesBottomSpace;
 

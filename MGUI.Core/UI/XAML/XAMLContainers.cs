@@ -161,7 +161,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLStaticGrid : XAMLElement
+    public class XAMLUniformGrid : XAMLElement
     {
         public int? Rows { get; set; }
         public int? Columns { get; set; }
@@ -183,11 +183,11 @@ namespace MGUI.Core.UI.XAML
         public int? RowSpacing { get; set; }
         public int? ColumnSpacing { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGStaticGrid(Window, Rows ?? 0, Columns ?? 0, CellSize?.ToSize() ?? Size.Empty);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGUniformGrid(Window, Rows ?? 0, Columns ?? 0, CellSize?.ToSize() ?? Size.Empty);
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
-            MGStaticGrid StaticGrid = Element as MGStaticGrid;
+            MGUniformGrid StaticGrid = Element as MGUniformGrid;
 
             if (Rows.HasValue)
                 StaticGrid.Rows = Rows.Value;

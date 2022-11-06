@@ -15,13 +15,13 @@ namespace MGUI.Core.UI.Containers.Grids
 {
     public readonly record struct GridCellIndex(int Row, int Column);
 
-    public readonly record struct StaticGridSelection(MGStaticGrid Grid, GridCellIndex Cell, GridSelectionMode SelectionMode)
+    public readonly record struct StaticGridSelection(MGUniformGrid Grid, GridCellIndex Cell, GridSelectionMode SelectionMode)
     : IEnumerable<GridCellIndex>
     {
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         public IEnumerator<GridCellIndex> GetEnumerator() => GetCells().GetEnumerator();
 
-        public MGStaticGrid Grid { get; init; } = Grid ?? throw new ArgumentNullException(nameof(Grid));
+        public MGUniformGrid Grid { get; init; } = Grid ?? throw new ArgumentNullException(nameof(Grid));
 
         private IEnumerable<GridCellIndex> GetCells()
         {
@@ -56,7 +56,7 @@ namespace MGUI.Core.UI.Containers.Grids
     /// <summary>Represents a 2d grid of cells, where each cell has a known, uniform size.<br/>
     /// Nested content cannot be added to the cells. Instead, content is directly rendered by the caller via events and delegates such as <see cref="RenderCell"/>.<para/>
     /// Typically used for things like a player's inventory, or a table filled with static content like skill icons</summary>
-    public class MGStaticGrid : MGElement
+    public class MGUniformGrid : MGElement
     {
         #region Dimensions
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -320,13 +320,13 @@ namespace MGUI.Core.UI.Containers.Grids
         public VisualStateFillBrush CellBackground { get; set; }
 
         /// <summary>An action to invoke on each cell whenever the cell is being drawn</summary>
-        public Action<GridCellIndex, Rectangle> RenderCell { get; set; }
+        public Action<ElementDrawArgs, GridCellIndex, Rectangle> RenderCell { get; set; }
 
         //TODO
         //events such as: CellEntered, CellExited, CellLeftCLicked, CellRightClicked, CellDragStart etc
 
-        public MGStaticGrid(MGWindow Window, int Rows, int Columns, Size CellSize)
-            : base(Window, MGElementType.StaticGrid)
+        public MGUniformGrid(MGWindow Window, int Rows, int Columns, Size CellSize)
+            : base(Window, MGElementType.UniformGrid)
         {
             using (BeginInitializing())
             {
@@ -507,7 +507,7 @@ namespace MGUI.Core.UI.Containers.Grids
                     {
                         GridCellIndex Index = new(R, C);
                         Rectangle Bounds = _CellBounds[Index];
-                        RenderCell(Index, Bounds);
+                        RenderCell(DA, Index, Bounds);
                     }
                 }
             }

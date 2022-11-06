@@ -32,6 +32,8 @@ namespace MGUI.Core.UI.XAML
         private static readonly Dictionary<string, string> ElementNameAliases = new()
         {
             { "ContentPresenter", nameof(XAMLContentPresenter) },
+            { "HeaderedContentPresenter", nameof(XAMLHeaderedContentPresenter) },
+
             { "Border", nameof(XAMLBorder) },
             { "Button", nameof(XAMLButton) },
             { "CheckBox", nameof(XAMLCheckBox) },
@@ -72,7 +74,7 @@ namespace MGUI.Core.UI.XAML
             { "ColumnDefinition", nameof(XAMLColumnDefinition) },
             { "GridSplitter", nameof(XAMLGridSplitter) },
             { "Grid", nameof(XAMLGrid) },
-            { "StaticGrid", nameof(XAMLStaticGrid) },
+            { "UniformGrid", nameof(XAMLUniformGrid) },
             { "DockPanel", nameof(XAMLDockPanel) },
             { "StackPanel", nameof(XAMLStackPanel) },
             { "OverlayPanel", nameof(XAMLOverlayPanel) }

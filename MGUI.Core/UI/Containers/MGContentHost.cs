@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace MGUI.Core.UI.Containers
 {
@@ -269,5 +270,121 @@ namespace MGUI.Core.UI.Containers
         }
 
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds) { }
+    }
+
+    /// <summary>A wrapper element that displays a <see cref="HeaderContent"/> at a given <see cref="HeaderPosition"/> in addition to the <see cref="MGSingleContentHost.Content"/></summary>
+    public class MGHeaderedContentPresenter : MGSingleContentHost
+    {
+        public MGElement HeaderContent
+        {
+            get => HeaderPresenter.Content;
+            set => HeaderPresenter.SetContent(value);
+        }
+
+        private Dock _HeaderPosition;
+        public Dock HeaderPosition
+        {
+            get => _HeaderPosition;
+            set => SetHeaderPosition(value, false);
+        }
+
+        private void SetHeaderPosition(Dock Value, bool IsInitializing)
+        {
+            if (_HeaderPosition != Value || IsInitializing)
+            {
+                _HeaderPosition = Value;
+
+                switch (HeaderPosition)
+                {
+                    case Dock.Left:
+                        HeaderPresenterComponent.IsWidthSharedWithContent = false;
+                        HeaderPresenterComponent.IsHeightSharedWithContent = true;
+                        HeaderPresenterComponent.ConsumesLeftSpace = true;
+                        HeaderPresenterComponent.ConsumesTopSpace = true;
+                        HeaderPresenterComponent.ConsumesRightSpace = false;
+                        HeaderPresenterComponent.ConsumesBottomSpace = false;
+                        break;
+                    case Dock.Top:
+                        HeaderPresenterComponent.IsWidthSharedWithContent = true;
+                        HeaderPresenterComponent.IsHeightSharedWithContent = false;
+                        HeaderPresenterComponent.ConsumesLeftSpace = true;
+                        HeaderPresenterComponent.ConsumesTopSpace = true;
+                        HeaderPresenterComponent.ConsumesRightSpace = false;
+                        HeaderPresenterComponent.ConsumesBottomSpace = false;
+                        break;
+                    case Dock.Right:
+                        HeaderPresenterComponent.IsWidthSharedWithContent = false;
+                        HeaderPresenterComponent.IsHeightSharedWithContent = true;
+                        HeaderPresenterComponent.ConsumesLeftSpace = false;
+                        HeaderPresenterComponent.ConsumesTopSpace = true;
+                        HeaderPresenterComponent.ConsumesRightSpace = true;
+                        HeaderPresenterComponent.ConsumesBottomSpace = false;
+                        break;
+                    case Dock.Bottom:
+                        HeaderPresenterComponent.IsWidthSharedWithContent = true;
+                        HeaderPresenterComponent.IsHeightSharedWithContent = false;
+                        HeaderPresenterComponent.ConsumesLeftSpace = true;
+                        HeaderPresenterComponent.ConsumesTopSpace = false;
+                        HeaderPresenterComponent.ConsumesRightSpace = false;
+                        HeaderPresenterComponent.ConsumesBottomSpace = true;
+                        break;
+                    default: throw new NotImplementedException($"Unrecognized {nameof(Dock)}: {this.HeaderPosition}");
+                }
+
+                UpdateHeaderMargin();
+                LayoutChanged(this, true);
+            }
+        }
+
+        private int _Spacing;
+        /// <summary>Empty space, in pixels, between the <see cref="HeaderContent"/> and <see cref="MGSingleContentHost.Content"/>.</summary>
+        public int Spacing
+        {
+            get => _Spacing;
+            set
+            {
+                if (_Spacing != value)
+                {
+                    _Spacing = value;
+                    UpdateHeaderMargin();
+                }
+            }
+        }
+
+        private void UpdateHeaderMargin()
+        {
+            HeaderPresenter.Margin = HeaderPosition switch
+            {
+                Dock.Left => new(0, 0, Spacing, 0),
+                Dock.Top => new(0, 0, 0, Spacing),
+                Dock.Right => new(Spacing, 0, 0, 0),
+                Dock.Bottom => new(0, Spacing, 0, 0),
+                _ => throw new NotImplementedException($"Unrecognized {nameof(Dock)}: {this.HeaderPosition}")
+            };
+        }
+
+        public MGComponent<MGContentPresenter> HeaderPresenterComponent { get; }
+        public MGContentPresenter HeaderPresenter { get; }
+
+        public MGHeaderedContentPresenter(MGWindow Window, MGElement Header = null, MGElement Content = null)
+            : base(Window, MGElementType.HeaderedContentPresenter)
+        {
+            using (BeginInitializing())
+            {
+                this.HeaderPresenter = new(Window);
+                this.HeaderPresenterComponent = new(HeaderPresenter, false, false, false, false, false, false, false,
+                    (AvailableBounds, ComponentSize) => this.HeaderPosition switch
+                    {
+                        Dock.Left => ApplyAlignment(AvailableBounds, HorizontalAlignment.Left, VerticalAlignment.Stretch, ComponentSize.Size),
+                        Dock.Top => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Top, ComponentSize.Size),
+                        Dock.Right => ApplyAlignment(AvailableBounds, HorizontalAlignment.Right, VerticalAlignment.Stretch, ComponentSize.Size),
+                        Dock.Bottom => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Bottom, ComponentSize.Size),
+                        _ => throw new NotImplementedException($"Unrecognized {nameof(Dock)}: {this.HeaderPosition}")
+                    });
+                AddComponent(HeaderPresenterComponent);
+
+                SetHeaderPosition(Dock.Left, true);
+            }
+        }
     }
 }

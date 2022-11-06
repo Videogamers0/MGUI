@@ -12,7 +12,7 @@ namespace MGUI.Core.UI
         StackPanel,
         DockPanel,
         Grid,
-        StaticGrid,
+        UniformGrid,
         OverlayPanel,
         //WrapPanel?
 
@@ -28,6 +28,7 @@ namespace MGUI.Core.UI
         TabControl,
         TabItem,
         ContentPresenter,
+        HeaderedContentPresenter,
         GridSplitter,
 
         //  Buttons and Selection

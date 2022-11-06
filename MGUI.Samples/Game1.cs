@@ -117,6 +117,12 @@ namespace MGUI.Samples
                     <StackPanel Orientation=""Vertical"" Dock=""Top"">
                         <CheckBox Content=""CheckBox #1"" />
                         <RadioButton Content=""RadioButton #1"" />
+                        <HeaderedContentPresenter Spacing=""5"" HeaderPosition=""Left"">
+                            <HeaderedContentPresenter.Header>
+                                <Rectangle Width=""16"" Height=""16"" Fill=""RoyalBlue"" HA=""Center"" />
+                            </HeaderedContentPresenter.Header>
+                            <TextBlock Text=""Hello World"" />
+                        </HeaderedContentPresenter>
                     </StackPanel>
                 </DockPanel>
             </TabItem>
@@ -156,7 +162,7 @@ namespace MGUI.Samples
             </TabItem>
         </TabControl>
 
-        <StaticGrid Rows=""6"" Columns=""4"" CellSize=""32,40"" HeaderRowHeight=""20"" HeaderColumnWidth=""16"" GridLinesVisibility=""All""
+        <UniformGrid Rows=""6"" Columns=""4"" CellSize=""32,40"" HeaderRowHeight=""20"" HeaderColumnWidth=""16"" GridLinesVisibility=""All""
                     HorizontalGridLineBrush = ""Red"" VerticalGridLineBrush=""Green"" RowSpacing=""5"" ColumnSpacing=""8"" GridLineMargin=""2"" SelectionMode=""Cell"" />
 
         <!--<Grid Name=""TestGrid"" RowLengths=""100[50,],16,*[80,]"" ColumnLengths=""1*[50,150],16,1.5*[50,60],1.2*"">
@@ -177,6 +183,7 @@ namespace MGUI.Samples
             ";
 
             MGWindow XAMLWindow = XAMLParser.LoadRootWindow(Desktop, xaml);
+            //XAMLWindow.MakeInvisible();
             this.Desktop.Windows.Add(XAMLWindow);
 
             if (XAMLWindow.TryGetElementByName("GB1", out MGGroupBox GB))

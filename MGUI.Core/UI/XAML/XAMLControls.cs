@@ -25,6 +25,30 @@ namespace MGUI.Core.UI.XAML
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element) => base.ApplyDerivedSettings(Parent, Element);
     }
 
+    public class XAMLHeaderedContentPresenter : XAMLSingleContentHost
+    {
+        public XAMLElement HeaderContent { get; set; }
+        public XAMLElement Header { get => HeaderContent; set => HeaderContent = value; }
+
+        public Dock? HeaderPosition { get; set; }
+        public int? Spacing { get; set; }
+
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGHeaderedContentPresenter(Window, null, null);
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        {
+            MGHeaderedContentPresenter ContentPresenter = Element as MGHeaderedContentPresenter;
+
+            if (HeaderContent != null)
+                ContentPresenter.HeaderContent = HeaderContent.ToElement<MGElement>(ContentPresenter.ParentWindow, ContentPresenter);
+            if (HeaderPosition.HasValue)
+                ContentPresenter.HeaderPosition = HeaderPosition.Value;
+            if (Spacing.HasValue)
+                ContentPresenter.Spacing = Spacing.Value;
+
+            base.ApplyDerivedSettings(Parent, Element);
+        }
+    }
+
     public class XAMLBorder : XAMLSingleContentHost
     {
         //public static readonly DependencyProperty BorderThicknessProperty = DependencyProperty.RegisterAttached(nameof(BorderThickness), typeof(XAMLThickness?), typeof(XAMLBorder));
