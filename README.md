@@ -43,7 +43,7 @@ Most of the controls have similar names to what you would expect from WPF, excep
   - MGTextBox
   - MGTimer
   
-# Multi-Platform?
+# Multi-Platform
 
 MGUI.Core targets `net6.0-windows` by default. If you wish to use MGUI on another OS, open `MGUI\MGUI.Core\MGUI.Core.csproj` and change `<TargetFramework>net6.0-windows</TargetFramework>` to `<TargetFramework>net6.0</TargetFramework>`. XAML parsing is only available if targeting `net6.0-windows` with `<UseWPF>True</UseWPF>`.
 
@@ -145,10 +145,9 @@ public class Game1 : Game, IObservableUpdate
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        PreviewUpdate?.Invoke(this, gameTime.ElapsedGameTime);
+        PreviewUpdate?.Invoke(this, gameTime.TotalGameTime);
 
         Desktop.Update();
-        
         // TODO: Add your update logic here
 
         base.Update(gameTime);
@@ -161,7 +160,6 @@ public class Game1 : Game, IObservableUpdate
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         // TODO: Add your drawing code here
-
         Desktop.Draw();
 
         base.Draw(gameTime);
