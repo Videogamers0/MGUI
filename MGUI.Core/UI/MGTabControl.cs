@@ -17,6 +17,24 @@ namespace MGUI.Core.UI
 {
     public class MGTabControl : MGSingleContentHost
     {
+        protected override void SetContentVirtual(MGElement Value)
+        {
+            if (_Content != Value)
+            {
+                if (!CanChangeContent)
+                    throw new InvalidOperationException($"Cannot set {nameof(MGSingleContentHost)}.{nameof(Content)} while {nameof(CanChangeContent)} is false.");
+
+                //_Content?.SetParent(null);
+                //InvokeContentRemoved(_Content);
+                _Content = Value;
+                //_Content?.SetParent(this);
+                LayoutChanged(this, true);
+                //InvokeContentAdded(_Content);
+            }
+        }
+
+        public override IEnumerable<MGElement> GetVisualTreeChildren() => _Tabs;
+
         #region Border
         /// <summary>Provides direct access to this element's border.</summary>
         public MGComponent<MGBorder> BorderComponent { get; }
@@ -127,6 +145,18 @@ namespace MGUI.Core.UI
         private ObservableCollection<MGTabItem> _Tabs { get; }
         public IReadOnlyList<MGTabItem> Tabs => _Tabs;
 
+        public void RemoveTab(MGTabItem Tab)
+        {
+            if (_Tabs.Contains(Tab))
+            {
+                if (Tab.IsTabSelected && _Tabs.Count > 1)
+                    _Tabs.First(x => x != Tab).IsTabSelected = true;
+
+                _Tabs.Remove(Tab);
+                InvokeContentRemoved(Tab);
+            }
+        }
+
         public MGTabItem AddTab(string TabHeader, MGElement TabContent)
             => AddTab(new MGTextBlock(ParentWindow, TabHeader), TabContent);
 
@@ -139,6 +169,7 @@ namespace MGUI.Core.UI
             ActualTabHeaders.Add(Tab, HeaderWrapper);
 
             _Tabs.Add(Tab);
+            InvokeContentAdded(Tab);
 
             ManagedAddHeadersPanelChild(HeaderWrapper);
 
@@ -360,6 +391,7 @@ namespace MGUI.Core.UI
                 this.TabControl = TabControl;
                 this.HeaderContent = HeaderContent;
                 SetContent(TabContent);
+                SetParent(TabControl);
             }
         }
 

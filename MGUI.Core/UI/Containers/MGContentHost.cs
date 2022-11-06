@@ -115,7 +115,7 @@ namespace MGUI.Core.UI.Containers
 
         protected override void UpdateContents(ElementUpdateArgs UA)
         {
-            foreach (MGElement Child in GetChildren().ToList())
+            foreach (MGElement Child in GetVisualTreeChildren().ToList())
                 Child.Update(UA);
         }
 
@@ -176,24 +176,22 @@ namespace MGUI.Core.UI.Containers
     public abstract class MGSingleContentHost : MGContentHost
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private MGElement _Content;
-        public MGElement Content
-        {
-            get => _Content;
-            protected set
-            {
-                if (_Content != value)
-                {
-                    if (!CanChangeContent)
-                        throw new InvalidOperationException($"Cannot set {nameof(MGSingleContentHost)}.{nameof(Content)} while {nameof(CanChangeContent)} is false.");
+        protected MGElement _Content;
+        public MGElement Content { get => _Content; }
 
-                    _Content?.SetParent(null);
-                    InvokeContentRemoved(_Content);
-                    _Content = value;
-                    _Content?.SetParent(this);
-                    LayoutChanged(this, true);
-                    InvokeContentAdded(_Content);
-                }
+        protected virtual void SetContentVirtual(MGElement Value)
+        {
+            if (_Content != Value)
+            {
+                if (!CanChangeContent)
+                    throw new InvalidOperationException($"Cannot set {nameof(MGSingleContentHost)}.{nameof(Content)} while {nameof(CanChangeContent)} is false.");
+
+                _Content?.SetParent(null);
+                InvokeContentRemoved(_Content);
+                _Content = Value;
+                _Content?.SetParent(this);
+                LayoutChanged(this, true);
+                InvokeContentAdded(_Content);
             }
         }
 
@@ -206,7 +204,7 @@ namespace MGUI.Core.UI.Containers
         public THostType SetContent<THostType>(MGElement Content)
             where THostType : MGSingleContentHost
         {
-            this.Content = Content;
+            SetContentVirtual(Content);
             return this as THostType;
         }
 

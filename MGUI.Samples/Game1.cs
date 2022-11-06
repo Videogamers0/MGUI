@@ -103,47 +103,48 @@ namespace MGUI.Samples
             <GridSplitter GridRow=""0"" GridColumn=""1"" />
         </Grid>-->
 
-<TabControl Dock=""Bottom"">
-    <TabItem>
-        <TabItem.Header>
-            <StackPanel Orientation=""Horizontal"">
-                <Rectangle Width=""16"" Height=""16"" Fill=""LightBlue"" />
-                <Spacer Width=""5"" />
-                <TextBlock Text=""Tab #1"" />
-            </StackPanel>
-        </TabItem.Header>
+        <TabControl Dock=""Bottom"">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation=""Horizontal"">
+                        <Rectangle Width=""16"" Height=""16"" Fill=""LightBlue"" />
+                        <Spacer Width=""5"" />
+                        <TextBlock Text=""Tab #1"" />
+                    </StackPanel>
+                </TabItem.Header>
 
-        <DockPanel>
-            <StackPanel Orientation=""Vertical"" Dock=""Top"">
-                <CheckBox Content=""CheckBox #1"" />
-                <RadioButton Content=""RadioButton #1"" />
-            </StackPanel>
-        </DockPanel>
-    </TabItem>
-    <TabItem Header=""Tab #2"">
-        <ScrollViewer Dock=""Top"">
-            <StackPanel Orientation=""Vertical"">
-                <Button Content=""Hello World"" />
-                <ComboBox Name=""CB"" />
-                <ProgressBar Name=""TestProgressBar"">
-                    <ProgressBar.ContextMenu>
-                        <ContextMenu Name=""CM1"">
-                            <ContextMenuButton Name=""CMB1"" Content=""ABC"" />
-                            <ContextMenuButton>
-                                <ContextMenuButton.Submenu>
-                                    <ContextMenu>
-                                        <ContextMenuToggle Content=""Toggle Me"" />
-                                    </ContextMenu>
-                                </ContextMenuButton.Submenu>
-                                <Rectangle Width=""16"" VA=""Stretch"" Fill=""Blue"" />
-                            </ContextMenuButton>
-                        </ContextMenu>
-                    </ProgressBar.ContextMenu>
-                </ProgressBar>
-            </StackPanel>
-        </ScrollViewer>
-    </TabItem>
-</TabControl>
+                <DockPanel>
+                    <StackPanel Orientation=""Vertical"" Dock=""Top"">
+                        <CheckBox Content=""CheckBox #1"" />
+                        <RadioButton Content=""RadioButton #1"" />
+                    </StackPanel>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header=""Tab #2"" Name=""Tab#2"">
+                <ScrollViewer Dock=""Top"">
+                    <StackPanel Orientation=""Vertical"">
+                        <Button Content=""Hello World"" />
+                        <ComboBox Name=""CB"" />
+                        <ProgressBar Name=""TestProgressBar"">
+                            <ProgressBar.ContextMenu>
+                                <ContextMenu Name=""CM1"">
+                                    <ContextMenuButton Name=""CMB1"" Content=""ABC"" />
+                                    <ContextMenuButton>
+                                        <ContextMenuButton.Submenu>
+                                            <ContextMenu>
+                                                <ContextMenuToggle Content=""Toggle Me"" />
+                                            </ContextMenu>
+                                        </ContextMenuButton.Submenu>
+                                        <Rectangle Width=""16"" VA=""Stretch"" Fill=""Blue"" />
+                                    </ContextMenuButton>
+                                </ContextMenu>
+                            </ProgressBar.ContextMenu>
+                        </ProgressBar>
+                        <Stopwatch IsRunning=""true"" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
 
         <Grid Name=""TestGrid"" RowLengths=""100[50,],16,*[80,]"" ColumnLengths=""1*[50,150],16,1.5*[50,60],1.2*"">
             <TextBlock BG=""Red"" GridRow=""0"" GridColumn=""0"" />
@@ -218,7 +219,7 @@ namespace MGUI.Samples
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            PreviewUpdate?.Invoke(this, gameTime.ElapsedGameTime);
+            PreviewUpdate?.Invoke(this, gameTime.TotalGameTime);
 
             Desktop.Update();
 

@@ -58,7 +58,7 @@ namespace MGUI.Core.UI.XAML
             { "Slider", nameof(XAMLSlider) },
             { "Spacer", nameof(XAMLSpacer) },
             { "Spoiler", nameof(XAMLSpoiler) },
-            { "StopWatch", nameof(XAMLStopWatch) },
+            { "Stopwatch", nameof(XAMLStopwatch) },
             { "TabControl", nameof(XAMLTabControl) },
             { "TabItem", nameof(XAMLTabItem) },
             { "TextBlock", nameof(XAMLTextBlock) },

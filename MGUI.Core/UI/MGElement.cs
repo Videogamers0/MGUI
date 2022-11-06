@@ -79,9 +79,6 @@ namespace MGUI.Core.UI
     }
 
     //TODO
-    //fix bug where elements in de-selected tabitems aren't visible in visual tree, and cannot be referenced via mgwindow.elementsbyname
-    //      tabcontrol probably needs to override the mgcontenthost logic that invokes content added/removed
-    //      will invoke added when a tab is added. invoke removed when tab removed. dont invoke when setting mgsinglecontenthost.content
     //UniformGrid?
     //StaticGrid - user specifies # of rows and columns, and the size of each cell
     //      also things like gridline size, spacing, gridline brush, cell background brush
@@ -1321,10 +1318,12 @@ namespace MGUI.Core.UI
         //  More info: https://stackoverflow.com/questions/42271087/how-to-call-a-base-method-that-is-declared-as-abstract-override
         protected virtual Thickness UpdateContentMeasurement(Size AvailableSize) => UpdateContentMeasurementBaseImplementation(AvailableSize);
 		protected Thickness UpdateContentMeasurementBaseImplementation(Size AvailableSize) => new(0);
-#endregion Measure
-#endregion Layout
+        #endregion Measure
+        #endregion Layout
 
-#region Visual Tree
+        #region Visual Tree
+        public virtual IEnumerable<MGElement> GetVisualTreeChildren() => GetChildren();
+
         public enum TreeTraversalMode
         {
             /// <summary>Visits the root node, then visits its children</summary>
@@ -1383,7 +1382,7 @@ namespace MGUI.Core.UI
 				}
             }
 
-            foreach (MGElement Child in this.GetChildren())
+            foreach (MGElement Child in GetVisualTreeChildren())
 			{
 				foreach (T Item in Child.TraverseVisualTree<T>(true, IncludeComponents, TraversalMode))
 					yield return Item;

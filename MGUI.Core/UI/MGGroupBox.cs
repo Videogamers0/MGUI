@@ -17,6 +17,14 @@ namespace MGUI.Core.UI
 {
     public class MGGroupBox : MGSingleContentHost
     {
+        public override IEnumerable<MGElement> GetVisualTreeChildren()
+        {
+            foreach (MGElement Child in base.GetVisualTreeChildren())
+                yield return Child;
+            if (HeaderContent != null)
+                yield return HeaderContent;
+        }
+
         #region Border
         private MGBorder BorderComponent { get; }
 

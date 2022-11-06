@@ -725,7 +725,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLStopWatch : XAMLElement
+    public class XAMLStopwatch : XAMLElement
     {
         public XAMLBorder Border { get; set; } = new();
 

@@ -773,7 +773,6 @@ namespace MGUI.Core.UI
 
             e.ContextMenuChanged += Element_ContextMenuChanged;
             e.OnNameChanged += Element_NameChanged;
-
         }
 
         private void Element_Removed(object sender, MGElement e)
