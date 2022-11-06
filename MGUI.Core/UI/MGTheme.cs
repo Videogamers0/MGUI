@@ -72,6 +72,9 @@ namespace MGUI.Core.UI
         /// <summary>The default background brush to use on items in an <see cref="MGComboBox{TItemType}"/>'s dropdown.</summary>
         public ThemeManagedVisualStateFillBrush ComboBoxDropdownItemBackground { get; }
 
+        /// <summary>The default value to use for <see cref="MGCheckBox.CheckMarkColor"/></summary>
+        public Color CheckMarkColor { get; set; }
+
         public Color DropdownArrowColor { get; set; }
 
         public ThemeManagedVisualStateFillBrush GridSplitterForeground { get; }
@@ -80,6 +83,8 @@ namespace MGUI.Core.UI
         public ThemeManagedVisualStateFillBrush ProgressBarIncompleteBrush { get; }
 
         public ThemeManagedVisualStateColorBrush RadioButtonBubbleBackground { get; set; }
+        /// <summary>The default value to use for <see cref="MGRadioButton.BubbleCheckedColor"/></summary>
+        public Color RadioButtonCheckedFillColor { get; set; }
 
         public ThemeManagedVisualStateColorBrush ResizeGripForeground { get; }
 
@@ -287,12 +292,14 @@ namespace MGUI.Core.UI
                             Color.White * 0.01f, PressedModifierType.Darken, 0f)
                     );
 
+                this.CheckMarkColor = Color.Black;
                 this.RadioButtonBubbleBackground =
                     new ThemeManagedVisualStateColorBrush(
                         new VisualStateColorBrush(
                             PrimaryColor,
                             Color.White * 0.12f, PressedModifierType.Darken, 0.06f)
                     );
+                this.RadioButtonCheckedFillColor = CheckMarkColor;
 
                 this.ResizeGripForeground =
                     new ThemeManagedVisualStateColorBrush(
@@ -493,12 +500,14 @@ namespace MGUI.Core.UI
                             Color.White * 0.01f, PressedModifierType.Darken, 0f)
                     );
 
+                this.CheckMarkColor = Color.Green;
                 this.RadioButtonBubbleBackground =
                     new ThemeManagedVisualStateColorBrush(
                         new VisualStateColorBrush(
                             PrimaryColor,
                             Color.White * 0.18f, PressedModifierType.Darken, 0.06f)
                     );
+                this.RadioButtonCheckedFillColor = CheckMarkColor;
 
                 this.ResizeGripForeground =
                     new ThemeManagedVisualStateColorBrush(

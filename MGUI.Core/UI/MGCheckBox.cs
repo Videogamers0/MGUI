@@ -52,7 +52,9 @@ namespace MGUI.Core.UI
             set => ButtonElement.Margin = new(ButtonElement.Margin.Left, ButtonElement.Margin.Top, value, ButtonElement.Margin.Bottom);
         }
 
-        /// <summary>The <see cref="Color"/> to use when stroking the check mark if <see cref="IsChecked"/> is true.</summary>
+        /// <summary>The <see cref="Color"/> to use when stroking the check mark if <see cref="IsChecked"/> is true.<para/>
+        /// Default value: <see cref="MGTheme.CheckMarkColor"/><para/>
+        /// See also: <see cref="MGDesktop.Theme"/></summary>
         public Color CheckMarkColor { get; set; }
 
         private bool _IsThreeState;
@@ -136,7 +138,7 @@ namespace MGUI.Core.UI
 
                 this.CheckBoxComponentSize = DefaultCheckBoxSize;
                 this.SpacingWidth = DefaultCheckBoxSpacingWidth;
-                this.CheckMarkColor = Color.Green;
+                this.CheckMarkColor = GetTheme().CheckMarkColor;
 
                 this.IsThreeState = !IsChecked.HasValue;
                 this.IsChecked = IsChecked;

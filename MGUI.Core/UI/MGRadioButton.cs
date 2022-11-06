@@ -136,7 +136,9 @@ namespace MGUI.Core.UI
         /// <summary>The background to use when drawing the checkable part.</summary>
         public VisualStateColorBrush BubbleComponentBackground { get; set; }
 
-        /// <summary>The <see cref="Color"/> to use when filling in the checkable bubble part when <see cref="IsChecked"/> is true.</summary>
+        /// <summary>The <see cref="Color"/> to use when filling in the checkable bubble part when <see cref="IsChecked"/> is true.<para/>
+        /// Default value: <see cref="MGTheme.RadioButtonCheckedFillColor"/><para/>
+        /// See also: <see cref="MGDesktop.Theme"/></summary>
         public Color BubbleCheckedColor { get; set; }
 
         /// <summary>The reserved empty width between the checkable part of this <see cref="MGRadioButton"/> and its <see cref="MGSingleContentHost.Content"/>.<para/>
@@ -197,7 +199,7 @@ namespace MGUI.Core.UI
                 this.BubbleComponentBorderColor = Color.Black;
                 this.BubbleComponentBorderThickness = 1;
                 this.BubbleComponentBackground = GetTheme().RadioButtonBubbleBackground.GetValue(true);
-                this.BubbleCheckedColor = Color.Green;
+                this.BubbleCheckedColor = GetTheme().RadioButtonCheckedFillColor;
 
                 this.SpacingWidth = DefaultBubbleSpacingWidth;
             }

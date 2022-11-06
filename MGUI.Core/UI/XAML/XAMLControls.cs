@@ -805,9 +805,7 @@ namespace MGUI.Core.UI.XAML
 
             foreach (XAMLTabItem Child in Tabs)
             {
-                MGElement Header = Child.HeaderContent?.ToElement<MGElement>(TabControl.ParentWindow, TabControl);
-                MGElement Content = Child.Content?.ToElement<MGElement>(TabControl.ParentWindow, TabControl);
-                TabControl.AddTab(Header, Content);
+                _ = Child.ToElement<MGTabItem>(TabControl.ParentWindow, TabControl);
             }
         }
     }
@@ -815,6 +813,12 @@ namespace MGUI.Core.UI.XAML
     public class XAMLTabItem : XAMLSingleContentHost
     {
         public XAMLElement HeaderContent { get; set; }
+        public XAMLElement Header
+        {
+            get => HeaderContent;
+            set => HeaderContent = value;
+        }
+
         public bool? IsTabSelected { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -833,8 +837,6 @@ namespace MGUI.Core.UI.XAML
         {
             MGTabItem TabItem = Element as MGTabItem;
 
-            //if (HeaderContent != null) // This is already handled in CreateElementInstance
-            //    TabItem.HeaderContent = HeaderContent.ToElement<MGElement>(Element.SelfOrParentWindow, null);
             if (IsTabSelected.HasValue)
                 TabItem.IsTabSelected = IsTabSelected.Value;
 

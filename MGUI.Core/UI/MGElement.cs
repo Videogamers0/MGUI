@@ -79,6 +79,9 @@ namespace MGUI.Core.UI
     }
 
     //TODO
+    //fix bug where elements in de-selected tabitems aren't visible in visual tree, and cannot be referenced via mgwindow.elementsbyname
+    //      tabcontrol probably needs to override the mgcontenthost logic that invokes content added/removed
+    //      will invoke added when a tab is added. invoke removed when tab removed. dont invoke when setting mgsinglecontenthost.content
     //UniformGrid?
     //StaticGrid - user specifies # of rows and columns, and the size of each cell
     //      also things like gridline size, spacing, gridline brush, cell background brush

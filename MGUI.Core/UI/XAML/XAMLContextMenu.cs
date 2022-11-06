@@ -59,7 +59,7 @@ namespace MGUI.Core.UI.XAML
 
             foreach (XAMLContextMenuItem Item in Items)
             {
-                MGContextMenuItem CMI = Item.ToElement<MGContextMenuItem>(Element.SelfOrParentWindow, ContextMenu);
+                _ = Item.ToElement<MGContextMenuItem>(Element.SelfOrParentWindow, ContextMenu);
             }
 
             base.ApplyDerivedSettings(Parent, Element);
