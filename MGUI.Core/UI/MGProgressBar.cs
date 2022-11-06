@@ -77,7 +77,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _ValueDisplayFormat;
-        /// <summary>Only relevant if <see cref="ShowValue"/>==true.<para/>
+        /// <summary>Only relevant if <see cref="ShowValue"/> is true.<para/>
         /// A format string to use when computing the text to display.<para/>
         /// "{{Minimum}}", "{{Maximum}}", "{{Value}}", and "{{ValuePercent}}" will be replaced with their actual underlying values when formatting the string.<br/>
         /// "{{Value-Minimum}}" will be replaced with the mathematical result of: <see cref="Value"/> - <see cref="Minimum"/><br/>
@@ -99,6 +99,25 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string _NumberFormat;
+        /// <summary>Only relevant if <see cref="ShowValue"/> is true.<para/>
+        /// Determines how numeric values are formatted when computing the displayed value.<para/>
+        /// Default value: "0.0"<para/>
+        /// See also: <see href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings"/></summary>
+        public string NumberFormat
+        {
+            get => _NumberFormat;
+            set
+            {
+                if (_NumberFormat != value)
+                {
+                    _NumberFormat = value;
+                    UpdateDisplayedValue();
+                }
+            }
+        }
+
         private void UpdateDisplayedValue()
         {
             if (ShowValue)
@@ -112,12 +131,12 @@ namespace MGUI.Core.UI
                 {
                     List<(string, string)> Tokens = new()
                     {
-                        ($@"{{{{{nameof(Minimum)}}}}}", Minimum.ToString("0.##")),
-                        ($@"{{{{{nameof(Maximum)}}}}}", Maximum.ToString("0.##")),
-                        ($@"{{{{{nameof(Value)}}}}}", Value.ToString("0.##")),
-                        ($@"{{{{{nameof(ValuePercent)}}}}}", ValuePercent.ToString("0.##")),
-                        ($@"{{{{{nameof(Value)}-{nameof(Minimum)}}}}}", (Value - Minimum).ToString("0.##")),
-                        ($@"{{{{{nameof(Maximum)}-{nameof(Minimum)}}}}}", (Maximum - Minimum).ToString("0.##")),
+                        ($@"{{{{{nameof(Minimum)}}}}}", Minimum.ToString(NumberFormat)),
+                        ($@"{{{{{nameof(Maximum)}}}}}", Maximum.ToString(NumberFormat)),
+                        ($@"{{{{{nameof(Value)}}}}}", Value.ToString(NumberFormat)),
+                        ($@"{{{{{nameof(ValuePercent)}}}}}", ValuePercent.ToString(NumberFormat)),
+                        ($@"{{{{{nameof(Value)}-{nameof(Minimum)}}}}}", (Value - Minimum).ToString(NumberFormat)),
+                        ($@"{{{{{nameof(Maximum)}-{nameof(Minimum)}}}}}", (Maximum - Minimum).ToString(NumberFormat)),
                     };
 
                     FormattedValue = ValueDisplayFormat;
@@ -246,6 +265,8 @@ namespace MGUI.Core.UI
                 this.BorderElement = new(Window);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
+
+                this.NumberFormat = "0.0";
 
                 this.ValueElement = new(Window, "", Color.White, 12);
                 this.ValueComponent = new(ValueElement, ComponentUpdatePriority.AfterContents, ComponentDrawPriority.BeforeContents,

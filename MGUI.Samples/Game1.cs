@@ -124,8 +124,9 @@ namespace MGUI.Samples
                 <ScrollViewer Dock=""Top"">
                     <StackPanel Orientation=""Vertical"">
                         <Button Content=""Hello World"" />
+                        <Slider UseDiscreteValues=""true"" DiscreteValueInterval=""5"" TickFrequency=""20"" DrawTicks=""true"" />
                         <ComboBox Name=""CB"" />
-                        <ProgressBar Name=""TestProgressBar"">
+                        <ProgressBar Name=""TestProgressBar"" ShowValue=""true"">
                             <ProgressBar.ContextMenu>
                                 <ContextMenu Name=""CM1"">
                                     <ContextMenuButton Name=""CMB1"" Content=""ABC"" />
@@ -191,9 +192,12 @@ namespace MGUI.Samples
             {
                 MGProgressBarGradientBrush Brush = new(TestProgressBar);
                 //TestProgressBar.CompletedBrush.NormalValue = Brush;
+                int Counter = 0;
                 TestProgressBar.OnEndUpdate += (sender, e) =>
                 {
-                    TestProgressBar.Value = (TestProgressBar.Value - 0.25f + TestProgressBar.Maximum) % TestProgressBar.Maximum;
+                    if (Counter % 6 == 0)
+                        TestProgressBar.Value = (TestProgressBar.Value + 0.5f + TestProgressBar.Maximum) % TestProgressBar.Maximum;
+                    Counter++;
                 };
             }
 
@@ -221,7 +225,6 @@ namespace MGUI.Samples
             {
                 List<string> Items = Enumerable.Range(0, 26).Select(x => ((char)(x + 'a')).ToString()).ToList();
                 TestComboBox.SetItemsSource(Items);
-                TestComboBox.Margin = new(10, 30, 0, 0);
             }
 
             base.Initialize();
