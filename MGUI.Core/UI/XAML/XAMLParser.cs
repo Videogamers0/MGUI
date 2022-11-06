@@ -72,6 +72,7 @@ namespace MGUI.Core.UI.XAML
             { "ColumnDefinition", nameof(XAMLColumnDefinition) },
             { "GridSplitter", nameof(XAMLGridSplitter) },
             { "Grid", nameof(XAMLGrid) },
+            { "StaticGrid", nameof(XAMLStaticGrid) },
             { "DockPanel", nameof(XAMLDockPanel) },
             { "StackPanel", nameof(XAMLStackPanel) },
             { "OverlayPanel", nameof(XAMLOverlayPanel) }

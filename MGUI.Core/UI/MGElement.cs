@@ -79,11 +79,11 @@ namespace MGUI.Core.UI
     }
 
     //TODO
-    //UniformGrid?
-    //StaticGrid - user specifies # of rows and columns, and the size of each cell
-    //      also things like gridline size, spacing, gridline brush, cell background brush
-    //      then there's things like Action<GridCell> RenderCell, event CellEntered, CellExited, CellLeftCLicked, CellRightClicked, CellDragStart etc
-    //      CellSize, int? RowHeaderHeight (default=null, if not null, overrides CellSize.Height for the first row). int? ColumnHeaderWidth
+    //Fix bug drawing gridlines in MGGrid when the grid doesn't span entire layout bounds
+    //      make a grid that doesnt have any weighted rows/columns and place it in a window that is bigger than the grids content
+    //      the gridlines should be incorrect because they're using layoutbounds for the total length of each line instead of the size of the content
+    //      refer to mgstaticgrid's gridline logic
+    //      also probably need to accoutn for padding in mggrid when computing the cell bounds
     //listbox, statusbar, menubar/menuitems, popup?
     //      messagebox
     //          has icon docked left

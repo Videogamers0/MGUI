@@ -12,9 +12,9 @@ namespace MGUI.Core.UI
         StackPanel,
         DockPanel,
         Grid,
-        UniformGrid,
+        StaticGrid,
         OverlayPanel,
-        //WrapPanel
+        //WrapPanel?
 
         //  Layout
         ScrollViewer,
@@ -33,7 +33,7 @@ namespace MGUI.Core.UI
         //  Buttons and Selection
         Button,
         ToggleButton,
-        //RepeatButton
+        //RepeatButton?
         CheckBox,
         RadioButton,
         ComboBox,
@@ -44,13 +44,12 @@ namespace MGUI.Core.UI
         ToolTip,
         ContextMenu,
         ContextMenuItem,
-        //MenuBar
-        //MenuItem
-        //Popup
+        //MenuBar?
+        //MenuItem?
 
         //  Data Display
         ListView,
-        //TreeView
+        //TreeView?
 
         //  User Info
         ProgressBar,
@@ -58,7 +57,7 @@ namespace MGUI.Core.UI
         Spoiler,
         Timer,
         Stopwatch,
-        //StatusBar
+        //StatusBar?
 
         //  Input
         TextBox,

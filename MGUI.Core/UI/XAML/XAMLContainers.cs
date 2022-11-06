@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MGUI.Core.UI.Brushes.Border_Brushes;
+using MonoGame.Extended;
 
 #if UseWPF
 using System.Windows.Markup;
@@ -157,6 +158,72 @@ namespace MGUI.Core.UI.XAML
                 MGElement ChildElement = Child.ToElement<MGElement>(Grid.SelfOrParentWindow, Grid);
                 Grid.TryAddChild(Child.GridRow, Child.GridColumn, new GridSpan(Child.GridRowSpan, Child.GridColumnSpan, Child.GridAffectsMeasure), ChildElement);
             }
+        }
+    }
+
+    public class XAMLStaticGrid : XAMLElement
+    {
+        public int? Rows { get; set; }
+        public int? Columns { get; set; }
+        public XAMLSize? CellSize { get; set; }
+        public int? HeaderRowHeight { get; set; }
+        public int? HeaderColumnWidth { get; set; }
+
+        public GridSelectionMode? SelectionMode { get; set; }
+        public bool? CanDeselectByClickingSelectedCell { get; set; }
+        public XAMLFillBrush SelectionBackground { get; set; }
+        public XAMLFillBrush SelectionOverlay { get; set; }
+
+        public GridLineIntersection? GridLineIntersectionHandling { get; set; }
+        public GridLinesVisibility? GridLinesVisibility { get; set; }
+        public int? GridLineMargin { get; set; }
+        public XAMLFillBrush HorizontalGridLineBrush { get; set; }
+        public XAMLFillBrush VerticalGridLineBrush { get; set; }
+
+        public int? RowSpacing { get; set; }
+        public int? ColumnSpacing { get; set; }
+
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGStaticGrid(Window, Rows ?? 0, Columns ?? 0, CellSize?.ToSize() ?? Size.Empty);
+
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        {
+            MGStaticGrid StaticGrid = Element as MGStaticGrid;
+
+            if (Rows.HasValue)
+                StaticGrid.Rows = Rows.Value;
+            if (Columns.HasValue)
+                StaticGrid.Columns = Columns.Value;
+            if (CellSize.HasValue)
+                StaticGrid.CellSize = CellSize.Value.ToSize();
+            if (HeaderRowHeight.HasValue)
+                StaticGrid.HeaderRowHeight = HeaderRowHeight.Value;
+            if (HeaderColumnWidth.HasValue)
+                StaticGrid.HeaderColumnWidth = HeaderColumnWidth.Value;
+
+            if (SelectionMode.HasValue)
+                StaticGrid.SelectionMode = SelectionMode.Value;
+            if (CanDeselectByClickingSelectedCell.HasValue)
+                StaticGrid.CanDeselectByClickingSelectedCell = CanDeselectByClickingSelectedCell.Value;
+            if (SelectionBackground != null)
+                StaticGrid.SelectionBackground = SelectionBackground.ToFillBrush();
+            if (SelectionOverlay != null)
+                StaticGrid.SelectionOverlay = SelectionOverlay.ToFillBrush();
+
+            if (GridLineIntersectionHandling.HasValue)
+                StaticGrid.GridLineIntersectionHandling = GridLineIntersectionHandling.Value;
+            if (GridLinesVisibility.HasValue)
+                StaticGrid.GridLinesVisibility = GridLinesVisibility.Value;
+            if (GridLineMargin.HasValue)
+                StaticGrid.GridLineMargin = GridLineMargin.Value;
+            if (HorizontalGridLineBrush != null)
+                StaticGrid.HorizontalGridLineBrush = HorizontalGridLineBrush.ToFillBrush();
+            if (VerticalGridLineBrush != null)
+                StaticGrid.VerticalGridLineBrush = VerticalGridLineBrush.ToFillBrush();
+
+            if (RowSpacing.HasValue)
+                StaticGrid.RowSpacing = RowSpacing.Value;
+            if (ColumnSpacing.HasValue)
+                StaticGrid.ColumnSpacing = ColumnSpacing.Value;
         }
     }
 

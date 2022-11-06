@@ -156,7 +156,10 @@ namespace MGUI.Samples
             </TabItem>
         </TabControl>
 
-        <Grid Name=""TestGrid"" RowLengths=""100[50,],16,*[80,]"" ColumnLengths=""1*[50,150],16,1.5*[50,60],1.2*"">
+        <StaticGrid Rows=""6"" Columns=""4"" CellSize=""32,40"" HeaderRowHeight=""20"" HeaderColumnWidth=""16"" GridLinesVisibility=""All""
+                    HorizontalGridLineBrush = ""Red"" VerticalGridLineBrush=""Green"" RowSpacing=""5"" ColumnSpacing=""8"" GridLineMargin=""2"" SelectionMode=""Cell"" />
+
+        <!--<Grid Name=""TestGrid"" RowLengths=""100[50,],16,*[80,]"" ColumnLengths=""1*[50,150],16,1.5*[50,60],1.2*"">
             <TextBlock BG=""Red"" GridRow=""0"" GridColumn=""0"" />
             <TextBlock BG=""Yellow"" GridRow=""2"" GridColumn=""2"" />
             <TextBlock BG=""Purple"" GridRow=""0"" GridColumn=""3"" />
@@ -168,8 +171,7 @@ namespace MGUI.Samples
             <GridSplitter GridRow=""1"" GridColumn=""0"" GridColumnSpan=""4"" />
 
             <TextBox GridRow=""2"" GridColumn=""3"" />
-            <!--<ToggleButton GridRow=""2"" GridColumn=""3"" Content=""Hello\nWorld"" CheckedTextForeground=""Red"" />-->
-        </Grid>
+        </Grid>-->
     </DockPanel>
 </Window>
             ";

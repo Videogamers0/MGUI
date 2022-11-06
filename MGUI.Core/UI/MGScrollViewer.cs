@@ -327,7 +327,7 @@ namespace MGUI.Core.UI
 
                 //  Pre-emptively handle mouse release events if user was dragging a scrollbar
                 //  so that the child content doesn't also react to the mouse release
-                OnBeginUpdateContents += (sender, e) =>
+                OnBeginUpdateContents += (sender, e) => // TODO should probably apply similar logic to anything that handles dragging, such as MGSlider
                 {
                     if (IsDraggingVSB || IsDraggingHSB)
                     {

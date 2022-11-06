@@ -633,6 +633,7 @@ namespace MGUI.Core.UI.Containers.Grids
         public IFillBrush SelectionOverlay { get; set; } = new MGSolidFillBrush(Color.Yellow * 0.25f);
         #endregion Selection
 
+        #region GridLines
         /// <summary>Default value: <see cref="GridLineIntersection.HorizontalThenVertical"/></summary>
         public GridLineIntersection GridLineIntersectionHandling { get; set; }
 
@@ -670,6 +671,10 @@ namespace MGUI.Core.UI.Containers.Grids
                 }
             }
         }
+
+        public IFillBrush HorizontalGridLineBrush { get; set; }
+        public IFillBrush VerticalGridLineBrush { get; set; }
+        #endregion GridLines
 
         private void CheckIfOuterPaddingChanged()
         {
@@ -720,9 +725,6 @@ namespace MGUI.Core.UI.Containers.Grids
                 }
             }
         }
-
-        public IFillBrush HorizontalGridLineBrush { get; set; }
-        public IFillBrush VerticalGridLineBrush { get; set; }
 
         public MGGrid(MGWindow Window)
             : base(Window, MGElementType.Grid)

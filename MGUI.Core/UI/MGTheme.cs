@@ -149,9 +149,9 @@ namespace MGUI.Core.UI
                 MGElementType.Spacer,
                 MGElementType.Spoiler,
                 MGElementType.StackPanel,
+                MGElementType.StaticGrid,
                 MGElementType.TabItem,
-                MGElementType.TextBlock,
-                MGElementType.UniformGrid
+                MGElementType.TextBlock
             };
             foreach (MGElementType Type in TypesWithoutBackgrounds)
             {

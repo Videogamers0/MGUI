@@ -316,6 +316,7 @@ namespace MGUI.Core.UI.XAML
         public XAMLTextBlock ValueTextBlock { get; set; } = new();
         public bool? ShowValue { get; set; }
         public string ValueDisplayFormat { get; set; }
+        public string NumberFormat { get; set; }
 
         public float? Minimum { get; set; }
         public float? Maximum { get; set; }
@@ -341,6 +342,8 @@ namespace MGUI.Core.UI.XAML
                 ProgressBar.ShowValue = ShowValue.Value;
             if (ValueDisplayFormat != null)
                 ProgressBar.ValueDisplayFormat = ValueDisplayFormat;
+            if (NumberFormat != null)
+                ProgressBar.NumberFormat = NumberFormat;
 
             if (Minimum.HasValue)
                 ProgressBar.Minimum = Minimum.Value;
