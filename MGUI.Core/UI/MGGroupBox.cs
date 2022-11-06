@@ -56,9 +56,17 @@ namespace MGUI.Core.UI
             {
                 if (_HeaderContent != value)
                 {
-                    HeaderContent?.SetParent(null);
+                    if (HeaderContent != null)
+                    {
+                        InvokeContentRemoved(HeaderContent);
+                        HeaderContent.SetParent(null);
+                    }
                     _HeaderContent = value;
-                    HeaderContent?.SetParent(this);
+                    if (HeaderContent != null)
+                    {
+                        HeaderContent.SetParent(this);
+                        InvokeContentAdded(HeaderContent);
+                    }
                     LayoutChanged(this, true);
                 }
             }
@@ -124,15 +132,6 @@ namespace MGUI.Core.UI
                     }
                 };
             }
-        }
-
-        public override IEnumerable<MGElement> GetChildren()
-        {
-            //yield return BorderComponent;
-            //if (HasHeader)
-            //    yield return HeaderContent;
-            foreach (MGElement Element in base.GetChildren())
-                yield return Element;
         }
 
         protected override void UpdateContents(ElementUpdateArgs UA)

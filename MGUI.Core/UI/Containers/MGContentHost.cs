@@ -15,6 +15,12 @@ namespace MGUI.Core.UI.Containers
     /// <summary>Represents an <see cref="MGElement"/> that is capable of hosting one or more child <see cref="MGElement"/>s as its content.</summary>
     public abstract class MGContentHost : MGElement
     {
+        protected override void AddComponent(MGComponentBase Component)
+        {
+            base.AddComponent(Component);
+            InvokeContentAdded(Component.BaseElement);
+        }
+
         public abstract override IEnumerable<MGElement> GetChildren();
         protected abstract override Thickness UpdateContentMeasurement(Size AvailableSize);
         protected abstract override void UpdateContentLayout(Rectangle Bounds);

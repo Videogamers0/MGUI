@@ -140,7 +140,16 @@ namespace MGUI.Samples
                                 </ContextMenu>
                             </ProgressBar.ContextMenu>
                         </ProgressBar>
-                        <Stopwatch IsRunning=""true"" />
+                        <GroupBox Name=""GB1"">
+                            <GroupBox.Header>
+                                <Expander Name=""GBExpander"">
+                                    <Expander.Header>
+                                        <TextBlock Text=""Expander Header"" Name=""TestHeader"" />
+                                    </Expander.Header>
+                                </Expander>
+                            </GroupBox.Header>
+                            <Stopwatch IsRunning=""true"" />
+                        </GroupBox>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -166,6 +175,17 @@ namespace MGUI.Samples
 
             MGWindow XAMLWindow = XAMLParser.LoadRootWindow(Desktop, xaml);
             this.Desktop.Windows.Add(XAMLWindow);
+
+            if (XAMLWindow.TryGetElementByName("GB1", out MGGroupBox GB))
+            {
+                if (XAMLWindow.TryGetElementByName("GBExpander", out MGExpander Expander))
+                {
+                    if (XAMLWindow.TryGetElementByName("TestHeader", out MGTextBlock TBHeader))
+                    {
+                        Expander.BindVisibility(GB.Content);
+                    }
+                }
+            }
 
             if (XAMLWindow.TryGetElementByName("TestProgressBar", out MGProgressBar TestProgressBar))
             {

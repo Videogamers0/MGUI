@@ -171,7 +171,7 @@ namespace MGUI.Core.UI
         public bool IsComponent => ComponentParent != null;
 
         protected List<MGComponentBase> Components { get; } = new();
-		protected void AddComponent(MGComponentBase Component)
+		protected virtual void AddComponent(MGComponentBase Component)
 		{
 			Component.BaseElement.SetParent(this);
             Component.BaseElement.ComponentParent = this;

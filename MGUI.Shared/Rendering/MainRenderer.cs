@@ -27,7 +27,8 @@ namespace MGUI.Shared.Rendering
 
     public interface IObservableUpdate
     {
-        /// <summary>The <see cref="TimeSpan"/> represents the total elapsed time.</summary>
+        /// <summary>The <see cref="TimeSpan"/> represents the total elapsed time.<para/>
+        /// See also: <see cref="GameTime.TotalGameTime"/></summary>
         public event EventHandler<TimeSpan> PreviewUpdate;
         public event EventHandler<EventArgs> EndUpdate;
     }
