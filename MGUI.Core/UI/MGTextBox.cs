@@ -56,6 +56,7 @@ namespace MGUI.Core.UI
         protected virtual string GetTextBackingField() => _Text;
         protected virtual void SetTextBackingField(string Value) => _Text = Value;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _Text;
         /// <summary>To set this value, use <see cref="SetText(string)"/>.<para/>
         /// If this <see cref="MGTextBox"/> is an <see cref="MGPasswordBox"/>, this value will only contain <see cref="MGPasswordBox.PasswordCharacter"/>s (and special characters such as \n).<para/>
@@ -113,6 +114,7 @@ namespace MGUI.Core.UI
         public event EventHandler<EventArgs<string>> TextChanged;
 
         #region Formmated Text
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _FormattedText;
         public string FormattedText { get => _FormattedText; }
 
@@ -169,6 +171,7 @@ namespace MGUI.Core.UI
         public MGComponent<MGTextBlock> PlaceholderTextBlockComponent { get; }
         private MGTextBlock PlaceholderTextBlockElement { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _PlaceholderText;
         /// <summary>Text to display in when <see cref="Text"/> is empty. Default value: null<para/>
         /// This value supports some basic markdown, such as:<br/>
@@ -203,6 +206,7 @@ namespace MGUI.Core.UI
             set => TextBlockElement.WrapText = value;
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int? _CharacterLimit;
         /// <summary>The maximum # of characters that can be inputted in this <see cref="MGTextBox"/>. Use null for no character limit.<para/>
         /// Some characters are automatically added to this <see cref="MGTextBox"/>,<br/>
@@ -243,6 +247,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _LimitedCharacterCountFormatString;
         /// <summary>Only relevant if <see cref="ShowCharacterCount"/>==true and <see cref="CharacterLimit"/> is not null.<para/>
         /// A format string to use when computing the character-count text displayed in the bottom-right corner of this <see cref="MGTextBox"/>.<br/>
@@ -264,6 +269,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _LimitlessCharacterCountFormatString;
         /// <summary>Only relevant if <see cref="ShowCharacterCount"/>==true and <see cref="CharacterLimit"/>==null.<para/>
         /// A format string to use when computing the character-count text displayed in the bottom-right corner of this <see cref="MGTextBox"/>.<br/>
@@ -302,6 +308,7 @@ namespace MGUI.Core.UI
         #endregion Text
 
         #region Selection
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool IsDraggingSelection { get; set; } = false;
 
         private record struct TextSelection(int Index1, int Index2)
@@ -315,6 +322,7 @@ namespace MGUI.Core.UI
             public int ActualLength(string Text) => ActualEndIndex(Text) - ActualStartIndex(Text);
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private TextSelection? _CurrentSelection;
         private TextSelection? CurrentSelection
         {
@@ -356,6 +364,7 @@ namespace MGUI.Core.UI
 
         #region Colors
         #region Focused
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Color _FocusedSelectionForegroundColor;
         /// <summary>The text foreground color of the selected text while this <see cref="MGTextBox"/> has focus.<para/>
         /// See also: <see cref="FocusedSelectionForegroundColor"/>, <see cref="FocusedSelectionBackgroundColor"/>, 
@@ -373,6 +382,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _FocusedSelectionForegroundColorString;
         private string FocusedSelectionForegroundColorString
         {
@@ -388,6 +398,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Color _FocusedSelectedBackgroundColor;
         /// <summary>The text background color of the selected text while this <see cref="MGTextBox"/> has focus.<para/>
         /// See also: <see cref="FocusedSelectionForegroundColor"/>, <see cref="FocusedSelectionBackgroundColor"/>, 
@@ -405,6 +416,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _FocusedSelectionBackgroundColorString;
         private string FocusedSelectionBackgroundColorString
         {
@@ -422,6 +434,7 @@ namespace MGUI.Core.UI
         #endregion Focused
 
         #region Unfocused
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Color _UnfocusedSelectionForegroundColor;
         /// <summary>The text foreground color of the selected text while this <see cref="MGTextBox"/> does NOT have focus.<para/>
         /// See also: <see cref="FocusedSelectionForegroundColor"/>, <see cref="FocusedSelectionBackgroundColor"/>, 
@@ -439,6 +452,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _UnfocusedSelectionForegroundColorString;
         private string UnfocusedSelectionForegroundColorString
         {
@@ -454,6 +468,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Color _UnfocusedSelectionBackgroundColor;
         /// <summary>The text background color of the selected text while this <see cref="MGTextBox"/> does NOT have focus.<para/>
         /// See also: <see cref="FocusedSelectionForegroundColor"/>, <see cref="FocusedSelectionBackgroundColor"/>, 
@@ -471,6 +486,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _UnfocusedSelectionBackgroundColorString;
         private string UnfocusedSelectionBackgroundColorString
         {
@@ -585,6 +601,7 @@ namespace MGUI.Core.UI
 
         public const int DefaultUndoRedoHistorySize = 20;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _UndoRedoHistorySize;
         /// <summary>The maximum number of undo or redo states that will be kept in memory. Decreasing this value may result in the oldest undo or redo states being lost.<para/>
         /// Default value: <see cref="DefaultUndoRedoHistorySize"/></summary>
@@ -670,6 +687,7 @@ namespace MGUI.Core.UI
         /// <summary>Attempts to set this element as the value for <see cref="MGDesktop.FocusedKeyboardHandler"/> at the end of the next update tick.</summary>
         public void RequestFocus() => GetDesktop().QueuedFocusedKeyboardHandler = this;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsReadonly;
         public bool IsReadonly
         {
@@ -735,6 +753,7 @@ namespace MGUI.Core.UI
         public MGComponent<MGResizeGrip> ResizeGripComponent { get; }
         private MGResizeGrip ResizeGripElement { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsUserResizable;
         /// <summary>If true, a <see cref="MGResizeGrip"/> will be visible in the bottom-right corner of the window, 
         /// allowing the user to click+drag it to adjust this <see cref="MGElement"/>'s <see cref="MGElement.PreferredWidth"/> / <see cref="MGElement.PreferredHeight"/></summary>

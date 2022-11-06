@@ -64,6 +64,7 @@ namespace MGUI.Core.UI
 
         public RatingItemShape ItemShape { get; set; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _ItemSize;
         /// <summary>The dimensions, in pixels, of each item in this <see cref="MGRatingControl"/>.<para/>
         /// Default value: 16<br/>
@@ -81,6 +82,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _Spacing;
         /// <summary>The spacing, in pixels, between each consecutive item.<para/>
         /// Default value: 3</summary>
@@ -98,12 +100,15 @@ namespace MGUI.Core.UI
         }
 
         #region Value
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _Minimum;
         /// <summary>The inclusive minimum that <see cref="Value"/> can be set to.<para/>
         /// To set this value, use <see cref="SetRange(float, float)"/><para/>
         /// Default value: 0<br/>
         /// Recommended value: 0, 0.5f, or 1.</summary>
         public float Minimum { get => _Minimum; }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _Maximum;
         /// <summary>The inclusive maximum that <see cref="Value"/> can be set to.<para/>
         /// To set this value, use <see cref="SetRange(float, float)"/><para/>
@@ -135,6 +140,7 @@ namespace MGUI.Core.UI
         /// <summary>Convenience property that simply returns: <see cref="Maximum"/> - <see cref="Minimum"/></summary>
         public float Interval => Maximum - Minimum;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _Value;
         /// <summary>The current value that this <see cref="MGRatingControl"/> is set to.<para/>
         /// To set this value, use <see cref="SetValue(float)"/></summary>
@@ -168,6 +174,7 @@ namespace MGUI.Core.UI
             return Result;
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _UseDiscreteValues;
         /// <summary>If true, <see cref="Value"/> will snap to the nearest multiple of the given <see cref="DiscreteValueInterval"/>.<para/>
         /// If false, <see cref="Value"/> is continuous and can be any numeric value in the inclusive range [<see cref="Minimum"/>,<see cref="Maximum"/>].</summary>
@@ -185,6 +192,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float? _DiscreteValueInterval;
         /// <summary>Only relevant if <see cref="UseDiscreteValues"/> is true. Represents the interval that <see cref="Value"/> will snap to.</summary>
         public float? DiscreteValueInterval
@@ -216,6 +224,7 @@ namespace MGUI.Core.UI
         /// Recommended to use a transparent <see cref="Color"/> so that <see cref="UnfilledShapeFillColor"/> and/or <see cref="FilledShapeFillColor"/> will still be partially visible underneath.</summary>
         public Color PreviewShapeFillColor { get; set; } = Color.LightBlue * 0.35f;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float? _PreviewValue;
         /// <summary>The value that the user's mouse cursor is hovering over, or null if not hovered (or if <see cref="IsReadonly"/> is true)</summary>
         public float? PreviewValue
@@ -229,6 +238,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsReadonly;
         /// <summary>If true, the user will be unable to modify <see cref="Value"/> via clicking or clicking+dragging within this <see cref="MGRatingControl"/>'s bounds.<para/>
         /// Default value: false</summary>

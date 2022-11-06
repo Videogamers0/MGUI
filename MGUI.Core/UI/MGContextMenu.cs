@@ -110,6 +110,7 @@ namespace MGUI.Core.UI
         public float? AutoCloseThreshold { get; set; }
         #endregion Close Conditions
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<MGButton> _ButtonWrapperTemplate;
         /// <summary>Every <see cref="MGContextMenuButton"/> and <see cref="MGContextMenuToggle"/> within <see cref="Items"/> will be automatically wrapped in an <see cref="MGButton"/> created by this function.</summary>
         public Func<MGButton> ButtonWrapperTemplate
@@ -128,6 +129,7 @@ namespace MGUI.Core.UI
         public event EventHandler<EventArgs> ButtonWrapperTemplateChanged;
 
         #region Items
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ObservableCollection<MGContextMenuItem> _Items { get; }
         public IList<MGContextMenuItem> Items => _Items;
 
@@ -164,6 +166,7 @@ namespace MGUI.Core.UI
         public MGScrollViewer ScrollViewerElement { get; }
         public MGStackPanel ItemsPanel { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Size _HeaderSize;
         /// <summary>The size of the header items that appear on the left edge of each <see cref="MGContextMenuItem"/>.<para/>
         /// For <see cref="MGContextMenuButton"/>s, this is either blank space or an icon.<br/>
@@ -186,6 +189,7 @@ namespace MGUI.Core.UI
         public event EventHandler<EventArgs<Size>> HeaderSizeChanged;
 
         #region Nested Menu
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGContextMenu _ActiveContextMenu;
         /// <summary>The currently open nested <see cref="MGContextMenu"/>.</summary>
         public MGContextMenu ActiveContextMenu { get => _ActiveContextMenu; }

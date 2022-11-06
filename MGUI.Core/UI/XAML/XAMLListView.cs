@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 #if UseWPF
 using System.Windows.Markup;
@@ -59,6 +60,8 @@ namespace MGUI.Core.UI.XAML
     {
         public XAMLListViewColumnWidth Width { get; set; }
         public XAMLElement HeaderContent { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public XAMLElement Header { get => HeaderContent; set => HeaderContent = value; }
     }
 
     [TypeConverter(typeof(XAMLListViewColumnWidthStringConverter))]

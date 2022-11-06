@@ -10,11 +10,13 @@ using System.Text;
 using System.Threading.Tasks;
 using MonoGame.Extended;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
     public class MGSeparator : MGElement
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Orientation _Orientation;
         public Orientation Orientation
         {
@@ -30,6 +32,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _Size;
         public int Size
         {

@@ -26,6 +26,7 @@ namespace MGUI.Core.UI
         //
 
         #region Items Source
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ObservableCollection<MGListViewItem<TItemType>> _InternalRowItems;
         private ObservableCollection<MGListViewItem<TItemType>> InternalRowItems
         {
@@ -87,6 +88,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ObservableCollection<TItemType> _ItemsSource;
         /// <summary>To set this value, use <see cref="SetItemsSource(ICollection{TItemType})"/></summary>
         public ObservableCollection<TItemType> ItemsSource
@@ -333,7 +335,9 @@ namespace MGUI.Core.UI
     public class ListViewColumnWidth
     {
         public GridLength Length { get; private set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsAbsoluteWidth => Length.IsPixelLength;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsWeightedWidth => Length.IsWeightedLength;
 
         /// <summary>Getter is only valid if <see cref="IsAbsoluteWidth"/> is true</summary>

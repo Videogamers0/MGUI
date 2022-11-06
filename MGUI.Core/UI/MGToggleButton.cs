@@ -9,6 +9,7 @@ using MonoGame.Extended;
 using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
@@ -48,6 +49,7 @@ namespace MGUI.Core.UI
             set => DefaultTextForeground.SelectedValue = value;
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsChecked;
         public bool IsChecked
         {

@@ -14,6 +14,7 @@ using MGUI.Shared.Text;
 using MGUI.Shared.Rendering;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
@@ -40,6 +41,7 @@ namespace MGUI.Core.UI
         Vector2 IMouseViewport.GetOffset() => Vector2.Zero;
 
         #region ToolTip
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGToolTip _ActiveToolTip;
         public MGToolTip ActiveToolTip
         {
@@ -96,6 +98,7 @@ namespace MGUI.Core.UI
         #endregion ToolTip
 
         #region Context Menu
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGContextMenu _ActiveContextMenu;
         /// <summary>The currently open <see cref="MGContextMenu"/>.<para/>
         /// To set this value, use <see cref="TryCloseActiveContextMenu"/> or <see cref="TryOpenContextMenu(MGContextMenu, Point)"/></summary>
@@ -242,6 +245,7 @@ namespace MGUI.Core.UI
 
         internal MGElement QueuedFocusedKeyboardHandler { get; set; } = null;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGElement _FocusedKeyboardHandler;
         /// <summary>The <see cref="MGElement"/> that should handle Keyboard inputs, if any.<para/>
         /// Only <see cref="MGElement"/>'s where <see cref="MGElement.CanHandleKeyboardInput"/> is true can be set as the <see cref="FocusedKeyboardHandler"/></summary>
@@ -283,6 +287,7 @@ namespace MGUI.Core.UI
 
         public MGTheme Theme { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Dictionary<string, Texture2D> _NamedTextures { get; }
         /// <summary>This dictionary is commonly used by <see cref="MGImage"/> to reference textures by a string key value.<para/>
         /// See also:<br/><see cref="AddNamedTexture(string, Texture2D)"/><br/><see cref="RemoveNamedTexture(string)"/><br/><see cref="NamedRegions"/></summary>
@@ -297,6 +302,7 @@ namespace MGUI.Core.UI
                 RemoveNamedRegion(Region.RegionName);
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Dictionary<string, NamedTextureRegion> _NamedRegions { get; }
         /// <summary>This dictionary is commonly used by <see cref="MGImage"/> to reference textures and various other texture settings by a string key value.<para/>
         /// See also:<br/><see cref="AddNamedRegion(NamedTextureRegion)"/><br/><see cref="RemoveNamedRegion(string)"/><br/><see cref="NamedTextures"/></summary>

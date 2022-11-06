@@ -9,12 +9,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MonoGame.Extended;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
     /// <summary>A lightweight control with no graphics whose primary purpose is to consume a defined amount of screen space</summary>
     public class MGSpacer : MGElement
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _Width;
         public int Width
         {
@@ -29,6 +31,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _Height;
         public int Height
         {

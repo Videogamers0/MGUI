@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
@@ -64,6 +65,7 @@ namespace MGUI.Core.UI
         }
         #endregion Text
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsRevealed;
         /// <summary>If false, the <see cref="MGSingleContentHost.Content"/> will not be visible.<br/>
         /// Instead, <see cref="UnspoiledBorderBrush"/>, <see cref="UnspoiledBorderThickness"/>, <see cref="UnspoiledBackgroundBrush"/>, and <see cref="UnspoiledText"/> will be visible.</summary>

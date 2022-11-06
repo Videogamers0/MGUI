@@ -12,6 +12,7 @@ using ColorTranslator = System.Drawing.ColorTranslator;
 using MonoGame.Extended;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
@@ -50,6 +51,7 @@ namespace MGUI.Core.UI
             AsPercent
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _ShowValue;
         /// <summary>True if the current value should be displayed.<para/>
         /// The value is rendered to the 'end' edge of the bar, which depends on <see cref="Orientation"/> and <see cref="IsReversed"/>.<br/>
@@ -73,6 +75,7 @@ namespace MGUI.Core.UI
         public const string RecommendedPercentageValueDisplayFormat = "[fg=White][b][shadow=Black 1 1]{{ValuePercent}}%[/shadow][/b][/fg]";
         public const string RecommendedExactValueDisplayFormat = "[fg=White][b][shadow=Black 1 1]{{Value-Minimum}}[/shadow][/b] / [b][shadow=Black 1 1]{{Maximum-Minimum}}[/shadow][/b][/fg]";
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _ValueDisplayFormat;
         /// <summary>Only relevant if <see cref="ShowValue"/>==true.<para/>
         /// A format string to use when computing the text to display.<para/>
@@ -128,6 +131,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _Minimum;
         public float Minimum
         {
@@ -142,6 +146,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _Maximum;
         public float Maximum
         {
@@ -156,6 +161,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _Value;
         public float Value
         {
@@ -176,6 +182,7 @@ namespace MGUI.Core.UI
         public float ValuePercent => (Maximum.IsAlmostEqual(Minimum) ? 1.0f : (ActualValue - Minimum) / (Maximum - Minimum)) * 100.0f;
         #endregion Value
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _Size;
         /// <summary>For a horizontal progress bar, this represents the requested Height.<br/>
         /// For a vertical progress bar, this represents the requested Width.</summary>
@@ -197,6 +204,7 @@ namespace MGUI.Core.UI
         /// <summary>The brush to use for the incomplete portion of this <see cref="MGProgressBar"/>. Can be null. This brush is rendered overtop of <see cref="MGElement.BackgroundBrush"/></summary>
         public VisualStateFillBrush IncompleteBrush { get; set; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Orientation _Orientation;
         /// <summary>If <see cref="Orientation.Horizontal"/>, the bar grows from left to right.<br/>
         /// If <see cref="Orientation.Vertical"/>, the bar grows from bottom to top.<para/>
@@ -215,7 +223,9 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsHorizontal => Orientation == Orientation.Horizontal;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsVertical => Orientation == Orientation.Vertical;
 
         /// <summary>If true, the bar will flow in the opposite direction.<para/>

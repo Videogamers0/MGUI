@@ -17,9 +17,12 @@ namespace MGUI.Core.UI
 {
     public class MGTextBlock : MGElement, ITextMeasurer
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _FontFamily;
         /// <summary>To set this value, use <see cref="TrySetFont(string, int)"/></summary>
         public string FontFamily { get => _FontFamily; }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _FontSize;
         /// <summary>To set this value, use <see cref="TrySetFont(string, int)"/></summary>
         public int FontSize { get => _FontSize; }
@@ -34,9 +37,13 @@ namespace MGUI.Core.UI
         internal SpriteFont SF_Italic { get; private set; }
         internal SpriteFont SF_BoldItalic { get; private set; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Dictionary<char, SpriteFont.Glyph> SF_Regular_Glyphs { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Dictionary<char, SpriteFont.Glyph> SF_Bold_Glyphs { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Dictionary<char, SpriteFont.Glyph> SF_Italic_Glyphs { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Dictionary<char, SpriteFont.Glyph> SF_BoldItalic_Glyphs { get; set; }
 
         private SpriteFont GetFont(bool IsBold, bool IsItalic, out Dictionary<char, SpriteFont.Glyph> Glyphs)
@@ -113,6 +120,7 @@ namespace MGUI.Core.UI
 
         public Color ActualForeground => Foreground.GetValue(VisualState.Primary) ?? DerivedDefaultTextForeground ?? GetTheme().TextBlockFallbackForeground.GetValue(false).GetValue(VisualState.Primary);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _Text;
         public string Text
         {
@@ -144,6 +152,7 @@ namespace MGUI.Core.UI
             this.Lines = MGTextLine.ParseLines(this, LayoutBounds.Width - Padding.Width, WrapText, Runs).ToList().AsReadOnly();
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _WrapText;
         public bool WrapText
         {
@@ -158,6 +167,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _LinePadding;
         /// <summary>Additional vertical space between each line of text</summary>
         public float LinePadding

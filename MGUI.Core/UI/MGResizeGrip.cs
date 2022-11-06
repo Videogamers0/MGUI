@@ -22,6 +22,7 @@ namespace MGUI.Core.UI
         /// Formula: 1 + (<see cref="MaxDots"/> - 1) * <see cref="Spacing"/> + <see cref="MGElement.Margin"/>.Right</summary>
         public int Size => 1 + (MaxDots - 1) * Spacing + Margin.Right;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _MaxDots;
         /// <summary>Determines how many dots to attempt to display for this <see cref="MGResizeGrip"/>'s graphics.<para/>
         /// If this resizer allows resizing in either dimension, <see cref="MaxDots"/> determines how many dots will be drawn on either the bottom or right edge of this element.<para/>
@@ -39,6 +40,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _Spacing;
         /// <summary>The amount of pixels between each dot of this <see cref="MGResizeGrip"/>'s graphics.<para/>
         /// Default value: 3. Recommended value: 3-4</summary>
@@ -55,6 +57,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGElement _Host;
         /// <summary>To set this value, use <see cref="TrySetHost(MGElement)"/>. This value cannot be modified if <see cref="MGElement.IsComponent"/> is true.<para/>
         /// See also: <see cref="ActualHost"/>, which accounts for <see cref="MGElement.IsComponent"/></summary>

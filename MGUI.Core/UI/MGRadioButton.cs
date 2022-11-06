@@ -12,6 +12,7 @@ using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Shared.Rendering;
 using MGUI.Shared.Input.Mouse;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
@@ -27,6 +28,7 @@ namespace MGUI.Core.UI
         public bool AllowUnchecking { get; set; }
         public bool ActualAllowUnchecking => AllowUnchecking && AllowNullCheckedItem;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _AllowNullCheckedItem;
         /// <summary>If true, <see cref="CheckedItem"/> can be set to null.<para/>
         /// Default value: false</summary>
@@ -44,6 +46,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGRadioButton _CheckedItem;
         public MGRadioButton CheckedItem
         {
@@ -61,8 +64,10 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ObservableCollection<MGRadioButton> _RadioButtons { get; }
         public IReadOnlyList<MGRadioButton> RadioButtons => _RadioButtons;
+
         public void AddRadioButton(MGRadioButton RB) => _RadioButtons.Add(RB);
         public bool RemoveRadioButton(MGRadioButton RB) => _RadioButtons.Remove(RB);
 
@@ -107,6 +112,7 @@ namespace MGUI.Core.UI
 
         private Size GetButtonComponentPreferredSize() => new(BubbleComponentSize, BubbleComponentSize);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _BubbleComponentSize;
         /// <summary>The dimensions of the checkable part of this <see cref="MGRadioButton"/>.<para/>
         /// See also: <see cref="DefaultBubbleSize"/></summary>

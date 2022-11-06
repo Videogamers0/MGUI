@@ -60,6 +60,7 @@ namespace MGUI.Core.UI
 
         public const string DefaultValueDisplayFormat = $"[b][shadow=Black 1 1]{{{{{nameof(Elapsed)}}}}}[/shadow][/b]";
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _ValueDisplayFormat;
         /// <summary>A format string to use when computing the text to display.<br/>
         /// "{{Elapsed}}" will be replaced with the value retrieved via <see cref="ElapsedToString"/>.<para/>
@@ -78,6 +79,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private TimeSpan _Elapsed;
         public TimeSpan Elapsed
         {
@@ -103,6 +105,7 @@ namespace MGUI.Core.UI
         /// unless you still wanted the stopwatch to track real time</summary>
         public double TimeScale { get; set; } = 1.0;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<TimeSpan, string> _ElapsedToString;
         /// <summary>A function whose input is the <see cref="Elapsed"/> time, and returns the string value that should be displayed by this <see cref="MGStopwatch"/>.<para/>
         /// Default value: A function that returns:
@@ -122,7 +125,7 @@ namespace MGUI.Core.UI
             }
         }
 
-
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsRunning;
         public bool IsRunning
         {

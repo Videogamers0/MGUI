@@ -14,6 +14,7 @@ using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Core.UI.XAML;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
@@ -73,6 +74,7 @@ namespace MGUI.Core.UI
         #endregion Dropdown Arrow
 
         #region Templated Items
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ObservableCollection<TemplatedElement<TItemType, MGButton>> _TemplatedItems;
         private ObservableCollection<TemplatedElement<TItemType, MGButton>> TemplatedItems
         {
@@ -99,6 +101,7 @@ namespace MGUI.Core.UI
         }
 
         #region Selected Item
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private TemplatedElement<TItemType, MGButton> _SelectedItem;
         public TemplatedElement<TItemType, MGButton> SelectedItem
         {
@@ -139,6 +142,7 @@ namespace MGUI.Core.UI
         #endregion Templated Items
 
         #region Items Source
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ObservableCollection<TItemType> _ItemsSource;
         public ObservableCollection<TItemType> ItemsSource
         {
@@ -225,6 +229,7 @@ namespace MGUI.Core.UI
         /// <summary>The default amount of padding in each item within the dropdown.</summary>
         public static Thickness DefaultDropdownItemPadding = new(8, 5, 8, 5);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<TItemType, MGButton> _DropdownItemTemplate;
         /// <summary>The template to use for items inside the dropdown.<br/>
         /// Highly recommend to use an <see cref="MGElement"/> with Padding, such as '8,5,8,5'. See also: <see cref="DefaultDropdownItemPadding"/></summary>
@@ -248,6 +253,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<TItemType, MGElement> _SelectedItemTemplate;
         /// <summary>The template to use for the selected item</summary>
         public Func<TItemType, MGElement> SelectedItemTemplate
@@ -304,6 +310,7 @@ namespace MGUI.Core.UI
             Dropdown.ApplySizeToContent(SizeToContent.WidthAndHeight, Math.Max(this.ActualWidth, MinDropdownWidth), ActualMinHeight, MaxDropdownWidth, ActualMaxHeight);
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsDropdownOpen;
         public bool IsDropdownOpen
         {

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
@@ -36,9 +37,11 @@ namespace MGUI.Core.UI
 
     public class MGImage : MGElement
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Texture2D _Texture;
         public Texture2D Texture { get => _Texture; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Rectangle? _SourceRect;
         public Rectangle? SourceRect { get => _SourceRect; }
 
@@ -64,6 +67,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Stretch _Stretch;
         public Stretch Stretch
         {
@@ -79,7 +83,8 @@ namespace MGUI.Core.UI
         }
 
         //  I'm too lazy to try implementing this. Nobody will care, right?
-        /*private StretchDirection _StretchDirection;
+        /*[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private StretchDirection _StretchDirection;
         public StretchDirection StretchDirection
         {
             get => _StretchDirection;

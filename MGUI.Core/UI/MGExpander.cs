@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using MonoGame.Extended;
 using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Brushes.Border_Brushes;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
@@ -72,6 +73,7 @@ namespace MGUI.Core.UI
             set => HeadersPanelElement.Spacing = value;
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGElement _HeaderContent;
         /// <summary>Optional. Additional content to display to the right of the expander button.</summary>
         public MGElement HeaderContent
@@ -105,6 +107,7 @@ namespace MGUI.Core.UI
         public bool HasHeader => HeaderContent != null;
         #endregion Header Content
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsExpanded;
         public bool IsExpanded
         {

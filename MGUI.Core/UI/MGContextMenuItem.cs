@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
@@ -63,8 +64,11 @@ namespace MGUI.Core.UI
         public string CommandId { get; set; }
 
         public ContextMenuItemType MenuItemType { get; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsButton => MenuItemType == ContextMenuItemType.Button;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsToggle => MenuItemType == ContextMenuItemType.Toggle;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsSeparator => MenuItemType == ContextMenuItemType.Separator;
 
         /// <summary>True if this <see cref="MGContextMenuItem"/> can accept and handle mouse input.</summary>
@@ -96,6 +100,7 @@ namespace MGUI.Core.UI
     {
         protected MGContentPresenter HeaderPresenter { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGButton _ContentWrapper;
         /// <summary>The wrapper element that contains the <see cref="MenuItemContent"/>.<para/>
         /// This element is automatically created via <see cref="MGContextMenu.ButtonWrapperTemplate"/></summary>
@@ -141,6 +146,7 @@ namespace MGUI.Core.UI
 
         protected virtual void OnContentWrapperChanged() { }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGElement _MenuItemContent;
         /// <summary>The content to display inside this <see cref="MGContextMenuItem"/>.<para/>
         /// This content is automatically wrapped inside of an <see cref="MGSingleContentHost"/> that is created via <see cref="MGContextMenu.ButtonWrapperTemplate"/>.<para/>
@@ -180,6 +186,7 @@ namespace MGUI.Core.UI
         public MGComponent<MGRectangle> SubmenuArrowComponent { get; }
         private MGRectangle SubmenuArrowElement { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGContextMenu _Submenu;
         /// <summary>If not null, represents a nested <see cref="MGContextMenu"/> that will open when hovering over this <see cref="MGContextMenuItem"/>.</summary>
         public MGContextMenu Submenu
@@ -232,6 +239,7 @@ namespace MGUI.Core.UI
             HeaderPresenter.Margin = new(0);
             HeaderPresenter.BackgroundBrush = new(null);
             HeaderPresenter.ComponentParent = this;
+            InvokeContentAdded(HeaderPresenter);
 
             Menu.HeaderSizeChanged += (sender, e) =>
             {

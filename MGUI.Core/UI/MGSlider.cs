@@ -11,16 +11,20 @@ using System.Threading.Tasks;
 using MonoGame.Extended;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Core.UI.Brushes.Border_Brushes;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
     public class MGSlider : MGElement
     {
         #region Value
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _Minimum;
         /// <summary>The inclusive minimum that <see cref="Value"/> can be set to.<para/>
         /// To set this value, use <see cref="SetRange(float, float)"/></summary>
         public float Minimum { get => _Minimum; }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _Maximum;
         /// <summary>The inclusive maximum that <see cref="Value"/> can be set to.<para/>
         /// To set this value, use <see cref="SetRange(float, float)"/></summary>
@@ -42,6 +46,7 @@ namespace MGUI.Core.UI
         /// <summary>Convenience property that simply returns: <see cref="Maximum"/> - <see cref="Minimum"/></summary>
         public float Interval => Maximum - Minimum;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _Value;
         /// <summary>The current value that this <see cref="MGSlider"/> is set to.<para/>
         /// To set this value, use <see cref="SetValue(float)"/></summary>
@@ -75,6 +80,7 @@ namespace MGUI.Core.UI
             return Result;
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _UseDiscreteValues;
         /// <summary>If true, <see cref="Value"/> will snap to the nearest multiple of the given <see cref="DiscreteValueInterval"/>.<para/>
         /// If false, <see cref="Value"/> is continuous and can be any numeric value in the inclusive range [<see cref="Minimum"/>,<see cref="Maximum"/>].</summary>
@@ -92,6 +98,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float? _DiscreteValueInterval;
         /// <summary>Only relevant if <see cref="UseDiscreteValues"/>==true. Represents the interval that <see cref="Value"/> will snap to.</summary>
         public float? DiscreteValueInterval
@@ -112,6 +119,7 @@ namespace MGUI.Core.UI
         #region Number Line
         public bool IsHoveringNumberLine { get; private set; } = false;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _NumberLineSize;
         /// <summary>If <see cref="Orientation"/>==<see cref="Orientation.Horizontal"/>, this represents the height of the number line. Else it is the width.</summary>
         public int NumberLineSize
@@ -143,6 +151,7 @@ namespace MGUI.Core.UI
 
         public float? TickFrequency { get; set; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _DrawTicks;
         /// <summary>True if tick marks should be drawn at the given <see cref="TickFrequency"/> interval along the number line.<para/>
         /// Only relevant if <see cref="TickFrequency"/> is specified.<para/>
@@ -163,6 +172,7 @@ namespace MGUI.Core.UI
         private const int MaxTickCount = 100;
         public bool CanDrawTickMarks => TickFrequency.HasValue && TickFrequency.Value > 0 && Interval / TickFrequency.Value <= MaxTickCount;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int? _TickWidth;
         /// <summary>The width of each tick mark. Only relevant if <see cref="DrawTicks"/>==true.<para/>
         /// If null, uses <see cref="DefaultTickPrimarySize"/> or <see cref="DefaultTickSecondarySize"/>, depending on <see cref="Orientation"/>.<para/>
@@ -181,6 +191,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int? _TickHeight;
         /// <summary>The height of each tick mark. Only relevant if <see cref="DrawTicks"/>==true.<para/>
         /// If null, uses <see cref="DefaultTickPrimarySize"/> or <see cref="DefaultTickSecondarySize"/>, depending on <see cref="Orientation"/>.<para/>
@@ -224,6 +235,7 @@ namespace MGUI.Core.UI
         public bool IsHoveringThumb { get; private set; } = false;
         public bool IsDraggingThumb { get; private set; } = false;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int? _ThumbWidth;
         /// <summary>The width of the thumb.<para/>
         /// If null, uses <see cref="DefaultThumbPrimarySize"/> or <see cref="DefaultThumbPrimarySize"/>, depending on <see cref="Orientation"/>.<para/>
@@ -241,6 +253,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int? _ThumbHeight;
         /// <summary>The height of the thumb.<para/>
         /// If null, uses <see cref="DefaultThumbPrimarySize"/> or <see cref="DefaultThumbPrimarySize"/>, depending on <see cref="Orientation"/>.<para/>
@@ -268,6 +281,7 @@ namespace MGUI.Core.UI
         #endregion Thumb
 
         #region Orientation
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Orientation _Orientation;
         public Orientation Orientation
         {
@@ -282,7 +296,9 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsHorizontal => Orientation == Orientation.Horizontal;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsVertical => Orientation == Orientation.Vertical;
         #endregion Orientation
 

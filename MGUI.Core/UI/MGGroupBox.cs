@@ -12,6 +12,7 @@ using MonoGame.Extended;
 using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
@@ -48,6 +49,7 @@ namespace MGUI.Core.UI
         }
         #endregion Border
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGElement _HeaderContent;
         public MGElement HeaderContent
         {
@@ -74,6 +76,7 @@ namespace MGUI.Core.UI
 
         public bool HasHeader => HeaderContent != null;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _HeaderHorizontalMargin;
         /// <summary>The empty width to the left and the right of the <see cref="HeaderContent"/>. This space will not be occupied by the top portion of the border.</summary>
         public int HeaderHorizontalMargin
@@ -89,6 +92,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _HeaderHorizontalPadding;
         /// <summary>The empty width to the left and the right of the <see cref="HeaderContent"/>. This space WILL be occupied by the top portion of the border.</summary>
         public int HeaderHorizontalPadding

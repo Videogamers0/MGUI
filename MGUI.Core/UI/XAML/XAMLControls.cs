@@ -165,11 +165,8 @@ namespace MGUI.Core.UI.XAML
 
         public int? HeaderSpacingWidth { get; set; }
         public XAMLElement HeaderContent { get; set; }
-        public XAMLElement Header
-        {
-            get => HeaderContent;
-            set => HeaderContent = value;
-        }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public XAMLElement Header { get => HeaderContent; set => HeaderContent = value; }
 
         public bool? IsExpanded { get; set; }
         public Visibility? ExpandedVisibility { get; set; }
@@ -222,11 +219,8 @@ namespace MGUI.Core.UI.XAML
         public XAMLThickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
         public XAMLElement HeaderContent { get; set; }
-        public XAMLElement Header
-        {
-            get => HeaderContent;
-            set => HeaderContent = value;
-        }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public XAMLElement Header { get => HeaderContent; set => HeaderContent = value; }
 
         public int? HeaderHorizontalMargin { get; set; }
         public int? HeaderHorizontalPadding { get; set; }
@@ -824,11 +818,8 @@ namespace MGUI.Core.UI.XAML
     public class XAMLTabItem : XAMLSingleContentHost
     {
         public XAMLElement HeaderContent { get; set; }
-        public XAMLElement Header
-        {
-            get => HeaderContent;
-            set => HeaderContent = value;
-        }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public XAMLElement Header { get => HeaderContent; set => HeaderContent = value; }
 
         public bool? IsTabSelected { get; set; }
 

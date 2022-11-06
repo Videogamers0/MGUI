@@ -14,7 +14,8 @@ namespace MGUI.Core.UI
 {
     public class MGPasswordBox : MGTextBox
     {
-		private char _PasswordCharacter;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private char _PasswordCharacter;
 		/// <summary>The character to display for each character in the text. Default value: <b>*</b><para/>
 		/// Recommended to use a character that belongs to a common character set, to avoid issues where the <see cref="SpriteFont"/> cannot render the character.</summary>
 		public char PasswordCharacter

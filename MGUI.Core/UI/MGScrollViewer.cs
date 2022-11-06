@@ -11,6 +11,7 @@ using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Shared.Input.Mouse;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
@@ -30,6 +31,7 @@ namespace MGUI.Core.UI
         /// Recommended value: Anywhere from 20 to 80 (Scrolling on reddit.com seems to scroll by about 84px? Might be percentage-based)</summary>
         public const int VerticalScrollInterval = 40;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ScrollBarVisibility _VSBVisibility;
         public ScrollBarVisibility VSBVisibility
         {
@@ -51,6 +53,7 @@ namespace MGUI.Core.UI
             set => VSBVisibility = value;
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ScrollBarVisibility _HSBVisibility;
         public ScrollBarVisibility HSBVisibility
         {
@@ -81,6 +84,7 @@ namespace MGUI.Core.UI
         public Rectangle? PaddedHSBBounds => HSBBounds?.GetCompressed(ScrollBarPadding);
 
         #region Offset
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _VerticalOffset;
         /// <summary>See also: <see cref="MaxVerticalOffset"/></summary>
         public float VerticalOffset
@@ -96,6 +100,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _MaxVerticalOffset;
         /// <summary>The maximum value that <see cref="VerticalOffset"/> can be set to.<br/>
         /// Setting <see cref="VerticalOffset"/> to this value will scroll to the bottom of the scrollable content.</summary>
@@ -112,6 +117,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _HorizontalOffset;
         /// <summary>See also: <see cref="MaxHorizontalOffset"/></summary>
         public float HorizontalOffset
@@ -127,6 +133,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _MaxHorizontalOffset;
         /// <summary>The maximum value that <see cref="HorizontalOffset"/> can be set to.<br/>
         /// Setting <see cref="HorizontalOffset"/> to this value will scroll to the right-most of the scrollable content.</summary>

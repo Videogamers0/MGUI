@@ -9,6 +9,7 @@ using MonoGame.Extended;
 using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
@@ -16,6 +17,7 @@ namespace MGUI.Core.UI
     {
         public IBorderBrush BorderBrush { get; set; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Thickness _BorderThickness;
         public Thickness BorderThickness
         {

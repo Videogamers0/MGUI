@@ -9,6 +9,7 @@ using MonoGame.Extended;
 using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Shared.Rendering;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
@@ -24,6 +25,7 @@ namespace MGUI.Core.UI
         /// <summary>The checkable button portion of this <see cref="MGCheckBox"/></summary>
         private MGButton ButtonElement { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _CheckBoxComponentSize;
         /// <summary>The dimensions of the checkable part of this <see cref="MGCheckBox"/>.<para/>
         /// See also: <see cref="DefaultCheckBoxSize"/></summary>
@@ -57,6 +59,7 @@ namespace MGUI.Core.UI
         /// See also: <see cref="MGDesktop.Theme"/></summary>
         public Color CheckMarkColor { get; set; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsThreeState;
         /// <summary>True if 'null' is a valid value for <see cref="IsChecked"/><para/>
         /// Default value: false</summary>
@@ -74,6 +77,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool? _IsChecked;
         /// <summary>If <see cref="IsThreeState"/> is false, this value should not be set to null.</summary>
         public bool? IsChecked

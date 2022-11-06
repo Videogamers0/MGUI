@@ -60,6 +60,7 @@ namespace MGUI.Core.UI
 
         public const string DefaultValueDisplayFormat = $"[b][shadow=Black 1 1]{{{{{nameof(RemainingDuration)}}}}}[/shadow][/b]";
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _ValueDisplayFormat;
         /// <summary>A format string to use when computing the text to display.<br/>
         /// "{{RemainingDuration}}" will be replaced with the value retrieved via <see cref="RemainingDurationToString"/>.<para/>
@@ -78,6 +79,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private TimeSpan _RemainingDuration;
         public TimeSpan RemainingDuration
         {
@@ -112,6 +114,7 @@ namespace MGUI.Core.UI
         /// unless you still wanted the timer to track real time</summary>
         public double TimeScale { get; set; } = 1.0;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<TimeSpan, string> _RemainingDurationToString;
         /// <summary>A function whose input is the <see cref="RemainingDuration"/> time, and returns the string value that should be displayed by this <see cref="MGTimer"/>.<para/>
         /// Default value: A function that returns:
@@ -131,6 +134,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsPaused;
         public bool IsPaused
         {

@@ -10,11 +10,13 @@ using System.Text;
 using System.Threading.Tasks;
 using MonoGame.Extended;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
     public class MGRectangle : MGElement
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _Width;
         public int Width
         {
@@ -29,6 +31,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _Height;
         public int Height
         {
