@@ -67,7 +67,7 @@ namespace MGUI.Core.UI
                 {
                     _ShowValue = value;
                     ValueElement.Visibility = ShowValue ? Visibility.Visible : Visibility.Collapsed;
-                    UpdateDisplayedValue();
+                    UpdateDisplayedValue(true);
                 }
             }
         }
@@ -94,7 +94,7 @@ namespace MGUI.Core.UI
                 if (_ValueDisplayFormat != value)
                 {
                     _ValueDisplayFormat = value;
-                    UpdateDisplayedValue();
+                    UpdateDisplayedValue(true);
                 }
             }
         }
@@ -113,12 +113,12 @@ namespace MGUI.Core.UI
                 if (_NumberFormat != value)
                 {
                     _NumberFormat = value;
-                    UpdateDisplayedValue();
+                    UpdateDisplayedValue(true);
                 }
             }
         }
 
-        private void UpdateDisplayedValue()
+        private void UpdateDisplayedValue(bool ForceLayoutRefresh)
         {
             if (ShowValue)
             {
@@ -146,7 +146,7 @@ namespace MGUI.Core.UI
                     }
                 }
 
-                ValueElement.Text = FormattedValue;
+                ValueElement.SetText(FormattedValue, ForceLayoutRefresh || (ValueElement.Text?.Length ?? 0) != FormattedValue.Length);
             }
         }
 
@@ -160,7 +160,7 @@ namespace MGUI.Core.UI
                 if (_Minimum != value)
                 {
                     _Minimum = value;
-                    UpdateDisplayedValue();
+                    UpdateDisplayedValue(true);
                 }
             }
         }
@@ -175,7 +175,7 @@ namespace MGUI.Core.UI
                 if (_Maximum != value)
                 {
                     _Maximum = value;
-                    UpdateDisplayedValue();
+                    UpdateDisplayedValue(true);
                 }
             }
         }
@@ -190,7 +190,7 @@ namespace MGUI.Core.UI
                 if (_Value != value)
                 {
                     _Value = value;
-                    UpdateDisplayedValue();
+                    UpdateDisplayedValue(false);
                 }
             }
         }

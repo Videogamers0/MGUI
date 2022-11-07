@@ -258,6 +258,14 @@ namespace MGUI.Core.UI
         }
 
         private readonly List<ElementMeasurement> RecentSelfMeasurements = new();
+        private void CacheSelfMeasurement(ElementMeasurement Value)
+        {
+            while (RecentSelfMeasurements.Count > MeasurementCacheSize)
+                RecentSelfMeasurements.RemoveAt(RecentSelfMeasurements.Count - 1);
+            if (!RecentSelfMeasurements.Contains(Value))
+                RecentSelfMeasurements.Insert(0, Value);
+        }
+
         private bool TryGetCachedSelfMeasurement(Size AvailableSize, out Thickness? Result)
         {
             foreach (ElementMeasurement Measurement in RecentSelfMeasurements)
@@ -307,7 +315,8 @@ namespace MGUI.Core.UI
             Vector2 Size = new(Lines.Select(x => x.LineSize.Width).DefaultIfEmpty(0).Max(), Lines.Sum(x => x.LineSize.Height) + LinePadding * (Lines.Count - 1));
             Thickness Measurement = new((int)Math.Ceiling(Size.X), (int)Math.Ceiling(Size.Y), 0, 0);
 
-            RecentSelfMeasurements.Add(new(RemainingSize, Measurement, SharedSize, new(0)));
+            ElementMeasurement SelfMeasurement = new(RemainingSize, Measurement, SharedSize, new(0));
+            CacheSelfMeasurement(SelfMeasurement);
             return Measurement;
         }
 

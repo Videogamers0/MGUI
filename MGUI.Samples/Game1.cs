@@ -174,7 +174,7 @@ namespace MGUI.Samples
             <Button BG=""OrangeRed"" GridRow=""5"" GridColumn=""3"" />
         </UniformGrid>-->
 
-        <Grid Padding=""10"" Name=""TestGrid2"" RowLengths=""30,50,40,50,60,30"" ColumnLengths=""40,50,60,70"" GridLinesVisibility=""All"" BG=""LightBlue""
+        <!--<Grid Padding=""10"" Name=""TestGrid2"" RowLengths=""30,50,40,50,60,30"" ColumnLengths=""40,50,60,70"" GridLinesVisibility=""All"" BG=""LightBlue""
                     HorizontalGridLineBrush = ""Red"" VerticalGridLineBrush=""Green"" RowSpacing=""5"" ColumnSpacing=""8"" GridLineMargin=""2"" SelectionMode=""None"">
             <Button BG=""Red"" GridRow=""0"" GridColumn=""0"" />
             <Button BG=""Orange"" GridRow=""1"" GridColumn=""1"" />
@@ -184,7 +184,16 @@ namespace MGUI.Samples
             <Button BG=""YellowGreen"" GridRow=""3"" GridColumn=""1"" />
             <Button BG=""GreenYellow"" GridRow=""4"" GridColumn=""2"" />
             <Button BG=""OrangeRed"" GridRow=""5"" GridColumn=""3"" />
-        </Grid>
+        </Grid>-->
+
+        <ListView Name=""LV1"" xmlns:System=""clr-namespace:System;assembly=mscorlib"" ItemType=""{x:Type System:Double}"">
+            <ListViewColumn Width=""80px"">
+                <ListViewColumn.Header>
+                    <Button Content=""Test"" />
+                </ListViewColumn.Header>
+            </ListViewColumn>
+            <ListViewColumn Header=""Test"" Width=""*"" />
+        </ListView>
 
         <!--<Grid Name=""TestGrid"" RowLengths=""100[50,],16,*[80,]"" ColumnLengths=""1*[50,150],16,1.5*[50,60],1.2*"">
             <TextBlock BG=""Red"" GridRow=""0"" GridColumn=""0"" />
@@ -206,6 +215,20 @@ namespace MGUI.Samples
             MGWindow XAMLWindow = XAMLParser.LoadRootWindow(Desktop, xaml);
             //XAMLWindow.MakeInvisible();
             this.Desktop.Windows.Add(XAMLWindow);
+
+            if (XAMLWindow.TryGetElementByName("LV1", out MGListView<double> LV))
+            {
+                LV.SetItemsSource(new List<double>() { 5, 25.5, 101.11, 0.0, -52.6, -18, 12345, -99.3, 0 });
+                LV.Columns[1].DataTemplate = (double val) =>
+                {
+                    if (val > 0)
+                        return new MGTextBlock(XAMLWindow, "Positive", Color.Green);
+                    else if (val == 0)
+                        return new MGTextBlock(XAMLWindow, "Zero", Color.Gray);
+                    else
+                        return new MGTextBlock(XAMLWindow, "Negative", Color.Red);
+                };
+            }
 
             if (XAMLWindow.TryGetElementByName("UG1", out MGUniformGrid UG))
             {

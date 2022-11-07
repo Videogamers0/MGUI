@@ -79,7 +79,7 @@ namespace MGUI.Core.UI
     }
 
     //TODO
-    //listbox, statusbar, menubar/menuitems, popup?
+    //listbox, statusbar, menubar/menuitems
     //      messagebox
     //          has icon docked left
     //          button choices like YesNoCancel, OKCancel, or even custom where you can call AddButton(mgelement content) and they are appended in order etc
@@ -1129,21 +1129,38 @@ namespace MGUI.Core.UI
         public int ActualWidth => LayoutBounds.Width;
         /// <summary>Note: This value does not include <see cref="Margin"/>. For a value with <see cref="Margin"/>, consider using <see cref="RenderBounds"/>.Height</summary>
         public int ActualHeight => LayoutBounds.Height;
-#endregion Arrange
+        #endregion Arrange
 
-#region Measure
+        #region Measure
+        protected const int MeasurementCacheSize = 15;
+
 		/// <summary>Full measurements - I.E. includes the requested size of this <see cref="MGElement"/> and its content, if any.<para/>
 		/// See also: <see cref="RecentMeasurementsSelfOnly"/></summary>
 		private List<ElementMeasurement> RecentMeasurementsFull { get; } = new();
+        private void CacheFullMeasurement(ElementMeasurement Value)
+        {
+            while (RecentMeasurementsFull.Count > MeasurementCacheSize)
+                RecentMeasurementsFull.RemoveAt(RecentMeasurementsFull.Count - 1);
+            if (!RecentMeasurementsFull.Contains(Value))
+                RecentMeasurementsFull.Insert(0, Value);
+        }
+
 		/// <summary>Recent measurements that only account for the requested size of this <see cref="MGElement"/>; does not include the requested size of its content, if any.<br/>
 		/// For example, a Border would only account for the total width of it's Margin, Padding, and BorderThickness.<para/>
 		/// See also: <see cref="RecentMeasurementsFull"/></summary>
 		private List<ElementMeasurement> RecentMeasurementsSelfOnly { get; } = new();
+        private void CacheSelfMeasurement(ElementMeasurement Value)
+        {
+            while (RecentMeasurementsSelfOnly.Count > MeasurementCacheSize)
+                RecentMeasurementsSelfOnly.RemoveAt(RecentMeasurementsSelfOnly.Count - 1);
+            if (!RecentMeasurementsSelfOnly.Contains(Value))
+                RecentMeasurementsSelfOnly.Insert(0, Value);
+        }
 
-		/// <param name="SelfMeasurement">A measurement that only accounts for this <see cref="MGElement"/> and not its content.<br/>
-		/// For example, for a Border, this would include Margin, Padding, and BorderThickness.</param>
-		/// <param name="FullMeasurement">A measurement that accounts for both this <see cref="MGElement"/> self-measurement and the measurement of its content, if any.</param>
-		protected bool TryGetCachedMeasurement(Size AvailableSize, out ElementMeasurement SelfMeasurement, out ElementMeasurement FullMeasurement)
+        /// <param name="SelfMeasurement">A measurement that only accounts for this <see cref="MGElement"/> and not its content.<br/>
+        /// For example, for a Border, this would include Margin, Padding, and BorderThickness.</param>
+        /// <param name="FullMeasurement">A measurement that accounts for both this <see cref="MGElement"/> self-measurement and the measurement of its content, if any.</param>
+        protected bool TryGetCachedMeasurement(Size AvailableSize, out ElementMeasurement SelfMeasurement, out ElementMeasurement FullMeasurement)
 		{
 			if (IsLayoutValid)
 			{
@@ -1216,7 +1233,8 @@ namespace MGUI.Core.UI
 			if (!TryGetRecentSelfMeasurement(RemainingSize, out SelfSize, out SharedSize, out ContentSize))
 			{
 				SelfSize = MeasureSelf(RemainingSize, out SharedSize);
-                RecentMeasurementsSelfOnly.Insert(0, new(AvailableSize, SelfSize, SharedSize, ContentSize));
+                ElementMeasurement SelfMeasurement = new(AvailableSize, SelfSize, SharedSize, ContentSize);
+                CacheSelfMeasurement(SelfMeasurement);
             }
 
 			Thickness UnsharedSelfSize = SelfSize.Subtract(SharedSize);
@@ -1241,7 +1259,8 @@ namespace MGUI.Core.UI
 			if (FullSize.Width <= 0 || FullSize.Height <= 0)
 				FullSize = new(0);
 
-			RecentMeasurementsFull.Insert(0, new(AvailableSize, FullSize, SharedSize, ContentSize));
+            ElementMeasurement FullMeasurement = new(AvailableSize, FullSize, SharedSize, ContentSize);
+            CacheFullMeasurement(FullMeasurement);
         }
 
         /// <summary>Returns the screen space required to display this <see cref="MGElement"/> if it has no child elements.<para/>
