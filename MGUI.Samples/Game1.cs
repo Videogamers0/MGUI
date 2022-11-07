@@ -162,7 +162,7 @@ namespace MGUI.Samples
             </TabItem>
         </TabControl>
 
-        <UniformGrid Rows=""6"" Columns=""4"" CellSize=""32,40"" HeaderRowHeight=""20"" HeaderColumnWidth=""16"" GridLinesVisibility=""All"" BG=""LightBlue""
+        <!--<UniformGrid Name=""UG1"" Rows=""6"" Columns=""4"" CellSize=""32,40"" HeaderRowHeight=""20"" HeaderColumnWidth=""16"" GridLinesVisibility=""All"" BG=""LightBlue""
                     HorizontalGridLineBrush = ""Red"" VerticalGridLineBrush=""Green"" RowSpacing=""5"" ColumnSpacing=""8"" GridLineMargin=""2"" SelectionMode=""None"">
             <Button BG=""Red"" GridRow=""0"" GridColumn=""0"" />
             <Button BG=""Orange"" GridRow=""1"" GridColumn=""1"" />
@@ -172,7 +172,19 @@ namespace MGUI.Samples
             <Button BG=""YellowGreen"" GridRow=""3"" GridColumn=""1"" />
             <Button BG=""GreenYellow"" GridRow=""4"" GridColumn=""2"" />
             <Button BG=""OrangeRed"" GridRow=""5"" GridColumn=""3"" />
-        </UniformGrid>
+        </UniformGrid>-->
+
+        <Grid Padding=""10"" Name=""TestGrid2"" RowLengths=""30,50,40,50,60,30"" ColumnLengths=""40,50,60,70"" GridLinesVisibility=""All"" BG=""LightBlue""
+                    HorizontalGridLineBrush = ""Red"" VerticalGridLineBrush=""Green"" RowSpacing=""5"" ColumnSpacing=""8"" GridLineMargin=""2"" SelectionMode=""None"">
+            <Button BG=""Red"" GridRow=""0"" GridColumn=""0"" />
+            <Button BG=""Orange"" GridRow=""1"" GridColumn=""1"" />
+            <Button BG=""Purple"" GridRow=""2"" GridColumn=""2"" />
+            <Button BG=""Yellow"" GridRow=""3"" GridColumn=""3"" />
+            <Button BG=""Green"" GridRow=""2"" GridColumn=""0"" />
+            <Button BG=""YellowGreen"" GridRow=""3"" GridColumn=""1"" />
+            <Button BG=""GreenYellow"" GridRow=""4"" GridColumn=""2"" />
+            <Button BG=""OrangeRed"" GridRow=""5"" GridColumn=""3"" />
+        </Grid>
 
         <!--<Grid Name=""TestGrid"" RowLengths=""100[50,],16,*[80,]"" ColumnLengths=""1*[50,150],16,1.5*[50,60],1.2*"">
             <TextBlock BG=""Red"" GridRow=""0"" GridColumn=""0"" />
@@ -194,6 +206,12 @@ namespace MGUI.Samples
             MGWindow XAMLWindow = XAMLParser.LoadRootWindow(Desktop, xaml);
             //XAMLWindow.MakeInvisible();
             this.Desktop.Windows.Add(XAMLWindow);
+
+            if (XAMLWindow.TryGetElementByName("UG1", out MGUniformGrid UG))
+            {
+                //UG.Columns = 3;
+                UG.Columns = 5;
+            }
 
             if (XAMLWindow.TryGetElementByName("GB1", out MGGroupBox GB))
             {

@@ -67,7 +67,13 @@ namespace MGUI.Core.UI.Containers.Grids
             {
                 if (_Rows != value)
                 {
+                    int PreviousRows = Rows;
                     _Rows = value;
+                    if (Rows < PreviousRows)
+                    {
+                        for (int i = PreviousRows - 1; i >= Rows; i--)
+                            _ = ClearRowContent(i);
+                    }
                     LayoutChanged(this, true);
                 }
             }
@@ -83,7 +89,13 @@ namespace MGUI.Core.UI.Containers.Grids
             {
                 if (_Columns != value)
                 {
+                    int PreviousColumns = Columns;
                     _Columns = value;
+                    if (Columns < PreviousColumns)
+                    {
+                        for (int i = PreviousColumns - 1; i >= Columns; i--)
+                            _ = ClearColumnContent(i);
+                    }
                     LayoutChanged(this, true);
                 }
             }
@@ -511,9 +523,6 @@ namespace MGUI.Core.UI.Containers.Grids
         /// <summary>An action to invoke on each cell whenever the cell is being drawn</summary>
         public Action<ElementDrawArgs, GridCellIndex, Rectangle> RenderCell { get; set; }
 
-        //TODO
-        //events such as: CellEntered, CellExited, CellLeftCLicked, CellRightClicked, CellDragStart etc
-
         public MGUniformGrid(MGWindow Window, int Rows, int Columns, Size CellSize)
             : base(Window, MGElementType.UniformGrid)
         {
@@ -698,7 +707,6 @@ namespace MGUI.Core.UI.Containers.Grids
 
             int Left = _CellBounds[new(0, 0)].Left - Math.Max(0, ColumnSpacing - GridLineMargin);
             int Right = _CellBounds[new(0, Columns - 1)].Right + Math.Max(0, ColumnSpacing - GridLineMargin);
-
             int Top = _CellBounds[new(0, 0)].Top - Math.Max(0, RowSpacing - GridLineMargin);
             int Bottom = _CellBounds[new(Rows - 1, 0)].Bottom + Math.Max(0, RowSpacing - GridLineMargin);
 
@@ -739,7 +747,6 @@ namespace MGUI.Core.UI.Containers.Grids
 
             int Left = _CellBounds[new(0, 0)].Left - Math.Max(0, ColumnSpacing - GridLineMargin);
             int Right = _CellBounds[new(0, Columns - 1)].Right + Math.Max(0, ColumnSpacing - GridLineMargin);
-
             int Top = _CellBounds[new(0, 0)].Top - Math.Max(0, RowSpacing - GridLineMargin);
             int Bottom = _CellBounds[new(Rows - 1, 0)].Bottom + Math.Max(0, RowSpacing - GridLineMargin);
 

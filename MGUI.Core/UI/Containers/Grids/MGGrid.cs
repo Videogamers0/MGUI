@@ -1075,7 +1075,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 CurrentX += ColumnWidth + ColumnSpacing;
             }
 
-            _CellBounds = GetCellBounds(false);
+            _CellBounds = GetCellBounds(true);
 
             //  Allocate space for each child
             for (int ColumnIndex = 0; ColumnIndex < Columns.Count; ColumnIndex++)
@@ -1152,20 +1152,28 @@ namespace MGUI.Core.UI.Containers.Grids
 
         private void DrawHorizontalGridLines(ElementDrawArgs DA, Rectangle LayoutBounds)
         {
-            if (DA.Opacity <= 0 || DA.Opacity.IsAlmostZero() || HorizontalGridLineBrush == null || Rows.Count == 0)
+            if (DA.Opacity <= 0 || DA.Opacity.IsAlmostZero() || HorizontalGridLineBrush == null || Rows.Count == 0 || Columns.Count == 0)
                 return;
+
+            Rectangle TopLeftCellBounds = _CellBounds[new GridCell(_Rows[0], _Columns[0])];
+            Rectangle BottomRightCellBounds = _CellBounds[new GridCell(_Rows[^1], _Columns[^1])];
+
+            int Left = TopLeftCellBounds.Left - Math.Max(0, ColumnSpacing - GridLineMargin);
+            int Right = BottomRightCellBounds.Right + Math.Max(0, ColumnSpacing - GridLineMargin);
+            int Top = TopLeftCellBounds.Top - Math.Max(0, RowSpacing - GridLineMargin);
+            int Bottom = BottomRightCellBounds.Bottom + Math.Max(0, RowSpacing - GridLineMargin);
 
             int FilledHeight = RowSpacing - GridLineMargin * 2;
 
             if (GridLinesVisibility.HasFlag(GridLinesVisibility.TopEdge))
             {
-                Rectangle TopGridLineBounds = new(LayoutBounds.Left, LayoutBounds.Top, LayoutBounds.Width, FilledHeight);
+                Rectangle TopGridLineBounds = new(Left, Top, Right - Left, FilledHeight);
                 HorizontalGridLineBrush.Draw(DA, this, TopGridLineBounds);
             }
 
             if (GridLinesVisibility.HasFlag(GridLinesVisibility.BottomEdge))
             {
-                Rectangle BottomGridLineBounds = new(LayoutBounds.Left, LayoutBounds.Bottom - FilledHeight, LayoutBounds.Width, FilledHeight);
+                Rectangle BottomGridLineBounds = new(Left, Bottom - FilledHeight, Right - Left, FilledHeight);
                 HorizontalGridLineBrush.Draw(DA, this, BottomGridLineBounds);
             }
 
@@ -1177,7 +1185,7 @@ namespace MGUI.Core.UI.Containers.Grids
 
                     if (i != Rows.Count - 1)
                     {
-                        Rectangle GridLineBounds = new(LayoutBounds.Left, Row.Top + Row.Height + GridLineMargin, LayoutBounds.Width, FilledHeight);
+                        Rectangle GridLineBounds = new(Left, Row.Top + Row.Height + GridLineMargin, Right - Left, FilledHeight);
                         HorizontalGridLineBrush.Draw(DA, this, GridLineBounds);
                     }
                 }
@@ -1186,20 +1194,28 @@ namespace MGUI.Core.UI.Containers.Grids
 
         private void DrawVerticalGridLines(ElementDrawArgs DA, Rectangle LayoutBounds)
         {
-            if (DA.Opacity <= 0 || DA.Opacity.IsAlmostZero() || VerticalGridLineBrush == null || Columns.Count == 0)
+            if (DA.Opacity <= 0 || DA.Opacity.IsAlmostZero() || VerticalGridLineBrush == null || Columns.Count == 0 || Columns.Count == 0)
                 return;
+
+            Rectangle TopLeftCellBounds = _CellBounds[new GridCell(_Rows[0], _Columns[0])];
+            Rectangle BottomRightCellBounds = _CellBounds[new GridCell(_Rows[^1], _Columns[^1])];
+
+            int Left = TopLeftCellBounds.Left - Math.Max(0, ColumnSpacing - GridLineMargin);
+            int Right = BottomRightCellBounds.Right + Math.Max(0, ColumnSpacing - GridLineMargin);
+            int Top = TopLeftCellBounds.Top - Math.Max(0, RowSpacing - GridLineMargin);
+            int Bottom = BottomRightCellBounds.Bottom + Math.Max(0, RowSpacing - GridLineMargin);
 
             int FilledWidth = ColumnSpacing - GridLineMargin * 2;
 
             if (GridLinesVisibility.HasFlag(GridLinesVisibility.LeftEdge))
             {
-                Rectangle LeftGridLineBounds = new(LayoutBounds.Left, LayoutBounds.Top, FilledWidth, LayoutBounds.Height);
+                Rectangle LeftGridLineBounds = new(Left, Top, FilledWidth, Bottom - Top);
                 VerticalGridLineBrush.Draw(DA, this, LeftGridLineBounds);
             }
 
             if (GridLinesVisibility.HasFlag(GridLinesVisibility.RightEdge))
             {
-                Rectangle RightGridLineBounds = new(LayoutBounds.Right - FilledWidth, LayoutBounds.Top, FilledWidth, LayoutBounds.Height);
+                Rectangle RightGridLineBounds = new(Right - FilledWidth, Top, FilledWidth, Bottom - Top);
                 VerticalGridLineBrush.Draw(DA, this, RightGridLineBounds);
             }
 
@@ -1211,7 +1227,7 @@ namespace MGUI.Core.UI.Containers.Grids
 
                     if (i != Columns.Count - 1)
                     {
-                        Rectangle GridLineBounds = new(Column.Left + Column.Width + GridLineMargin, LayoutBounds.Top, FilledWidth, LayoutBounds.Height);
+                        Rectangle GridLineBounds = new(Column.Left + Column.Width + GridLineMargin, Top, FilledWidth, Bottom - Top);
                         VerticalGridLineBrush.Draw(DA, this, GridLineBounds);
                     }
                 }
