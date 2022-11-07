@@ -161,7 +161,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLUniformGrid : XAMLElement
+    public class XAMLUniformGrid : XAMLMultiContentHost
     {
         public int? Rows { get; set; }
         public int? Columns { get; set; }
@@ -187,43 +187,49 @@ namespace MGUI.Core.UI.XAML
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
-            MGUniformGrid StaticGrid = Element as MGUniformGrid;
+            MGUniformGrid Grid = Element as MGUniformGrid;
 
             if (Rows.HasValue)
-                StaticGrid.Rows = Rows.Value;
+                Grid.Rows = Rows.Value;
             if (Columns.HasValue)
-                StaticGrid.Columns = Columns.Value;
+                Grid.Columns = Columns.Value;
             if (CellSize.HasValue)
-                StaticGrid.CellSize = CellSize.Value.ToSize();
+                Grid.CellSize = CellSize.Value.ToSize();
             if (HeaderRowHeight.HasValue)
-                StaticGrid.HeaderRowHeight = HeaderRowHeight.Value;
+                Grid.HeaderRowHeight = HeaderRowHeight.Value;
             if (HeaderColumnWidth.HasValue)
-                StaticGrid.HeaderColumnWidth = HeaderColumnWidth.Value;
+                Grid.HeaderColumnWidth = HeaderColumnWidth.Value;
 
             if (SelectionMode.HasValue)
-                StaticGrid.SelectionMode = SelectionMode.Value;
+                Grid.SelectionMode = SelectionMode.Value;
             if (CanDeselectByClickingSelectedCell.HasValue)
-                StaticGrid.CanDeselectByClickingSelectedCell = CanDeselectByClickingSelectedCell.Value;
+                Grid.CanDeselectByClickingSelectedCell = CanDeselectByClickingSelectedCell.Value;
             if (SelectionBackground != null)
-                StaticGrid.SelectionBackground = SelectionBackground.ToFillBrush();
+                Grid.SelectionBackground = SelectionBackground.ToFillBrush();
             if (SelectionOverlay != null)
-                StaticGrid.SelectionOverlay = SelectionOverlay.ToFillBrush();
+                Grid.SelectionOverlay = SelectionOverlay.ToFillBrush();
 
             if (GridLineIntersectionHandling.HasValue)
-                StaticGrid.GridLineIntersectionHandling = GridLineIntersectionHandling.Value;
+                Grid.GridLineIntersectionHandling = GridLineIntersectionHandling.Value;
             if (GridLinesVisibility.HasValue)
-                StaticGrid.GridLinesVisibility = GridLinesVisibility.Value;
+                Grid.GridLinesVisibility = GridLinesVisibility.Value;
             if (GridLineMargin.HasValue)
-                StaticGrid.GridLineMargin = GridLineMargin.Value;
+                Grid.GridLineMargin = GridLineMargin.Value;
             if (HorizontalGridLineBrush != null)
-                StaticGrid.HorizontalGridLineBrush = HorizontalGridLineBrush.ToFillBrush();
+                Grid.HorizontalGridLineBrush = HorizontalGridLineBrush.ToFillBrush();
             if (VerticalGridLineBrush != null)
-                StaticGrid.VerticalGridLineBrush = VerticalGridLineBrush.ToFillBrush();
+                Grid.VerticalGridLineBrush = VerticalGridLineBrush.ToFillBrush();
 
             if (RowSpacing.HasValue)
-                StaticGrid.RowSpacing = RowSpacing.Value;
+                Grid.RowSpacing = RowSpacing.Value;
             if (ColumnSpacing.HasValue)
-                StaticGrid.ColumnSpacing = ColumnSpacing.Value;
+                Grid.ColumnSpacing = ColumnSpacing.Value;
+
+            foreach (XAMLElement Child in Children)
+            {
+                MGElement ChildElement = Child.ToElement<MGElement>(Grid.SelfOrParentWindow, Grid);
+                Grid.TryAddChild(Child.GridRow, Child.GridColumn, ChildElement);
+            }
         }
     }
 

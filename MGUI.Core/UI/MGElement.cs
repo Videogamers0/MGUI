@@ -93,7 +93,6 @@ namespace MGUI.Core.UI
     //maybe a subclass of MGImage for showing animations? Automatically cycles through a set list of textures/sourcerects without invoking LayoutChanged each time
     //		under the assumption each frame of the animation is same size. MGAnimatedImage(bool IsUniform) (if !IsUniform, has to invoke LayoutChanged)
     //chatbox
-    //IconedTextBlock - just a textblock that has an image on the left of it, so you don't need to make a horizontal stackpanel and add both elements to it
     //
     //BasicXAMLDesigner : MGwindow
     //      Content is Grid with 3 rows 1 column
@@ -126,8 +125,6 @@ namespace MGUI.Core.UI
     //maybe MGElement should have a: List<MGElement> AttachedElements { get; }
     //		This would specifically be for elements where the parent doesn't normally have a reference to the child, such as MGResizeGrip when using MGResizeGrip.Host to attach to
     //		The Visual Tree traversal logic should have an additional parameter, IncludeAttached
-    //maybe AttachedElement, has MGElement Element, MGElement Host, handles things like updating layout when host updates layout, handles drawing self when host ends draw etc
-    //		could even be like component, with updatepriority/drawpriority
 
     /// <summary>Base class for all UI elements.</summary>
     public abstract class MGElement : IMouseHandlerHost, IKeyboardHandlerHost

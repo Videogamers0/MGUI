@@ -1106,7 +1106,6 @@ namespace MGUI.Core.UI.Containers.Grids
                     }
                 }
             }
-
         }
 
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)

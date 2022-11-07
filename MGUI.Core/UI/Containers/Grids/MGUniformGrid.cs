@@ -53,10 +53,8 @@ namespace MGUI.Core.UI.Containers.Grids
         }
     }
 
-    /// <summary>Represents a 2d grid of cells, where each cell has a known, uniform size.<br/>
-    /// Nested content cannot be added to the cells. Instead, content is directly rendered by the caller via events and delegates such as <see cref="RenderCell"/>.<para/>
-    /// Typically used for things like a player's inventory, or a table filled with static content like skill icons</summary>
-    public class MGUniformGrid : MGElement
+    /// <summary>Represents a 2d grid of cells, where each cell has a known, uniform size (such as a player's inventory)</summary>
+    public class MGUniformGrid : MGMultiContentHost
     {
         #region Dimensions
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -144,9 +142,200 @@ namespace MGUI.Core.UI.Containers.Grids
             }
         }
 
-        private Dictionary<GridCellIndex, Rectangle> _CellBounds { get; }
+        private Dictionary<GridCellIndex, Rectangle> _CellBounds = new();
+        /// <summary>Warning - the <see cref="Rectangle"/>s in this dictionary do not account for <see cref="MGElement.BoundsOffset"/></summary>
         public IReadOnlyDictionary<GridCellIndex, Rectangle> CellBounds => _CellBounds;
+
+        private Dictionary<GridCellIndex, Rectangle> GetCellBounds(Rectangle LayoutBounds, bool IncludeGridLineMargin)
+        {
+            Dictionary<GridCellIndex, Rectangle> CellBounds = new();
+
+            int CurrentX = LayoutBounds.Left + Padding.Left;
+            if (GridLinesVisibility.HasFlag(GridLinesVisibility.LeftEdge))
+                CurrentX += Math.Max(0, ColumnSpacing - GridLineMargin);
+
+            for (int ColumnIndex = 0; ColumnIndex < this.Columns; ColumnIndex++)
+            {
+                int ColumnWidth = ColumnIndex == 0 && HeaderColumnWidth.HasValue ? HeaderColumnWidth.Value : CellSize.Width;
+
+                int CurrentY = LayoutBounds.Top + Padding.Top;
+                if (GridLinesVisibility.HasFlag(GridLinesVisibility.TopEdge))
+                    CurrentY += Math.Max(0, RowSpacing - GridLineMargin);
+
+                for (int RowIndex = 0; RowIndex < this.Rows; RowIndex++)
+                {
+                    int RowHeight = RowIndex == 0 && HeaderRowHeight.HasValue ? HeaderRowHeight.Value : CellSize.Height;
+
+                    GridCellIndex Cell = new(RowIndex, ColumnIndex);
+                    Rectangle PaddedBounds = new(CurrentX, CurrentY, ColumnWidth, RowHeight);
+                    Rectangle ActualBounds = IncludeGridLineMargin ? PaddedBounds : PaddedBounds.GetExpanded(Math.Max(0, GridLineMargin));
+                    CellBounds.Add(Cell, ActualBounds);
+
+                    CurrentY += RowHeight + RowSpacing;
+                }
+
+                CurrentX += ColumnWidth + ColumnSpacing;
+            }
+
+            return CellBounds;
+        }
         #endregion Dimensions
+
+        #region Elements
+        /// <summary>All content in this <see cref="MGUniformGrid"/>, indexed by the <see cref="GridCellIndex"/> it resides in.</summary>
+        private readonly Dictionary<GridCellIndex, List<MGElement>> ChildrenByRC = new();
+        /// <summary>A lookup table that returns the <see cref="GridCellIndex"/> that a given <see cref="MGElement"/> resides in.</summary>
+        private readonly Dictionary<MGElement, GridCellIndex> ChildCellLookup = new();
+
+        /// <summary>Retrieves the <see cref="GridCellIndex"/> that the given <paramref name="Element"/> belongs to.</summary>
+        public bool TryGetCell(MGElement Element, out GridCellIndex Cell) => ChildCellLookup.TryGetValue(Element, out Cell);
+
+        public IReadOnlyDictionary<GridCellIndex, IReadOnlyList<MGElement>> GetRowContent(int Row)
+        {
+            Dictionary<GridCellIndex, List<MGElement>> RowContent = new();
+            for (int Column = 0; Column < Columns; Column++)
+            {
+                GridCellIndex Cell = new(Row, Column);
+                if (ChildrenByRC.TryGetValue(Cell, out List<MGElement> Elements))
+                    RowContent.Add(Cell, Elements);
+            }
+            return RowContent.ToDictionary(x => x.Key, x => x.Value as IReadOnlyList<MGElement>);
+        }
+
+        public IReadOnlyDictionary<GridCellIndex, IReadOnlyList<MGElement>> GetColumnContent(int Column)
+        {
+            Dictionary<GridCellIndex, List<MGElement>> ColumnContent = new();
+            for (int Row = 0; Row < Rows; Row++)
+            {
+                GridCellIndex Cell = new(Row, Column);
+                if (ChildrenByRC.TryGetValue(Cell, out List<MGElement> Elements))
+                    ColumnContent.Add(Cell, Elements);
+            }
+            return ColumnContent.ToDictionary(x => x.Key, x => x.Value as IReadOnlyList<MGElement>);
+        }
+
+        public IReadOnlyList<MGElement> GetCellContent(int Row, int Column) => GetCellContent(new GridCellIndex(Row, Column));
+        public IReadOnlyList<MGElement> GetCellContent(GridCellIndex Cell)
+        {
+            if (ChildrenByRC.TryGetValue(Cell, out List<MGElement> Elements))
+                return Elements;
+            else
+                return new List<MGElement>();
+        }
+
+        public bool TryAddChild(int Row, int Column, MGElement Item) => TryAddChild(new GridCellIndex(Row, Column), Item);
+        /// <returns>True if the given <paramref name="Item"/> was successfully added.<br/>
+        /// False otherwise, such as if <see cref="MGContentHost.CanChangeContent"/> is false.</returns>
+        public bool TryAddChild(GridCellIndex Cell, MGElement Item)
+        {
+            if (!CanChangeContent)
+                return false;
+            if (Item == null)
+                throw new ArgumentNullException(nameof(Item));
+            if (_Children.Contains(Item))
+                throw new InvalidOperationException($"{nameof(MGUniformGrid)} does not support adding the same {nameof(MGElement)} multiple times.");
+            if (!IsValidCellIndex(Cell))
+                throw new ArgumentOutOfRangeException($"Cell: {Cell.Row},{Cell.Column}. Row must be >= 0 and < {nameof(MGUniformGrid)}.{nameof(Rows)}, Column must be >= 0 and < {nameof(MGUniformGrid)}.{nameof(MGUniformGrid.Columns)}");
+
+            if (!ChildrenByRC.TryGetValue(Cell, out var CellContent))
+            {
+                CellContent = new();
+                ChildrenByRC.Add(Cell, CellContent);
+            }
+
+            CellContent.Add(Item);
+            ChildCellLookup[Item] = Cell;
+
+            _Children.Add(Item);
+            return true;
+        }
+
+        /// <returns>True if the given <paramref name="Item"/> was found in <see cref="MGMultiContentHost.Children"/> and was successfully removed.<br/>
+        /// False otherwise, such as if <see cref="MGContentHost.CanChangeContent"/> is false.</returns>
+        public bool TryRemoveChild(MGElement Item)
+        {
+            if (!CanChangeContent)
+                return false;
+
+            if (_Children.Remove(Item))
+            {
+                GridCellIndex Cell = ChildCellLookup[Item];
+                ChildrenByRC[Cell].Remove(Item);
+                ChildCellLookup.Remove(Item);
+                return true;
+            }
+            else
+                return false;
+        }
+
+        /// <summary>Removes all elements from every row/column of this grid</summary>
+        public bool TryRemoveAll()
+        {
+            if (!CanChangeContent)
+                return false;
+
+            _Children.ClearOneByOne();
+            ChildrenByRC.Clear();
+            ChildCellLookup.Clear();
+            return true;
+        }
+
+        public List<MGElement> ClearCellContent(int Row, int Column) => ClearCellContent(new GridCellIndex(Row, Column));
+        public List<MGElement> ClearCellContent(GridCellIndex Cell)
+        {
+            List<MGElement> Removed = new();
+            if (!CanChangeContent)
+                return Removed;
+
+            IReadOnlyList<MGElement> CellContent = GetCellContent(Cell);
+            foreach (MGElement Element in CellContent)
+            {
+                if (_Children.Remove(Element))
+                {
+                    Removed.Add(Element);
+                    ChildCellLookup.Remove(Element);
+                }
+            }
+
+            if (Removed.Any())
+            {
+                if (Removed.Count == CellContent.Count)
+                    ChildrenByRC.Remove(Cell);
+                else
+                {
+#if DEBUG
+                    throw new Exception($"{nameof(MGGrid)}.{nameof(ClearCellContent)}: failed to remove all elements in {Cell.Row},{Cell.Column}");
+#else
+                    ChildrenByRC[Cell].RemoveAll(x => Removed.Contains(x));
+#endif
+                }
+            }
+
+            return Removed;
+        }
+
+        public List<MGElement> ClearRowContent(int Row)
+        {
+            List<MGElement> Removed = new();
+            for (int Column = 0; Column < Columns; Column++)
+            {
+                GridCellIndex Cell = new(Row, Column);
+                Removed.AddRange(ClearCellContent(Cell));
+            }
+            return Removed;
+        }
+
+        public List<MGElement> ClearColumnContent(int Column)
+        {
+            List<MGElement> Removed = new();
+            for (int Row = 0; Row < Rows; Row++)
+            {
+                GridCellIndex Cell = new(Row, Column);
+                Removed.AddRange(ClearCellContent(Cell));
+            }
+            return Removed;
+        }
+        #endregion Elements
 
         #region Selection
         private MouseHandler SelectionMouseHandler { get; }
@@ -382,37 +571,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 SelectionMode = GridSelectionMode.None;
                 CurrentSelection = null;
 
-                OnLayoutBoundsChanged += (sender, e) =>
-                {
-                    //  Compute the bounds of each cell
-                    _CellBounds.Clear();
-
-                    int CurrentX = e.NewValue.Left + Padding.Left;
-                    if (GridLinesVisibility.HasFlag(GridLinesVisibility.LeftEdge))
-                        CurrentX += Math.Max(0, ColumnSpacing - GridLineMargin);
-
-                    for (int ColumnIndex = 0; ColumnIndex < this.Columns; ColumnIndex++)
-                    {
-                        int ColumnWidth = ColumnIndex == 0 && HeaderColumnWidth.HasValue ? HeaderColumnWidth.Value : CellSize.Width;
-
-                        int CurrentY = e.NewValue.Top + Padding.Top;
-                        if (GridLinesVisibility.HasFlag(GridLinesVisibility.TopEdge))
-                            CurrentY += Math.Max(0, RowSpacing - GridLineMargin);
-
-                        for (int RowIndex = 0; RowIndex < this.Rows; RowIndex++)
-                        {
-                            int RowHeight = RowIndex == 0 && HeaderRowHeight.HasValue ? HeaderRowHeight.Value : CellSize.Height;
-
-                            GridCellIndex Cell = new(RowIndex, ColumnIndex);
-                            Rectangle CellBounds = new(CurrentX, CurrentY, ColumnWidth, RowHeight);
-                            _CellBounds.Add(Cell, CellBounds);
-
-                            CurrentY += RowHeight + RowSpacing;
-                        }
-
-                        CurrentX += ColumnWidth + ColumnSpacing;
-                    }
-                };
+                OnLayoutBoundsChanged += (sender, e) => { _CellBounds = GetCellBounds(e.NewValue, true); };
 
                 this.CellBackground = new(null);
             }
@@ -456,6 +615,22 @@ namespace MGUI.Core.UI.Containers.Grids
                 TotalHeight += HeaderRowHeight.Value - CellSize.Height;
 
             return new(TotalWidth, TotalHeight, 0, 0);
+        }
+
+        protected override Thickness UpdateContentMeasurement(Size AvailableSize) => new(0);
+
+        protected override void UpdateContentLayout(Rectangle Bounds)
+        {
+            _CellBounds = GetCellBounds(LayoutBounds, true);
+            foreach (var KVP in _CellBounds)
+            {
+                Rectangle CellBounds = KVP.Value;
+                foreach (MGElement Element in GetCellContent(KVP.Key))
+                {
+                    Rectangle ElementBounds = Rectangle.Intersect(LayoutBounds, CellBounds);
+                    Element.UpdateLayout(ElementBounds);
+                }
+            }
         }
 
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
