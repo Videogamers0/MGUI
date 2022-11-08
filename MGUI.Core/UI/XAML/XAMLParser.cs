@@ -10,6 +10,10 @@ using Microsoft.Xna.Framework;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using Microsoft.Xna.Framework.Graphics;
+using System.IO;
+using System.Xml;
+using System.Xml.Linq;
+using MGUI.Shared.Helpers;
 
 #if UseWPF
 using System.Xaml;
@@ -22,12 +26,12 @@ namespace MGUI.Core.UI.XAML
     {
         private const string XMLNameSpaceBaseUri = @"http://schemas.microsoft.com/winfx/2006/xaml/presentation";
 
-        public const string XMLLocalNameSpacePrefix = "local";
+        public const string XMLLocalNameSpacePrefix = "MGUI";
         public static readonly string XMLLocalNameSpaceUri = $"clr-namespace:{nameof(MGUI)}.{nameof(Core)}.{nameof(UI)}.{nameof(XAML)};assembly={nameof(MGUI)}.{nameof(Core)}";
 
         private static readonly string XMLNameSpaces = 
             $"xmlns=\"{XMLNameSpaceBaseUri}\" xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\" xmlns:{XMLLocalNameSpacePrefix}=\"{XMLLocalNameSpaceUri}\"";
-            //$"xmlns:x=\"{XMLNameSpaceBaseUri}\" xmlns=\"{XMLLocalNameSpaceUri}\"";; // This URI avoids using a prefix for the local namespace
+            //$"xmlns:x=\"{XMLNameSpaceBaseUri}\" xmlns=\"{XMLLocalNameSpaceUri}\""; // This URI avoids using a prefix for the MGUI namespace
 
         private static readonly Dictionary<string, string> ElementNameAliases = new()
         {
@@ -78,7 +82,34 @@ namespace MGUI.Core.UI.XAML
             { "UniformGrid", nameof(XAMLUniformGrid) },
             { "DockPanel", nameof(XAMLDockPanel) },
             { "StackPanel", nameof(XAMLStackPanel) },
-            { "OverlayPanel", nameof(XAMLOverlayPanel) }
+            { "OverlayPanel", nameof(XAMLOverlayPanel) },
+
+            //  Abbreviated names
+            { "CP", nameof(XAMLContentPresenter) },
+            { "HCP", nameof(XAMLHeaderedContentPresenter) },
+            { "CM", nameof(XAMLContextMenu) },
+            { "CMB", nameof(XAMLContextMenuButton) },
+            { "CMT", nameof(XAMLContextMenuToggle) },
+            { "CMS", nameof(XAMLContextMenuSeparator) },
+            { "GB", nameof(XAMLGroupBox) },
+            { "LB", nameof(XAMLListBox) },
+            { "LV", nameof(XAMLListView) },
+            { "LVC", nameof(XAMLListViewColumn) },
+            { "RB", nameof(XAMLRadioButton) },
+            { "RC", nameof(XAMLRatingControl) },
+            { "RG", nameof(XAMLResizeGrip) },
+            { "SV", nameof(XAMLScrollViewer) },
+            { "TC", nameof(XAMLTabControl) },
+            { "TI", nameof(XAMLTabItem) },
+            { "TB", nameof(XAMLTextBlock) },
+            { "TT", nameof(XAMLToolTip) },
+            { "RD", nameof(XAMLRowDefinition) },
+            { "CD", nameof(XAMLColumnDefinition) },
+            { "GS", nameof(XAMLGridSplitter) },
+            { "UG", nameof(XAMLUniformGrid) },
+            { "DP", nameof(XAMLDockPanel) },
+            { "SP", nameof(XAMLStackPanel) },
+            { "OP", nameof(XAMLOverlayPanel) }
         };
 
         private static string ValidateXAMLString(string XAMLString)
@@ -100,25 +131,59 @@ namespace MGUI.Core.UI.XAML
                 }
             }
 
+            //  Replace all element names with their fully-qualified, aliased name, such as:
+            //  "<Button/>"                 --> "<MGUI:XAMLButton/>"
+            //  "<Button Content="Foo" />"  --> "<MGUI:XAMLButton Content="Foo" />"
+            //  "<Button.Content>"          --> "<MGUI:XAMLButton.Content>"
+            //  ("XAMLButton" is the aliased name for "Button", and the type exists in the xml namespace referenced by the "MGUI" prefix)
+#if true
+            XDocument Document = XDocument.Parse(XAMLString);
+
+            foreach (var Element in Document.Descendants())
+            {
+                string ElementName = Element.Name.LocalName;
+                foreach (KeyValuePair<string, string> KVP in ElementNameAliases)
+                {
+                    if (ElementName.StartsWith(KVP.Key))
+                    {
+                        Element.Name = XName.Get(ElementName.ReplaceFirstOccurrence(KVP.Key, KVP.Value), XMLLocalNameSpaceUri);
+                        break;
+                    }
+                }
+            }
+
+            using (StringWriter SW = new())
+            {
+                using (XmlWriter XW = XmlWriter.Create(SW, new XmlWriterSettings() { OmitXmlDeclaration = true, Indent = true }))
+                {
+                    Document.WriteTo(XW);
+                }
+
+                string Result = SW.ToString();
+                return Result;
+            }
+#else
             StringBuilder SB = new(XAMLString);
             foreach (KeyValuePair<string, string> KVP in ElementNameAliases)
             {
-#if true
-                SB.Replace($"<{KVP.Key}", $"<{XMLLocalNameSpacePrefix}:{KVP.Value}");
-                SB.Replace($"</{KVP.Key}", $"</{XMLLocalNameSpacePrefix}:{KVP.Value}");
-#else
-                SB.Replace($"<{KVP.Key}", $"<{KVP.Value}");
-                SB.Replace($"</{KVP.Key}", $"</{KVP.Value}");
-#endif
+                SB.Replace($"<{KVP.Key} ", $"<{XMLLocalNameSpacePrefix}:{KVP.Value} ");
+                SB.Replace($"<{KVP.Key}.", $"<{XMLLocalNameSpacePrefix}:{KVP.Value}.");
+                SB.Replace($"<{KVP.Key}/", $"<{XMLLocalNameSpacePrefix}:{KVP.Value}/");
+                SB.Replace($"<{KVP.Key}>", $"<{XMLLocalNameSpacePrefix}:{KVP.Value}>");
+
+                SB.Replace($"</{KVP.Key} ", $"</{XMLLocalNameSpacePrefix}:{KVP.Value} ");
+                SB.Replace($"</{KVP.Key}.", $"</{XMLLocalNameSpacePrefix}:{KVP.Value}.");
+                SB.Replace($"</{KVP.Key}>", $"</{XMLLocalNameSpacePrefix}:{KVP.Value}>");
             }
             return SB.ToString();
+#endif
         }
 
 #if UseWPF
         /// <param name="SanitizeXAMLString">If true, the given <paramref name="XAMLString"/> will be pre-processed via the following logic:<para/>
         /// 1. Trim leading and trailing whitespace<br/>
         /// 2. Insert required XML namespaces (such as "xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation")<br/>
-        /// 3. Replace aliased type names with their fully-qualified type names, such as "Button" -> "local:XAMLButton" where the "local" namespace prefix points to the URI defined by <see cref="XMLLocalNameSpaceUri"/></param>
+        /// 3. Replace aliased type names with their fully-qualified type names, such as "Button" -> "MGUI:XAMLButton" where the "MGUI" namespace prefix points to the URI defined by <see cref="XMLLocalNameSpaceUri"/></param>
         /// <param name="ReplaceLinebreakLiterals">If true, the literal string @"\n" will be replaced with "&#38;#x0a;", which is the XAML representation of the linebreak character '\n'.<br/>
         /// If false, setting the text of an <see cref="MGTextBlock"/> requires encoding the '\n' character as ""&#38;#x0a;""<para/>
         /// See also: <see href="https://stackoverflow.com/a/183435/11689514"/></param>
@@ -136,7 +201,7 @@ namespace MGUI.Core.UI.XAML
         /// <param name="SanitizeXAMLString">If true, the given <paramref name="XAMLString"/> will be pre-processed via the following logic:<para/>
         /// 1. Trim leading and trailing whitespace<br/>
         /// 2. Insert required XML namespaces (such as "xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation")<br/>
-        /// 3. Replace aliased type names with their fully-qualified type names, such as "Button" -> "local:XAMLButton" where the "local" namespace prefix points to the URI defined by <see cref="XMLLocalNameSpaceUri"/></param>
+        /// 3. Replace aliased type names with their fully-qualified type names, such as "Button" -> "MGUI:XAMLButton" where the "MGUI" namespace prefix points to the URI defined by <see cref="XMLLocalNameSpaceUri"/></param>
         /// <param name="ReplaceLinebreakLiterals">If true, the literal string @"\n" will be replaced with the "v", which is the XAML representation of the linebreak character '\n'.<br/>
         /// If false, setting the text of an <see cref="MGTextBlock"/> requires encoding the '\n' character as ""&#38;#x0a;""<para/>
         /// See also: <see href="https://stackoverflow.com/a/183435/11689514"/></param>

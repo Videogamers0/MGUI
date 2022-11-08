@@ -23,14 +23,10 @@ namespace MGUI.Core.UI.XAML
         public HorizontalAlignment? HorizontalContentAlignment { get; set; }
         public VerticalAlignment? VerticalContentAlignment { get; set; }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public HorizontalAlignment? HA { get => HorizontalAlignment; set => HorizontalAlignment = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public VerticalAlignment? VA { get => VerticalAlignment; set => VerticalAlignment = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public HorizontalAlignment? HCA { get => HorizontalContentAlignment; set => HorizontalContentAlignment = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public VerticalAlignment? VCA { get => VerticalContentAlignment; set => VerticalContentAlignment = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public HorizontalAlignment? HA { get => HorizontalAlignment; set => HorizontalAlignment = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public VerticalAlignment? VA { get => VerticalAlignment; set => VerticalAlignment = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public HorizontalAlignment? HCA { get => HorizontalContentAlignment; set => HorizontalContentAlignment = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public VerticalAlignment? VCA { get => VerticalContentAlignment; set => VerticalContentAlignment = value; }
 
         public int? MinWidth { get; set; }
         public int? MinHeight { get; set; }
@@ -38,12 +34,10 @@ namespace MGUI.Core.UI.XAML
         public int? MaxHeight { get; set; }
 
         public int? PreferredWidth { get; set; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public int? Width { get => PreferredWidth; set => PreferredWidth = value; }
-
         public int? PreferredHeight { get; set; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public int? Height { get => PreferredHeight; set => PreferredHeight = value; }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int? Width { get => PreferredWidth; set => PreferredWidth = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int? Height { get => PreferredHeight; set => PreferredHeight = value; }
 
         public XAMLToolTip ToolTip { get; set; }
         public XAMLContextMenu ContextMenu { get; set; }
@@ -80,6 +74,11 @@ namespace MGUI.Core.UI.XAML
         public bool GridAffectsMeasure { get; set; } = true;
         /// <summary>Used by <see cref="XAMLOverlayPanel"/>'s children</summary>
         public XAMLThickness Offset { get; set; } = new();
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int Row { get => GridRow; set => GridRow = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int Column { get => GridColumn; set => GridColumn = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int RowSpan { get => GridRowSpan; set => GridRowSpan = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int ColumnSpan { get => GridColumnSpan; set => GridColumnSpan = value; }
 
         public Dictionary<string, object> AttachedProperties { get; set; } = new();
 

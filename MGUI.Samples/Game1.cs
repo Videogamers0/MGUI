@@ -296,10 +296,15 @@ namespace MGUI.Samples
                 };
             }
 
-            if (XAMLWindow.TryGetElementByName("CB", out MGComboBox<string> TestComboBox))
+            if (XAMLWindow.TryGetElementByName("CB", out MGComboBox<object> TestComboBox))
             {
                 List<string> Items = Enumerable.Range(0, 26).Select(x => ((char)(x + 'a')).ToString()).ToList();
-                TestComboBox.SetItemsSource(Items);
+                TestComboBox.SetItemsSource(Items.Cast<object>().ToList());
+            }
+            
+            if (XAMLWindow.TryGetElementByName("CM1", out MGContextMenu CM))
+            {
+
             }
 
             base.Initialize();

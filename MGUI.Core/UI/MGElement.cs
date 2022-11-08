@@ -79,7 +79,6 @@ namespace MGUI.Core.UI
     }
 
     //TODO
-    //change default itemtype of listview and listbox to Object? make a method overload that takes in ICollection<Object> and just casts them to TItemType?
     //statusbar, menubar/menuitems
     //      messagebox
     //          has icon docked left

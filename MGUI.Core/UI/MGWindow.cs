@@ -724,6 +724,17 @@ namespace MGUI.Core.UI
                     DragWindowPositionOffset = null;
                 }
             };
+
+            //  Pre-emptively handle mouse release events if user was dragging this window
+            //  so that the child content doesn't also react to the mouse release
+            //  (such as if you end the mouse drag by releasing the mouse overtop of a button)
+            OnBeginUpdateContents += (sender, e) =>
+            {
+                if (IsDraggingWindowPosition)
+                {
+                    MouseHandler.Tracker.CurrentButtonReleasedEvents[MouseButton.Left]?.SetHandled(this, false);
+                }
+            };
         }
         #endregion Drag Window Position
 
