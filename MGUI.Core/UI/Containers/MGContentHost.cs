@@ -272,10 +272,10 @@ namespace MGUI.Core.UI.Containers
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds) { }
     }
 
-    /// <summary>A wrapper element that displays a <see cref="HeaderContent"/> at a given <see cref="HeaderPosition"/> in addition to the <see cref="MGSingleContentHost.Content"/></summary>
+    /// <summary>A wrapper element that displays a <see cref="Header"/> at a given <see cref="HeaderPosition"/> in addition to the <see cref="MGSingleContentHost.Content"/></summary>
     public class MGHeaderedContentPresenter : MGSingleContentHost
     {
-        public MGElement HeaderContent
+        public MGElement Header
         {
             get => HeaderPresenter.Content;
             set => HeaderPresenter.SetContent(value);
@@ -336,8 +336,11 @@ namespace MGUI.Core.UI.Containers
             }
         }
 
+        public const int DefaultSpacing = 5;
+
         private int _Spacing;
-        /// <summary>Empty space, in pixels, between the <see cref="HeaderContent"/> and <see cref="MGSingleContentHost.Content"/>.</summary>
+        /// <summary>Empty space, in pixels, between the <see cref="Header"/> and <see cref="MGSingleContentHost.Content"/>.<para/>
+        /// Default value: <see cref="DefaultSpacing"/></summary>
         public int Spacing
         {
             get => _Spacing;
@@ -384,6 +387,8 @@ namespace MGUI.Core.UI.Containers
                 AddComponent(HeaderPresenterComponent);
 
                 SetHeaderPosition(Dock.Left, true);
+
+                Spacing = DefaultSpacing;
             }
         }
     }

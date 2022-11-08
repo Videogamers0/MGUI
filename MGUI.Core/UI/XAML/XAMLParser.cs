@@ -47,6 +47,7 @@ namespace MGUI.Core.UI.XAML
             { "Expander", nameof(XAMLExpander) },
             { "GroupBox", nameof(XAMLGroupBox) },
             { "Image", nameof(XAMLImage) },
+            { "ListBox", nameof(XAMLListBox) },
             { "ListView", nameof(XAMLListView) },
             { "ListViewColumn", nameof(XAMLListViewColumn) },
             { "PasswordBox", nameof(XAMLPasswordBox) },

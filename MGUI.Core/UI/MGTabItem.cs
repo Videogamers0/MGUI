@@ -16,27 +16,27 @@ namespace MGUI.Core.UI
         public MGTabControl TabControl { get; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private MGElement _HeaderContent;
+        private MGElement _Header;
         /// <summary>The content to display inside the tab's header.<para/>
         /// This content is automatically wrapped inside of an <see cref="MGButton"/> that is created via <see cref="MGTabControl.UnselectedTabHeaderTemplate"/> or <see cref="MGTabControl.SelectedTabHeaderTemplate"/>,<br/>
         /// See also: <see cref="IsTabSelected"/>, <see cref="MGTabControl.SelectedTab"/></summary>
-        public MGElement HeaderContent
+        public MGElement Header
         {
-            get => _HeaderContent;
+            get => _Header;
             set
             {
-                if (_HeaderContent != value)
+                if (_Header != value)
                 {
-                    MGElement Previous = HeaderContent;
-                    _HeaderContent = value;
-                    HeaderContentChanged?.Invoke(this, new(Previous, HeaderContent));
+                    MGElement Previous = Header;
+                    _Header = value;
+                    HeaderChanged?.Invoke(this, new(Previous, Header));
                     LayoutChanged(this, true);
                 }
             }
         }
 
-        /// <summary>Invoked after <see cref="HeaderContent"/> has changed.</summary>
-        public event EventHandler<EventArgs<MGElement>> HeaderContentChanged;
+        /// <summary>Invoked after <see cref="Header"/> has changed.</summary>
+        public event EventHandler<EventArgs<MGElement>> HeaderChanged;
 
         /// <summary>Convenience property that is really just an alias for <see cref="MGTabControl.SelectedTab"/>.<para/>
         /// See also:<br/><see cref="MGTabControl.TrySelectTab(MGTabItem)"/><br/><see cref="MGTabControl.TrySelectTabAtIndex(int)"/><br/><see cref="MGTabControl.TryDeselectTab(MGTabItem, bool)"/></summary>
@@ -52,13 +52,13 @@ namespace MGUI.Core.UI
             }
         }
 
-        internal MGTabItem(MGTabControl TabControl, MGElement HeaderContent, MGElement TabContent)
+        internal MGTabItem(MGTabControl TabControl, MGElement Header, MGElement TabContent)
             : base(TabControl.ParentWindow, MGElementType.TabItem)
         {
             using (BeginInitializing())
             {
                 this.TabControl = TabControl;
-                this.HeaderContent = HeaderContent;
+                this.Header = Header;
                 SetContent(TabContent);
                 SetParent(TabControl);
             }

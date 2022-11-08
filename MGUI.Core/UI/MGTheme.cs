@@ -193,7 +193,7 @@ namespace MGUI.Core.UI
                     );
                 _Backgrounds[MGElementType.GridSplitter] = GridSplitterBG;
 
-                //  GroupBox/ListView/ProgressBar/TabControl
+                //  GroupBox/ListBox/ListView/ProgressBar/TabControl
                 ThemeManagedVisualStateFillBrush BrightNeutralBG =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
@@ -201,6 +201,7 @@ namespace MGUI.Core.UI
                             null, PressedModifierType.Darken, 0.06f)
                     );
                 _Backgrounds[MGElementType.GroupBox] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
+                _Backgrounds[MGElementType.ListBox] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
                 _Backgrounds[MGElementType.ListView] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
                 _Backgrounds[MGElementType.ProgressBar] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
                 _Backgrounds[MGElementType.TabControl] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));

@@ -184,9 +184,9 @@ namespace MGUI.Core.UI
         private readonly List<MGListViewColumn<TItemType>> _Columns;
         public IReadOnlyList<MGListViewColumn<TItemType>> Columns => _Columns;
 
-        public MGListViewColumn<TItemType> AddColumn(ListViewColumnWidth Width, MGElement HeaderContent, Func<TItemType, MGElement> DataTemplate)
+        public MGListViewColumn<TItemType> AddColumn(ListViewColumnWidth Width, MGElement Header, Func<TItemType, MGElement> DataTemplate)
         {
-            MGListViewColumn<TItemType> Column = new(this, Width, HeaderContent, DataTemplate);
+            MGListViewColumn<TItemType> Column = new(this, Width, Header, DataTemplate);
             _Columns.Add(Column);
             return Column;
         }
@@ -320,7 +320,7 @@ namespace MGUI.Core.UI
             foreach (XAMLListViewColumn ColumnDefinition in Settings.Columns)
             {
                 ListViewColumnWidth Width = ColumnDefinition.Width.ToWidth();
-                MGElement Header = ColumnDefinition.HeaderContent.ToElement<MGElement>(SelfOrParentWindow, this);
+                MGElement Header = ColumnDefinition.Header.ToElement<MGElement>(SelfOrParentWindow, this);
                 AddColumn(Width, Header, x => new MGTextBlock(SelfOrParentWindow, x.ToString()));
             }
 
@@ -441,24 +441,24 @@ namespace MGUI.Core.UI
         public ColumnDefinition DataColumn { get; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private MGElement _HeaderContent;
+        private MGElement _Header;
         /// <summary>The content to display in the header row of the list view.</summary>
-        public MGElement HeaderContent
+        public MGElement Header
         {
-            get => _HeaderContent;
+            get => _Header;
             set
             {
-                if (_HeaderContent != value)
+                if (_Header != value)
                 {
-                    _HeaderContent = value;
+                    _Header = value;
 
                     RowDefinition HeaderRow = HeaderGrid.Rows.First();
                     using (HeaderGrid.AllowChangingContentTemporarily())
                     {
                         HeaderGrid.ClearCellContent(HeaderRow, HeaderColumn);
-                        if (HeaderContent != null)
+                        if (Header != null)
                         {
-                            HeaderGrid.TryAddChild(HeaderRow, HeaderColumn, HeaderContent);
+                            HeaderGrid.TryAddChild(HeaderRow, HeaderColumn, Header);
                         }
                     }
                 }
@@ -498,7 +498,7 @@ namespace MGUI.Core.UI
             }
         }
 
-        internal MGListViewColumn(MGListView<TItemType> ListView, ListViewColumnWidth Width, MGElement HeaderContent, Func<TItemType, MGElement> DataTemplate)
+        internal MGListViewColumn(MGListView<TItemType> ListView, ListViewColumnWidth Width, MGElement Header, Func<TItemType, MGElement> DataTemplate)
         {
             this.ListView = ListView;
             this.Width = Width;
@@ -512,7 +512,7 @@ namespace MGUI.Core.UI
             this.HeaderColumn = HeaderGrid.AddColumn(Width.Length);
             this.DataColumn = DataGrid.AddColumn(Width.Length);
 
-            this.HeaderContent = HeaderContent;
+            this.Header = Header;
 
             this.DataTemplate = DataTemplate;
         }

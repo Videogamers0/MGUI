@@ -54,14 +54,12 @@ namespace MGUI.Core.UI.XAML
     }
 
 #if UseWPF
-    [ContentProperty(nameof(HeaderContent))]
+    [ContentProperty(nameof(Header))]
 #endif
     public class XAMLListViewColumn
     {
         public XAMLListViewColumnWidth Width { get; set; }
-        public XAMLElement HeaderContent { get; set; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public XAMLElement Header { get => HeaderContent; set => HeaderContent = value; }
+        public XAMLElement Header { get; set; }
     }
 
     [TypeConverter(typeof(XAMLListViewColumnWidthStringConverter))]

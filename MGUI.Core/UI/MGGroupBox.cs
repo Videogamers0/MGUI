@@ -22,8 +22,8 @@ namespace MGUI.Core.UI
         {
             foreach (MGElement Child in base.GetVisualTreeChildren())
                 yield return Child;
-            if (HeaderContent != null)
-                yield return HeaderContent;
+            if (Header != null)
+                yield return Header;
         }
 
         #region Border
@@ -50,35 +50,35 @@ namespace MGUI.Core.UI
         #endregion Border
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private MGElement _HeaderContent;
-        public MGElement HeaderContent
+        private MGElement _Header;
+        public MGElement Header
         {
-            get => _HeaderContent;
+            get => _Header;
             set
             {
-                if (_HeaderContent != value)
+                if (_Header != value)
                 {
-                    if (HeaderContent != null)
+                    if (Header != null)
                     {
-                        InvokeContentRemoved(HeaderContent);
-                        HeaderContent.SetParent(null);
+                        InvokeContentRemoved(Header);
+                        Header.SetParent(null);
                     }
-                    _HeaderContent = value;
-                    if (HeaderContent != null)
+                    _Header = value;
+                    if (Header != null)
                     {
-                        HeaderContent.SetParent(this);
-                        InvokeContentAdded(HeaderContent);
+                        Header.SetParent(this);
+                        InvokeContentAdded(Header);
                     }
                     LayoutChanged(this, true);
                 }
             }
         }
 
-        public bool HasHeader => HeaderContent != null;
+        public bool HasHeader => Header != null;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _HeaderHorizontalMargin;
-        /// <summary>The empty width to the left and the right of the <see cref="HeaderContent"/>. This space will not be occupied by the top portion of the border.</summary>
+        /// <summary>The empty width to the left and the right of the <see cref="Header"/>. This space will not be occupied by the top portion of the border.</summary>
         public int HeaderHorizontalMargin
         {
             get => _HeaderHorizontalMargin;
@@ -94,7 +94,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _HeaderHorizontalPadding;
-        /// <summary>The empty width to the left and the right of the <see cref="HeaderContent"/>. This space WILL be occupied by the top portion of the border.</summary>
+        /// <summary>The empty width to the left and the right of the <see cref="Header"/>. This space WILL be occupied by the top portion of the border.</summary>
         public int HeaderHorizontalPadding
         {
             get => _HeaderHorizontalPadding;
@@ -108,7 +108,7 @@ namespace MGUI.Core.UI
             }
         }
 
-        public MGGroupBox(MGWindow Window, MGElement HeaderContent = null)
+        public MGGroupBox(MGWindow Window, MGElement Header = null)
             : base(Window, MGElementType.GroupBox)
         {
             using (BeginInitializing())
@@ -122,7 +122,7 @@ namespace MGUI.Core.UI
 
                 this.Padding = new(8,4,8,8);
 
-                this.HeaderContent = HeaderContent;
+                this.Header = Header;
 
                 OnLayoutUpdated += (sender, e) =>
                 {
@@ -130,9 +130,9 @@ namespace MGUI.Core.UI
                     {
                         Size HeaderlessSize = GetHeaderlessSize();
                         Size AvailableSize = LayoutBounds.Size.AsSize().Subtract(HeaderlessSize, 0, 0);
-                        this.HeaderContent.UpdateMeasurement(AvailableSize, out _, out Thickness HeaderContentSize, out _, out _);
+                        this.Header.UpdateMeasurement(AvailableSize, out _, out Thickness HeaderContentSize, out _, out _);
                         Rectangle HeaderBounds = new(LayoutBounds.Left + BorderThickness.Left + HeaderHorizontalMargin + HeaderHorizontalPadding, LayoutBounds.Top, HeaderContentSize.Width, HeaderContentSize.Height);
-                        this.HeaderContent.UpdateLayout(HeaderBounds);
+                        this.Header.UpdateLayout(HeaderBounds);
                     }
                 };
             }
@@ -140,7 +140,7 @@ namespace MGUI.Core.UI
 
         protected override void UpdateContents(ElementUpdateArgs UA)
         {
-            HeaderContent?.Update(UA);
+            Header?.Update(UA);
             base.UpdateContents(UA);
         }
 
@@ -156,10 +156,10 @@ namespace MGUI.Core.UI
             Size HeaderlessSize = GetHeaderlessSize();
 
             Thickness HeaderSize = new(0);
-            if (HeaderContent != null)
+            if (Header != null)
             {
                 Size RemainingSize = AvailableSize.Subtract(HeaderlessSize, 0, 0);
-                HeaderContent.UpdateMeasurement(RemainingSize, out _, out HeaderSize, out _, out _);
+                Header.UpdateMeasurement(RemainingSize, out _, out HeaderSize, out _, out _);
             }
 
             SharedSize = new(HeaderHorizontalMargin * 2 + HeaderHorizontalPadding * 2 + HeaderSize.Width, 0, 0, 0);
@@ -173,10 +173,10 @@ namespace MGUI.Core.UI
         public override void DrawBackground(ElementDrawArgs DA, Rectangle LayoutBounds)
         {
             Rectangle ActualLayoutBounds = LayoutBounds;
-            if (HeaderContent != null)
+            if (Header != null)
             {
                 //  Move the top edge of the background downwards by half the header's height (since we also do this to the border)
-                ActualLayoutBounds = new(LayoutBounds.Left, LayoutBounds.Top + HeaderContent.LayoutBounds.Height / 2, LayoutBounds.Width, LayoutBounds.Height - HeaderContent.LayoutBounds.Height / 2);
+                ActualLayoutBounds = new(LayoutBounds.Left, LayoutBounds.Top + Header.LayoutBounds.Height / 2, LayoutBounds.Width, LayoutBounds.Height - Header.LayoutBounds.Height / 2);
             }
             base.DrawBackground(DA, ActualLayoutBounds);
         }
@@ -184,10 +184,10 @@ namespace MGUI.Core.UI
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
         {
             Rectangle BorderBounds = LayoutBounds;
-            if (HeaderContent != null)
+            if (Header != null)
             {
                 //  Move the top edge of the border down by half the header's height
-                BorderBounds = new(LayoutBounds.Left, LayoutBounds.Top + HeaderContent.LayoutBounds.Height / 2, LayoutBounds.Width, LayoutBounds.Height - HeaderContent.LayoutBounds.Height / 2);
+                BorderBounds = new(LayoutBounds.Left, LayoutBounds.Top + Header.LayoutBounds.Height / 2, LayoutBounds.Width, LayoutBounds.Height - Header.LayoutBounds.Height / 2);
             }
 
             //  Draw each side of the border
@@ -204,7 +204,7 @@ namespace MGUI.Core.UI
                     //  Divide the top border into 2 pieces, the part to the left of the header content and the part to the right of it
                     int StartX = BorderBounds.Left + BT.Left;
                     Brush.Draw(DA, this, new(StartX, BorderBounds.Top, HeaderHorizontalPadding, BT.Top));
-                    StartX += HeaderHorizontalPadding + HeaderHorizontalMargin + HeaderContent.LayoutBounds.Width + HeaderHorizontalMargin;
+                    StartX += HeaderHorizontalPadding + HeaderHorizontalMargin + Header.LayoutBounds.Width + HeaderHorizontalMargin;
                     Brush.Draw(DA, this, new(StartX, BorderBounds.Top, BorderBounds.Right - StartX, BT.Top));
                 }
                 else
@@ -216,7 +216,7 @@ namespace MGUI.Core.UI
                 Brush.Draw(DA, this, new(BorderBounds.Left + BT.Left, BorderBounds.Bottom - BT.Bottom, BorderBounds.Width - BT.Width, BT.Bottom));
 
             //  Draw the header
-            HeaderContent?.Draw(DA);
+            Header?.Draw(DA);
         }
     }
 }

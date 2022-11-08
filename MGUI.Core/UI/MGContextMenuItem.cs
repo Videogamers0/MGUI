@@ -375,8 +375,8 @@ namespace MGUI.Core.UI
             });
         }
 
-        internal MGContextMenuToggle(MGContextMenu Menu, MGElement HeaderContent, bool IsChecked)
-            : base(Menu, ContextMenuItemType.Toggle, Menu.ButtonWrapperTemplate(), HeaderContent)
+        internal MGContextMenuToggle(MGContextMenu Menu, MGElement Header, bool IsChecked)
+            : base(Menu, ContextMenuItemType.Toggle, Menu.ButtonWrapperTemplate(), Header)
         {
             Menu.ButtonWrapperTemplateChanged += (sender, e) =>
             {

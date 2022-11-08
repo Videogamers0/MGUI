@@ -13,7 +13,8 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
         public static MGSolidFillBrush AsFillBrush(this Color @this) => new(@this);
     }
 
-    /// <summary>An <see cref="IFillBrush"/> that uses a single solid <see cref="Color"/> to fill its bounds.</summary>
+    /// <summary>An <see cref="IFillBrush"/> that uses a single solid <see cref="Color"/> to fill its bounds.<para/>
+    /// See also: <see cref="SolidFillBrushes"/>, which contains several static <see cref="MGSolidFillBrush"/> such as <see cref="SolidFillBrushes.Green"/></summary>
     public readonly struct MGSolidFillBrush : IFillBrush
     {
         //TODO change the references to these static MGSolidFillBrushes to use the newer statics in SolidFillBrushes class

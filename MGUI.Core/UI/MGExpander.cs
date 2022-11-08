@@ -65,8 +65,8 @@ namespace MGUI.Core.UI
         public int ExpanderDropdownArrowSize { get; set; }
         #endregion Expander Button
 
-        #region Header Content
-        /// <summary>The empty width between the expander button and the <see cref="HeaderContent"/></summary>
+        #region Header
+        /// <summary>The empty width between the expander button and the <see cref="Header"/></summary>
         public int HeaderSpacingWidth
         {
             get => HeadersPanelElement.Spacing;
@@ -74,38 +74,38 @@ namespace MGUI.Core.UI
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private MGElement _HeaderContent;
+        private MGElement _Header;
         /// <summary>Optional. Additional content to display to the right of the expander button.</summary>
-        public MGElement HeaderContent
+        public MGElement Header
         {
-            get => _HeaderContent;
+            get => _Header;
             set
             {
-                if (_HeaderContent != value)
+                if (_Header != value)
                 {
-                    if (HeaderContent != null)
+                    if (Header != null)
                     {
                         using (HeadersPanelElement.AllowChangingContentTemporarily())
                         {
-                            HeadersPanelElement.TryRemoveChild(HeaderContent);
+                            HeadersPanelElement.TryRemoveChild(Header);
                         }
                     }
 
-                    _HeaderContent = value;
+                    _Header = value;
 
-                    if (HeaderContent != null)
+                    if (Header != null)
                     {
                         using (HeadersPanelElement.AllowChangingContentTemporarily())
                         {
-                            HeadersPanelElement.TryAddChild(HeaderContent);
+                            HeadersPanelElement.TryAddChild(Header);
                         }
                     }
                 }
             }
         }
 
-        public bool HasHeader => HeaderContent != null;
-        #endregion Header Content
+        public bool HasHeader => Header != null;
+        #endregion Header
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsExpanded;

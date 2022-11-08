@@ -50,6 +50,7 @@ namespace MGUI.Core.UI
 
         //  Data Display
         ListView,
+        ListBox,
         //TreeView?
 
         //  User Info

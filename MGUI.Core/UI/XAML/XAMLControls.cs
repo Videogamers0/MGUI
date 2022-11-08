@@ -27,8 +27,7 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLHeaderedContentPresenter : XAMLSingleContentHost
     {
-        public XAMLElement HeaderContent { get; set; }
-        public XAMLElement Header { get => HeaderContent; set => HeaderContent = value; }
+        public XAMLElement Header { get; set; }
 
         public Dock? HeaderPosition { get; set; }
         public int? Spacing { get; set; }
@@ -38,8 +37,8 @@ namespace MGUI.Core.UI.XAML
         {
             MGHeaderedContentPresenter ContentPresenter = Element as MGHeaderedContentPresenter;
 
-            if (HeaderContent != null)
-                ContentPresenter.HeaderContent = HeaderContent.ToElement<MGElement>(ContentPresenter.ParentWindow, ContentPresenter);
+            if (Header != null)
+                ContentPresenter.Header = Header.ToElement<MGElement>(ContentPresenter.ParentWindow, ContentPresenter);
             if (HeaderPosition.HasValue)
                 ContentPresenter.HeaderPosition = HeaderPosition.Value;
             if (Spacing.HasValue)
@@ -188,9 +187,7 @@ namespace MGUI.Core.UI.XAML
         public int? ExpanderDropdownArrowSize { get; set; }
 
         public int? HeaderSpacingWidth { get; set; }
-        public XAMLElement HeaderContent { get; set; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public XAMLElement Header { get => HeaderContent; set => HeaderContent = value; }
+        public XAMLElement Header { get; set; }
 
         public bool? IsExpanded { get; set; }
         public Visibility? ExpandedVisibility { get; set; }
@@ -221,8 +218,8 @@ namespace MGUI.Core.UI.XAML
 
             if (HeaderSpacingWidth.HasValue)
                 Expander.HeaderSpacingWidth = HeaderSpacingWidth.Value;
-            if (HeaderContent != null)
-                Expander.HeaderContent = HeaderContent.ToElement<MGElement>(Element.SelfOrParentWindow, Parent);
+            if (Header != null)
+                Expander.Header = Header.ToElement<MGElement>(Element.SelfOrParentWindow, Parent);
 
             if (IsExpanded.HasValue)
                 Expander.IsExpanded = IsExpanded.Value;
@@ -242,9 +239,7 @@ namespace MGUI.Core.UI.XAML
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public XAMLThickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
-        public XAMLElement HeaderContent { get; set; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public XAMLElement Header { get => HeaderContent; set => HeaderContent = value; }
+        public XAMLElement Header { get; set; }
 
         public int? HeaderHorizontalMargin { get; set; }
         public int? HeaderHorizontalPadding { get; set; }
@@ -259,8 +254,8 @@ namespace MGUI.Core.UI.XAML
                 GroupBox.BorderBrush = (MGUniformBorderBrush)BorderBrush.ToBorderBrush();
             if (BorderThickness.HasValue)
                 GroupBox.BorderThickness = BorderThickness.Value.ToThickness();
-            if (HeaderContent != null)
-                GroupBox.HeaderContent = HeaderContent.ToElement<MGElement>(Element.SelfOrParentWindow, Parent);
+            if (Header != null)
+                GroupBox.Header = Header.ToElement<MGElement>(Element.SelfOrParentWindow, Parent);
             if (HeaderHorizontalMargin.HasValue)
                 GroupBox.HeaderHorizontalMargin = HeaderHorizontalMargin.Value;
             if (HeaderHorizontalPadding.HasValue)
@@ -844,9 +839,7 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLTabItem : XAMLSingleContentHost
     {
-        public XAMLElement HeaderContent { get; set; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public XAMLElement Header { get => HeaderContent; set => HeaderContent = value; }
+        public XAMLElement Header { get; set; }
 
         public bool? IsTabSelected { get; set; }
 
@@ -854,7 +847,7 @@ namespace MGUI.Core.UI.XAML
         {
             if (Parent is MGTabControl TabControl)
             {
-                MGElement HeaderElement = HeaderContent?.ToElement<MGElement>(Window, null);
+                MGElement HeaderElement = Header?.ToElement<MGElement>(Window, null);
                 MGElement ContentElement = Content?.ToElement<MGElement>(Window, null);
                 return TabControl.AddTab(HeaderElement, ContentElement);
             }

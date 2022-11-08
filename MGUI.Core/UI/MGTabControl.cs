@@ -85,7 +85,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<MGTabItem, MGButton> _UnselectedTabHeaderTemplate;
-        /// <summary>Creates the wrapper element that hosts the given <see cref="MGTabItem"/>'s <see cref="MGTabItem.HeaderContent"/> for tabs that aren't selected.<para/>
+        /// <summary>Creates the wrapper element that hosts the given <see cref="MGTabItem"/>'s <see cref="MGTabItem.Header"/> for tabs that aren't selected.<para/>
         /// See also: <see cref="SelectedTabHeaderTemplate"/></summary>
         public Func<MGTabItem, MGButton> UnselectedTabHeaderTemplate
         {
@@ -107,7 +107,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<MGTabItem, MGButton> _SelectedTabHeaderTemplate;
-        /// <summary>Creates the wrapper element that hosts the given <see cref="MGTabItem"/>'s <see cref="MGTabItem.HeaderContent"/> for the selected tab.<para/>
+        /// <summary>Creates the wrapper element that hosts the given <see cref="MGTabItem"/>'s <see cref="MGTabItem.Header"/> for the selected tab.<para/>
         /// See also: <see cref="UnselectedTabHeaderTemplate"/></summary>
         public Func<MGTabItem, MGButton> SelectedTabHeaderTemplate
         {
@@ -135,7 +135,7 @@ namespace MGUI.Core.UI
                 if (ManagedReplaceHeadersPanelChild(OldHeaderWrapper, NewHeaderWrapper))
                 {
                     OldHeaderWrapper.SetContent(null as MGElement);
-                    NewHeaderWrapper.SetContent(Tab.HeaderContent);
+                    NewHeaderWrapper.SetContent(Tab.Header);
                     ActualTabHeaders[Tab] = NewHeaderWrapper;
                 }
             }
@@ -281,7 +281,7 @@ namespace MGUI.Core.UI
                         {
                             foreach (MGTabItem Item in e.NewItems)
                             {
-                                Item.HeaderContentChanged += Tab_HeaderContentChanged;
+                                Item.HeaderChanged += Tab_HeaderChanged;
                             }
                         }
                     }
@@ -292,7 +292,7 @@ namespace MGUI.Core.UI
                         {
                             foreach (MGTabItem Item in e.OldItems)
                             {
-                                Item.HeaderContentChanged -= Tab_HeaderContentChanged;
+                                Item.HeaderChanged -= Tab_HeaderChanged;
                             }
                         }
                     }
@@ -321,7 +321,7 @@ namespace MGUI.Core.UI
             }
         }
 
-        private void Tab_HeaderContentChanged(object sender, EventArgs<MGElement> e)
+        private void Tab_HeaderChanged(object sender, EventArgs<MGElement> e)
         {
             MGTabItem TabItem = sender as MGTabItem;
             this.ActualTabHeaders[TabItem].SetContent(e.NewValue);

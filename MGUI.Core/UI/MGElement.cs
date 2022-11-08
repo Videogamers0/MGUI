@@ -79,7 +79,7 @@ namespace MGUI.Core.UI
     }
 
     //TODO
-    //listbox, statusbar, menubar/menuitems
+    //statusbar, menubar/menuitems
     //      messagebox
     //          has icon docked left
     //          button choices like YesNoCancel, OKCancel, or even custom where you can call AddButton(mgelement content) and they are appended in order etc
@@ -1291,10 +1291,10 @@ namespace MGUI.Core.UI
 
 			foreach (MGComponentBase Component in Components)
 			{
-				Size RemainingSizeorComponent = Component.UsesOwnersPadding ? RemainingSize.Subtract(PaddingSize, 0, 0) : RemainingSize;
+				Size RemainingSizeForComponent = Component.UsesOwnersPadding ? RemainingSize.Subtract(PaddingSize, 0, 0) : RemainingSize;
 
 				MGElement Element = Component.BaseElement;
-                Element.UpdateMeasurement(RemainingSizeorComponent, out _, out Thickness ComponentSize, out _, out _);
+                Element.UpdateMeasurement(RemainingSizeForComponent, out _, out Thickness ComponentSize, out _, out _);
 
 				Thickness ActualComponentSize = Component.ConsumesAnySpace ? Component.Arrange(ComponentSize) : new(0);
 				Thickness ComponentSharedSize = new(

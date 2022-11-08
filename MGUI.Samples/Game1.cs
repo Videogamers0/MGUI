@@ -78,17 +78,17 @@ namespace MGUI.Samples
         </OverlayPanel>
         <ListView Name=""TestLV"" Dock=""Right"" HA=""Right"" xmlns:System=""clr-namespace:System;assembly=mscorlib"" ItemType=""{x:Type System:Double}"">
             <ListViewColumn Width=""55px"">
-                <ListViewColumn.HeaderContent>
+                <ListViewColumn.Header>
                     <Button Content=""Test"" BG=""LightGray"" />
-                </ListViewColumn.HeaderContent>
+                </ListViewColumn.Header>
             </ListViewColumn>
-            <ListViewColumn HeaderContent=""Test"" Width=""*"" />
+            <ListViewColumn Header=""Test"" Width=""*"" />
         </ListView>
         <TabControl Name=""TC1"" Dock=""Left"" MinWidth=""150"" VA=""Top"">
-            <TabItem HeaderContent=""Tab1"">
+            <TabItem Header=""Tab1"">
                 <Button Content=""Test"" />
             </TabItem>
-            <TabItem HeaderContent=""Tab2"" />
+            <TabItem Header=""Tab2"" />
         </TabControl>-->
 
         <!--<Grid RowLengths=""Auto,1.5*,2*,60"" ColumnLengths=""Auto,15,*"">
@@ -186,14 +186,25 @@ namespace MGUI.Samples
             <Button BG=""OrangeRed"" GridRow=""5"" GridColumn=""3"" />
         </Grid>-->
 
-        <ListView Name=""LV1"" xmlns:System=""clr-namespace:System;assembly=mscorlib"" ItemType=""{x:Type System:Double}"">
+        <!--<ListView Name=""LV1"" xmlns:System=""clr-namespace:System;assembly=mscorlib"" ItemType=""{x:Type System:Double}"">
             <ListViewColumn Width=""80px"">
                 <ListViewColumn.Header>
                     <Button Content=""Test"" />
                 </ListViewColumn.Header>
             </ListViewColumn>
             <ListViewColumn Header=""Test"" Width=""*"" />
-        </ListView>
+        </ListView>-->
+
+<ListBox BG=""Red"" IsTitleVisible=""True"">
+    <ListBox.Header>
+        <HeaderedContentPresenter Spacing=""5"" HeaderPosition=""Left"">
+            <HeaderedContentPresenter.Header>
+                <Rectangle Width=""16"" Height=""16"" Fill=""RoyalBlue"" HA=""Center"" />
+            </HeaderedContentPresenter.Header>
+            <TextBlock Text=""Hello World"" />
+        </HeaderedContentPresenter>
+    </ListBox.Header>
+</ListBox>
 
         <!--<Grid Name=""TestGrid"" RowLengths=""100[50,],16,*[80,]"" ColumnLengths=""1*[50,150],16,1.5*[50,60],1.2*"">
             <TextBlock BG=""Red"" GridRow=""0"" GridColumn=""0"" />
