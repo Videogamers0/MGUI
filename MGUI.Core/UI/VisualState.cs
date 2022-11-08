@@ -32,15 +32,11 @@ namespace MGUI.Core.UI
 
     public readonly record struct VisualState(PrimaryVisualState Primary, SecondaryVisualState Secondary)
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public bool IsDisabled => Primary == PrimaryVisualState.Disabled;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public bool IsSelected => Primary == PrimaryVisualState.Selected;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public bool IsDisabled => Primary == PrimaryVisualState.Disabled;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public bool IsSelected => Primary == PrimaryVisualState.Selected;
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public bool IsPressed => Secondary == SecondaryVisualState.Pressed;
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public bool IsHovered => Secondary == SecondaryVisualState.Hovered;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public bool IsPressed => Secondary == SecondaryVisualState.Pressed;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public bool IsHovered => Secondary == SecondaryVisualState.Hovered;
 
         public SecondaryVisualState GetSecondaryState(bool SpoofIsPressed, bool SpoofIsHovered)
         {

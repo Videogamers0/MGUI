@@ -244,6 +244,11 @@ namespace MGUI.Core.UI.XAML
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public XAMLThickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
+        public XAMLExpander Expander { get; set; } = new();
+        public XAMLContentPresenter HeaderPresenter { get; set; } = new();
+
+        public bool? IsExpandable { get; set; }
+
         public XAMLElement Header { get; set; }
 
         public int? HeaderHorizontalMargin { get; set; }
@@ -255,10 +260,15 @@ namespace MGUI.Core.UI.XAML
         {
             MGGroupBox GroupBox = Element as MGGroupBox;
 
+            Expander.ApplySettings(GroupBox, GroupBox.Expander);
+            HeaderPresenter.ApplySettings(GroupBox, GroupBox.HeaderPresenter);
+
             if (BorderBrush != null)
                 GroupBox.BorderBrush = (MGUniformBorderBrush)BorderBrush.ToBorderBrush();
             if (BorderThickness.HasValue)
                 GroupBox.BorderThickness = BorderThickness.Value.ToThickness();
+            if (IsExpandable.HasValue)
+                GroupBox.IsExpandable = IsExpandable.Value;
             if (Header != null)
                 GroupBox.Header = Header.ToElement<MGElement>(Element.SelfOrParentWindow, Parent);
             if (HeaderHorizontalMargin.HasValue)

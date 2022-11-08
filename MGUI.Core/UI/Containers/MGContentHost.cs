@@ -389,6 +389,9 @@ namespace MGUI.Core.UI.Containers
                 SetHeaderPosition(Dock.Left, true);
 
                 Spacing = DefaultSpacing;
+
+                this.Header = Header;
+                SetContent(Content);
             }
         }
     }

@@ -22,8 +22,7 @@ namespace MGUI.Core.UI
         {
             foreach (MGElement Child in base.GetVisualTreeChildren())
                 yield return Child;
-            if (Header != null)
-                yield return Header;
+            yield return OuterHeaderPresenter;
         }
 
         #region Border
@@ -49,6 +48,16 @@ namespace MGUI.Core.UI
         }
         #endregion Border
 
+        private MGHeaderedContentPresenter OuterHeaderPresenter { get; }
+        public MGExpander Expander { get; }
+        public MGContentPresenter HeaderPresenter { get; }
+
+        public bool IsExpandable
+        {
+            get => Expander.Visibility == Visibility.Visible;
+            set => Expander.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGElement _Header;
         public MGElement Header
@@ -58,23 +67,16 @@ namespace MGUI.Core.UI
             {
                 if (_Header != value)
                 {
-                    if (Header != null)
-                    {
-                        InvokeContentRemoved(Header);
-                        Header.SetParent(null);
-                    }
                     _Header = value;
-                    if (Header != null)
+                    using (HeaderPresenter.AllowChangingContentTemporarily())
                     {
-                        Header.SetParent(this);
-                        InvokeContentAdded(Header);
+                        HeaderPresenter.SetContent(Header);
                     }
-                    LayoutChanged(this, true);
                 }
             }
         }
 
-        public bool HasHeader => Header != null;
+        private bool HasHeaderContent => IsExpandable || Header != null;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _HeaderHorizontalMargin;
@@ -120,27 +122,39 @@ namespace MGUI.Core.UI
                 BorderComponent.SetParent(this);
                 BorderComponent.ComponentParent = this;
 
+                this.Expander = new(Window);
+                Expander.Margin = new(0, 0, 5, 0);
+                Expander.VerticalAlignment = VerticalAlignment.Center;
+                this.HeaderPresenter = new(Window);
+                HeaderPresenter.VerticalAlignment = VerticalAlignment.Center;
+                HeaderPresenter.CanChangeContent = false;
+                this.OuterHeaderPresenter = new(Window, Expander, HeaderPresenter);
+                OuterHeaderPresenter.Spacing = 0;
+                OuterHeaderPresenter.CanChangeContent = false;
+                OuterHeaderPresenter.SetParent(this);
+
                 this.Padding = new(8,4,8,8);
 
                 this.Header = Header;
 
+                OnContentAdded += (sender, e) => { Expander.BindVisibility(e); };
+                OnContentRemoved += (sender, e) => { Expander.UnbindVisibility(e); };
+
                 OnLayoutUpdated += (sender, e) =>
                 {
-                    if (HasHeader)
-                    {
-                        Size HeaderlessSize = GetHeaderlessSize();
-                        Size AvailableSize = LayoutBounds.Size.AsSize().Subtract(HeaderlessSize, 0, 0);
-                        this.Header.UpdateMeasurement(AvailableSize, out _, out Thickness HeaderContentSize, out _, out _);
-                        Rectangle HeaderBounds = new(LayoutBounds.Left + BorderThickness.Left + HeaderHorizontalMargin + HeaderHorizontalPadding, LayoutBounds.Top, HeaderContentSize.Width, HeaderContentSize.Height);
-                        this.Header.UpdateLayout(HeaderBounds);
-                    }
+                    Size HeaderlessSize = GetHeaderlessSize();
+                    Size AvailableSize = LayoutBounds.Size.AsSize().Subtract(HeaderlessSize, 0, 0);
+                    this.OuterHeaderPresenter.UpdateMeasurement(AvailableSize, out _, out Thickness HeaderContentSize, out _, out _);
+                    Rectangle HeaderBounds = new(LayoutBounds.Left + BorderThickness.Left + HeaderHorizontalMargin + HeaderHorizontalPadding, LayoutBounds.Top, HeaderContentSize.Width, HeaderContentSize.Height);
+                    this.OuterHeaderPresenter.UpdateLayout(HeaderBounds);
                 };
+
             }
         }
 
         protected override void UpdateContents(ElementUpdateArgs UA)
         {
-            Header?.Update(UA);
+            OuterHeaderPresenter.Update(UA);
             base.UpdateContents(UA);
         }
 
@@ -155,12 +169,8 @@ namespace MGUI.Core.UI
         {
             Size HeaderlessSize = GetHeaderlessSize();
 
-            Thickness HeaderSize = new(0);
-            if (Header != null)
-            {
-                Size RemainingSize = AvailableSize.Subtract(HeaderlessSize, 0, 0);
-                Header.UpdateMeasurement(RemainingSize, out _, out HeaderSize, out _, out _);
-            }
+            Size RemainingSize = AvailableSize.Subtract(HeaderlessSize, 0, 0);
+            OuterHeaderPresenter.UpdateMeasurement(RemainingSize, out _, out Thickness HeaderSize, out _, out _);
 
             SharedSize = new(HeaderHorizontalMargin * 2 + HeaderHorizontalPadding * 2 + HeaderSize.Width, 0, 0, 0);
 
@@ -172,23 +182,16 @@ namespace MGUI.Core.UI
 
         public override void DrawBackground(ElementDrawArgs DA, Rectangle LayoutBounds)
         {
-            Rectangle ActualLayoutBounds = LayoutBounds;
-            if (Header != null)
-            {
-                //  Move the top edge of the background downwards by half the header's height (since we also do this to the border)
-                ActualLayoutBounds = new(LayoutBounds.Left, LayoutBounds.Top + Header.LayoutBounds.Height / 2, LayoutBounds.Width, LayoutBounds.Height - Header.LayoutBounds.Height / 2);
-            }
+            //  Move the top edge of the background downwards by half the header's height (since we also do this to the border)
+            Rectangle ActualLayoutBounds = new(LayoutBounds.Left, LayoutBounds.Top + OuterHeaderPresenter.LayoutBounds.Height / 2, LayoutBounds.Width, LayoutBounds.Height - OuterHeaderPresenter.LayoutBounds.Height / 2);
+
             base.DrawBackground(DA, ActualLayoutBounds);
         }
 
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
         {
-            Rectangle BorderBounds = LayoutBounds;
-            if (Header != null)
-            {
-                //  Move the top edge of the border down by half the header's height
-                BorderBounds = new(LayoutBounds.Left, LayoutBounds.Top + Header.LayoutBounds.Height / 2, LayoutBounds.Width, LayoutBounds.Height - Header.LayoutBounds.Height / 2);
-            }
+            //  Move the top edge of the border down by half the header's height
+            Rectangle BorderBounds = new(LayoutBounds.Left, LayoutBounds.Top + OuterHeaderPresenter.LayoutBounds.Height / 2, LayoutBounds.Width, LayoutBounds.Height - OuterHeaderPresenter.LayoutBounds.Height / 2);
 
             //  Draw each side of the border
             Thickness BT = BorderThickness;
@@ -199,12 +202,12 @@ namespace MGUI.Core.UI
                 Brush.Draw(DA, this, new(BorderBounds.Right - BT.Right, BorderBounds.Top, BT.Right, BorderBounds.Height));
             if (BT.Top > 0)
             {
-                if (HasHeader)
+                if (HasHeaderContent)
                 {
                     //  Divide the top border into 2 pieces, the part to the left of the header content and the part to the right of it
                     int StartX = BorderBounds.Left + BT.Left;
                     Brush.Draw(DA, this, new(StartX, BorderBounds.Top, HeaderHorizontalPadding, BT.Top));
-                    StartX += HeaderHorizontalPadding + HeaderHorizontalMargin + Header.LayoutBounds.Width + HeaderHorizontalMargin;
+                    StartX += HeaderHorizontalPadding + HeaderHorizontalMargin + OuterHeaderPresenter.LayoutBounds.Width + HeaderHorizontalMargin;
                     Brush.Draw(DA, this, new(StartX, BorderBounds.Top, BorderBounds.Right - StartX, BT.Top));
                 }
                 else
@@ -216,7 +219,7 @@ namespace MGUI.Core.UI
                 Brush.Draw(DA, this, new(BorderBounds.Left + BT.Left, BorderBounds.Bottom - BT.Bottom, BorderBounds.Width - BT.Width, BT.Bottom));
 
             //  Draw the header
-            Header?.Draw(DA);
+            OuterHeaderPresenter.Draw(DA);
         }
     }
 }

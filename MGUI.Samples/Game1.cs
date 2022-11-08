@@ -147,14 +147,7 @@ namespace MGUI.Samples
                                 </ContextMenu>
                             </ProgressBar.ContextMenu>
                         </ProgressBar>
-                        <GroupBox Name=""GB1"">
-                            <GroupBox.Header>
-                                <Expander Name=""GBExpander"">
-                                    <Expander.Header>
-                                        <TextBlock Text=""Expander Header"" Name=""TestHeader"" />
-                                    </Expander.Header>
-                                </Expander>
-                            </GroupBox.Header>
+                        <GroupBox Name=""GB1"" IsExpandable=""true"" Header=""Header of GroupBox"">
                             <Stopwatch IsRunning=""true"" />
                         </GroupBox>
                     </StackPanel>
@@ -252,15 +245,9 @@ namespace MGUI.Samples
                 UG.Columns = 5;
             }
 
-            if (XAMLWindow.TryGetElementByName("GB1", out MGGroupBox GB))
+            if (XAMLWindow.TryGetElementByName("GB1", out MGGroupBox GB1))
             {
-                if (XAMLWindow.TryGetElementByName("GBExpander", out MGExpander Expander))
-                {
-                    if (XAMLWindow.TryGetElementByName("TestHeader", out MGTextBlock TBHeader))
-                    {
-                        Expander.BindVisibility(GB.Content);
-                    }
-                }
+                //GB1.Header = new MGTextBlock(XAMLWindow, "Foo Bar Long text to test layout updating correctly after initialization", Color.Red);
             }
 
             if (XAMLWindow.TryGetElementByName("TestProgressBar", out MGProgressBar TestProgressBar))
