@@ -134,15 +134,18 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLComboBox : XAMLElement
+#if UseWPF
+    [ContentProperty(nameof(Items))]
+#endif
+    public class XAMLComboBox : XAMLMultiContentHost
     {
         /// <summary>The generic type that will be used when instantiating <see cref="MGComboBox{TItemType}"/>.<para/>
         /// To set this value from a XAML string, you must define the namespace the type belongs to, then use the x:Type Markup Extension<br/>
         /// (See: <see href="https://learn.microsoft.com/en-us/dotnet/desktop/xaml-services/xtype-markup-extension"/>)<para/>
         /// Example:
         /// <code>&lt;ComboBox xmlns:System="clr-namespace:System;assembly=mscorlib" ItemType="{x:Type System:Double}" /&gt;</code><para/>
-        /// Default value: typeof(string)</summary>
-        public Type ItemType { get; set; } = typeof(string);
+        /// Default value: <code>typeof(object)</code></summary>
+        public Type ItemType { get; set; } = typeof(object);
 
         public XAMLBorder Border { get; set; } = new();
 
@@ -159,6 +162,8 @@ namespace MGUI.Core.UI.XAML
         public int? DropdownArrowLeftMargin { get; set; }
         public int? DropdownArrowRightMargin { get; set; }
         public XAMLColor? DropdownArrowColor { get; set; }
+
+        public List<object> Items { get; set; } = new();
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {

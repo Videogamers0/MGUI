@@ -111,6 +111,16 @@ namespace MGUI.Core.UI.Containers
             return true;
         }
 
+        /// <summary>Removes all elements from every row/column of this grid</summary>
+        public bool TryRemoveAll()
+        {
+            if (!CanChangeContent)
+                return false;
+
+            _Children.ClearOneByOne();
+            return true;
+        }
+
         public MGStackPanel(MGWindow Window, Orientation Orientation)
             : base(Window, MGElementType.StackPanel)
         {

@@ -195,16 +195,21 @@ namespace MGUI.Samples
             <ListViewColumn Header=""Test"" Width=""*"" />
         </ListView>-->
 
-<ListBox BG=""Red"" IsTitleVisible=""True"">
-    <ListBox.Header>
-        <HeaderedContentPresenter Spacing=""5"" HeaderPosition=""Left"">
-            <HeaderedContentPresenter.Header>
-                <Rectangle Width=""16"" Height=""16"" Fill=""RoyalBlue"" HA=""Center"" />
-            </HeaderedContentPresenter.Header>
-            <TextBlock Text=""Hello World"" />
-        </HeaderedContentPresenter>
-    </ListBox.Header>
-</ListBox>
+        <ListBox IsTitleVisible=""True"" xmlns:System=""clr-namespace:System;assembly=mscorlib"" ItemType=""{x:Type System:String}"">
+            <ListBox.Header>
+                <HeaderedContentPresenter Spacing=""5"" HeaderPosition=""Left"">
+                    <HeaderedContentPresenter.Header>
+                        <Rectangle Width=""16"" Height=""16"" Fill=""RoyalBlue"" HA=""Center"" />
+                    </HeaderedContentPresenter.Header>
+                    <TextBlock Text=""Hello World"" />
+                </HeaderedContentPresenter>
+            </ListBox.Header>
+            <System:String>Hello!</System:String>
+            <System:String>Baz</System:String>
+            <System:String>Foo</System:String>
+            <System:Double>115.0</System:Double>
+            <System:String>Bar</System:String>
+        </ListBox>
 
         <!--<Grid Name=""TestGrid"" RowLengths=""100[50,],16,*[80,]"" ColumnLengths=""1*[50,150],16,1.5*[50,60],1.2*"">
             <TextBlock BG=""Red"" GridRow=""0"" GridColumn=""0"" />

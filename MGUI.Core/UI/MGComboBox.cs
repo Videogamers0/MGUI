@@ -501,6 +501,25 @@ namespace MGUI.Core.UI
                 DropdownArrowRightMargin = Settings.DropdownArrowRightMargin.Value;
             if (Settings.DropdownArrowColor.HasValue)
                 DropdownArrowColor = Settings.DropdownArrowColor.Value.ToXNAColor();
+
+            if (Settings.Items?.Any() == true)
+            {
+                List<TItemType> TempItems = new();
+                Type TargetType = typeof(TItemType);
+                foreach (object Item in Settings.Items)
+                {
+                    if (TargetType.IsAssignableFrom(Item.GetType()))
+                    {
+                        TItemType Value = (TItemType)Item;
+                        TempItems.Add(Value);
+                    }
+                }
+
+                if (TempItems.Any())
+                {
+                    SetItemsSource(TempItems);
+                }
+            }
         }
     }
 }

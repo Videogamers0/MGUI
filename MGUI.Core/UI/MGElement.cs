@@ -79,12 +79,18 @@ namespace MGUI.Core.UI
     }
 
     //TODO
+    //change default itemtype of listview and listbox to Object? make a method overload that takes in ICollection<Object> and just casts them to TItemType?
     //statusbar, menubar/menuitems
     //      messagebox
     //          has icon docked left
     //          button choices like YesNoCancel, OKCancel, or even custom where you can call AddButton(mgelement content) and they are appended in order etc
-    //		dialogbox (a transparent window with a bordered img docked on 1 side, and a textblock taking up rest of space)
-    //			could have dialog options like yesnocancel or custom "commandlinks" like taskdialog
+    //          also 'commandlinks' like taskdialog
+    //dialoguebox
+    //      subclass of window, but mostly invisible
+    //      left is an optional image to display character portrait
+    //      rest is a border with a gradientfill background that displays a dockpanel
+    //      dockpanel has user choices on the bottom (optional)
+    //      rest is a textblock for the character's dialogue
     //maybe a subclass of MGImage for showing animations? Automatically cycles through a set list of textures/sourcerects without invoking LayoutChanged each time
     //		under the assumption each frame of the animation is same size. MGAnimatedImage(bool IsUniform) (if !IsUniform, has to invoke LayoutChanged)
     //chatbox

@@ -467,7 +467,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<TItemType, MGElement> _DataTemplate;
-        /// <summary>This function is invoked to instantiated the content of each cell in this column</summary>
+        /// <summary>This function is invoked to instantiate the content of each cell in this column</summary>
         public Func<TItemType, MGElement> DataTemplate
         {
             get => _DataTemplate;
