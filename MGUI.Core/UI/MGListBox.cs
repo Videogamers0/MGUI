@@ -40,6 +40,7 @@ namespace MGUI.Core.UI
         /// 2. <see cref="InnerBorder"/>: Wrapped around the <see cref="ItemsPanel"/>, but not the <see cref="TitleComponent"/><br/>
         /// 3. <see cref="TitleBorder"/>: Wrapped around the <see cref="TitleComponent"/></summary>
         public MGBorder OuterBorder { get; }
+        public override MGBorder GetBorder() => OuterBorder;
 
         public IBorderBrush OuterBorderBrush
         {
@@ -131,6 +132,8 @@ namespace MGUI.Core.UI
                                 _ = ItemsPanel.TryAddChild(LBI.ContentPresenter);
                         }
                     }
+
+                    ClearSelection();
                 }
             }
         }
@@ -140,9 +143,12 @@ namespace MGUI.Core.UI
         {
             using (ItemsPanel.AllowChangingContentTemporarily())
             {
+                HashSet<MGListBoxItem<TItemType>> Removed = new();
+
                 if (e.Action is NotifyCollectionChangedAction.Reset)
                 {
                     _ = ItemsPanel.TryRemoveAll();
+                    ClearSelection();
                 }
                 else if (e.Action is NotifyCollectionChangedAction.Add && e.NewItems != null)
                 {
@@ -157,7 +163,10 @@ namespace MGUI.Core.UI
                 {
                     foreach (MGListBoxItem<TItemType> Item in e.OldItems)
                     {
-                        ItemsPanel.TryRemoveChild(Item.ContentPresenter);
+                        if (ItemsPanel.TryRemoveChild(Item.ContentPresenter))
+                        {
+                            Removed.Add(Item);
+                        }
                     }
                 }
                 else if (e.Action is NotifyCollectionChangedAction.Replace)
@@ -166,13 +175,26 @@ namespace MGUI.Core.UI
                     List<MGListBoxItem<TItemType>> New = e.NewItems.Cast<MGListBoxItem<TItemType>>().ToList();
                     for (int i = 0; i < Old.Count; i++)
                     {
-                        ItemsPanel.TryReplaceChild(Old[i].ContentPresenter, New[i].ContentPresenter);
+                        if (ItemsPanel.TryReplaceChild(Old[i].ContentPresenter, New[i].ContentPresenter))
+                        {
+                            Removed.Add(Old[i]);
+                        }
                     }
                 }
                 else if (e.Action is NotifyCollectionChangedAction.Move)
                 {
                     throw new NotImplementedException();
                 }
+
+                //  Ensure none of the removed items are Selected
+                if (SelectedItems != null)
+                {
+                    List<MGListBoxItem<TItemType>> NewSelectedItems = SelectedItems.Where(x => !Removed.Contains(x)).ToList();
+                    if (NewSelectedItems.Count != SelectedItems.Count || !NewSelectedItems.SequenceEqual(SelectedItems))
+                        SelectedItems = NewSelectedItems.AsReadOnly();
+                }
+                if (SelectionSourceItem != null && Removed.Contains(SelectionSourceItem))
+                    SelectionSourceItem = null;
             }
         }
 
@@ -265,7 +287,7 @@ namespace MGUI.Core.UI
                 if (_SelectionMode != value)
                 {
                     _SelectionMode = value;
-                    SelectedItems = null;
+                    ClearSelection();
                 }
             }
         }
@@ -309,7 +331,11 @@ namespace MGUI.Core.UI
             }
         }
 
-        //TODO when items removed/cleared from the rowitems, ensure they're de-selected
+        public void ClearSelection()
+        {
+            SelectionSourceItem = null;
+            SelectedItems = null;
+        }
         #endregion Selection
 
         public MGScrollViewer ScrollViewer { get; }
@@ -380,9 +406,8 @@ namespace MGUI.Core.UI
         public event EventHandler<EventArgs> ItemContainerStyleChanged;
 
         //TODO:
-        //Default styles for things like hovering an listboxitem.contentpresenter (similar to comboboxitems?)
         //Readonlycollection<ifillbrush> alternatingrowbackgrounds. whenever this is set or when adding/removing items to the stackpanel
-        //          apply these background brushes to the contentpresenters
+        //          apply these background brushes to the InternalItems.Select(x => x.ContentPresenter).BackgroundBrush.NormalValue (which is usually null/transparent)
 
         public MGListBox(MGWindow ParentWindow)
             : base(ParentWindow, MGElementType.ListBox)
@@ -443,10 +468,32 @@ namespace MGUI.Core.UI
                     contentPresenter.BackgroundBrush = GetTheme().ListBoxItemBackground.GetValue(true);
                 };
                 this.DataTemplate = (item) => new MGTextBlock(ParentWindow, item.ToString()) { Padding = new(1,0) };
+
+                this.SelectionMode = ListBoxSelectionMode.Single;
+
+                MouseHandler.LMBReleasedInside += (sender, e) =>
+                {
+                    MGListBoxItem<TItemType> PressedItem = InternalItems?.FirstOrDefault(x => x.ContentPresenter.IsHovered);
+
+                    switch (this.SelectionMode)
+                    {
+                        case ListBoxSelectionMode.None:
+                            break;
+                        case ListBoxSelectionMode.Single:
+                            SelectionSourceItem = PressedItem;
+                            SelectedItems = PressedItem == null ? null : new List<MGListBoxItem<TItemType>>() { PressedItem }.AsReadOnly();
+                            break;
+                        case ListBoxSelectionMode.Contiguous:
+                            //TODO checks KeyboardHandler.Tracker.IsShiftDown / IsControlDown
+                            break;
+                        case ListBoxSelectionMode.Multiple:
+                            //TODO checks KeyboardHandler.Tracker.IsShiftDown / IsControlDown
+                            break;
+                        default: throw new NotImplementedException($"Unrecognized {nameof(ListBoxSelectionMode)}: {nameof(SelectionMode)}");
+                    }
+                };
             }
         }
-
-        public override MGBorder GetBorder() => OuterBorder;
 
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
         {

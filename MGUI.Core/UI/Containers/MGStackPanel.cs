@@ -20,6 +20,7 @@ namespace MGUI.Core.UI.Containers
         /// <summary>Provides direct access to this element's border.</summary>
         public MGComponent<MGBorder> BorderComponent { get; }
         private MGBorder BorderElement { get; }
+        public override MGBorder GetBorder() => BorderElement;
 
         public IBorderBrush BorderBrush
         {
@@ -32,8 +33,6 @@ namespace MGUI.Core.UI.Containers
             get => BorderElement.BorderThickness;
             set => BorderElement.BorderThickness = value;
         }
-
-        public override MGBorder GetBorder() => BorderElement;
         #endregion Border
 
         private Orientation _Orientation;

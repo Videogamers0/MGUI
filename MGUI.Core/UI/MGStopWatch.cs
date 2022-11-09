@@ -18,6 +18,7 @@ namespace MGUI.Core.UI
         /// <summary>Provides direct access to this element's border.</summary>
         public MGComponent<MGBorder> BorderComponent { get; }
         private MGBorder BorderElement { get; }
+        public override MGBorder GetBorder() => BorderElement;
 
         public IBorderBrush BorderBrush
         {
@@ -196,8 +197,6 @@ namespace MGUI.Core.UI
                 this.ValueDisplayFormat = DefaultValueDisplayFormat;
             }
         }
-
-        public override MGBorder GetBorder() => BorderElement;
 
         public override void UpdateSelf(ElementUpdateArgs UA)
         {

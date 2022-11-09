@@ -27,6 +27,7 @@ namespace MGUI.Core.UI
         /// <summary>Provides direct access to this element's border.</summary>
         public MGComponent<MGBorder> BorderComponent { get; }
         private MGBorder BorderElement { get; }
+        public override MGBorder GetBorder() => BorderElement;
 
         public IBorderBrush BorderBrush
         {
@@ -490,8 +491,6 @@ namespace MGUI.Core.UI
                 Dropdown.ValidateWindowSizeAndPosition();
             }
         }
-
-        public override MGBorder GetBorder() => BorderElement;
 
         //  This method is invoked via reflection in XAMLControls.XAMLComboBox.ApplyDerivedSettings.
         //  Do not modify the method signature.

@@ -294,7 +294,7 @@ namespace MGUI.Core.UI
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             null, Color.Yellow.AsFillBrush() * 0.65f, null,
-                            Color.LightBlue * 0.4f, PressedModifierType.Darken, 0.06f)
+                            Color.LightBlue * 0.18f, PressedModifierType.Darken, 0.04f)
                     );
 
                 this.GridSplitterForeground =
@@ -509,7 +509,7 @@ namespace MGUI.Core.UI
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             null, Color.Yellow.AsFillBrush() * 0.65f, null,
-                            Color.LightBlue * 0.8f, PressedModifierType.Darken, 0.06f)
+                            Color.LightBlue * 0.4f, PressedModifierType.Darken, 0.04f)
                     );
 
                 this.GridSplitterForeground =

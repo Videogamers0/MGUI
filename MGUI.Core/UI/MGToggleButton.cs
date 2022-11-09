@@ -19,6 +19,7 @@ namespace MGUI.Core.UI
         /// <summary>Provides direct access to this element's border.</summary>
         public MGComponent<MGBorder> BorderComponent { get; }
         private MGBorder BorderElement { get; }
+        public override MGBorder GetBorder() => BorderElement;
 
         public IBorderBrush BorderBrush
         {
@@ -31,8 +32,6 @@ namespace MGUI.Core.UI
             get => BorderElement.BorderThickness;
             set => BorderElement.BorderThickness = value;
         }
-
-        public override MGBorder GetBorder() => BorderElement;
         #endregion Border
 
         /// <summary>The background brush to use for this <see cref="MGToggleButton"/> when <see cref="IsChecked"/> is true.<para/>

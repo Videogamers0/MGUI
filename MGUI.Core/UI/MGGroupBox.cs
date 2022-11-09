@@ -27,6 +27,7 @@ namespace MGUI.Core.UI
 
         #region Border
         private MGBorder BorderElement { get; }
+        public override MGBorder GetBorder() => BorderElement;
 
         public MGUniformBorderBrush BorderBrush
         {
@@ -182,8 +183,6 @@ namespace MGUI.Core.UI
             return new(BorderThickness.Left + HeaderHorizontalMargin * 2 + HeaderHorizontalPadding * 2 + HeaderSize.Width, 
                 BorderThickness.Height + HeaderSize.Height, BorderThickness.Right, BorderThickness.Bottom);
         }
-
-        public override MGBorder GetBorder() => BorderElement;
 
         public override void DrawBackground(ElementDrawArgs DA, Rectangle LayoutBounds)
         {

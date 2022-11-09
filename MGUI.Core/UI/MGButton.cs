@@ -19,6 +19,7 @@ namespace MGUI.Core.UI
         /// <summary>Provides direct access to this element's border.</summary>
         public MGComponent<MGBorder> BorderComponent { get; }
         private MGBorder BorderElement { get; }
+        public override MGBorder GetBorder() => BorderElement;
 
         public IBorderBrush BorderBrush
         {
@@ -97,7 +98,5 @@ namespace MGUI.Core.UI
         /// Consider checking <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> at the start of this <see cref="EventHandler"/><br/>
         /// or subscribing via <see cref="AddCommandHandler(Action{MGButton, BaseMouseReleasedEventArgs}, bool)"/>.</summary>
         public event EventHandler<BaseMouseReleasedEventArgs> OnRightClicked;
-
-        public override MGBorder GetBorder() => BorderElement;
     }
 }

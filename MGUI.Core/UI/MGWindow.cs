@@ -211,6 +211,7 @@ namespace MGUI.Core.UI
         /// <summary>Provides direct access to this element's border.</summary>
         public MGComponent<MGBorder> BorderComponent { get; }
         private MGBorder BorderElement { get; }
+        public override MGBorder GetBorder() => BorderElement;
 
         public IBorderBrush BorderBrush
         {
@@ -861,7 +862,5 @@ namespace MGUI.Core.UI
         }
 
         public void Draw(DrawBaseArgs BA) => Draw(new ElementDrawArgs(BA, this.VisualState, Point.Zero));
-
-        public override MGBorder GetBorder() => BorderElement;
     }
 }
