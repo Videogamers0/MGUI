@@ -16,6 +16,20 @@ using System.Threading.Tasks;
 
 namespace MGUI.Core.UI
 {
+    public enum ListBoxSelectionMode
+    {
+        /// <summary>Items cannot be selected</summary>
+        None,
+        /// <summary>A single item may be selected at a time, by left-clicking it</summary>
+        Single,
+        /// <summary>A set of consecutive items may be selected at once. Left-click to replace selection with a single item.<br/>
+        /// Shift+Left-click to select all consecutive items between the current selection source and the clicked item.</summary>
+        Contiguous,
+        /// <summary>Any number of items may be selected at once. Left-click to replace selection with a single item.<br/>
+        /// Ctrl+Left-click to toggle the selection state of the clicked item.</summary>
+        Multiple
+    }
+
     /// <typeparam name="TItemType">The type that the ItemsSource will be bound to.</typeparam>
     public class MGListBox<TItemType> : MGElement
     {
@@ -241,9 +255,68 @@ namespace MGUI.Core.UI
         }
         #endregion Items Source
 
+        #region Selection
+        private ListBoxSelectionMode _SelectionMode;
+        public ListBoxSelectionMode SelectionMode
+        {
+            get => _SelectionMode;
+            set
+            {
+                if (_SelectionMode != value)
+                {
+                    _SelectionMode = value;
+                    SelectedItems = null;
+                }
+            }
+        }
+
+        private MGListBoxItem<TItemType> _SelectionSourceItem;
+        /// <summary>Only relevant if <see cref="SelectionMode"/> is <see cref="ListBoxSelectionMode.Contiguous"/>.<para/>
+        /// Represents the starting item of the contiguous selection of items.</summary>
+        public MGListBoxItem<TItemType> SelectionSourceItem
+        {
+            get => _SelectionSourceItem;
+            private set
+            {
+                if (_SelectionSourceItem != value)
+                {
+                    _SelectionSourceItem = value;
+
+                }
+            }
+        }
+
+        private ReadOnlyCollection<MGListBoxItem<TItemType>> _SelectedItems;
+        public ReadOnlyCollection<MGListBoxItem<TItemType>> SelectedItems
+        {
+            get => _SelectedItems;
+            set
+            {
+                if (_SelectedItems != value)
+                {
+                    if (SelectedItems != null)
+                    {
+                        foreach (MGListBoxItem<TItemType> Item in SelectedItems)
+                            Item.ContentPresenter.IsSelected = false;
+                    }
+                    _SelectedItems = value;
+                    if (SelectedItems != null)
+                    {
+                        foreach (MGListBoxItem<TItemType> Item in SelectedItems)
+                            Item.ContentPresenter.IsSelected = true;
+                    }
+                }
+            }
+        }
+
+        //TODO when items removed/cleared from the rowitems, ensure they're de-selected
+        #endregion Selection
+
         public MGScrollViewer ScrollViewer { get; }
         public MGStackPanel ItemsPanel { get; }
 
+        /// <summary>Sets the <see cref="TitleBorderBrush"/> to the given <paramref name="Brush"/> using the given <paramref name="BorderThickness"/>, except with a bottom thickness of 0 to avoid doubled thickness between the title and content.<br/>
+        /// Sets the <see cref="InnerBorderBrush"/> to the given <paramref name="Brush"/> using the given <paramref name="BorderThickness"/></summary>
         public void SetTitleAndContentBorder(IFillBrush Brush, int BorderThickness)
         {
             TitleBorderBrush = Brush?.AsUniformBorderBrush();
@@ -254,6 +327,7 @@ namespace MGUI.Core.UI
         }
 
         private MGElement _Header;
+        /// <summary>Content to display inside the <see cref="TitlePresenter"/>. Only relevant if <see cref="IsTitleVisible"/> is true.</summary>
         public MGElement Header
         {
             get => _Header;
@@ -287,10 +361,10 @@ namespace MGUI.Core.UI
 
         public event EventHandler<EventArgs> DataTemplateChanged;
 
-        private Action<MGContentPresenter> _ItemContainerStyle;
-        /// <summary>An action that will be invoked on every <see cref="MGContentPresenter"/> that wraps each <see cref="MGListBoxItem{TItemType}"/>'s content.<para/>
+        private Action<MGBorder> _ItemContainerStyle;
+        /// <summary>An action that will be invoked on every <see cref="MGBorder"/> that wraps each <see cref="MGListBoxItem{TItemType}"/>'s content.<para/>
         /// See also: <see cref="MGListBoxItem{TItemType}.ContentPresenter"/></summary>
-        public Action<MGContentPresenter> ItemContainerStyle
+        public Action<MGBorder> ItemContainerStyle
         {
             get => _ItemContainerStyle;
             set
@@ -306,7 +380,6 @@ namespace MGUI.Core.UI
         public event EventHandler<EventArgs> ItemContainerStyleChanged;
 
         //TODO:
-        //SelectionMode: None, Single, Multiple, Extended
         //Default styles for things like hovering an listboxitem.contentpresenter (similar to comboboxitems?)
         //Readonlycollection<ifillbrush> alternatingrowbackgrounds. whenever this is set or when adding/removing items to the stackpanel
         //          apply these background brushes to the contentpresenters
@@ -343,6 +416,7 @@ namespace MGUI.Core.UI
 
                 //  Create the scrollviewer and itemspanel
                 this.ItemsPanel = new(ParentWindow, Orientation.Vertical);
+                ItemsPanel.VerticalAlignment = VerticalAlignment.Top;
                 ItemsPanel.CanChangeContent = false;
                 this.ScrollViewer = new(ParentWindow);
                 ScrollViewer.Padding = new(0, 3);
@@ -355,9 +429,18 @@ namespace MGUI.Core.UI
 
                 MinHeight = 30;
 
+                IBorderBrush ItemBorderBrush = new MGSolidFillBrush(Color.Black * 0.35f).AsUniformBorderBrush();
+                Thickness ItemBorderThickness = new(0, 1);
+
+                ItemsPanel.BorderThickness = ItemBorderThickness;
+                ItemsPanel.BorderBrush = ItemBorderBrush;
+
                 this.ItemContainerStyle = (contentPresenter) =>
                 {
-                    contentPresenter.Padding = new(6, 2);
+                    contentPresenter.BorderBrush = ItemBorderBrush;
+                    contentPresenter.BorderThickness = ItemBorderThickness;
+                    contentPresenter.Padding = new(6, 4);
+                    contentPresenter.BackgroundBrush = GetTheme().ListBoxItemBackground.GetValue(true);
                 };
                 this.DataTemplate = (item) => new MGTextBlock(ParentWindow, item.ToString()) { Padding = new(1,0) };
             }
@@ -417,7 +500,7 @@ namespace MGUI.Core.UI
         public TItemType Data { get; }
 
         /// <summary>The wrapper element that hosts this item's content</summary>
-        public MGContentPresenter ContentPresenter { get; }
+        public MGBorder ContentPresenter { get; }
 
         private MGElement _Content;
         /// <summary>This <see cref="MGElement"/> is automatically generated via <see cref="MGListBox{TItemType}.DataTemplate"/> using this.<see cref="Data"/> as the parameter.<para/>

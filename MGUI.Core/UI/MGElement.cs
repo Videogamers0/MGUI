@@ -15,6 +15,7 @@ using MGUI.Shared.Rendering;
 using MGUI.Shared.Input.Mouse;
 using MGUI.Shared.Input.Keyboard;
 using MGUI.Shared.Input;
+using MGUI.Core.UI.Containers;
 
 namespace MGUI.Core.UI
 {
@@ -1223,6 +1224,11 @@ namespace MGUI.Core.UI
 			return false;
 		}
 
+        /// <summary>If true, this element is capable of consuming non-zero width when the height is zero, or a non-zero height when the width is zero.<br/>
+        /// Default value is false, which means that if the element is assigned 0 width or height, then BOTH the width and height are automatically truncated to zero.<para/>
+        /// For example, if an <see cref="MGButton"/> requested 16x16, but there was no vertical space available, then rather than allocating it 16x0, it is allocated 0x0</summary>
+        protected virtual bool CanConsumeSpaceInSingleDimension => false;
+
         internal protected void UpdateMeasurement(Size AvailableSize, out Thickness SelfSize, out Thickness FullSize, out Thickness SharedSize, out Thickness ContentSize)
         {
 			if (IsVisibilityCollapsed)
@@ -1263,8 +1269,8 @@ namespace MGUI.Core.UI
 			//  Adjust width/height based on min/max sizes
 			FullSize = FullSize.Clamp(MinSizeIncludingMargin, MaxSizeIncludingMargin).Clamp(Size.Empty, AvailableSize);
 
-			if (FullSize.Width <= 0 || FullSize.Height <= 0)
-				FullSize = new(0);
+            if ((FullSize.Width <= 0 || FullSize.Height <= 0) && !CanConsumeSpaceInSingleDimension)
+                FullSize = new(0);
 
             ElementMeasurement FullMeasurement = new(AvailableSize, FullSize, SharedSize, ContentSize);
             CacheFullMeasurement(FullMeasurement);

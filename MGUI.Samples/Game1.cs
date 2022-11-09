@@ -53,23 +53,7 @@ namespace MGUI.Samples
         </DockPanel>
     </Window.TitleBar>-->
     <DockPanel Margin=""5"">
-        <!--<Button HA=""Center"" BG=""LightGray"" BorderBrush=""Red"" BT=""2"" Padding=""8,2"" Dock=""Top"">
-            <Button.ContextMenu>
-                <ContextMenu Name=""CM1"">
-                    <ContextMenuButton Name=""CMB1"" Content=""ABC"" />
-                    <ContextMenuButton>
-                        <ContextMenuButton.Submenu>
-                            <ContextMenu>
-                                <ContextMenuToggle Content=""Toggle Me"" />
-                            </ContextMenu>
-                        </ContextMenuButton.Submenu>
-                        <Rectangle Width=""16"" VA=""Stretch"" Fill=""Blue"" />
-                    </ContextMenuButton>
-                </ContextMenu>
-            </Button.ContextMenu>
-            <TextBlock Text=""Hello World!"" />
-        </Button>
-        <Button BG=""LightBlue"" BorderBrush=""Crimson"" BT=""2"" Padding=""20,4"" Dock=""Left"">
+        <!--<Button BG=""LightBlue"" BorderBrush=""Crimson"" BT=""2"" Padding=""20,4"" Dock=""Left"">
             <TextBlock Text=""Last Child of DockPanel"" />
         </Button>
         <OverlayPanel Dock=""Left"">
@@ -114,7 +98,7 @@ namespace MGUI.Samples
                 </TabItem.Header>
 
                 <DockPanel>
-                    <StackPanel Orientation=""Vertical"" Dock=""Top"">
+                    <StackPanel Orientation=""Vertical"" Dock=""Top"" Spacing=""5"">
                         <CheckBox Content=""CheckBox #1"" />
                         <RadioButton Content=""RadioButton #1"" />
                         <HeaderedContentPresenter Spacing=""5"" HeaderPosition=""Left"">
@@ -128,7 +112,7 @@ namespace MGUI.Samples
             </TabItem>
             <TabItem Header=""Tab #2"" Name=""Tab#2"">
                 <ScrollViewer Dock=""Top"">
-                    <StackPanel Orientation=""Vertical"">
+                    <StackPanel Orientation=""Vertical"" Spacing=""5"">
                         <Button Content=""Hello World"" />
                         <Slider UseDiscreteValues=""true"" DiscreteValueInterval=""5"" TickFrequency=""20"" DrawTicks=""true"" />
                         <ComboBox Name=""CB"" />
@@ -148,12 +132,12 @@ namespace MGUI.Samples
                             </ProgressBar.ContextMenu>
                         </ProgressBar>
                         <GroupBox Name=""GB1"" IsExpandable=""true"" Header=""Header of GroupBox"">
-                            <StackPanel Orientation=""Vertical"">
+                            <StackPanel Orientation=""Vertical"" Spacing=""5"">
                                 <Grid RowLengths=""auto"" ColumnLengths=""*,8,*"">
                                     <Stopwatch Column=""0"" IsRunning=""true"" />
                                     <Timer Column=""2"" IsPaused=""false"" />
                                 </Grid>
-                                <ToggleButton Content=""Toggle me"" />
+                                <ToggleButton Name=""TB1"" Content=""Toggle me"" />
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>

@@ -185,13 +185,15 @@ namespace MGUI.Core.UI
 
         public HorizontalAlignment TextAlignment { get; set; }
 
-        public MGTextBlock(MGWindow Window, string Text, Color? Foreground = null, int FontSize = 11)
+        /// <param name="FontSize">If null, uses the font size specified by <see cref="ThemeFontSizes.Default"/>.<para/>
+        /// See also: <see cref="MGDesktop.Theme"/>, <see cref="MGTheme.FontSizes"/></param>
+        public MGTextBlock(MGWindow Window, string Text, Color? Foreground = null, int? FontSize = null)
             : base(Window, MGElementType.TextBlock)
         {
             using (BeginInitializing())
             {
                 this.WrapText = true;
-                if (!TrySetFont(GetDesktop().FontManager.DefaultFontFamily, FontSize))
+                if (!TrySetFont(GetDesktop().FontManager.DefaultFontFamily, FontSize ?? GetTheme().FontSizes.Default))
                     throw new ArgumentException($"Default font not found.");
                 this.Text = Text;
                 this.Foreground = new VisualStateSetting<Color?>(Foreground, Foreground, Foreground);

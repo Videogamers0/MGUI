@@ -9,11 +9,33 @@ using System.Threading.Tasks;
 using MGUI.Shared.Helpers;
 using Microsoft.Xna.Framework;
 using System.Collections.Specialized;
+using MGUI.Core.UI.Brushes.Border_Brushes;
+using MGUI.Core.UI.Brushes.Fill_Brushes;
 
 namespace MGUI.Core.UI.Containers
 {
     public class MGStackPanel : MGMultiContentHost
     {
+        #region Border
+        /// <summary>Provides direct access to this element's border.</summary>
+        public MGComponent<MGBorder> BorderComponent { get; }
+        private MGBorder BorderElement { get; }
+
+        public IBorderBrush BorderBrush
+        {
+            get => BorderElement.BorderBrush;
+            set => BorderElement.BorderBrush = value;
+        }
+
+        public Thickness BorderThickness
+        {
+            get => BorderElement.BorderThickness;
+            set => BorderElement.BorderThickness = value;
+        }
+
+        public override MGBorder GetBorder() => BorderElement;
+        #endregion Border
+
         private Orientation _Orientation;
         public Orientation Orientation
         {
@@ -45,7 +67,7 @@ namespace MGUI.Core.UI.Containers
         private int _Spacing;
         /// <summary>A padding amount, in pixels, between each consecutive non-collapsed child in this <see cref="MGStackPanel"/>.<br/>
         /// Spacing is ignored between children where <see cref="MGElement.IsVisibilityCollapsed"/> is true.<para/>
-        /// Default value: 4</summary>
+        /// Default value: 0</summary>
         public int Spacing
         {
             get => _Spacing;
@@ -126,9 +148,13 @@ namespace MGUI.Core.UI.Containers
         {
             using (BeginInitializing())
             {
+                this.BorderElement = new(Window, 0, null as IFillBrush);
+                this.BorderComponent = MGComponentBase.Create(BorderElement);
+                AddComponent(BorderComponent);
+
                 this.Orientation = Orientation;
                 //this.FlowDirection = FlowDirection.LeftToRight;
-                Spacing = 4;
+                Spacing = 0;
             }
         }
 

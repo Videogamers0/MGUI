@@ -204,7 +204,8 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _Size;
         /// <summary>For a horizontal progress bar, this represents the requested Height.<br/>
-        /// For a vertical progress bar, this represents the requested Width.</summary>
+        /// For a vertical progress bar, this represents the requested Width.<para/>
+        /// If <see cref="ShowValue"/> is true, <see cref="Size"/> should be large enough to fully display the <see cref="ValueElement"/></summary>
         public int Size
         {
             get => _Size;
@@ -268,7 +269,7 @@ namespace MGUI.Core.UI
 
                 this.NumberFormat = "0.0";
 
-                this.ValueElement = new(Window, "", Color.White, 12);
+                this.ValueElement = new(Window, "", Color.White, GetTheme().FontSizes.Medium);
                 this.ValueComponent = new(ValueElement, ComponentUpdatePriority.AfterContents, ComponentDrawPriority.BeforeContents,
                     true, true, false, false, false, false, false,
                     (AvailableBounds, ComponentSize) =>
@@ -280,7 +281,7 @@ namespace MGUI.Core.UI
                             _ => throw new NotImplementedException($"Unrecognized {nameof(Orientation)}: {Orientation}")
                         };
                     });
-                this.ValueElement.Padding = new(3);
+                this.ValueElement.Padding = new(4);
                 AddComponent(ValueComponent);
 
                 this.CompletedBrush = GetTheme().ProgressBarCompletedBrush.GetValue(true);

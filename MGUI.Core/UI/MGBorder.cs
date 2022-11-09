@@ -36,7 +36,7 @@ namespace MGUI.Core.UI
             : this(Window, new(1), MGUniformBorderBrush.Black) { }
 
         public MGBorder(MGWindow Window, Thickness BorderThickness, IFillBrush BorderBrush)
-            : this(Window, BorderThickness, new MGUniformBorderBrush(BorderBrush)) { }
+            : this(Window, BorderThickness, BorderBrush == null ? null : new MGUniformBorderBrush(BorderBrush)) { }
 
         public MGBorder(MGWindow Window, Thickness BorderThickness, IBorderBrush BorderBrush)
             : base(Window, MGElementType.Border)
@@ -55,6 +55,8 @@ namespace MGUI.Core.UI
         }
 
         public override MGBorder GetBorder() => this;
+
+        protected override bool CanConsumeSpaceInSingleDimension => true;
 
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
         {

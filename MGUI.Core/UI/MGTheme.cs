@@ -43,6 +43,18 @@ namespace MGUI.Core.UI
         public ThemeManagedVisualStateColorBrush(VisualStateColorBrush Value) : base(Value) { }
     }
 
+    public class ThemeFontSizes
+    {
+        /// <summary>The default fontsize for content inside an <see cref="MGContextMenu"/>, such as <see cref="MGContextMenuButton"/> and <see cref="MGContextMenuToggle"/></summary>
+        public int ContextMenu { get; set; } = 10;
+
+        public int Small { get; set; } = 10;
+        public int Medium { get; set; } = 12;
+        public int Large { get; set; } = 14;
+
+        public int Default { get; set; } = 11;
+    }
+
     public class MGTheme
     {
         #region Background
@@ -79,6 +91,9 @@ namespace MGUI.Core.UI
 
         public ThemeManagedVisualStateFillBrush GridSplitterForeground { get; }
 
+        /// <summary>The default background brush to use on items in an <see cref="MGListBox{TItemType}"/>.</summary>
+        public ThemeManagedVisualStateFillBrush ListBoxItemBackground { get; }
+
         public ThemeManagedVisualStateFillBrush ProgressBarCompletedBrush { get; }
         public ThemeManagedVisualStateFillBrush ProgressBarIncompleteBrush { get; }
 
@@ -113,6 +128,8 @@ namespace MGUI.Core.UI
 
         /// <summary>The fallback value to use for <see cref="MGTextBlock.ActualForeground"/> when there is no foreground color applied to the <see cref="MGTextBlock"/> or its parents.</summary>
         public ThemeManagedVisualStateColorBrush TextBlockFallbackForeground { get; }
+
+        public ThemeFontSizes FontSizes { get; } = new();
 
         public enum BuiltInTheme
         {
@@ -272,6 +289,13 @@ namespace MGUI.Core.UI
                     );
 
                 this.DropdownArrowColor = Color.White;
+
+                this.ListBoxItemBackground =
+                    new ThemeManagedVisualStateFillBrush(
+                        new VisualStateFillBrush(
+                            null, Color.Yellow.AsFillBrush() * 0.65f, null,
+                            Color.LightBlue * 0.4f, PressedModifierType.Darken, 0.06f)
+                    );
 
                 this.GridSplitterForeground =
                     new ThemeManagedVisualStateFillBrush(
@@ -480,6 +504,13 @@ namespace MGUI.Core.UI
                     );
 
                 this.DropdownArrowColor = Color.Black;
+
+                this.ListBoxItemBackground =
+                    new ThemeManagedVisualStateFillBrush(
+                        new VisualStateFillBrush(
+                            null, Color.Yellow.AsFillBrush() * 0.65f, null,
+                            Color.LightBlue * 0.8f, PressedModifierType.Darken, 0.06f)
+                    );
 
                 this.GridSplitterForeground =
                     new ThemeManagedVisualStateFillBrush(

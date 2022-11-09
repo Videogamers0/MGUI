@@ -135,7 +135,7 @@ namespace MGUI.Core.UI
 
         /// <param name="Action">The action to invoke if the <see cref="MGContextMenuButton"/> is left-clicked.</param>
         public MGContextMenuButton AddButton(string Text, Action<MGContextMenuButton> Action)
-            => AddButton(new MGTextBlock(this, Text, null, 10), Action);
+            => AddButton(new MGTextBlock(this, Text, null, GetTheme().FontSizes.ContextMenu), Action);
 
         /// <param name="Action">The action to invoke if the <see cref="MGContextMenuButton"/> is left-clicked.</param>
         public MGContextMenuButton AddButton(MGElement Content, Action<MGContextMenuButton> Action)
@@ -146,7 +146,7 @@ namespace MGUI.Core.UI
         }
 
         public MGContextMenuToggle AddCheckBox(string Text, bool IsChecked)
-            => AddToggle(new MGTextBlock(this, Text, null, 10), IsChecked);
+            => AddToggle(new MGTextBlock(this, Text, null, GetTheme().FontSizes.ContextMenu), IsChecked);
 
         public MGContextMenuToggle AddToggle(MGElement Content, bool IsChecked)
         {
@@ -319,10 +319,11 @@ namespace MGUI.Core.UI
 
             if (Items != null)
             {
+                int FontSize = Menu.GetTheme().FontSizes.ContextMenu;
                 foreach (MGSimpleContextMenuItem Item in Items)
                 {
                     MGContextMenuItem GeneratedItem;
-                    MGTextBlock Content = new(Menu, Item.Text, TextForeground, 10);
+                    MGTextBlock Content = new(Menu, Item.Text, TextForeground, FontSize);
                     if (!Item.IsToggle)
                     {
                         MGContextMenuButton ButtonItem = Menu.AddButton(Content, null);
