@@ -26,30 +26,33 @@ namespace MGUI.Core.UI
         }
 
         #region Border
-        private MGBorder BorderComponent { get; }
+        private MGBorder BorderElement { get; }
 
         public MGUniformBorderBrush BorderBrush
         {
-            get => (MGUniformBorderBrush)BorderComponent.BorderBrush;
-            set => BorderComponent.BorderBrush = value;
+            get => (MGUniformBorderBrush)BorderElement.BorderBrush;
+            set => BorderElement.BorderBrush = value;
         }
 
         public Thickness BorderThickness
         {
-            get => BorderComponent.BorderThickness;
+            get => BorderElement.BorderThickness;
             set
             {
-                if (!BorderComponent.BorderThickness.Equals(value))
+                if (!BorderElement.BorderThickness.Equals(value))
                 {
-                    BorderComponent.BorderThickness = value;
+                    BorderElement.BorderThickness = value;
                     LayoutChanged(this, true);
                 }
             }
         }
         #endregion Border
 
-        private MGHeaderedContentPresenter OuterHeaderPresenter { get; }
+        /// <summary>The primary header of this <see cref="MGGroupBox"/> which contains both the <see cref="Expander"/> and the <see cref="HeaderPresenter"/></summary>
+        public MGHeaderedContentPresenter OuterHeaderPresenter { get; }
+        /// <summary>Only visible if <see cref="IsExpandable"/> is true. Defaults to a 5px right margin.</summary>
         public MGExpander Expander { get; }
+        /// <summary>The wrapper element that contains the <see cref="Header"/>.</summary>
         public MGContentPresenter HeaderPresenter { get; }
 
         public bool IsExpandable
@@ -60,6 +63,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGElement _Header;
+        /// <summary>The content to displays in this <see cref="MGGroupBox"/>'s header, above the content and vertically-centered with the top edge of the <see cref="BorderBrush"/>.</summary>
         public MGElement Header
         {
             get => _Header;
@@ -118,9 +122,9 @@ namespace MGUI.Core.UI
                 this.HeaderHorizontalMargin = 5;
                 this.HeaderHorizontalPadding = 10;
 
-                this.BorderComponent = new(Window, new Thickness(2), MGUniformBorderBrush.Black);
-                BorderComponent.SetParent(this);
-                BorderComponent.ComponentParent = this;
+                this.BorderElement = new(Window, new Thickness(2), MGUniformBorderBrush.Black);
+                BorderElement.SetParent(this);
+                BorderElement.ComponentParent = this;
 
                 this.Expander = new(Window);
                 Expander.Margin = new(0, 0, 5, 0);
@@ -131,6 +135,7 @@ namespace MGUI.Core.UI
                 this.OuterHeaderPresenter = new(Window, Expander, HeaderPresenter);
                 OuterHeaderPresenter.Spacing = 0;
                 OuterHeaderPresenter.CanChangeContent = false;
+                OuterHeaderPresenter.ComponentParent = this;
                 OuterHeaderPresenter.SetParent(this);
 
                 this.Padding = new(8,4,8,8);
@@ -178,7 +183,7 @@ namespace MGUI.Core.UI
                 BorderThickness.Height + HeaderSize.Height, BorderThickness.Right, BorderThickness.Bottom);
         }
 
-        public override MGBorder GetBorder() => BorderComponent;
+        public override MGBorder GetBorder() => BorderElement;
 
         public override void DrawBackground(ElementDrawArgs DA, Rectangle LayoutBounds)
         {

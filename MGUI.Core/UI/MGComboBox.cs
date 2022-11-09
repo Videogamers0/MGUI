@@ -43,18 +43,22 @@ namespace MGUI.Core.UI
 
         #region Dropdown Arrow
         /// <summary>Provides direct access to the dropdown part of this combobox.</summary>
-        public MGComponent<MGRectangle> DropdownArrowComponent { get; }
-        private MGRectangle DropdownArrowElement { get; }
+        public MGComponent<MGContentPresenter> DropdownArrowComponent { get; }
+        private MGContentPresenter DropdownArrowElement { get; }
 
+        /// <summary>The width of the <see cref="MGContentPresenter"/> that hosts the dropdown arrow. This should be >= <see cref="DropdownArrowWidth"/></summary>
+        public const int DropdownArrowPaddedWidth = 16;
         /// <summary>The width of the dropdown arrow</summary>
         public const int DropdownArrowWidth = 10;
+        /// <summary>The height of the <see cref="MGContentPresenter"/> that hosts the dropdown arrow. This should be >= <see cref="DropdownArrowHeight"/></summary>
+        public const int DropdownArrowPaddedHeight = 16;
         /// <summary>The height of the dropdown arrow</summary>
         public const int DropdownArrowHeight = 6;
 
         /// <summary>The default empty width between the right edge of the <see cref="MGSingleContentHost.Content"/> and the left edge of the dropdown arrow</summary>
-        public static int DefaultDropdownArrowLeftMargin = 10;
+        public static int DefaultDropdownArrowLeftMargin { get; set; } = 7;
         /// <summary>The default empty width between the right edge of the dropdown arrow and the right edge of this <see cref="MGComboBox{TItemType}"/></summary>
-        public static int DefaultDropdownArrowRightMargin = 8;
+        public static int DefaultDropdownArrowRightMargin { get; set; } = 5;
 
         /// <summary>The default empty width between the right edge of the <see cref="MGSingleContentHost.Content"/> and the left edge of the dropdown arrow<para/>
         /// See also: <see cref="DefaultDropdownArrowLeftMargin"/></summary>
@@ -375,12 +379,12 @@ namespace MGUI.Core.UI
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
 
-                this.DropdownArrowElement = new(Window, DropdownArrowWidth, DropdownArrowHeight, Color.Transparent, 0, Color.Transparent);
+                this.DropdownArrowElement = new(Window) { PreferredWidth = DropdownArrowPaddedWidth, PreferredHeight = DropdownArrowPaddedHeight };
                 this.DropdownArrowComponent = new(DropdownArrowElement, false, true, false, true, true, false, false,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Right, VerticalAlignment.Center, ComponentSize.Size));
                 AddComponent(DropdownArrowComponent);
 
-                this.DropdownArrowElement.Margin = new(DefaultDropdownArrowLeftMargin, 5, DefaultDropdownArrowRightMargin, 5);
+                this.DropdownArrowElement.Margin = new(DefaultDropdownArrowLeftMargin, 0, DefaultDropdownArrowRightMargin, 0);
                 this.DropdownArrowColor = GetTheme().DropdownArrowColor;
 
                 DropdownArrowElement.OnEndDraw += (sender, e) =>
@@ -494,11 +498,8 @@ namespace MGUI.Core.UI
         internal void LoadSettings(XAMLComboBox Settings)
         {
             Settings.Border.ApplySettings(this, BorderComponent.Element);
+            Settings.DropdownArrow.ApplySettings(this, DropdownArrowComponent.Element);
 
-            if (Settings.DropdownArrowLeftMargin.HasValue)
-                DropdownArrowLeftMargin = Settings.DropdownArrowLeftMargin.Value;
-            if (Settings.DropdownArrowRightMargin.HasValue)
-                DropdownArrowRightMargin = Settings.DropdownArrowRightMargin.Value;
             if (Settings.DropdownArrowColor.HasValue)
                 DropdownArrowColor = Settings.DropdownArrowColor.Value.ToXNAColor();
 

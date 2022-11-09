@@ -160,7 +160,9 @@ namespace MGUI.Core.UI
 
 		public event EventHandler<EventArgs<MGElement>> OnParentChanged;
 
-        /// <summary>The parent <see cref="MGElement"/> that this <see cref="MGComponent{TElementType}"/> belongs to, or null if this <see cref="MGElement"/> is not a <see cref="MGComponent{TElementType}"/></summary>
+        /// <summary>The parent <see cref="MGElement"/> that this <see cref="MGComponent{TElementType}"/> belongs to, or null if this <see cref="MGElement"/> is not a <see cref="MGComponent{TElementType}"/>.<para/>
+        /// In very rare cases, an element may represent hard-coded content nested inside another element without actually being an <see cref="MGComponent{TElementType}"/>, and still be treated as a component.<br/>
+        /// Such as <see cref="MGGroupBox.OuterHeaderPresenter"/>, which wraps the <see cref="MGGroupBox.Expander"/> and <see cref="MGGroupBox.HeaderPresenter"/></summary>
         public MGElement ComponentParent { get; protected internal set; }
 
         /// <summary>True if this <see cref="MGElement"/> is a <see cref="MGComponent{TElementType}"/> of its parent,

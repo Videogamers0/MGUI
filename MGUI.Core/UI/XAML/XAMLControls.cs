@@ -159,8 +159,7 @@ namespace MGUI.Core.UI.XAML
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public XAMLThickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
-        public int? DropdownArrowLeftMargin { get; set; }
-        public int? DropdownArrowRightMargin { get; set; }
+        public XAMLContentPresenter DropdownArrow { get; set; } = new();
         public XAMLColor? DropdownArrowColor { get; set; }
 
         public List<object> Items { get; set; } = new();

@@ -148,7 +148,13 @@ namespace MGUI.Samples
                             </ProgressBar.ContextMenu>
                         </ProgressBar>
                         <GroupBox Name=""GB1"" IsExpandable=""true"" Header=""Header of GroupBox"">
-                            <Stopwatch IsRunning=""true"" />
+                            <StackPanel Orientation=""Vertical"">
+                                <Grid RowLengths=""auto"" ColumnLengths=""*,8,*"">
+                                    <Stopwatch Column=""0"" IsRunning=""true"" />
+                                    <Timer Column=""2"" IsPaused=""false"" />
+                                </Grid>
+                                <ToggleButton Content=""Toggle me"" />
+                            </StackPanel>
                         </GroupBox>
                     </StackPanel>
                 </ScrollViewer>
