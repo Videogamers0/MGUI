@@ -93,6 +93,8 @@ namespace MGUI.Core.UI
 
         /// <summary>The default background brush to use on items in an <see cref="MGListBox{TItemType}"/>.</summary>
         public ThemeManagedVisualStateFillBrush ListBoxItemBackground { get; }
+        /// <summary>The default value to use for <see cref="MGListBox{TItemType}.AlternatingRowBackgrounds"/></summary>
+        public List<ThemeManagedFillBrush> ListBoxItemAlternatingRowBackgrounds { get; }
 
         public ThemeManagedVisualStateFillBrush ProgressBarCompletedBrush { get; }
         public ThemeManagedVisualStateFillBrush ProgressBarIncompleteBrush { get; }
@@ -133,7 +135,7 @@ namespace MGUI.Core.UI
 
         public enum BuiltInTheme
         {
-            Windows_Gray,
+            Light_Gray,
             Dark_Blue
         }
 
@@ -179,7 +181,7 @@ namespace MGUI.Core.UI
             {
                 Color PrimaryColor = new(0, 108, 214);
                 MGSolidFillBrush PrimaryBG = new(PrimaryColor);
-                Color BrightNeutralColor = new Color(11, 28, 72);
+                Color BrightNeutralColor = new(11, 28, 72);
                 IFillBrush BrightNeutralBrush = new MGSolidFillBrush(BrightNeutralColor);
 
                 //  Button/ComboBox
@@ -296,6 +298,11 @@ namespace MGUI.Core.UI
                             null, Color.Yellow.AsFillBrush() * 0.65f, null,
                             Color.LightBlue * 0.18f, PressedModifierType.Darken, 0.04f)
                     );
+                this.ListBoxItemAlternatingRowBackgrounds = new List<ThemeManagedFillBrush>()
+                {
+                    new ThemeManagedFillBrush(BrightNeutralColor.Darken(0.04f).AsFillBrush()),
+                    new ThemeManagedFillBrush(BrightNeutralColor.Brighten(0.04f).AsFillBrush())
+                };
 
                 this.GridSplitterForeground =
                     new ThemeManagedVisualStateFillBrush(
@@ -394,10 +401,12 @@ namespace MGUI.Core.UI
                         new VisualStateColorBrush(Color.White)
                     );
             }
-            else if (ThemeType == BuiltInTheme.Windows_Gray)
+            else if (ThemeType == BuiltInTheme.Light_Gray)
             {
                 Color PrimaryColor = Color.LightGray;
                 MGSolidFillBrush PrimaryBG = new(PrimaryColor);
+                Color BrightNeutralColor = Color.White;
+                IFillBrush BrightNeutralBrush = BrightNeutralColor.AsFillBrush();
 
                 //  Button/ComboBox
                 ThemeManagedVisualStateFillBrush ButtonBG =
@@ -413,7 +422,7 @@ namespace MGUI.Core.UI
                 ThemeManagedVisualStateFillBrush ContextMenuBG =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
-                            new Color(233, 238, 255).AsFillBrush(), // Maybe should just use MGSolidFillBrush.White
+                            BrightNeutralBrush,
                             null, PressedModifierType.Darken, 0.06f)
                     );
                 _Backgrounds[MGElementType.ContextMenu] = ContextMenuBG;
@@ -428,7 +437,6 @@ namespace MGUI.Core.UI
                 _Backgrounds[MGElementType.GridSplitter] = GridSplitterBG;
 
                 //  GroupBox/ListView/ProgressBar/TabControl
-                IFillBrush BrightNeutralBrush = MGSolidFillBrush.White;
                 ThemeManagedVisualStateFillBrush BrightNeutralBG =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
@@ -436,6 +444,7 @@ namespace MGUI.Core.UI
                             null, PressedModifierType.Darken, 0.06f)
                     );
                 _Backgrounds[MGElementType.GroupBox] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
+                _Backgrounds[MGElementType.ListBox] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
                 _Backgrounds[MGElementType.ListView] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
                 _Backgrounds[MGElementType.ProgressBar] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
                 _Backgrounds[MGElementType.TabControl] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
@@ -511,6 +520,11 @@ namespace MGUI.Core.UI
                             null, Color.Yellow.AsFillBrush() * 0.65f, null,
                             Color.LightBlue * 0.4f, PressedModifierType.Darken, 0.04f)
                     );
+                this.ListBoxItemAlternatingRowBackgrounds = new List<ThemeManagedFillBrush>()
+                {
+                    new ThemeManagedFillBrush(BrightNeutralColor.Darken(0.04f).AsFillBrush()),
+                    new ThemeManagedFillBrush(BrightNeutralColor.Brighten(0.04f).AsFillBrush())
+                };
 
                 this.GridSplitterForeground =
                     new ThemeManagedVisualStateFillBrush(
@@ -532,7 +546,7 @@ namespace MGUI.Core.UI
                             Color.White * 0.01f, PressedModifierType.Darken, 0f)
                     );
 
-                this.CheckMarkColor = Color.Green;
+                this.CheckMarkColor = new(0, 128, 255);
                 this.RadioButtonBubbleBackground =
                     new ThemeManagedVisualStateColorBrush(
                         new VisualStateColorBrush(

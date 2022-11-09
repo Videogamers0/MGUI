@@ -134,6 +134,7 @@ namespace MGUI.Core.UI
                     }
 
                     ClearSelection();
+                    RefreshRowBackgrounds();
                 }
             }
         }
@@ -158,6 +159,8 @@ namespace MGUI.Core.UI
                         ItemsPanel.TryInsertChild(Index, Item.ContentPresenter);
                         Index++;
                     }
+
+                    RefreshRowBackgrounds();
                 }
                 else if (e.Action is NotifyCollectionChangedAction.Remove && e.OldItems != null)
                 {
@@ -168,6 +171,8 @@ namespace MGUI.Core.UI
                             Removed.Add(Item);
                         }
                     }
+
+                    RefreshRowBackgrounds();
                 }
                 else if (e.Action is NotifyCollectionChangedAction.Replace)
                 {
@@ -178,6 +183,9 @@ namespace MGUI.Core.UI
                         if (ItemsPanel.TryReplaceChild(Old[i].ContentPresenter, New[i].ContentPresenter))
                         {
                             Removed.Add(Old[i]);
+
+                            if (AlternatingRowBackgrounds?.Any() == true)
+                                New[i].ContentPresenter.BackgroundBrush.NormalValue = Old[i].ContentPresenter.BackgroundBrush.NormalValue;
                         }
                     }
                 }
@@ -278,6 +286,13 @@ namespace MGUI.Core.UI
         #endregion Items Source
 
         #region Selection
+        /// <summary>Only relevant if <see cref="SelectionMode"/> is not <see cref="ListBoxSelectionMode.None"/><para/>
+        /// If true, allows deselecting a currently-selected item by left-clicking it.<para/>
+        /// Note: If <see cref="SelectionMode"/> is <see cref="ListBoxSelectionMode.Multiple"/>, and the Control key is held when clicking an item,<br/>
+        /// the user is always able to deselect regardless of this setting.<para/>
+        /// Default value: true</summary>
+        public bool CanDeselectByClickingSelectedItem { get; set; }
+
         private ListBoxSelectionMode _SelectionMode;
         public ListBoxSelectionMode SelectionMode
         {
@@ -309,6 +324,7 @@ namespace MGUI.Core.UI
         }
 
         private ReadOnlyCollection<MGListBoxItem<TItemType>> _SelectedItems;
+        /// <summary>The currently-selected items. This collection is never null: Uses an empty list if setting to null.</summary>
         public ReadOnlyCollection<MGListBoxItem<TItemType>> SelectedItems
         {
             get => _SelectedItems;
@@ -321,12 +337,14 @@ namespace MGUI.Core.UI
                         foreach (MGListBoxItem<TItemType> Item in SelectedItems)
                             Item.ContentPresenter.IsSelected = false;
                     }
-                    _SelectedItems = value;
-                    if (SelectedItems != null)
-                    {
-                        foreach (MGListBoxItem<TItemType> Item in SelectedItems)
-                            Item.ContentPresenter.IsSelected = true;
-                    }
+
+                    _SelectedItems = value ?? new List<MGListBoxItem<TItemType>>().AsReadOnly();
+
+                    if (SelectedItems.Any(x => x == null))
+                        throw new ArgumentNullException($"{nameof(MGListBoxItem<object>)}.{nameof(SelectedItems)} cannnot contain null items.");
+
+                    foreach (MGListBoxItem<TItemType> Item in SelectedItems)
+                        Item.ContentPresenter.IsSelected = true;
                 }
             }
         }
@@ -334,7 +352,7 @@ namespace MGUI.Core.UI
         public void ClearSelection()
         {
             SelectionSourceItem = null;
-            SelectedItems = null;
+            SelectedItems = new List<MGListBoxItem<TItemType>>().AsReadOnly();
         }
         #endregion Selection
 
@@ -405,9 +423,32 @@ namespace MGUI.Core.UI
 
         public event EventHandler<EventArgs> ItemContainerStyleChanged;
 
-        //TODO:
-        //Readonlycollection<ifillbrush> alternatingrowbackgrounds. whenever this is set or when adding/removing items to the stackpanel
-        //          apply these background brushes to the InternalItems.Select(x => x.ContentPresenter).BackgroundBrush.NormalValue (which is usually null/transparent)
+        private ReadOnlyCollection<IFillBrush> _AlternatingRowBackgrounds;
+        /// <summary>If not null/empty, the row items will cycle through these <see cref="IFillBrush"/> for their backgrounds</summary>
+        public ReadOnlyCollection<IFillBrush> AlternatingRowBackgrounds
+        {
+            get => _AlternatingRowBackgrounds;
+            set
+            {
+                if (_AlternatingRowBackgrounds != value)
+                {
+                    _AlternatingRowBackgrounds = value;
+                    RefreshRowBackgrounds();
+                }
+            }
+        }
+
+        private void RefreshRowBackgrounds()
+        {
+            if (InternalItems != null)
+            {
+                for (int i = 0; i < InternalItems.Count; i++)
+                {
+                    IFillBrush Brush = AlternatingRowBackgrounds?.Any() == true ? AlternatingRowBackgrounds[i % AlternatingRowBackgrounds.Count] : null;
+                    InternalItems[i].ContentPresenter.BackgroundBrush.NormalValue = Brush;
+                }
+            }
+        }
 
         public MGListBox(MGWindow ParentWindow)
             : base(ParentWindow, MGElementType.ListBox)
@@ -454,6 +495,8 @@ namespace MGUI.Core.UI
 
                 MinHeight = 30;
 
+                AlternatingRowBackgrounds = GetTheme().ListBoxItemAlternatingRowBackgrounds.Select(x => x.GetValue(true)).ToList().AsReadOnly();
+
                 IBorderBrush ItemBorderBrush = new MGSolidFillBrush(Color.Black * 0.35f).AsUniformBorderBrush();
                 Thickness ItemBorderThickness = new(0, 1);
 
@@ -469,27 +512,73 @@ namespace MGUI.Core.UI
                 };
                 this.DataTemplate = (item) => new MGTextBlock(ParentWindow, item.ToString()) { Padding = new(1,0) };
 
+                this.SelectedItems = new List<MGListBoxItem<TItemType>>().AsReadOnly();
                 this.SelectionMode = ListBoxSelectionMode.Single;
+                this.CanDeselectByClickingSelectedItem = true;
 
                 MouseHandler.LMBReleasedInside += (sender, e) =>
                 {
                     MGListBoxItem<TItemType> PressedItem = InternalItems?.FirstOrDefault(x => x.ContentPresenter.IsHovered);
-
-                    switch (this.SelectionMode)
+                    if (PressedItem != null)
                     {
-                        case ListBoxSelectionMode.None:
-                            break;
-                        case ListBoxSelectionMode.Single:
-                            SelectionSourceItem = PressedItem;
-                            SelectedItems = PressedItem == null ? null : new List<MGListBoxItem<TItemType>>() { PressedItem }.AsReadOnly();
-                            break;
-                        case ListBoxSelectionMode.Contiguous:
-                            //TODO checks KeyboardHandler.Tracker.IsShiftDown / IsControlDown
-                            break;
-                        case ListBoxSelectionMode.Multiple:
-                            //TODO checks KeyboardHandler.Tracker.IsShiftDown / IsControlDown
-                            break;
-                        default: throw new NotImplementedException($"Unrecognized {nameof(ListBoxSelectionMode)}: {nameof(SelectionMode)}");
+                        bool IsPressedItemAlreadySelected = SelectedItems?.Contains(PressedItem) == true;
+                        bool IsShiftDown = KeyboardHandler.Tracker.IsShiftDown;
+                        bool IsControlDown = KeyboardHandler.Tracker.IsControlDown;
+
+                        void SelectSingle()
+                        {
+                            if (IsPressedItemAlreadySelected && CanDeselectByClickingSelectedItem && SelectedItems.Count <= 1)
+                            {
+                                ClearSelection();
+                            }
+                            else
+                            {
+                                SelectionSourceItem = PressedItem;
+                                SelectedItems = new List<MGListBoxItem<TItemType>>() { PressedItem }.AsReadOnly();
+                            }
+                        }
+
+                        void SelectContiguous()
+                        {
+                            if (!IsShiftDown || SelectionSourceItem == null || !InternalItems.Contains(SelectionSourceItem))
+                            {
+                                SelectSingle();
+                            }
+                            else
+                            {
+                                int SourceIndex = InternalItems.IndexOf(SelectionSourceItem);
+                                int PressedIndex = InternalItems.IndexOf(PressedItem);
+
+                                int StartIndex = Math.Min(SourceIndex, PressedIndex);
+                                int EndIndex = Math.Max(SourceIndex, PressedIndex);
+
+                                SelectedItems = InternalItems.Skip(StartIndex).Take(EndIndex - StartIndex + 1).ToList().AsReadOnly();
+                            }
+                        }
+
+                        switch (this.SelectionMode)
+                        {
+                            case ListBoxSelectionMode.None:
+                                break;
+                            case ListBoxSelectionMode.Single:
+                                SelectSingle();
+                                break;
+                            case ListBoxSelectionMode.Contiguous:
+                                SelectContiguous();
+                                break;
+                            case ListBoxSelectionMode.Multiple:
+                                if (IsControlDown)
+                                {
+                                    if (IsPressedItemAlreadySelected)
+                                        SelectedItems = SelectedItems.Where(x => x != PressedItem).ToList().AsReadOnly();
+                                    else
+                                        SelectedItems = SelectedItems.Append(PressedItem).ToList().AsReadOnly();
+                                }
+                                else
+                                    SelectContiguous();
+                                break;
+                            default: throw new NotImplementedException($"Unrecognized {nameof(ListBoxSelectionMode)}: {nameof(SelectionMode)}");
+                        }
                     }
                 };
             }

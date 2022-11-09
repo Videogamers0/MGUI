@@ -192,6 +192,10 @@ namespace MGUI.Samples
             <System:String>Foo</System:String>
             <System:Double>115.0</System:Double>
             <System:String>Bar</System:String>
+            <System:String>Long string that may require textwrapping</System:String>
+            <System:String>hello world</System:String>
+            <System:String>string\n with linebreaks</System:String>
+            <System:String>Bar2</System:String>
         </ListBox>
 
         <!--<Grid Name=""TestGrid"" RowLengths=""100[50,],16,*[80,]"" ColumnLengths=""1*[50,150],16,1.5*[50,60],1.2*"">
