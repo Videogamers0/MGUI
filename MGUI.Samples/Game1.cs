@@ -293,6 +293,8 @@ namespace MGUI.Samples
 
             Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
             Desktop.Windows.Add(LoadRegistrationWindow(CurrentAssembly, Desktop));
+            Desktop.Windows.Add(LoadCharacterStatsWindow(CurrentAssembly, Desktop));
+            Desktop.Windows.Add(LoadInventoryWindow(CurrentAssembly, Desktop));
 
             base.Initialize();
         }
@@ -347,6 +349,26 @@ namespace MGUI.Samples
                     //
                 }
             });
+
+            return Window;
+        }
+
+        private static MGWindow LoadCharacterStatsWindow(Assembly CurrentAssembly, MGDesktop Desktop)
+        {
+            //  Parse the XAML markup into an MGWindow instance
+            string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.CharacterStats.xaml";
+            string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML);
+
+            return Window;
+        }
+
+        private static MGWindow LoadInventoryWindow(Assembly CurrentAssembly, MGDesktop Desktop)
+        {
+            //  Parse the XAML markup into an MGWindow instance
+            string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Inventory.xaml";
+            string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML);
 
             return Window;
         }

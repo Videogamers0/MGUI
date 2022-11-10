@@ -1,0 +1,6 @@
+﻿<Window Left="300" Top="400" Width="500" Height="300">
+    <OverlayPanel TextForeground="Black">
+        <Button HorizontalAlignment="Right" VerticalAlignment="Top" Content="[b]X" TextForeground="Red" Padding="3,2,3,0"
+                BorderBrush="RGB(91,43,42)" BorderThickness="2" Background="rgb(242,191,114)" />
+    </OverlayPanel>
+</Window>

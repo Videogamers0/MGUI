@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DrawingColor = System.Drawing.Color;
 using ColorTranslator = System.Drawing.ColorTranslator;
+using System.Text.RegularExpressions;
 
 namespace MGUI.Core.UI.XAML
 {
@@ -51,16 +52,35 @@ namespace MGUI.Core.UI.XAML
             return base.CanConvertFrom(context, sourceType);
         }
 
+        private static readonly Regex RGBColorRegex = 
+            new($@"^(?i)RGB(?-i)\((?<RedComponent>\d{{1,3}}), ?(?<GreenComponent>\d{{1,3}}), ?(?<BlueComponent>\d{{1,3}})(, ?(?<AlphaComponent>\d{{1,3}}))?\)$"); // EX: "RGB(0,128,255)"
+
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value is string stringValue)
             {
+                DrawingColor ParseColor(string colorName)
+                {
+                    Match RGBMatch = RGBColorRegex.Match(colorName);
+                    if (RGBMatch.Success)
+                    {
+                        int r = int.Parse(RGBMatch.Groups["RedComponent"].Value);
+                        int g = int.Parse(RGBMatch.Groups["GreenComponent"].Value);
+                        int b = int.Parse(RGBMatch.Groups["BlueComponent"].Value);
+                        int a = RGBMatch.Groups["AlphaComponent"].Success ? int.Parse(RGBMatch.Groups["AlphaComponent"].Value) : byte.MaxValue;
+                        return DrawingColor.FromArgb(a, r, g, b);
+                    }
+                    else
+                    {
+                        return ColorTranslator.FromHtml(colorName);
+                    }
+                }
+
                 int asteriskIndex = stringValue.IndexOf('*');
                 if (asteriskIndex > 0)
                 {
                     string colorName = stringValue.Substring(0, asteriskIndex).Trim();
-                    DrawingColor color = ColorTranslator.FromHtml(colorName);
-
+                    DrawingColor color = ParseColor(colorName);
                     string opacityScalarString = stringValue.Substring(asteriskIndex + 1).Trim();
                     float opacityScalar = float.Parse(opacityScalarString);
 
@@ -68,7 +88,7 @@ namespace MGUI.Core.UI.XAML
                 }
                 else
                 {
-                    DrawingColor color = ColorTranslator.FromHtml(stringValue);
+                    DrawingColor color = ParseColor(stringValue);
                     return new XAMLColor(color.R, color.G, color.B, color.A);
                 }
             }
@@ -172,7 +192,7 @@ namespace MGUI.Core.UI.XAML
         {
             if (value is string stringValue)
             {
-                string[] fillBrushStrings = stringValue.Split(',');
+                string[] fillBrushStrings = stringValue.Split('-');
                 if (fillBrushStrings.Length == 1)
                 {
                     XAMLFillBrush FillBrush = (XAMLFillBrush)FillBrushStringConverter.ConvertFrom(context, culture, fillBrushStrings[0]);

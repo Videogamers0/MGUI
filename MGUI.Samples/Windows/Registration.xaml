@@ -1,8 +1,25 @@
-﻿<Window Left="100" Top="100" Width="300" Height="380" TitleText="[color=orange][b]Register[/b] for a new account[/color]">
+﻿<Window Left="50" Top="50" Width="300" Height="380">
+    
+    <!-- Replace the window's Title bar with custom content -->
+    <Window.TitleBar>
+        <!-- The root-element of the window's Title bar must always be an MGDockPanel, but we can add whatever we want to it -->
+        <DockPanel Padding="5,2">
+            <Rectangle Dock="Left" Width="16" Height="16" Stroke="Gray" StrokeThickness="1" Fill="Black" Margin="0,0,5,0">
+                <Rectangle.ToolTip>
+                    <ToolTip Padding="0" Width="240" Height="30" TextForeground="RoyalBlue" Background="White * 0.85">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="[b]Pretend this is a window icon[/b]" />
+                    </ToolTip>
+                </Rectangle.ToolTip>
+            </Rectangle>
+            
+            <TextBlock FontSize="10" Foreground="White" Text="Registration Form" />
+        </DockPanel>
+    </Window.TitleBar>
+    
     <DockPanel Margin="5">
         <!-- Window header -->
         <StackPanel Dock="Top" Orientation="Vertical">
-            <TextBlock Dock="Top" HorizontalAlignment="Center" FontSize="14" Foreground="Orange" Text="Registration form:" />
+            <TextBlock Dock="Top" HorizontalAlignment="Center" FontSize="14" Foreground="Orange" Text="Register for a new account" />
             <Separator Size="3" Orientation="Horizontal" Background="Orange * 0.5" />
         </StackPanel>
         
@@ -20,7 +37,7 @@
                         <HeaderedContentPresenter.Header>
                             <TextBlock Text="Email:" Foreground="Gray" />
                         </HeaderedContentPresenter.Header>
-                        <TextBox Name="TextBox_Email" PlaceholderText="[i][opacity=0.5]Email[/opacity][/i]" CharacterLimit="16" ShowCharacterCount="true" AcceptsReturn="false" AcceptsTab="false" />
+                        <TextBox Name="TextBox_Email" PlaceholderText="[i][opacity=0.5]Email[/opacity][/i]" CharacterLimit="40" ShowCharacterCount="false" AcceptsReturn="false" AcceptsTab="false" />
                     </HeaderedContentPresenter>
                     <Spacer Height="8" />
                     
@@ -29,7 +46,13 @@
                         <HeaderedContentPresenter.Header>
                             <TextBlock Text="Username:" Foreground="Gray" />
                         </HeaderedContentPresenter.Header>
-                        <TextBox Name="TextBox_Username" PlaceholderText="[i][opacity=0.5]Username[/opacity][/i]" CharacterLimit="16" ShowCharacterCount="true" AcceptsReturn="false" AcceptsTab="false" />
+                        <TextBox Name="TextBox_Username" PlaceholderText="[i][opacity=0.5]Username[/opacity][/i]" CharacterLimit="16" ShowCharacterCount="true" AcceptsReturn="false" AcceptsTab="false">
+                            <TextBox.ToolTip>
+                                <ToolTip Width="320" Height="64" TextForeground="Red" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                    <TextBlock WrapText="True" LinePadding="10" FontSize="10" Text="Must contain only alphanumeric characters.\nCannot exceed [b]16[/b] characters." />
+                                </ToolTip>
+                            </TextBox.ToolTip>
+                        </TextBox>
                     </HeaderedContentPresenter>
                     <Spacer Height="8" />
 
