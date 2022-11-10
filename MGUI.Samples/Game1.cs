@@ -1,4 +1,5 @@
 ﻿using MGUI.Core.UI;
+using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Core.UI.Containers.Grids;
 using MGUI.Core.UI.XAML;
@@ -369,6 +370,40 @@ namespace MGUI.Samples
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Inventory.xaml";
             string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
             MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML);
+
+            MGButton Button_Close = Window.GetElementByName<MGButton>("Button_Close");
+            Button_Close.AddCommandHandler((Button, e) =>
+            {
+                _ = Window.TryCloseWindow();
+            });
+
+            MGTabControl TabControl = Window.GetElementByName<MGTabControl>("Tabs");
+            TabControl.SelectedTabHeaderTemplate = (TabItem) =>
+            {
+                MGButton Button = new(Window, new(2, 2, 2, 0), new Color(177, 78, 5).AsFillBrush().AsUniformBorderBrush(), x => TabItem.IsTabSelected = true);
+                Button.Padding = new(2,1);
+                Button.BackgroundBrush.NormalValue = new Color(255, 210, 132).AsFillBrush();
+                Button.VerticalAlignment = VerticalAlignment.Bottom;
+                return Button;
+            };
+
+            TabControl.UnselectedTabHeaderTemplate = (TabItem) =>
+            {
+                MGButton Button = new(Window, new(2, 2, 2, 0), new Color(177, 78, 5).AsFillBrush().AsUniformBorderBrush(), x => TabItem.IsTabSelected = true);
+                Button.Padding = new(2, 3);
+                Button.BackgroundBrush.NormalValue = new Color(228, 174, 110).AsFillBrush();
+                Button.VerticalAlignment = VerticalAlignment.Bottom;
+                return Button;
+            };
+
+            MGUniformGrid UniformGrid_Inventory = Window.GetElementByName<MGUniformGrid>("UniformGrid_Inventory");
+
+            IFillBrush Border1 = new Color(214, 143, 84).AsFillBrush();
+            IFillBrush Border2 = new Color(255, 228, 161).AsFillBrush();
+            IBorderBrush CellBorderBrush = new MGDockedBorderBrush(Border2, Border1, Border1, Border2);
+            UniformGrid_Inventory.CellBackground.NormalValue = new MGBorderedFillBrush(new(3), CellBorderBrush, new Color(255, 195, 118).AsFillBrush(), true);
+
+            Window.MakeInvisible();
 
             return Window;
         }

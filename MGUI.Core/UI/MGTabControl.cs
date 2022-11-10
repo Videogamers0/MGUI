@@ -339,8 +339,7 @@ namespace MGUI.Core.UI
             //  Does not fill the region with the tab headers
             Rectangle TabHeadersBounds = HeadersPanelElement.LayoutBounds;
             Rectangle TabContentBounds = new(LayoutBounds.Left, TabHeadersBounds.Bottom, LayoutBounds.Width, LayoutBounds.Height - TabHeadersBounds.Height);
-            Rectangle BorderlessTabContentBounds = TabContentBounds.GetCompressed(BorderThickness);
-            base.DrawBackground(DA, BorderlessTabContentBounds);
+            base.DrawBackground(DA, TabContentBounds);
         }
 
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds) { }

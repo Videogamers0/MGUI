@@ -183,6 +183,8 @@ namespace MGUI.Core.UI.XAML
         public int? RowSpacing { get; set; }
         public int? ColumnSpacing { get; set; }
 
+        public XAMLFillBrush CellBackground { get; set; }
+
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGUniformGrid(Window, Rows ?? 0, Columns ?? 0, CellSize?.ToSize() ?? Size.Empty);
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
@@ -224,6 +226,9 @@ namespace MGUI.Core.UI.XAML
                 Grid.RowSpacing = RowSpacing.Value;
             if (ColumnSpacing.HasValue)
                 Grid.ColumnSpacing = ColumnSpacing.Value;
+
+            if (CellBackground != null)
+                Grid.CellBackground.NormalValue = CellBackground.ToFillBrush();
 
             foreach (XAMLElement Child in Children)
             {

@@ -683,16 +683,17 @@ namespace MGUI.Core.UI.Containers.Grids
             else if (HasVerticalGridLines)
                 DrawVerticalGridLines(DA, LayoutBounds);
 
-            if (RenderCell != null)
+            for (int C = 0; C < Columns; C++)
             {
-                for (int C = 0; C < Columns; C++)
+                for (int R = 0; R < Rows; R++)
                 {
-                    for (int R = 0; R < Rows; R++)
-                    {
-                        GridCellIndex Index = new(R, C);
-                        Rectangle Bounds = _CellBounds[Index];
-                        RenderCell(DA, Index, Bounds);
-                    }
+                    GridCellIndex Index = new(R, C);
+                    Rectangle Bounds = _CellBounds[Index];
+
+                    CellBackground.GetUnderlay(VisualState.Primary)?.Draw(DA, this, Bounds);
+                    CellBackground.GetFillOverlay(VisualState.Secondary)?.Draw(DA, this, Bounds);
+
+                    RenderCell?.Invoke(DA, Index, Bounds);
                 }
             }
 
