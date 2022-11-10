@@ -9,7 +9,10 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace MGUI.Samples
 {
@@ -288,7 +291,64 @@ namespace MGUI.Samples
 
             }
 
+            Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
+            Desktop.Windows.Add(LoadRegistrationWindow(CurrentAssembly, Desktop));
+
             base.Initialize();
+        }
+
+        private static string ReadEmbeddedResourceAsString(Assembly CurrentAssembly, string ResourceName)
+        {
+            using (Stream ResourceStream = CurrentAssembly.GetManifestResourceStream(ResourceName))
+            using (StreamReader Reader = new StreamReader(ResourceStream))
+            return Reader.ReadToEnd();
+        }
+
+        private static MGWindow LoadRegistrationWindow(Assembly CurrentAssembly, MGDesktop Desktop)
+        {
+            //  Parse the XAML markup into an MGWindow instance
+            string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Registration.xaml";
+            string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML);
+
+            //  Retrieve named elements from the window
+            MGTextBox TextBox_Email = Window.GetElementByName<MGTextBox>("TextBox_Email");
+            MGTextBox TextBox_Username = Window.GetElementByName<MGTextBox>("TextBox_Username");
+            MGPasswordBox TextBox_Password = Window.GetElementByName<MGPasswordBox>("TextBox_Password");
+            MGCheckBox CheckBox_TOS = Window.GetElementByName<MGCheckBox>("CheckBox_TOS");
+            MGButton Button_Register = Window.GetElementByName<MGButton>("Button_Register");
+
+            //  React to the terms of service checkbox
+            CheckBox_TOS.OnCheckStateChanged += (sender, e) =>
+            {
+                if (e.NewValue.Value)
+                {
+                    Button_Register.IsEnabled = true;
+                    Button_Register.Opacity = 1f;
+                }
+                else
+                {
+                    Button_Register.IsEnabled = false;
+                    Button_Register.Opacity = 0.5f;
+                }
+            };
+
+            //  React to the register button
+            Button_Register.AddCommandHandler((btn, e) =>
+            {
+                if (CheckBox_TOS.IsChecked.Value)
+                {
+                    string Email = TextBox_Email.Text;
+                    string Username = TextBox_Username.Text;
+                    string Password = TextBox_Password.Password;
+
+                    //TODO
+                    //Do something with email/username/password inputs
+                    //
+                }
+            });
+
+            return Window;
         }
 
         protected override void LoadContent()

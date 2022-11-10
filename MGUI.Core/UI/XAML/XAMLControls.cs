@@ -319,7 +319,7 @@ namespace MGUI.Core.UI.XAML
     {
         public char? PasswordCharacter { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGProgressBar(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGPasswordBox(Window);
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {

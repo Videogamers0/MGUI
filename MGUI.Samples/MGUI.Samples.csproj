@@ -18,6 +18,14 @@
     <NoWarn>1701;1702</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Windows\Registration.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Windows\Registration.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <MonoGameContentReference Include="..\MGUI.Shared\Content\MGUI.Shared.Content.mgcb" Link="Content\MGUI.Shared.Content.mgcb" />
   </ItemGroup>
   <ItemGroup>

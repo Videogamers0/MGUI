@@ -94,6 +94,8 @@ namespace MGUI.Core.UI
 			using (BeginInitializing())
 			{
 				this.PasswordCharacter = '*';
+				this.AcceptsReturn = false;
+				this.AcceptsTab = false;
 			}
         }
     }

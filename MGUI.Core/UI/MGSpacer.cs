@@ -56,6 +56,8 @@ namespace MGUI.Core.UI
             }
         }
 
+        protected override bool CanConsumeSpaceInSingleDimension => true;
+
         public override Thickness MeasureSelfOverride(Size AvailableSize, out Thickness SharedSize)
         {
             SharedSize = new(0);
