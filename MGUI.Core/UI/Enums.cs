@@ -8,6 +8,8 @@ namespace MGUI.Core.UI
 {
     public enum MGElementType
     {
+        Undefined,
+
         //  Containers
         StackPanel,
         DockPanel,

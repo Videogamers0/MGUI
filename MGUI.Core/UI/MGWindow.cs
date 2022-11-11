@@ -850,7 +850,8 @@ namespace MGUI.Core.UI
         }
         #endregion Indexed Elements
 
-        /// <summary>Removes all graphics from this window except its content. Such as hiding the title bar, resize grip, close button, removing padding, setting the border and background to transparent</summary>
+        /// <summary>Removes all graphics from this window except its content.<br/>
+        /// Such as hiding the title bar, resize grip, close button, removing padding, setting the border and background to transparent</summary>
         public void MakeInvisible()
         {
             this.IsTitleBarVisible = false;
@@ -858,7 +859,14 @@ namespace MGUI.Core.UI
             this.IsUserResizable = false;
             this.Padding = new(0);
             this.BorderThickness = new(0);
-            this.BackgroundBrush.SetAll(MGSolidFillBrush.Transparent);
+            this.BackgroundBrush.SetAll(MGSolidFillBrush.Transparent); // Set this to MGSolidFillBrush.White * 0.1f while testing the AllowsClickThrough issue below
+            //this.AllowsClickThrough = true;   //TODO we probably want AllowsClickThrough=false, but to then handle any unhandled events that occurred overtop of this window's content.
+                                                //That way, an invisible window with margin around the content (such as horizontally-centered content) won't auto-handle clicks within the
+                                                //window that are outside the content.
+                                                //For Example, make an invisible window at topleft=0,0, size=500,500
+                                                //Add content with size=200,200, centered in the window
+                                                //clicking at position=100,100 overlaps the window, but doesn't overlap the content of the window
+                                                //so the click should fall-through to whatever's under the window
         }
 
         public void Draw(DrawBaseArgs BA) => Draw(new ElementDrawArgs(BA, this.VisualState, Point.Zero));

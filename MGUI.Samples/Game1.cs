@@ -45,8 +45,27 @@ namespace MGUI.Samples
             this.MGUIRenderer = new(new GameRenderHost<Game1>(this));
             this.Desktop = new(MGUIRenderer);
 
+            Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
+            Desktop.Windows.Add(LoadDebugWindow(CurrentAssembly, Desktop));
+            Desktop.Windows.Add(LoadRegistrationWindow(CurrentAssembly, Desktop));
+            Desktop.Windows.Add(LoadCharacterStatsWindow(CurrentAssembly, Desktop));
+            Desktop.Windows.Add(LoadInventoryWindow(CurrentAssembly, Desktop));
+            //Desktop.Windows.Add(LoadStylesTestWindow(CurrentAssembly, Desktop));
+
+            base.Initialize();
+        }
+
+        private static string ReadEmbeddedResourceAsString(Assembly CurrentAssembly, string ResourceName)
+        {
+            using (Stream ResourceStream = CurrentAssembly.GetManifestResourceStream(ResourceName))
+            using (StreamReader Reader = new StreamReader(ResourceStream))
+            return Reader.ReadToEnd();
+        }
+
+        private static MGWindow LoadDebugWindow(Assembly CurrentAssembly, MGDesktop Desktop)
+        {
             string xaml =
-            @"
+ @"
 <Window Left=""500"" Top=""100"" Width=""400"" Height=""600"" TitleText=""[b]Window Title Text[/b]"">
     <!--<Window.TitleBar>
         <DockPanel BG=""LightGreen"" Padding=""16,4"">
@@ -219,36 +238,35 @@ namespace MGUI.Samples
 </Window>
             ";
 
-            MGWindow XAMLWindow = XAMLParser.LoadRootWindow(Desktop, xaml);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, xaml);
             //XAMLWindow.MakeInvisible();
-            this.Desktop.Windows.Add(XAMLWindow);
 
-            if (XAMLWindow.TryGetElementByName("LV1", out MGListView<double> LV))
+            if (Window.TryGetElementByName("LV1", out MGListView<double> LV))
             {
                 LV.SetItemsSource(new List<double>() { 5, 25.5, 101.11, 0.0, -52.6, -18, 12345, -99.3, 0 });
                 LV.Columns[1].DataTemplate = (double val) =>
                 {
                     if (val > 0)
-                        return new MGTextBlock(XAMLWindow, "Positive", Color.Green);
+                        return new MGTextBlock(Window, "Positive", Color.Green);
                     else if (val == 0)
-                        return new MGTextBlock(XAMLWindow, "Zero", Color.Gray);
+                        return new MGTextBlock(Window, "Zero", Color.Gray);
                     else
-                        return new MGTextBlock(XAMLWindow, "Negative", Color.Red);
+                        return new MGTextBlock(Window, "Negative", Color.Red);
                 };
             }
 
-            if (XAMLWindow.TryGetElementByName("UG1", out MGUniformGrid UG))
+            if (Window.TryGetElementByName("UG1", out MGUniformGrid UG))
             {
                 //UG.Columns = 3;
                 UG.Columns = 5;
             }
 
-            if (XAMLWindow.TryGetElementByName("GB1", out MGGroupBox GB1))
+            if (Window.TryGetElementByName("GB1", out MGGroupBox GB1))
             {
                 //GB1.Header = new MGTextBlock(XAMLWindow, "Foo Bar Long text to test layout updating correctly after initialization", Color.Red);
             }
 
-            if (XAMLWindow.TryGetElementByName("TestProgressBar", out MGProgressBar TestProgressBar))
+            if (Window.TryGetElementByName("TestProgressBar", out MGProgressBar TestProgressBar))
             {
                 MGProgressBarGradientBrush Brush = new(TestProgressBar);
                 //TestProgressBar.CompletedBrush.NormalValue = Brush;
@@ -261,7 +279,7 @@ namespace MGUI.Samples
                 };
             }
 
-            if (XAMLWindow.TryGetElementByName("TestGrid", out MGGrid TestGrid))
+            if (Window.TryGetElementByName("TestGrid", out MGGrid TestGrid))
             {
                 TestGrid.OnLayoutUpdated += (sender, e) =>
                 {
@@ -281,31 +299,18 @@ namespace MGUI.Samples
                 };
             }
 
-            if (XAMLWindow.TryGetElementByName("CB", out MGComboBox<object> TestComboBox))
+            if (Window.TryGetElementByName("CB", out MGComboBox<object> TestComboBox))
             {
                 List<string> Items = Enumerable.Range(0, 26).Select(x => ((char)(x + 'a')).ToString()).ToList();
                 TestComboBox.SetItemsSource(Items.Cast<object>().ToList());
             }
-            
-            if (XAMLWindow.TryGetElementByName("CM1", out MGContextMenu CM))
+
+            if (Window.TryGetElementByName("CM1", out MGContextMenu CM))
             {
 
             }
 
-            Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
-            Desktop.Windows.Add(LoadRegistrationWindow(CurrentAssembly, Desktop));
-            Desktop.Windows.Add(LoadCharacterStatsWindow(CurrentAssembly, Desktop));
-            Desktop.Windows.Add(LoadInventoryWindow(CurrentAssembly, Desktop));
-            Desktop.Windows.Add(LoadStylesTestWindow(CurrentAssembly, Desktop));
-
-            base.Initialize();
-        }
-
-        private static string ReadEmbeddedResourceAsString(Assembly CurrentAssembly, string ResourceName)
-        {
-            using (Stream ResourceStream = CurrentAssembly.GetManifestResourceStream(ResourceName))
-            using (StreamReader Reader = new StreamReader(ResourceStream))
-            return Reader.ReadToEnd();
+            return Window;
         }
 
         private static MGWindow LoadRegistrationWindow(Assembly CurrentAssembly, MGDesktop Desktop)

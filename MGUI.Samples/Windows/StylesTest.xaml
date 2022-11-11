@@ -10,14 +10,14 @@
         <TextBlock Text="Two" />
         <StackPanel Orientation="Vertical">
             <StackPanel.Styles>
-                <Style TargetType="TextBlock">
+                <Style TargetType="TextBlock" Name="Test1">
                     <Setter Property="HorizontalAlignment" Value="Center" />
                     <Setter Property="Foreground" Value="Red" />
                 </Style>
             </StackPanel.Styles>
-            <TextBlock Text="Three" />
-            <TextBlock Text="Four" />
-            <TextBlock Text="Five" HorizontalAlignment="Left" Foreground="Blue" />
+            <TextBlock Text="Three" StyleNames="Test1" />
+            <TextBlock Text="Four" StyleNames="Test1" Foreground="Orange" />
+            <TextBlock Text="Five" Foreground="Blue" />
         </StackPanel>
         <TextBlock Text="Six" />
         <TextBlock Text="Seven" />

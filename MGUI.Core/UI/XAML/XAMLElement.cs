@@ -87,6 +87,11 @@ namespace MGUI.Core.UI.XAML
         /// Default value: true</summary>
         public bool IsStyleable { get; set; } = true;
         public List<XAMLStyle> Styles { get; set; } = new();
+        /// <summary>The names of the named <see cref="XAMLStyle"/>s that should be applied to this <see cref="XAMLElement"/>.<br/>
+        /// Use a comma to delimit multiple names, such as: "Style1,Style2<br/>
+        /// to apply <see cref="XAMLStyle"/> with <see cref="XAMLStyle.Name"/>="Style1" and <see cref="XAMLStyle"/> with <see cref="XAMLStyle.Name"/>="Style2" to this <see cref="XAMLElement"/><para/>
+        /// See also: <see cref="XAMLStyle.Name"/></summary>
+        public string StyleNames { get; set; }
 
         public Dictionary<string, object> AttachedProperties { get; set; } = new();
 
@@ -177,60 +182,116 @@ namespace MGUI.Core.UI.XAML
 
         protected internal abstract IEnumerable<XAMLElement> GetChildren();
 
-        protected internal void ProcessStyles() => ProcessStyles(new Dictionary<MGElementType, Dictionary<string, List<object>>>());
-        private void ProcessStyles(Dictionary<MGElementType, Dictionary<string, List<object>>> StylesByType)
+        protected internal void ProcessStyles() => ProcessStyles(new Dictionary<string, XAMLStyle>(), new Dictionary<MGElementType, Dictionary<string, List<object>>>());
+        private void ProcessStyles(Dictionary<string, XAMLStyle> StylesByName, Dictionary<MGElementType, Dictionary<string, List<object>>> StylesByType)
         {
             Dictionary<string, List<object>> ValuesByProperty;
 
             //  Append current style setters to indexed data
             foreach (XAMLStyle Style in this.Styles.Where(x => x.Setters.Any()))
             {
-                MGElementType Type = Style.TargetType;
-                if (!StylesByType.TryGetValue(Type, out ValuesByProperty))
+                if (Style.Name != null)
                 {
-                    ValuesByProperty = new();
-                    StylesByType.Add(Type, ValuesByProperty);
+                    StylesByName.Add(Style.Name, Style);
                 }
-
-                foreach (XAMLStyleSetter Setter in Style.Setters)
+                else
                 {
-                    string Property = Setter.Property;
-                    if (!ValuesByProperty.TryGetValue(Property, out List<object> Values))
+                    MGElementType Type = Style.TargetType;
+                    if (!StylesByType.TryGetValue(Type, out ValuesByProperty))
                     {
-                        Values = new();
-                        ValuesByProperty.Add(Property, Values);
+                        ValuesByProperty = new();
+                        StylesByType.Add(Type, ValuesByProperty);
                     }
 
-                    Values.Add(Setter.Value);
+                    foreach (XAMLStyleSetter Setter in Style.Setters)
+                    {
+                        string Property = Setter.Property;
+                        if (!ValuesByProperty.TryGetValue(Property, out List<object> Values))
+                        {
+                            Values = new();
+                            ValuesByProperty.Add(Property, Values);
+                        }
+
+                        Values.Add(Setter.Value);
+                    }
                 }
             }
 
             //  Apply the appropriate style setters to this instance
-            if (this.IsStyleable && StylesByType.TryGetValue(this.ElementType, out ValuesByProperty))
+            if (this.IsStyleable)
             {
                 Type ThisType = GetType();
 
-                foreach (KeyValuePair<string, List<object>> KVP in ValuesByProperty)
+                HashSet<string> ModifiedPropertyNames = new();
+
+                //  Apply implicit styles (styles that aren't referenced by a Name)
+                if (StylesByType.TryGetValue(this.ElementType, out ValuesByProperty))
                 {
+                    foreach (KeyValuePair<string, List<object>> KVP in ValuesByProperty)
+                    {
 #if DEBUG
-                    //  Sanity check
-                    if (KVP.Value.Count == 0)
-                        throw new InvalidOperationException($"{nameof(XAMLElement)}.{nameof(ProcessStyles)}.{nameof(ValuesByProperty)} should never be empty. The indexed data might not be properly updated.");
+                        //  Sanity check
+                        if (KVP.Value.Count == 0)
+                            throw new InvalidOperationException($"{nameof(XAMLElement)}.{nameof(ProcessStyles)}.{nameof(ValuesByProperty)} should never be empty. The indexed data might not be properly updated.");
 #endif
 
-                    string Property = KVP.Key;
-                    PropertyInfo PropertyInfo = ThisType.GetProperty(Property, BindingFlags.Public | BindingFlags.Instance); // | BindingFlags.IgnoreCase?
-                    if (PropertyInfo != null)
-                    {
-                        if (PropertyInfo.GetValue(this) == default)
+                        string PropertyName = KVP.Key;
+                        PropertyInfo PropertyInfo = ThisType.GetProperty(PropertyName, BindingFlags.Public | BindingFlags.Instance); // | BindingFlags.IgnoreCase?
+                        if (PropertyInfo != null)
                         {
-                            TypeConverter Converter = TypeDescriptor.GetConverter(PropertyInfo.PropertyType);
-                            foreach (object Value in KVP.Value)
+                            if (ModifiedPropertyNames.Contains(PropertyName) || PropertyInfo.GetValue(this) == default) // Don't allow a style to override a value that was already explicitly set
                             {
-                                if (Value is string StringValue)
+                                TypeConverter Converter = TypeDescriptor.GetConverter(PropertyInfo.PropertyType);
+                                foreach (object Value in KVP.Value)
+                                {
+                                    if (Value is string StringValue)
+                                        PropertyInfo.SetValue(this, Converter.ConvertFromString(StringValue));
+                                    else
+                                        PropertyInfo.SetValue(this, Value);
+                                }
+
+                                ModifiedPropertyNames.Add(PropertyName);
+                            }
+                        }
+                    }
+                }
+
+                //  Apply explicit styles (styles that were explicitly referenced by their Name)
+                if (StyleNames != null)
+                {
+                    string[] Names = StyleNames.Split(',');
+                    List<XAMLStyle> ExplicitStyles = Names.Select(x => StylesByName[x]).ToList();
+
+                    //  Get all the properties that the explicit styles will modify
+                    HashSet<string> PropertyNames = ExplicitStyles.SelectMany(x => x.Setters).Select(x => x.Property).ToHashSet();
+                    Dictionary<string, PropertyInfo> PropertiesByName = new();
+                    foreach (string PropertyName in PropertyNames)
+                    {
+                        PropertyInfo PropertyInfo = ThisType.GetProperty(PropertyName, BindingFlags.Public | BindingFlags.Instance); // | BindingFlags.IgnoreCase?
+                        if (PropertyInfo != null)
+                        {
+                            if (ModifiedPropertyNames.Contains(PropertyName) || PropertyInfo.GetValue(this) == default) // Don't allow a style to override a value that was already explicitly set
+                            {
+                                PropertiesByName.Add(PropertyName, PropertyInfo);
+                            }
+                        }
+                    }
+
+                    //  Apply the values of each setter
+                    foreach (XAMLStyle Style in ExplicitStyles)
+                    {
+                        foreach (XAMLStyleSetter Setter in Style.Setters)
+                        {
+                            string PropertyName = Setter.Property;
+                            if (PropertiesByName.TryGetValue(PropertyName, out PropertyInfo PropertyInfo))
+                            {
+                                TypeConverter Converter = TypeDescriptor.GetConverter(PropertyInfo.PropertyType);
+                                if (Setter.Value is string StringValue)
                                     PropertyInfo.SetValue(this, Converter.ConvertFromString(StringValue));
                                 else
-                                    PropertyInfo.SetValue(this, Value);
+                                    PropertyInfo.SetValue(this, Setter.Value);
+
+                                ModifiedPropertyNames.Add(PropertyName);
                             }
                         }
                     }
@@ -240,25 +301,32 @@ namespace MGUI.Core.UI.XAML
             //  Recursively process all children
             foreach (XAMLElement Child in GetChildren())
             {
-                Child.ProcessStyles(StylesByType);
+                Child.ProcessStyles(StylesByName, StylesByType);
             }
 
             //  Remove current style setters from indexed data
             foreach (XAMLStyle Style in this.Styles.Where(x => x.Setters.Any()))
             {
-                MGElementType Type = Style.TargetType;
-                if (StylesByType.TryGetValue(Type, out ValuesByProperty))
+                if (Style.Name != null)
                 {
-                    foreach (XAMLStyleSetter Setter in Style.Setters)
+                    StylesByName.Remove(Style.Name);
+                }
+                else
+                {
+                    MGElementType Type = Style.TargetType;
+                    if (StylesByType.TryGetValue(Type, out ValuesByProperty))
                     {
-                        string Property = Setter.Property;
-                        if (ValuesByProperty.TryGetValue(Property, out List<object> Values))
+                        foreach (XAMLStyleSetter Setter in Style.Setters)
                         {
-                            if (Values.Remove(Setter.Value) && Values.Count == 0)
+                            string Property = Setter.Property;
+                            if (ValuesByProperty.TryGetValue(Property, out List<object> Values))
                             {
-                                ValuesByProperty.Remove(Property);
-                                if (ValuesByProperty.Count == 0)
-                                    StylesByType.Remove(Type);
+                                if (Values.Remove(Setter.Value) && Values.Count == 0)
+                                {
+                                    ValuesByProperty.Remove(Property);
+                                    if (ValuesByProperty.Count == 0)
+                                        StylesByType.Remove(Type);
+                                }
                             }
                         }
                     }

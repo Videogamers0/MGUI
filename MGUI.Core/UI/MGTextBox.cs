@@ -813,6 +813,7 @@ namespace MGUI.Core.UI
                 this.LimitlessCharacterCountFormatString = "[b]{{CharacterCount}}[/b] character(s)";
 
                 this.TextBlockElement = new(Window, "");
+                TextBlockElement.ClipToBounds = false;
                 this.TextBlockComponent = new(TextBlockElement, ComponentUpdatePriority.AfterContents, ComponentDrawPriority.BeforeSelf, 
                     false, false, true, true, false, false, true,
                     (AvailableBounds, ComponentSize) => AvailableBounds.GetCompressed(Padding));
