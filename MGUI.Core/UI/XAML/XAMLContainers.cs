@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MonoGame.Extended;
+using System.Reflection.Metadata;
 
 #if UseWPF
 using System.Windows.Markup;
@@ -23,6 +24,8 @@ namespace MGUI.Core.UI.XAML
     public abstract class XAMLMultiContentHost : XAMLElement
     {
         public List<XAMLElement> Children { get; set; } = new();
+
+        protected internal override IEnumerable<XAMLElement> GetChildren() => Children;
     }
 
 #if UseWPF
@@ -39,6 +42,12 @@ namespace MGUI.Core.UI.XAML
                 MGSingleContentHost TypedElement = Element as MGSingleContentHost;
                 TypedElement.SetContent(Content.ToElement<MGElement>(Element.SelfOrParentWindow, Element));
             }
+        }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            if (Content != null)
+                yield return Content;
         }
     }
 
@@ -60,6 +69,8 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLGridSplitter : XAMLElement
     {
+        public override MGElementType ElementType => MGElementType.GridSplitter;
+
         public int? Size { get; set; }
         public XAMLSize? TickSize { get; set; }
         public XAMLFillBrush Foreground { get; set; }
@@ -77,10 +88,14 @@ namespace MGUI.Core.UI.XAML
             if (Foreground != null)
                 GridSplitter.Foreground.NormalValue = Foreground.ToFillBrush();
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren() => Enumerable.Empty<XAMLElement>();
     }
 
     public class XAMLGrid : XAMLMultiContentHost
     {
+        public override MGElementType ElementType => MGElementType.Grid;
+
         public string RowLengths { get; set; }
         public string ColumnLengths { get; set; }
         public List<XAMLRowDefinition> RowDefinitions { get; set; } = new();
@@ -163,6 +178,8 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLUniformGrid : XAMLMultiContentHost
     {
+        public override MGElementType ElementType => MGElementType.UniformGrid;
+
         public int? Rows { get; set; }
         public int? Columns { get; set; }
         public XAMLSize? CellSize { get; set; }
@@ -240,6 +257,8 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLDockPanel : XAMLMultiContentHost
     {
+        public override MGElementType ElementType => MGElementType.DockPanel;
+
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGDockPanel(Window);
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
@@ -256,6 +275,8 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLStackPanel : XAMLMultiContentHost
     {
+        public override MGElementType ElementType => MGElementType.StackPanel;
+
         public Orientation? Orientation { get; set; }
         public int? Spacing { get; set; }
 
@@ -280,6 +301,8 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLOverlayPanel : XAMLMultiContentHost
     {
+        public override MGElementType ElementType => MGElementType.OverlayPanel;
+
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGOverlayPanel(Window);
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)

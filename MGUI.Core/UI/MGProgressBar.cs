@@ -270,7 +270,7 @@ namespace MGUI.Core.UI
 
                 this.NumberFormat = "0.0";
 
-                this.ValueElement = new(Window, "", Color.White, GetTheme().FontSizes.Medium);
+                this.ValueElement = new(Window, "", Color.White, GetTheme().FontSettings.Medium);
                 this.ValueElement.WrapText = false;
                 this.ValueComponent = new(ValueElement, ComponentUpdatePriority.AfterContents, ComponentDrawPriority.BeforeContents,
                     true, true, false, false, false, false, false,

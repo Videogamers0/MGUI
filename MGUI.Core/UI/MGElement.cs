@@ -80,6 +80,7 @@ namespace MGUI.Core.UI
     }
 
     //TODO
+    //fix the bug with progress bar textwrapping? Set ValueElement.Text to "[b]200 / 255" with WrapText=true, and for some reason it linebreaks (arial 11pt font)
     //statusbar, menubar/menuitems
     //      messagebox
     //          has icon docked left

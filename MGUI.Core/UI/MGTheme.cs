@@ -43,7 +43,7 @@ namespace MGUI.Core.UI
         public ThemeManagedVisualStateColorBrush(VisualStateColorBrush Value) : base(Value) { }
     }
 
-    public class ThemeFontSizes
+    public class ThemeFontSettings
     {
         /// <summary>The default fontsize for content inside an <see cref="MGContextMenu"/>, such as <see cref="MGContextMenuButton"/> and <see cref="MGContextMenuToggle"/></summary>
         public int ContextMenu { get; set; } = 10;
@@ -53,6 +53,14 @@ namespace MGUI.Core.UI
         public int Large { get; set; } = 14;
 
         public int Default { get; set; } = 11;
+
+        /// <summary>If true, <see cref="MGTextBlock"/> will attempt to draw text with a scale that most closely results in the desired font size.<br/>
+        /// If false, <see cref="MGTextBlock"/> may choose a slightly different font size that approximates the exact size, but results in better scaling results.<para/>
+        /// For example, if you have SpriteFonts for these font sizes: 8, 10, 12, and you wanted to use font size = 19<br/>
+        /// If <see cref="ExactScale"/> is true: <see cref="MGTextBlock"/> would choose size=10, scale=1.9<br/>
+        /// If <see cref="ExactScale"/> is false: <see cref="MGTextBlock"/> would choose size=10, scale=2.0, preferring to scale by values such as 0.25, 0.5, 1.0, 2.0 etc<para/>
+        /// Default value: false</summary>
+        public bool ExactScale { get; set; } = false;
     }
 
     public class MGTheme
@@ -131,7 +139,7 @@ namespace MGUI.Core.UI
         /// <summary>The fallback value to use for <see cref="MGTextBlock.ActualForeground"/> when there is no foreground color applied to the <see cref="MGTextBlock"/> or its parents.</summary>
         public ThemeManagedVisualStateColorBrush TextBlockFallbackForeground { get; }
 
-        public ThemeFontSizes FontSizes { get; } = new();
+        public ThemeFontSettings FontSettings { get; } = new();
 
         public enum BuiltInTheme
         {

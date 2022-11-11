@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection.PortableExecutable;
 
 #if UseWPF
 using System.Windows.Markup;
@@ -21,12 +22,15 @@ namespace MGUI.Core.UI.XAML
 {
     public class XAMLContentPresenter : XAMLSingleContentHost
     {
+        public override MGElementType ElementType => MGElementType.ContentPresenter;
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGContentPresenter(Window);
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element) => base.ApplyDerivedSettings(Parent, Element);
     }
 
     public class XAMLHeaderedContentPresenter : XAMLSingleContentHost
     {
+        public override MGElementType ElementType => MGElementType.HeaderedContentPresenter;
+
         public XAMLElement Header { get; set; }
 
         public Dock? HeaderPosition { get; set; }
@@ -46,10 +50,21 @@ namespace MGUI.Core.UI.XAML
 
             base.ApplyDerivedSettings(Parent, Element);
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            foreach (XAMLElement Element in base.GetChildren())
+                yield return Element;
+
+            if (Header != null)
+                yield return Header;
+        }
     }
 
     public class XAMLBorder : XAMLSingleContentHost
     {
+        public override MGElementType ElementType => MGElementType.Border;
+
         //public static readonly DependencyProperty BorderThicknessProperty = DependencyProperty.RegisterAttached(nameof(BorderThickness), typeof(XAMLThickness?), typeof(XAMLBorder));
         //public static XAMLThickness? GetBorderThickness(DependencyObject element) => ((XAMLThickness?)element.GetValue(BorderThicknessProperty));
         //public static void SetBorderThickness(DependencyObject element, XAMLThickness? borderThickness) => element.SetValue(BorderThicknessProperty, borderThickness);
@@ -79,6 +94,8 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLButton : XAMLSingleContentHost
     {
+        public override MGElementType ElementType => MGElementType.Button;
+
         public XAMLBorder Border { get; set; } = new();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -104,6 +121,8 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLCheckBox : XAMLSingleContentHost
     {
+        public override MGElementType ElementType => MGElementType.CheckBox;
+
         public XAMLButton Button { get; set; } = new();
 
         public int? CheckBoxComponentSize { get; set; }
@@ -132,6 +151,13 @@ namespace MGUI.Core.UI.XAML
 
             base.ApplyDerivedSettings(Parent, Element);
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            foreach (XAMLElement Element in base.GetChildren())
+                yield return Element;
+            yield return Button;
+        }
     }
 
 #if UseWPF
@@ -139,6 +165,8 @@ namespace MGUI.Core.UI.XAML
 #endif
     public class XAMLComboBox : XAMLMultiContentHost
     {
+        public override MGElementType ElementType => MGElementType.ComboBox;
+
         /// <summary>The generic type that will be used when instantiating <see cref="MGComboBox{TItemType}"/>.<para/>
         /// To set this value from a XAML string, you must define the namespace the type belongs to, then use the x:Type Markup Extension<br/>
         /// (See: <see href="https://learn.microsoft.com/en-us/dotnet/desktop/xaml-services/xtype-markup-extension"/>)<para/>
@@ -177,10 +205,21 @@ namespace MGUI.Core.UI.XAML
             MethodInfo Method = GenericType.GetMethod(nameof(MGComboBox<object>.LoadSettings), BindingFlags.Instance | BindingFlags.NonPublic);
             Method.Invoke(Element, new object[] { this });
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            foreach (XAMLElement Element in base.GetChildren())
+                yield return Element;
+
+            yield return Border;
+            yield return DropdownArrow;
+        }
     }
 
     public class XAMLExpander : XAMLSingleContentHost
     {
+        public override MGElementType ElementType => MGElementType.Expander;
+
         public XAMLToggleButton ExpanderToggleButton { get; set; } = new();
 
         public int? ExpanderButtonSize { get; set; }
@@ -234,10 +273,25 @@ namespace MGUI.Core.UI.XAML
 
             base.ApplyDerivedSettings(Parent, Element);
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            foreach (XAMLElement Element in base.GetChildren())
+                yield return Element;
+
+            yield return ExpanderToggleButton;
+
+            if (Header != null)
+                yield return Header;
+
+            yield return HeadersPanel;
+        }
     }
 
     public class XAMLGroupBox : XAMLSingleContentHost
     {
+        public override MGElementType ElementType => MGElementType.GroupBox;
+
         public XAMLUniformBorderBrush BorderBrush { get; set; }
         public XAMLThickness? BorderThickness { get; set; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -277,10 +331,24 @@ namespace MGUI.Core.UI.XAML
 
             base.ApplyDerivedSettings(Parent, Element);
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            foreach (XAMLElement Element in base.GetChildren())
+                yield return Element;
+
+            yield return Expander;
+            yield return HeaderPresenter;
+
+            if (Header != null)
+                yield return Header;
+        }
     }
 
     public class XAMLImage : XAMLElement
     {
+        public override MGElementType ElementType => MGElementType.Image;
+
         public string TextureName { get; set; }
         public string RegionName { get; set; }
 
@@ -313,10 +381,14 @@ namespace MGUI.Core.UI.XAML
             if (Stretch.HasValue)
                 Image.Stretch = Stretch.Value;
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren() => Enumerable.Empty<XAMLElement>();
     }
 
     public class XAMLPasswordBox : XAMLTextBox
     {
+        public override MGElementType ElementType => MGElementType.PasswordBox;
+
         public char? PasswordCharacter { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGPasswordBox(Window);
@@ -334,6 +406,8 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLProgressBar : XAMLElement
     {
+        public override MGElementType ElementType => MGElementType.ProgressBar;
+
         public XAMLBorder Border { get; set; } = new();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -398,10 +472,18 @@ namespace MGUI.Core.UI.XAML
             if (IsReversed.HasValue)
                 ProgressBar.IsReversed = IsReversed.Value;
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            yield return Border;
+            yield return ValueTextBlock;
+        }
     }
 
     public class XAMLRadioButton : XAMLSingleContentHost
     {
+        public override MGElementType ElementType => MGElementType.RadioButton;
+
         public XAMLButton Button { get; set; } = new();
 
         public string GroupName { get; set; }
@@ -443,10 +525,20 @@ namespace MGUI.Core.UI.XAML
 
             base.ApplyDerivedSettings(Parent, Element);
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            foreach (XAMLElement Element in base.GetChildren())
+                yield return Element;
+
+            yield return Button;
+        }
     }
 
     public class XAMLRatingControl : XAMLElement
     {
+        public override MGElementType ElementType => MGElementType.RatingControl;
+
         public RatingItemShape? ItemShape { get; set; }
         public int? ItemSize { get; set; }
         public int? Spacing { get; set; }
@@ -517,10 +609,14 @@ namespace MGUI.Core.UI.XAML
             if (IsReadonly.HasValue)
                 RatingControl.IsReadonly = IsReadonly.Value;
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren() => Enumerable.Empty<XAMLElement>();
     }
 
     public class XAMLRectangleElement : XAMLElement
     {
+        public override MGElementType ElementType => MGElementType.Rectangle;
+
         public XAMLColor? Stroke { get; set; }
         public int? StrokeThickness { get; set; }
         public XAMLFillBrush Fill { get; set; }
@@ -539,10 +635,14 @@ namespace MGUI.Core.UI.XAML
             if (Fill != null)
                 Rectangle.Fill = Fill.ToFillBrush();
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren() => Enumerable.Empty<XAMLElement>();
     }
 
     public class XAMLResizeGrip : XAMLElement
     {
+        public override MGElementType ElementType => MGElementType.ResizeGrip;
+
         public XAMLColor? Foreground { get; set; }
         public int? MaxDots { get; set; }
         public int? Spacing { get; set; }
@@ -561,10 +661,14 @@ namespace MGUI.Core.UI.XAML
             if (Spacing.HasValue)
                 ResizeGrip.Spacing = Spacing.Value;
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren() => Enumerable.Empty<XAMLElement>();
     }
 
     public class XAMLScrollViewer : XAMLSingleContentHost
     {
+        public override MGElementType ElementType => MGElementType.ScrollViewer;
+
         public ScrollBarVisibility? VerticalScrollBarVisibility { get; set; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public ScrollBarVisibility? VSBVisibility { get => VerticalScrollBarVisibility; set => VerticalScrollBarVisibility = value; }
@@ -612,6 +716,8 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLSeparator : XAMLElement
     {
+        public override MGElementType ElementType => MGElementType.Separator;
+
         public Orientation? Orientation { get; set; }
         public int? Size { get; set; }
 
@@ -627,10 +733,14 @@ namespace MGUI.Core.UI.XAML
             if (Size.HasValue)
                 Separator.Size = Size.Value;
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren() => Enumerable.Empty<XAMLElement>();
     }
 
     public class XAMLSlider : XAMLElement
     {
+        public override MGElementType ElementType => MGElementType.Slider;
+
         public float? Minimum { get; set; }
         public float? Maximum { get; set; }
         public float? Value { get; set; }
@@ -724,16 +834,22 @@ namespace MGUI.Core.UI.XAML
             if (AcceptsMouseScrollWheel.HasValue)
                 Slider.AcceptsMouseScrollWheel = AcceptsMouseScrollWheel.Value;
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren() => Enumerable.Empty<XAMLElement>();
     }
 
     public class XAMLSpacer : XAMLElement
     {
+        public override MGElementType ElementType => MGElementType.Spacer;
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGSpacer(Window, Width ?? 0, Height ?? 0);
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element) { }
+        protected internal override IEnumerable<XAMLElement> GetChildren() => Enumerable.Empty<XAMLElement>();
     }
 
     public class XAMLSpoiler : XAMLSingleContentHost
     {
+        public override MGElementType ElementType => MGElementType.Spoiler;
+
         public XAMLButton Button { get; set; } = new();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -764,10 +880,20 @@ namespace MGUI.Core.UI.XAML
 
             base.ApplyDerivedSettings(Parent, Element);
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            foreach (XAMLElement Element in base.GetChildren())
+                yield return Element;
+
+            yield return Button;
+        }
     }
 
     public class XAMLStopwatch : XAMLElement
     {
+        public override MGElementType ElementType => MGElementType.Stopwatch;
+
         public XAMLBorder Border { get; set; } = new();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -809,6 +935,12 @@ namespace MGUI.Core.UI.XAML
                     StopWatch.Stop();
             }
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            yield return Border;
+            yield return Value;
+        }
     }
 
 #if UseWPF
@@ -816,6 +948,8 @@ namespace MGUI.Core.UI.XAML
 #endif
     public class XAMLTabControl : XAMLElement
     {
+        public override MGElementType ElementType => MGElementType.TabControl;
+
         public XAMLBorder Border { get; set; } = new();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -849,10 +983,21 @@ namespace MGUI.Core.UI.XAML
                 _ = Child.ToElement<MGTabItem>(TabControl.ParentWindow, TabControl);
             }
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            yield return Border;
+            yield return HeadersPanel;
+
+            foreach (XAMLTabItem Tab in Tabs)
+                yield return Tab;
+        }
     }
 
     public class XAMLTabItem : XAMLSingleContentHost
     {
+        public override MGElementType ElementType => MGElementType.TabItem;
+
         public XAMLElement Header { get; set; }
 
         public bool? IsTabSelected { get; set; }
@@ -878,10 +1023,21 @@ namespace MGUI.Core.UI.XAML
 
             //base.ApplyDerivedSettings(Parent, Element);
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            foreach (XAMLElement Element in base.GetChildren())
+                yield return Element;
+
+            if (Header != null)
+                yield return Header;
+        }
     }
 
     public class XAMLTextBlock : XAMLElement
     {
+        public override MGElementType ElementType => MGElementType.TextBlock;
+
         public string FontFamily { get; set; }
         public int? FontSize { get; set; }
         public XAMLColor? Foreground { get; set; }
@@ -909,10 +1065,14 @@ namespace MGUI.Core.UI.XAML
             if (TextAlignment.HasValue)
                 TextBlock.TextAlignment = TextAlignment.Value;
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren() => Enumerable.Empty<XAMLElement>();
     }
 
     public class XAMLTextBox : XAMLElement
     {
+        public override MGElementType ElementType => MGElementType.TextBox;
+
         public XAMLBorder Border { get; set; } = new();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -1019,10 +1179,21 @@ namespace MGUI.Core.UI.XAML
             if (IsUserResizable.HasValue)
                 TextBox.IsUserResizable = IsUserResizable.Value;
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            yield return Border;
+            yield return TextBlock;
+            yield return Placeholder;
+            yield return CharacterCounter;
+            yield return ResizeGrip;
+        }
     }
 
     public class XAMLTimer : XAMLElement
     {
+        public override MGElementType ElementType => MGElementType.Timer;
+
         public XAMLBorder Border { get; set; } = new();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -1072,10 +1243,18 @@ namespace MGUI.Core.UI.XAML
                     Timer.Resume();
             }
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            yield return Border;
+            yield return Value;
+        }
     }
 
     public class XAMLToggleButton : XAMLSingleContentHost
     {
+        public override MGElementType ElementType => MGElementType.ToggleButton;
+
         public XAMLBorder Border { get; set; } = new();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -1108,10 +1287,20 @@ namespace MGUI.Core.UI.XAML
 
             base.ApplyDerivedSettings(Parent, Element);
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            foreach (XAMLElement Element in base.GetChildren())
+                yield return Element;
+
+            yield return Border;
+        }
     }
 
     public class XAMLToolTip : XAMLWindow
     {
+        public override MGElementType ElementType => MGElementType.ToolTip;
+
         public bool? ShowOnDisabled { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -1130,6 +1319,8 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLWindow : XAMLSingleContentHost
     {
+        public override MGElementType ElementType => MGElementType.Window;
+
         public int? Left { get; set; }
         public int? Top { get; set; }
 
@@ -1224,6 +1415,25 @@ namespace MGUI.Core.UI.XAML
             }
 
             base.ApplyDerivedSettings(Parent, Element);
+        }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            foreach (XAMLElement Element in base.GetChildren())
+                yield return Element;
+
+            yield return ResizeGrip;
+            yield return Border;
+
+            if (ModalWindow != null)
+                yield return ModalWindow;
+
+            foreach (XAMLWindow Window in NestedWindows)
+                yield return Window;
+
+            yield return TitleBar;
+            yield return TitleBarTextBlock;
+            yield return CloseButton;
         }
     }
 }

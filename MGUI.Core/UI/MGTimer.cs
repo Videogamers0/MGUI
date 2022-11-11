@@ -184,7 +184,7 @@ namespace MGUI.Core.UI
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
 
-                this.ValueElement = new(Window, "", Color.White, GetTheme().FontSizes.Medium);
+                this.ValueElement = new(Window, "", Color.White, GetTheme().FontSettings.Medium);
                 this.ValueComponent = new(ValueElement, false, false, true, true, false, false, true,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds.GetCompressed(Padding), HorizontalContentAlignment, VerticalContentAlignment, ComponentSize.Size));
                 AddComponent(ValueComponent);

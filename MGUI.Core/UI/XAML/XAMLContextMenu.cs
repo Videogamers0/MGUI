@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +17,8 @@ namespace MGUI.Core.UI.XAML
 #endif
     public class XAMLContextMenu : XAMLWindow
     {
+        public override MGElementType ElementType => MGElementType.ContextMenu;
+
         public bool? CanOpen { get; set; }
         public bool? StaysOpenOnItemSelected { get; set; }
         public bool? StaysOpenOnItemToggled { get; set; }
@@ -64,6 +67,18 @@ namespace MGUI.Core.UI.XAML
 
             base.ApplyDerivedSettings(Parent, Element);
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            foreach (XAMLElement Element in base.GetChildren())
+                yield return Element;
+
+            yield return ScrollViewer;
+            yield return ItemsPanel;
+
+            foreach (XAMLContextMenuItem Item in Items)
+                yield return Item;
+        }
     }
 
     public abstract class XAMLContextMenuItem : XAMLSingleContentHost
@@ -88,6 +103,8 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLContextMenuButton : XAMLWrappedContextMenuItem
     {
+        public override MGElementType ElementType => MGElementType.ContextMenuItem;
+
         public XAMLImage Icon { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -110,10 +127,21 @@ namespace MGUI.Core.UI.XAML
 
             base.ApplyDerivedSettings(Parent, Element);
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            foreach (XAMLElement Element in base.GetChildren())
+                yield return Element;
+
+            if (Icon != null)
+                yield return Icon;
+        }
     }
 
     public class XAMLContextMenuToggle : XAMLWrappedContextMenuItem
     {
+        public override MGElementType ElementType => MGElementType.ContextMenuItem;
+
         public bool? IsChecked { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -140,6 +168,8 @@ namespace MGUI.Core.UI.XAML
 
     public class XAMLContextMenuSeparator : XAMLContextMenuItem
     {
+        public override MGElementType ElementType => MGElementType.ContextMenuItem;
+
         public XAMLSeparator Separator { get; set; } = new();
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -157,6 +187,14 @@ namespace MGUI.Core.UI.XAML
             MGContextMenuSeparator ContextMenuSeparator = Element as MGContextMenuSeparator;
             Separator.ApplySettings(Element, ContextMenuSeparator.SeparatorElement);
             base.ApplyDerivedSettings(Parent, Element);
+        }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            foreach (XAMLElement Element in base.GetChildren())
+                yield return Element;
+
+            yield return Separator;
         }
     }
 }

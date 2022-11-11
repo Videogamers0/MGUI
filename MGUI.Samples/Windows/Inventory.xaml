@@ -20,18 +20,26 @@
                                 
                                 <!-- 4x12 grid of 48x48 px slots -->
                                 <UniformGrid Name="UniformGrid_Inventory" Rows="4" Columns="12" CellSize="48,48" Margin="16,8,16,12" HeaderRowHeight="15" RowSpacing="3">
-                                    <TextBlock Foreground="Red" Text="1" Row="0" Column="0" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <TextBlock Foreground="Gray" Text="2" Row="0" Column="1" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <TextBlock Foreground="Gray" Text="3" Row="0" Column="2" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <TextBlock Foreground="Gray" Text="4" Row="0" Column="3" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <TextBlock Foreground="Gray" Text="5" Row="0" Column="4" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <TextBlock Foreground="Gray" Text="6" Row="0" Column="5" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <TextBlock Foreground="Gray" Text="7" Row="0" Column="6" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <TextBlock Foreground="Gray" Text="8" Row="0" Column="7" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <TextBlock Foreground="Gray" Text="9" Row="0" Column="8" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <TextBlock Foreground="Gray" Text="0" Row="0" Column="9" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <TextBlock Foreground="Gray" Text="-" Row="0" Column="10" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    <TextBlock Foreground="Gray" Text="=" Row="0" Column="11" FontSize="8" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <UniformGrid.Styles>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="Gray" />
+                                            <Setter Property="FontSize" Value="8" />
+                                            <Setter Property="HorizontalAlignment" Value="Center" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                        </Style>
+                                    </UniformGrid.Styles>
+                                    <TextBlock Foreground="Red" Text="1" Row="0" Column="0" />
+                                    <TextBlock Text="2" Row="0" Column="1" />
+                                    <TextBlock Text="3" Row="0" Column="2" />
+                                    <TextBlock Text="4" Row="0" Column="3" />
+                                    <TextBlock Text="5" Row="0" Column="4" />
+                                    <TextBlock Text="6" Row="0" Column="5" />
+                                    <TextBlock Text="7" Row="0" Column="6" />
+                                    <TextBlock Text="8" Row="0" Column="7" />
+                                    <TextBlock Text="9" Row="0" Column="8" />
+                                    <TextBlock Text="0" Row="0" Column="9" />
+                                    <TextBlock Text="-" Row="0" Column="10" />
+                                    <TextBlock Text="=" Row="0" Column="11" />
                                 </UniformGrid>
 
                                 <Separator Orientation="Horizontal" Size="3" Margin="0" Background="RGB(133,54,5)" />

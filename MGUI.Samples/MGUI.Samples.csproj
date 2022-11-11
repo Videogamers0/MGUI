@@ -21,6 +21,7 @@
     <None Remove="Windows\CharacterStats.xaml" />
     <None Remove="Windows\Inventory.xaml" />
     <None Remove="Windows\Registration.xaml" />
+    <None Remove="Windows\StylesTest.xaml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Windows\CharacterStats.xaml">
@@ -30,6 +31,9 @@
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Registration.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\StylesTest.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
   </ItemGroup>

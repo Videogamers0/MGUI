@@ -296,6 +296,7 @@ namespace MGUI.Samples
             Desktop.Windows.Add(LoadRegistrationWindow(CurrentAssembly, Desktop));
             Desktop.Windows.Add(LoadCharacterStatsWindow(CurrentAssembly, Desktop));
             Desktop.Windows.Add(LoadInventoryWindow(CurrentAssembly, Desktop));
+            Desktop.Windows.Add(LoadStylesTestWindow(CurrentAssembly, Desktop));
 
             base.Initialize();
         }
@@ -404,6 +405,16 @@ namespace MGUI.Samples
             UniformGrid_Inventory.CellBackground.NormalValue = new MGBorderedFillBrush(new(3), CellBorderBrush, new Color(255, 195, 118).AsFillBrush(), true);
 
             Window.MakeInvisible();
+
+            return Window;
+        }
+
+        private static MGWindow LoadStylesTestWindow(Assembly CurrentAssembly, MGDesktop Desktop)
+        {
+            //  Parse the XAML markup into an MGWindow instance
+            string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.StylesTest.xaml";
+            string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML);
 
             return Window;
         }

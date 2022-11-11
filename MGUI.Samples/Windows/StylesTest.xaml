@@ -1,0 +1,25 @@
+﻿<Window Left="50" Top="50" Width="200" Height="300">
+    <StackPanel Orientation="Vertical">
+        <StackPanel.Styles>
+            <Style TargetType="TextBlock">
+                <Setter Property="HorizontalAlignment" Value="Right" />
+            </Style>
+        </StackPanel.Styles>
+
+        <TextBlock Text="One" IsStyleable="False" />
+        <TextBlock Text="Two" />
+        <StackPanel Orientation="Vertical">
+            <StackPanel.Styles>
+                <Style TargetType="TextBlock">
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="Foreground" Value="Red" />
+                </Style>
+            </StackPanel.Styles>
+            <TextBlock Text="Three" />
+            <TextBlock Text="Four" />
+            <TextBlock Text="Five" HorizontalAlignment="Left" Foreground="Blue" />
+        </StackPanel>
+        <TextBlock Text="Six" />
+        <TextBlock Text="Seven" />
+    </StackPanel>
+</Window>

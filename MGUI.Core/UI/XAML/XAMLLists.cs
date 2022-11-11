@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Reflection.PortableExecutable;
 
 #if UseWPF
 using System.Windows.Markup;
@@ -21,6 +22,8 @@ namespace MGUI.Core.UI.XAML
 #endif
     public class XAMLListBox : XAMLMultiContentHost
     {
+        public override MGElementType ElementType => MGElementType.ListBox;
+
         /// <summary>The generic type that will be used when instantiating <see cref="MGListBox{TItemType}"/>.<para/>
         /// To set this value from a XAML string, you must define the namespace the type belongs to, then use the x:Type Markup Extension<br/>
         /// (See: <see href="https://learn.microsoft.com/en-us/dotnet/desktop/xaml-services/xtype-markup-extension"/>)<para/>
@@ -73,6 +76,22 @@ namespace MGUI.Core.UI.XAML
             MethodInfo Method = GenericType.GetMethod(nameof(MGListBox<object>.LoadSettings), BindingFlags.Instance | BindingFlags.NonPublic);
             Method.Invoke(Element, new object[] { this });
         }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            foreach (XAMLElement Element in base.GetChildren())
+                yield return Element;
+
+            yield return OuterBorder;
+            yield return InnerBorder;
+            yield return TitleBorder;
+            yield return TitlePresenter;
+            yield return ScrollViewer;
+            yield return ItemsPanel;
+
+            if (Header != null)
+                yield return Header;
+        }
     }
 
 #if UseWPF
@@ -80,6 +99,8 @@ namespace MGUI.Core.UI.XAML
 #endif
     public class XAMLListView : XAMLMultiContentHost
     {
+        public override MGElementType ElementType => MGElementType.ListView;
+
         /// <summary>The generic type that will be used when instantiating <see cref="MGListView{TItemType}"/>.<para/>
         /// To set this value from a XAML string, you must define the namespace the type belongs to, then use the x:Type Markup Extension<br/>
         /// (See: <see href="https://learn.microsoft.com/en-us/dotnet/desktop/xaml-services/xtype-markup-extension"/>)<para/>
@@ -109,6 +130,16 @@ namespace MGUI.Core.UI.XAML
             Type GenericType = typeof(MGListView<>).MakeGenericType(new Type[] { ItemType });
             MethodInfo Method = GenericType.GetMethod(nameof(MGListView<object>.LoadSettings), BindingFlags.Instance | BindingFlags.NonPublic);
             Method.Invoke(Element, new object[] { this });
+        }
+
+        protected internal override IEnumerable<XAMLElement> GetChildren()
+        {
+            foreach (XAMLElement Element in base.GetChildren())
+                yield return Element;
+
+            yield return HeaderGrid;
+            yield return ScrollViewer;
+            yield return DataGrid;
         }
     }
 

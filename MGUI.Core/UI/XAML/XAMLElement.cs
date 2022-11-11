@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +14,8 @@ namespace MGUI.Core.UI.XAML
     [TypeConverter(typeof(XAMLElementStringConverter))]
     public abstract class XAMLElement
     {
+        public abstract MGElementType ElementType { get; }
+
         public string Name { get; set; }
 
         public XAMLThickness? Margin { get; set; }
@@ -79,6 +82,11 @@ namespace MGUI.Core.UI.XAML
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int Column { get => GridColumn; set => GridColumn = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int RowSpan { get => GridRowSpan; set => GridRowSpan = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int ColumnSpan { get => GridColumnSpan; set => GridColumnSpan = value; }
+
+        /// <summary>If true, this object can have <see cref="XAMLStyleSetter"/>s applied to its properties.<para/>
+        /// Default value: true</summary>
+        public bool IsStyleable { get; set; } = true;
+        public List<XAMLStyle> Styles { get; set; } = new();
 
         public Dictionary<string, object> AttachedProperties { get; set; } = new();
 
@@ -166,6 +174,97 @@ namespace MGUI.Core.UI.XAML
 
         protected abstract MGElement CreateElementInstance(MGWindow Window, MGElement Parent);
         protected internal abstract void ApplyDerivedSettings(MGElement Parent, MGElement Element);
+
+        protected internal abstract IEnumerable<XAMLElement> GetChildren();
+
+        protected internal void ProcessStyles() => ProcessStyles(new Dictionary<MGElementType, Dictionary<string, List<object>>>());
+        private void ProcessStyles(Dictionary<MGElementType, Dictionary<string, List<object>>> StylesByType)
+        {
+            Dictionary<string, List<object>> ValuesByProperty;
+
+            //  Append current style setters to indexed data
+            foreach (XAMLStyle Style in this.Styles.Where(x => x.Setters.Any()))
+            {
+                MGElementType Type = Style.TargetType;
+                if (!StylesByType.TryGetValue(Type, out ValuesByProperty))
+                {
+                    ValuesByProperty = new();
+                    StylesByType.Add(Type, ValuesByProperty);
+                }
+
+                foreach (XAMLStyleSetter Setter in Style.Setters)
+                {
+                    string Property = Setter.Property;
+                    if (!ValuesByProperty.TryGetValue(Property, out List<object> Values))
+                    {
+                        Values = new();
+                        ValuesByProperty.Add(Property, Values);
+                    }
+
+                    Values.Add(Setter.Value);
+                }
+            }
+
+            //  Apply the appropriate style setters to this instance
+            if (this.IsStyleable && StylesByType.TryGetValue(this.ElementType, out ValuesByProperty))
+            {
+                Type ThisType = GetType();
+
+                foreach (KeyValuePair<string, List<object>> KVP in ValuesByProperty)
+                {
+#if DEBUG
+                    //  Sanity check
+                    if (KVP.Value.Count == 0)
+                        throw new InvalidOperationException($"{nameof(XAMLElement)}.{nameof(ProcessStyles)}.{nameof(ValuesByProperty)} should never be empty. The indexed data might not be properly updated.");
+#endif
+
+                    string Property = KVP.Key;
+                    PropertyInfo PropertyInfo = ThisType.GetProperty(Property, BindingFlags.Public | BindingFlags.Instance); // | BindingFlags.IgnoreCase?
+                    if (PropertyInfo != null)
+                    {
+                        if (PropertyInfo.GetValue(this) == default)
+                        {
+                            TypeConverter Converter = TypeDescriptor.GetConverter(PropertyInfo.PropertyType);
+                            foreach (object Value in KVP.Value)
+                            {
+                                if (Value is string StringValue)
+                                    PropertyInfo.SetValue(this, Converter.ConvertFromString(StringValue));
+                                else
+                                    PropertyInfo.SetValue(this, Value);
+                            }
+                        }
+                    }
+                }
+            }
+
+            //  Recursively process all children
+            foreach (XAMLElement Child in GetChildren())
+            {
+                Child.ProcessStyles(StylesByType);
+            }
+
+            //  Remove current style setters from indexed data
+            foreach (XAMLStyle Style in this.Styles.Where(x => x.Setters.Any()))
+            {
+                MGElementType Type = Style.TargetType;
+                if (StylesByType.TryGetValue(Type, out ValuesByProperty))
+                {
+                    foreach (XAMLStyleSetter Setter in Style.Setters)
+                    {
+                        string Property = Setter.Property;
+                        if (ValuesByProperty.TryGetValue(Property, out List<object> Values))
+                        {
+                            if (Values.Remove(Setter.Value) && Values.Count == 0)
+                            {
+                                ValuesByProperty.Remove(Property);
+                                if (ValuesByProperty.Count == 0)
+                                    StylesByType.Remove(Type);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public class XAMLElementStringConverter : TypeConverter

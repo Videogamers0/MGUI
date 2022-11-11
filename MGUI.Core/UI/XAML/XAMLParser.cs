@@ -84,6 +84,9 @@ namespace MGUI.Core.UI.XAML
             { "StackPanel", nameof(XAMLStackPanel) },
             { "OverlayPanel", nameof(XAMLOverlayPanel) },
 
+            { "Style", nameof(XAMLStyle) },
+            { "Setter", nameof(XAMLStyleSetter) },
+
             //  Abbreviated names
             { "CP", nameof(XAMLContentPresenter) },
             { "HCP", nameof(XAMLHeaderedContentPresenter) },
@@ -195,6 +198,7 @@ namespace MGUI.Core.UI.XAML
             if (ReplaceLinebreakLiterals)
                 XAMLString = XAMLString.Replace(@"\n", "&#x0a;");
             XAMLElement Parsed = (XAMLElement)XamlServices.Parse(XAMLString);
+            Parsed.ProcessStyles();
             return Parsed.ToElement<T>(Window, null);
         }
 
@@ -212,6 +216,7 @@ namespace MGUI.Core.UI.XAML
             if (ReplaceLinebreakLiterals)
                 XAMLString = XAMLString.Replace(@"\n", "&#x0a;");
             XAMLWindow Parsed = (XAMLWindow)XamlServices.Parse(XAMLString);
+            Parsed.ProcessStyles();
             return Parsed.ToElement(Desktop);
         }
 #endif
