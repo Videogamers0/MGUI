@@ -40,6 +40,234 @@ All control names are prefixed with 'MG' and have similar names and properties t
   - MGTextBox
   - MGTimer
   
+# Examples
+  
+A simple registration window created with MGUI:
+
+![Register.png](assets/samples/Sample_Registration_Window.png)
+<details>
+  <summary>XAML Markup:</summary>
+  
+```xaml
+<Window Left="50" Top="50" Width="300" Height="380">
+    
+    <!-- Replace the window's Title bar with custom content -->
+    <Window.TitleBar>
+        <!-- The root-element of the window's Title bar must always be an MGDockPanel, but we can add whatever we want to it -->
+        <DockPanel Padding="5,2">
+            <Rectangle Dock="Left" Width="16" Height="16" Stroke="Gray" StrokeThickness="1" Fill="Black" Margin="0,0,5,0">
+                <Rectangle.ToolTip>
+                    <ToolTip Padding="0" Width="240" Height="30" TextForeground="RoyalBlue" Background="White * 0.85">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="[b]Pretend this is a window icon[/b]" />
+                    </ToolTip>
+                </Rectangle.ToolTip>
+            </Rectangle>
+            
+            <TextBlock FontSize="10" Foreground="White" Text="Registration Form" />
+        </DockPanel>
+    </Window.TitleBar>
+    
+    <DockPanel Margin="5">
+        <!-- Window header -->
+        <StackPanel Dock="Top" Orientation="Vertical">
+            <TextBlock Dock="Top" HorizontalAlignment="Center" FontSize="14" Foreground="Orange" Text="Register for a new account" />
+            <Separator Size="3" Orientation="Horizontal" Background="Orange * 0.5" />
+        </StackPanel>
+        
+        <!-- Register -->
+        <Button Name="Button_Register" Dock="Bottom" Background="Orange" HorizontalAlignment="Center" Padding="25,5">
+            <TextBlock Text="[b]Register[/b]" FontSize="14" />
+        </Button>
+        
+        <Border BorderBrush="Black" BorderThickness="1">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="8" Margin="0,10,0,15" Background="White * 0.08">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel.Styles>
+                        <Style TargetType="HeaderedContentPresenter">
+                            <Setter Property="HeaderPosition" Value="Top" />
+                            <Setter Property="Spacing" Value="2" />
+                        </Style>
+                    </StackPanel.Styles>
+                    
+                    <!-- Email -->
+                    <HeaderedContentPresenter>
+                        <HeaderedContentPresenter.Header>
+                            <TextBlock Text="Email:" Foreground="Gray" />
+                        </HeaderedContentPresenter.Header>
+                        <TextBox Name="TextBox_Email" PlaceholderText="[i][opacity=0.5]Email[/opacity][/i]" CharacterLimit="40" ShowCharacterCount="false" AcceptsReturn="false" AcceptsTab="false" />
+                    </HeaderedContentPresenter>
+                    <Spacer Height="8" />
+                    
+                    <!-- Username -->
+                    <HeaderedContentPresenter>
+                        <HeaderedContentPresenter.Header>
+                            <TextBlock Text="Username:" Foreground="Gray" />
+                        </HeaderedContentPresenter.Header>
+                        <TextBox Name="TextBox_Username" PlaceholderText="[i][opacity=0.5]Username[/opacity][/i]" CharacterLimit="16" ShowCharacterCount="true" AcceptsReturn="false" AcceptsTab="false">
+                            <TextBox.ToolTip>
+                                <ToolTip Width="320" Height="64" TextForeground="Red" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                    <TextBlock WrapText="True" LinePadding="10" FontSize="10" Text="Must contain only alphanumeric characters.\nCannot exceed [b]16[/b] characters." />
+                                </ToolTip>
+                            </TextBox.ToolTip>
+                        </TextBox>
+                    </HeaderedContentPresenter>
+                    <Spacer Height="8" />
+
+                    <!-- Password -->
+                    <HeaderedContentPresenter>
+                        <HeaderedContentPresenter.Header>
+                            <TextBlock Text="Password:" Foreground="Gray" />
+                        </HeaderedContentPresenter.Header>
+                        <PasswordBox Name="TextBox_Password" PasswordCharacter="*" Text="Hunter2" />
+                    </HeaderedContentPresenter>
+                    <Spacer Height="16" />
+                    
+                    <!-- Terms of service -->
+                    <CheckBox Name="CheckBox_TOS" IsChecked="true">
+                        <TextBlock Text="I agree to the [color=#3483eb][i][u]Terms of service[/u][/i][/color]" />
+                    </CheckBox>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </DockPanel>
+</Window>
+```
+</details>
+
+![Register.png](assets/samples/Sample_Inventory_Window.png)
+<details>
+  <summary>XAML Markup</summary>
+
+```xaml
+<Window Left="300" Top="400" Width="800" Height="500" IsUserResizable="False">
+    <OverlayPanel TextForeground="Black" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Button Name="Button_Close" HorizontalAlignment="Right" VerticalAlignment="Top" Content="[b]X" TextForeground="Red" Padding="3,2,3,0"
+                BorderBrush="RGB(91,43,42)" BorderThickness="2" Background="rgb(242,191,114)" />
+        
+        <TabControl Name="Tabs" Background="RGB(255,203,123)" BorderBrush="RGB(177,78,5)" BorderThickness="0" MinWidth="300" MinHeight="300" Padding="0" Margin="0,12,12,0">
+            <TabControl.HeadersPanel>
+                <StackPanel Orientation="Horizontal" Margin="35,0,0,0" Spacing="0" />
+            </TabControl.HeadersPanel>
+            <TabItem Padding="0">
+                <TabItem.Header>
+                    <TextBlock Text="[b]1" Foreground="Black" Padding="5,2" />
+                </TabItem.Header>
+
+                <!-- Content of the first tab -->
+                <Border BorderBrush="RGB(133,54,5)" BorderThickness="3">
+                    <Border BorderBrush="RGB(250,147,5)" BorderThickness="3">
+                        <Border BorderBrush="RGB(177,78,5)" BorderThickness="3">
+                            <StackPanel Orientation="Vertical">
+                                
+                                <!-- 4x12 grid of 48x48 px slots -->
+                                <UniformGrid Name="UniformGrid_Inventory" Rows="4" Columns="12" CellSize="48,48" Margin="16,8,16,12" HeaderRowHeight="15" RowSpacing="3">
+                                    <UniformGrid.Styles>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="Gray" />
+                                            <Setter Property="FontSize" Value="8" />
+                                            <Setter Property="HorizontalAlignment" Value="Center" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                        </Style>
+                                    </UniformGrid.Styles>
+                                    <TextBlock Foreground="Red" Text="1" Row="0" Column="0" />
+                                    <TextBlock Text="2" Row="0" Column="1" />
+                                    <TextBlock Text="3" Row="0" Column="2" />
+                                    <TextBlock Text="4" Row="0" Column="3" />
+                                    <TextBlock Text="5" Row="0" Column="4" />
+                                    <TextBlock Text="6" Row="0" Column="5" />
+                                    <TextBlock Text="7" Row="0" Column="6" />
+                                    <TextBlock Text="8" Row="0" Column="7" />
+                                    <TextBlock Text="9" Row="0" Column="8" />
+                                    <TextBlock Text="0" Row="0" Column="9" />
+                                    <TextBlock Text="-" Row="0" Column="10" />
+                                    <TextBlock Text="=" Row="0" Column="11" />
+                                </UniformGrid>
+
+                                <Separator Orientation="Horizontal" Size="3" Margin="0" Background="RGB(133,54,5)" />
+                                <Separator Orientation="Horizontal" Size="3" Margin="0" Background="RGB(250,147,5)" />
+                                <Separator Orientation="Horizontal" Size="3" Margin="0" Background="RGB(177,78,5)" />
+
+                                <DockPanel Margin="12,10,12,12">
+                                    <Grid Dock="Left" RowLengths="48,48,48,30" ColumnLengths="48,100,48">
+                                        <!-- Note: If you specify 4 colors, delimited by a hyphen, it will create an MGDockedBorderBrush (Left, Top, Right, Bottom) -->
+                                        <Border Row="0" Column="0" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+                                        <Border Row="1" Column="0" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+                                        <Border Row="2" Column="0" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+
+                                        <Border Row="0" Column="1" RowSpan="3" Margin="9,0"  BorderBrush="RGB(133,54,5)" BorderThickness="3">
+                                            <Border BorderBrush="RGB(250,147,5)" BorderThickness="3">
+                                                <Border BorderBrush="RGB(177,78,5)" BorderThickness="3" Background="RGB(56,170,255)">
+                                                    <!--<Image Texture="texture_name..."></Image>-->
+                                                </Border>
+                                            </Border>
+                                        </Border>
+
+                                        <Border Row="0" Column="2" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+                                        <Border Row="1" Column="2" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+                                        <Border Row="2" Column="2" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+
+                                        <TextBlock Row="3" Column="0" ColumnSpan="3" Margin="0,12,0,0" Text="Character Name" HorizontalAlignment="Center" FontSize="14" />
+                                    </Grid>
+
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Margin="15,15,15,65">
+                                        <TextBlock Text="Farm Name" FontSize="20" HorizontalAlignment="Center" />
+                                        <Grid HorizontalAlignment="Center" RowSpacing="12" ColumnSpacing="8" RowLengths="auto,auto" ColumnLengths="auto,auto">
+                                            <TextBlock Row="0" Column="0" Text="Current Funds:" FontSize="18" HorizontalAlignment="Right" />
+                                            <TextBlock Row="0" Column="1"  Text="999,999g" FontSize="18" HorizontalAlignment="Left" />
+
+                                            <TextBlock Row="1" Column="0" Text="Total Earnings:" FontSize="18" HorizontalAlignment="Right" />
+                                            <TextBlock Row="1" Column="1" Text="2,147,483,647g" FontSize="18" HorizontalAlignment="Left" />
+                                        </Grid>
+                                    </StackPanel>
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+                </Border>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="[b]2" Foreground="Black" Padding="5,2" />
+                </TabItem.Header>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="[b]3" Foreground="Black" Padding="5,2" />
+                </TabItem.Header>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="[b]4" Foreground="Black" Padding="5,2" />
+                </TabItem.Header>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="[b]5" Foreground="Black" Padding="5,2" />
+                </TabItem.Header>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="[b]6" Foreground="Black" Padding="5,2" />
+                </TabItem.Header>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="[b]7" Foreground="Black" Padding="5,2" />
+                </TabItem.Header>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="[b]8" Foreground="Black" Padding="5,2" />
+                </TabItem.Header>
+            </TabItem>
+        </TabControl>
+    </OverlayPanel>
+</Window>
+```
+</details>
+
+![Register.png](assets/samples/Sample_Debug_Window.png)
+  
 # Getting Started:
 
 1. Clone this repo
