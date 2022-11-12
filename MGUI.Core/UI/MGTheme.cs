@@ -1,6 +1,7 @@
 ﻿using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Shared.Helpers;
+using MGUI.Shared.Text;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using System;
@@ -48,19 +49,29 @@ namespace MGUI.Core.UI
         /// <summary>The default fontsize for content inside an <see cref="MGContextMenu"/>, such as <see cref="MGContextMenuButton"/> and <see cref="MGContextMenuToggle"/></summary>
         public int ContextMenu { get; set; } = 10;
 
-        public int Small { get; set; } = 10;
-        public int Medium { get; set; } = 12;
-        public int Large { get; set; } = 14;
+        public int SmallFontSize { get; set; } = 10;
+        public int MediumFontSize { get; set; } = 12;
+        public int LargeFontSize { get; set; } = 14;
 
-        public int Default { get; set; } = 11;
+        public int DefaultFontSize { get; set; } = 11;
 
         /// <summary>If true, <see cref="MGTextBlock"/> will attempt to draw text with a scale that most closely results in the desired font size.<br/>
         /// If false, <see cref="MGTextBlock"/> may choose a slightly different font size that approximates the exact size, but results in better scaling results.<para/>
         /// For example, if you have SpriteFonts for these font sizes: 8, 10, 12, and you wanted to use font size = 19<br/>
-        /// If <see cref="ExactScale"/> is true: <see cref="MGTextBlock"/> would choose size=10, scale=1.9<br/>
-        /// If <see cref="ExactScale"/> is false: <see cref="MGTextBlock"/> would choose size=10, scale=2.0, preferring to scale by values such as 0.25, 0.5, 1.0, 2.0 etc<para/>
+        /// If <see cref="UseExactScale"/> is true: <see cref="MGTextBlock"/> would choose size=10, scale=1.9<br/>
+        /// If <see cref="UseExactScale"/> is false: <see cref="MGTextBlock"/> would choose size=10, scale=2.0, preferring to scale by values such as 0.25, 0.5, 1.0, 2.0 etc<para/>
         /// Default value: false</summary>
-        public bool ExactScale { get; set; } = false;
+        public bool UseExactScale { get; set; } = false;
+
+        /// <summary>The name of the font that should be used by default in <see cref="MGTextBlock"/>s when no font family is explicitly specified.<para/>
+        /// If null, uses <see cref="FontManager.DefaultFontFamily"/> instead.<para/>
+        /// EX: "Arial". If not null, the <see cref="FontManager"/> must contain a <see cref="FontSet"/> with <see cref="FontSet.Name"/> that matches this value.</summary>
+        public string DefaultFontFamily { get; set; }
+
+        public ThemeFontSettings(string FontFamily)
+        {
+            this.DefaultFontFamily = FontFamily;
+        }
     }
 
     public class MGTheme
@@ -139,7 +150,7 @@ namespace MGUI.Core.UI
         /// <summary>The fallback value to use for <see cref="MGTextBlock.ActualForeground"/> when there is no foreground color applied to the <see cref="MGTextBlock"/> or its parents.</summary>
         public ThemeManagedVisualStateColorBrush TextBlockFallbackForeground { get; }
 
-        public ThemeFontSettings FontSettings { get; } = new();
+        public ThemeFontSettings FontSettings { get; }
 
         public enum BuiltInTheme
         {
@@ -147,11 +158,13 @@ namespace MGUI.Core.UI
             Dark_Blue
         }
 
-        public MGTheme()
-            : this(BuiltInTheme.Dark_Blue) { }
+        public MGTheme(string DefaultFontFamily)
+            : this(BuiltInTheme.Dark_Blue, DefaultFontFamily) { }
 
-        public MGTheme(BuiltInTheme ThemeType)
+        public MGTheme(BuiltInTheme ThemeType, string DefaultFontFamily)
         {
+            FontSettings = new(DefaultFontFamily);
+
             _Backgrounds = new();
 
             List<MGElementType> TypesWithoutBackgrounds = new()

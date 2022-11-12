@@ -81,7 +81,7 @@ namespace MGUI.Core.UI
                 this._FontSize = FontSize;
 
                 this.SF_Regular = Font;
-                this.FontScale = GetTheme().FontSettings.ExactScale ? ExactScale : SuggestedScale;
+                this.FontScale = GetTheme().FontSettings.UseExactScale ? ExactScale : SuggestedScale;
                 this.FontOrigin = FS.Origins[Size];
                 this.FontHeight = FS.Heights[Size];
                 this.SpaceWidth = (SF_Regular.MeasureString(" ") * FontScale).X;
@@ -185,7 +185,7 @@ namespace MGUI.Core.UI
 
         public HorizontalAlignment TextAlignment { get; set; }
 
-        /// <param name="FontSize">If null, uses the font size specified by <see cref="ThemeFontSettings.Default"/>.<para/>
+        /// <param name="FontSize">If null, uses the font size specified by <see cref="ThemeFontSettings.DefaultFontSize"/>.<para/>
         /// See also: <see cref="MGDesktop.Theme"/>, <see cref="MGTheme.FontSettings"/></param>
         public MGTextBlock(MGWindow Window, string Text, Color? Foreground = null, int? FontSize = null)
             : base(Window, MGElementType.TextBlock)
@@ -193,8 +193,11 @@ namespace MGUI.Core.UI
             using (BeginInitializing())
             {
                 this.WrapText = true;
-                if (!TrySetFont(GetDesktop().FontManager.DefaultFontFamily, FontSize ?? GetTheme().FontSettings.Default))
+
+                MGDesktop Desktop = GetDesktop();
+                if (!TrySetFont(Desktop.Theme.FontSettings.DefaultFontFamily ?? Desktop.FontManager.DefaultFontFamily, FontSize ?? GetTheme().FontSettings.DefaultFontSize))
                     throw new ArgumentException($"Default font not found.");
+
                 this.Text = Text;
                 this.Foreground = new VisualStateSetting<Color?>(Foreground, Foreground, Foreground);
                 this.LinePadding = 2;

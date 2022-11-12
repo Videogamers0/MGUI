@@ -320,7 +320,7 @@ namespace MGUI.Core.UI
         {
             this.Renderer = Renderer;
             this.Windows = new();
-            this.Theme = new();
+            this.Theme = new(Renderer.FontManager.DefaultFontFamily);
 
             this._NamedTextures = new();
             this._NamedRegions = new();
