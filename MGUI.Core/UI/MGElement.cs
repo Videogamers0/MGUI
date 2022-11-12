@@ -80,7 +80,6 @@ namespace MGUI.Core.UI
     }
 
     //TODO
-    //maybe MGTextBlock should have FontWeight (or just bool IsBold, bool IsItalic) which determines the default spritefont used when parsing the runs
     //fix the bug with progress bar textwrapping? Set ValueElement.Text to "[b]200 / 255" with WrapText=true, and for some reason it linebreaks (arial 11pt font or maybe it was 12pt)
     //statusbar, menubar/menuitems
     //      messagebox

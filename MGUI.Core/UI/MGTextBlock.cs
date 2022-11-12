@@ -111,6 +111,64 @@ namespace MGUI.Core.UI
                 return Default;
         }
 
+        #region Font Style
+        private bool _IsBold;
+        public bool IsBold
+        {
+            get => _IsBold;
+            set
+            {
+                if (_IsBold != value)
+                {
+                    _IsBold = value;
+                    if (!string.IsNullOrEmpty(Text))
+                    {
+                        Runs = MGTextRun.ParseRuns(Text, DefaultTextRunSettings).ToList().AsReadOnly();
+                        InvokeLayoutChanged();
+                    }
+                }
+            }
+        }
+
+        private bool _IsItalic;
+        public bool IsItalic
+        {
+            get => _IsItalic;
+            set
+            {
+                if (_IsItalic != value)
+                {
+                    _IsItalic = value;
+                    if (!string.IsNullOrEmpty(Text))
+                    {
+                        Runs = MGTextRun.ParseRuns(Text, DefaultTextRunSettings).ToList().AsReadOnly();
+                        InvokeLayoutChanged();
+                    }
+                }
+            }
+        }
+
+        private bool _IsUnderlined;
+        public bool IsUnderlined
+        {
+            get => _IsUnderlined;
+            set
+            {
+                if (_IsUnderlined != value)
+                {
+                    _IsUnderlined = value;
+                    if (!string.IsNullOrEmpty(Text))
+                    {
+                        Runs = MGTextRun.ParseRuns(Text, DefaultTextRunSettings).ToList().AsReadOnly();
+                        UpdateLines();
+                    }
+                }
+            }
+        }
+
+        private MGTextRunConfig DefaultTextRunSettings => new(IsBold, IsItalic, IsUnderlined);
+        #endregion Font Style
+
         /// <summary>The foreground color to use when rendering the text.<br/>
         /// If the text is formatted with color codes (such as '[color=Red]Hello World[/color]'), the color specified in the <see cref="MGTextRun"/> will take precedence.<para/>
         /// If the value for the current <see cref="MGElement.VisualState"/> is null, will attempt to resolve the value from <see cref="MGElement.DerivedDefaultTextForeground"/>, or <see cref="MGTheme.TextBlockFallbackForeground"/> if no value is specified.<para/>
@@ -136,7 +194,7 @@ namespace MGUI.Core.UI
             if (_Text != Value)
             {
                 _Text = Value;
-                Runs = MGTextRun.ParseRuns(Text, new(false)).ToList().AsReadOnly();
+                Runs = MGTextRun.ParseRuns(Text, DefaultTextRunSettings).ToList().AsReadOnly();
                 if (!SuppressLayoutChanged)
                     InvokeLayoutChanged();
                 else
@@ -198,6 +256,9 @@ namespace MGUI.Core.UI
                 if (!TrySetFont(Desktop.Theme.FontSettings.DefaultFontFamily ?? Desktop.FontManager.DefaultFontFamily, FontSize ?? GetTheme().FontSettings.DefaultFontSize))
                     throw new ArgumentException($"Default font not found.");
 
+                this.IsBold = false;
+                this.IsItalic = false;
+                this.IsUnderlined = false;
                 this.Text = Text;
                 this.Foreground = new VisualStateSetting<Color?>(Foreground, Foreground, Foreground);
                 this.LinePadding = 2;

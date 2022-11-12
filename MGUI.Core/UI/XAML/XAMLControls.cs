@@ -1040,6 +1040,11 @@ namespace MGUI.Core.UI.XAML
 
         public string FontFamily { get; set; }
         public int? FontSize { get; set; }
+
+        public bool? IsBold { get; set; }
+        public bool? IsItalic { get; set; }
+        public bool? IsUnderlined { get; set; }
+
         public XAMLColor? Foreground { get; set; }
         public string Text { get; set; }
         public bool? WrapText { get; set; }
@@ -1054,6 +1059,14 @@ namespace MGUI.Core.UI.XAML
 
             if (FontFamily != null || FontSize.HasValue)
                 TextBlock.TrySetFont(FontFamily ?? TextBlock.FontFamily, FontSize ?? TextBlock.FontSize);
+
+            if (IsBold.HasValue)
+                TextBlock.IsBold = IsBold.Value;
+            if (IsItalic.HasValue)
+                TextBlock.IsItalic = IsItalic.Value;
+            if (IsUnderlined.HasValue)
+                TextBlock.IsUnderlined = IsUnderlined.Value;
+
             if (Foreground.HasValue)
                 TextBlock.Foreground.NormalValue = Foreground.Value.ToXNAColor();
             if (Text != null)
