@@ -999,15 +999,25 @@ namespace MGUI.Core.UI.Containers.Grids
                     {
                         //  Measure every element in this row and take the maximum height
                         List<int> RowChildHeights = new();
-                        foreach (ColumnDefinition Column in Columns)
+                        for (int ColumnIndex = 0; ColumnIndex < _Columns.Count; ColumnIndex++)
                         {
+                            ColumnDefinition Column = _Columns[ColumnIndex];
                             GridCell Cell = new(Row, Column);
                             int ColumnWidth = ColumnWidths[Column];
 
                             Size CellAvailableSize = new(ColumnWidth, RemainingRowHeight);
                             foreach (MGElement Element in GetMeasurableCellContent(Cell))
                             {
-                                Element.UpdateMeasurement(CellAvailableSize, out _, out Thickness ElementSize, out _, out _);
+                                int AvailableWidth = CellAvailableSize.Width;
+
+                                //  Measure the element using the total width of the spanned columns
+                                int ColumnSpan = ChildSpanLookup[Element].ColumnSpan;
+                                if (ColumnSpan != 1)
+                                {
+                                    AvailableWidth = Enumerable.Range(ColumnIndex, ColumnSpan).Sum(x => ColumnWidths[_Columns[x]]) + (ColumnSpan - 1) * ColumnSpacing;
+                                }
+
+                                Element.UpdateMeasurement(new Size(AvailableWidth, CellAvailableSize.Height), out _, out Thickness ElementSize, out _, out _);
                                 RowChildHeights.Add(ElementSize.Size.Height);
                             }
                         }

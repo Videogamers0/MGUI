@@ -47,7 +47,7 @@
                                 <Separator Orientation="Horizontal" Size="3" Margin="0" Background="RGB(177,78,5)" />
 
                                 <DockPanel Margin="12,10,12,12">
-                                    <Grid Dock="Left" RowLengths="48,48,48,30" ColumnLengths="48,100,48">
+                                    <Grid Dock="Left" RowLengths="48,48,48,auto" ColumnLengths="48,100,48">
                                         <!-- Note: If you specify 4 colors, delimited by a hyphen, it will create an MGDockedBorderBrush (Left, Top, Right, Bottom) -->
                                         <Border Row="0" Column="0" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
                                         <Border Row="1" Column="0" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
