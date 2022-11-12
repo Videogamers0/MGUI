@@ -66,7 +66,7 @@ namespace MGUI.Samples
         {
             string xaml =
  @"
-<Window Left=""500"" Top=""100"" Width=""400"" Height=""600"" TitleText=""[b]Window Title Text[/b]"">
+<Window Left=""500"" Top=""50"" Width=""400"" Height=""600"" TitleText=""[b]Window Title Text[/b]"">
     <!--<Window.TitleBar>
         <DockPanel BG=""LightGreen"" Padding=""16,4"">
             <TextBlock Text=""ABC"" Dock=""Left"" />
@@ -410,6 +410,7 @@ namespace MGUI.Samples
             UniformGrid_Inventory.CellBackground.NormalValue = new MGBorderedFillBrush(new(3), CellBorderBrush, new Color(255, 195, 118).AsFillBrush(), true);
 
             Window.MakeInvisible();
+            Window.ApplySizeToContent(SizeToContent.WidthAndHeight, 100, 100, null, null, false);
 
             return Window;
         }

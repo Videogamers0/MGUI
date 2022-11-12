@@ -139,12 +139,12 @@ namespace MGUI.Core.UI
             return Size;
         }
 
-        /// <summary>Resizes this <see cref="MGWindow"/> to satisfy the given constraints. Note: The layout of child content isn't refrshed until the next update tick.</summary>
+        /// <summary>Resizes this <see cref="MGWindow"/> to satisfy the given constraints. Note: The layout of child content isn't refreshed until the next update tick.</summary>
         /// <returns>The computed size that this <see cref="MGWindow"/> will be changed to.</returns>
-        public Size ApplySizeToContent(SizeToContent Value, int MinWidth = 100, int MinHeight = 100, int MaxWidth = 1920, int MaxHeight = 1080, bool UpdateLayoutImmediately = true)
+        public Size ApplySizeToContent(SizeToContent Value, int MinWidth = 100, int MinHeight = 100, int? MaxWidth = 1920, int? MaxHeight = 1080, bool UpdateLayoutImmediately = true)
         {
             Size MinSize = new(MinWidth, MinHeight);
-            Size MaxSize = new(Math.Min(GetDesktop().ValidScreenBounds.Width, MaxWidth), Math.Min(GetDesktop().ValidScreenBounds.Height, MaxHeight));
+            Size MaxSize = new(Math.Min(GetDesktop().ValidScreenBounds.Width, MaxWidth ?? int.MaxValue), Math.Min(GetDesktop().ValidScreenBounds.Height, MaxHeight ?? int.MaxValue));
             Size AvailableSize = GetActualAvailableSize(new Size(WindowWidth, WindowHeight), Value).Clamp(MinSize, MaxSize);
             UpdateMeasurement(AvailableSize, out _, out Thickness FullSize, out _, out _);
             Size Size = FullSize.Size.Clamp(MinSize, MaxSize);
@@ -783,6 +783,7 @@ namespace MGUI.Core.UI
                 }
             }
 
+            e.ToolTipChanged += Element_ToolTipChanged;
             e.ContextMenuChanged += Element_ContextMenuChanged;
             e.OnNameChanged += Element_NameChanged;
         }
@@ -810,6 +811,7 @@ namespace MGUI.Core.UI
                 }
             }
 
+            e.ToolTipChanged -= Element_ToolTipChanged;
             e.ContextMenuChanged -= Element_ContextMenuChanged;
             e.OnNameChanged -= Element_NameChanged;
         }
@@ -822,9 +824,11 @@ namespace MGUI.Core.UI
                 ElementsByName.Add(e.NewValue, sender as MGElement);
         }
 
-        private void Element_ContextMenuChanged(object sender, EventArgs<MGContextMenu> e)
+        private void Element_ToolTipChanged(object sender, EventArgs<MGToolTip> e) => Element_NestedElementChanged(e.PreviousValue, e.NewValue);
+        private void Element_ContextMenuChanged(object sender, EventArgs<MGContextMenu> e) => Element_NestedElementChanged(e.PreviousValue, e.NewValue);
+
+        private void Element_NestedElementChanged(MGSingleContentHost Previous, MGSingleContentHost New)
         {
-            MGContextMenu Previous = e.PreviousValue;
             if (Previous != null)
             {
                 Previous.OnDirectOrNestedContentAdded -= Element_Added;
@@ -836,7 +840,6 @@ namespace MGUI.Core.UI
                 }
             }
 
-            MGContextMenu New = e.NewValue;
             if (New != null)
             {
                 New.OnDirectOrNestedContentAdded += Element_Added;
@@ -859,7 +862,7 @@ namespace MGUI.Core.UI
             this.IsUserResizable = false;
             this.Padding = new(0);
             this.BorderThickness = new(0);
-            this.BackgroundBrush.SetAll(MGSolidFillBrush.Transparent); // Set this to MGSolidFillBrush.White * 0.1f while testing the AllowsClickThrough issue below
+            this.BackgroundBrush.SetAll(MGSolidFillBrush.Transparent); // Set this to MGSolidFillBrush.White * 0.2f while testing the AllowsClickThrough issue below
             //this.AllowsClickThrough = true;   //TODO we probably want AllowsClickThrough=false, but to then handle any unhandled events that occurred overtop of this window's content.
                                                 //That way, an invisible window with margin around the content (such as horizontally-centered content) won't auto-handle clicks within the
                                                 //window that are outside the content.

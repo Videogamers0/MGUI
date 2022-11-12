@@ -1,4 +1,4 @@
-﻿<Window Left="400" Top="50" Width="500" Height="500" TitleText="Player Stats" Padding="10">
+﻿<Window Left="1000" Top="50" MinWidth="500" TitleText="Player Stats" Padding="10" SizeToContent="Height">
     <Border BorderBrush="Black" BorderThickness="1">
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="White * 0.08" Padding="5">
             <StackPanel Orientation="Vertical" Spacing="15">

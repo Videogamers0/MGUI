@@ -1324,6 +1324,8 @@ namespace MGUI.Core.UI.XAML
         public int? Left { get; set; }
         public int? Top { get; set; }
 
+        public SizeToContent? SizeToContent { get; set; }
+
         public XAMLResizeGrip ResizeGrip { get; set; } = new();
         public bool? IsUserResizable { get; set; }
 
@@ -1358,7 +1360,9 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
-            MGWindow Instance = new(Window, Left ?? 0, Top ?? 0, Width ?? 0, Height ?? 0);
+            int WindowWidth = Math.Clamp(Width ?? 0, MinWidth ?? 0, MaxWidth ?? int.MaxValue);
+            int WindowHeight = Math.Clamp(Height ?? 0, MinHeight ?? 0, MaxHeight ?? int.MaxValue);
+            MGWindow Instance = new(Window, Left ?? 0, Top ?? 0, WindowWidth, WindowHeight);
             foreach (XAMLWindow Nested in NestedWindows)
                 Instance.AddNestedWindow(Nested.ToElement<MGWindow>(Window, Window));
             return Instance;
@@ -1366,7 +1370,9 @@ namespace MGUI.Core.UI.XAML
 
         public MGWindow ToElement(MGDesktop Desktop)
         {
-            MGWindow Window = new(Desktop, Left ?? 0, Top ?? 0, Width ?? 0, Height ?? 0);
+            int WindowWidth = Math.Clamp(Width ?? 0, MinWidth ?? 0, MaxWidth ?? int.MaxValue);
+            int WindowHeight = Math.Clamp(Height ?? 0, MinHeight ?? 0, MaxHeight ?? int.MaxValue);
+            MGWindow Window = new(Desktop, Left ?? 0, Top ?? 0, WindowWidth, WindowHeight);
             ApplySettings(null, Window);
             return Window;
         }
@@ -1415,6 +1421,9 @@ namespace MGUI.Core.UI.XAML
             }
 
             base.ApplyDerivedSettings(Parent, Element);
+
+            if (SizeToContent != null)
+                Window.ApplySizeToContent(SizeToContent.Value, 50, 50, null, null, false);
         }
 
         protected internal override IEnumerable<XAMLElement> GetChildren()
