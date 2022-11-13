@@ -73,9 +73,11 @@ namespace MGUI.Core.UI
         //  Other
         Rectangle,
 
+        Designer,
         /// <summary>Represents an element that doesn't fit any other category</summary>
         Misc,
         Custom,
+        UserControl,
     }
 
     /// <summary>Describes how a child element is vertically positioned or stretched within a parent's layout slot</summary>

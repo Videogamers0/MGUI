@@ -104,6 +104,8 @@ namespace MGUI.Core.UI.Text
             public readonly WrappableRunGroup Group;
             public readonly MGTextRunConfig Settings;
             public readonly bool IsLineBreak;
+            /// <summary>The number of characters used to specify the line break. For example, on Windows this is usually 2 ("\r\n") but on Mac / Linux it's usually 1 ('\r' / '\n')</summary>
+            public readonly int LineBreakCharacterCount;
 
             public readonly List<WrappableRunWord> OriginalWords;
             public readonly List<WrappableRunWord> RemainingWords;
@@ -113,10 +115,16 @@ namespace MGUI.Core.UI.Text
                 this.Group = Group;
                 this.Settings = OriginalRun.Settings;
                 this.IsLineBreak = OriginalRun.IsLineBreak;
+                this.LineBreakCharacterCount = 0;
 
                 if (IsLineBreak)
                 {
                     OriginalWords = new List<WrappableRunWord>();
+#if DEBUG
+                    if (OriginalRun.Text == null)
+                        throw new Exception($"{nameof(MGTextRun)}.{nameof(MGTextRun.Text)} is null in a run that indicates a linebreak. This means the number of linebreak characters is ambiguous (it could be \\r\\n, \\r, or \\n) and may break parsing logic.");
+#endif
+                    LineBreakCharacterCount = OriginalRun.Text?.Length ?? 1;
                 }
                 else
                 {
@@ -194,12 +202,15 @@ namespace MGUI.Core.UI.Text
             List<int> CurrentIndicesMap = new();
             int CurrentIndexInOriginalText = 0;
 
-            MGTextLine FlushLine(bool EndsInLinebreakCharacter)
+            MGTextLine FlushLine(bool EndsInLinebreakCharacter, int LineBreakCharacterCount = 1)
             {
                 if (EndsInLinebreakCharacter)
                 {
-                    CurrentIndicesMap.Add(CurrentIndexInOriginalText);
-                    CurrentIndexInOriginalText++;
+                    for (int i = 0; i < LineBreakCharacterCount; i++)
+                    {
+                        CurrentIndicesMap.Add(CurrentIndexInOriginalText);
+                        CurrentIndexInOriginalText++;
+                    }
                 }
                 else if (CurrentLine.Count > 0 && CurrentLine.All(x => string.IsNullOrEmpty(x.Text)))
                 {
@@ -233,7 +244,7 @@ namespace MGUI.Core.UI.Text
                 {
                     if (!CurrentLine.Any())
                         CurrentLine.Add(new("", false, Run.Settings));
-                    yield return FlushLine(true);
+                    yield return FlushLine(true, Run.LineBreakCharacterCount);
                 }
                 else
                 {

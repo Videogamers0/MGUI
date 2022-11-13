@@ -317,18 +317,18 @@ namespace MGUI.Core.UI.Text
             return Result.ToString();
         }
 
-        /// <param name="ShouldTokenizeLineBreak">If true, '\n' will be tokenized as <see cref="FTTokenType.LineBreak"/>.<br/>
-        /// If false, '\n' will not be tokenized, and will instead remain as a substring inside a <see cref="FTTokenType.StringValue"/> token.<para/>
-        /// Warning - A linebreak is treated as the character literal '\n', as opposed to the string @"\n". Be sure not to accidentally use a literal escape character '\\', such as if prefixing a hard-coded string with @.</param>
-        public bool TryTokenize(string Text, bool ShouldTokenizeLineBreak, out List<FTTokenMatch> Result)
+        /// <param name="ShouldTokenizeLineBreaks">If true, linebreaks '\n', '\r', "\r\n" will be tokenized as <see cref="FTTokenType.LineBreak"/>.<br/>
+        /// If false, they will not be tokenized, and will instead remain as a substring inside a <see cref="FTTokenType.StringValue"/> token.<para/>
+        /// Warning - A linebreak is treated as the character literals: '\n', '\r', "\r\n", as opposed to the escaped strings such as @"\n". Be sure not to accidentally use a literal escape character '\\', such as if prefixing a hard-coded string with @.</param>
+        public bool TryTokenize(string Text, bool ShouldTokenizeLineBreaks, out List<FTTokenMatch> Result)
         {
-            Result = Tokenize(Text, ShouldTokenizeLineBreak).ToList();
+            Result = Tokenize(Text, ShouldTokenizeLineBreaks).ToList();
             return !Result.Any(x => x.TokenType == FTTokenType.InvalidToken);
         }
 
-        /// <param name="ShouldTokenizeLineBreaks">If true, '\n' will be tokenized as <see cref="FTTokenType.LineBreak"/>.<br/>
-        /// If false, '\n' will not be tokenized, and will instead remain as a substring inside a <see cref="FTTokenType.StringValue"/> token.<para/>
-        /// Warning - A linebreak is treated as the character literal '\n', as opposed to the string @"\n". Be sure not to accidentally use a literal escape character '\\', such as if prefixing a hard-coded string with @.</param>
+        /// <param name="ShouldTokenizeLineBreaks">If true, linebreaks '\n', '\r', "\r\n" will be tokenized as <see cref="FTTokenType.LineBreak"/>.<br/>
+        /// If false, they will not be tokenized, and will instead remain as a substring inside a <see cref="FTTokenType.StringValue"/> token.<para/>
+        /// Warning - A linebreak is treated as the character literals: '\n', '\r', "\r\n", as opposed to the escaped strings such as @"\n". Be sure not to accidentally use a literal escape character '\\', such as if prefixing a hard-coded string with @.</param>
         public IEnumerable<FTTokenMatch> Tokenize(string Text, bool ShouldTokenizeLineBreaks)
         {
             if (string.IsNullOrEmpty(Text))
@@ -361,6 +361,11 @@ namespace MGUI.Core.UI.Text
                     yield return Match.Value;
                     RemainingText = Match.Value.RemainingText;
                     Previous = Match.Value.TokenType;
+
+                    if (Match.Value.TokenType == FTTokenType.InvalidToken)
+                    {
+                        yield break;
+                    }
                 }
                 else
                 {
@@ -378,7 +383,9 @@ namespace MGUI.Core.UI.Text
             }
         }
 
-        /// <param name="Enabled">True if '\n' characters should be treated be tokenized as <see cref="FTTokenType.LineBreak"/>.<br/>
+        private static readonly Regex LineBreakRegex = new("(\r\n|\r|\n)"); // "\r\n" for Windows, '\r' for Mac, '\n' for Linux
+
+        /// <param name="Enabled">True if '\n', '\r', and "\r\n" characters should be tokenized as <see cref="FTTokenType.LineBreak"/>.<br/>
         /// False if the entire <paramref name="Text"/> should be returned as a single <see cref="FTTokenType.StringValue"/> token.</param>
         private static IEnumerable<FTTokenMatch> TokenizeLineBreaks(string Text, bool Enabled)
         {
@@ -387,13 +394,14 @@ namespace MGUI.Core.UI.Text
 
             if (Enabled)
             {
-                int Index;
-                while ((Index = Text.IndexOf('\n')) >= 0)
+                Match Match;
+                while ((Match = LineBreakRegex.Match(Text)).Success)
                 {
+                    int Index = Match.Index;
                     if (Index != 0)
                         yield return new(FTTokenType.StringValue, Text.Substring(0, Index), "");
-                    yield return new(FTTokenType.LineBreak, '\n'.ToString(), "");
-                    Text = Text.Substring(Index + 1);
+                    yield return new(FTTokenType.LineBreak, Match.Value, "");
+                    Text = Text.Substring(Index + Match.Length);
                     if (Text == string.Empty)
                         break;
                 }

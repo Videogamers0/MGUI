@@ -2,6 +2,7 @@
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Core.UI.Containers.Grids;
+using MGUI.Core.UI.Text;
 using MGUI.Core.UI.XAML;
 using MGUI.Shared.Rendering;
 using Microsoft.Xna.Framework;
@@ -46,11 +47,15 @@ namespace MGUI.Samples
             this.Desktop = new(MGUIRenderer);
 
             Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
+            MGWindow XAMLDesigner = LoadDesignerWindow(CurrentAssembly, Desktop);
+            Desktop.Windows.Add(XAMLDesigner);
             Desktop.Windows.Add(LoadDebugWindow(CurrentAssembly, Desktop));
             Desktop.Windows.Add(LoadRegistrationWindow(CurrentAssembly, Desktop));
             Desktop.Windows.Add(LoadCharacterStatsWindow(CurrentAssembly, Desktop));
             Desktop.Windows.Add(LoadInventoryWindow(CurrentAssembly, Desktop));
             //Desktop.Windows.Add(LoadStylesTestWindow(CurrentAssembly, Desktop));
+
+            Desktop.BringToFront(XAMLDesigner);
 
             base.Initialize();
         }
@@ -60,6 +65,15 @@ namespace MGUI.Samples
             using (Stream ResourceStream = CurrentAssembly.GetManifestResourceStream(ResourceName))
             using (StreamReader Reader = new StreamReader(ResourceStream))
             return Reader.ReadToEnd();
+        }
+
+        private static MGWindow LoadDesignerWindow(Assembly CurrentAssembly, MGDesktop Desktop)
+        {
+            MGWindow Window = new(Desktop, 0, 0, 500, 500);
+            Window.SetContent(new MGDesigner(Window));
+            if (Window.BackgroundBrush.NormalValue is MGSolidFillBrush SolidFill)
+                Window.BackgroundBrush.NormalValue = SolidFill * 0.5f;
+            return Window;
         }
 
         private static MGWindow LoadDebugWindow(Assembly CurrentAssembly, MGDesktop Desktop)

@@ -174,6 +174,7 @@ namespace MGUI.Core.UI
                 MGElementType.ContentPresenter,
                 MGElementType.ContextMenuItem,
                 MGElementType.Custom,
+                MGElementType.Designer,
                 MGElementType.DockPanel,
                 MGElementType.Expander,
                 MGElementType.Grid,
@@ -191,7 +192,8 @@ namespace MGUI.Core.UI
                 MGElementType.StackPanel,
                 MGElementType.UniformGrid,
                 MGElementType.TabItem,
-                MGElementType.TextBlock
+                MGElementType.TextBlock,
+                MGElementType.UserControl
             };
             foreach (MGElementType Type in TypesWithoutBackgrounds)
             {

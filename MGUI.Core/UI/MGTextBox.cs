@@ -54,7 +54,7 @@ namespace MGUI.Core.UI
         public MGComponent<MGTextBlock> TextBlockComponent { get; }
         private MGTextBlock TextBlockElement { get; }
 
-        protected virtual string GetTextBackingField() => _Text;
+        protected virtual string GetTextBackingField() => _Text ?? "";
         protected virtual void SetTextBackingField(string Value) => _Text = Value;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -73,7 +73,7 @@ namespace MGUI.Core.UI
         /// <returns>True if <see cref="Text"/> value was changed.</returns>
         protected virtual bool SetText(string Value, bool ExecuteEvenIfSameValue)
         {
-            if (!AcceptsReturn && Value.Contains('\n'))
+            if (!AcceptsReturn && (Value.Contains('\n') || Value.Contains('\r')))
                 return false;
 
             if (CharacterLimit.HasValue && Value.Length > CharacterLimit.Value)
@@ -713,9 +713,11 @@ namespace MGUI.Core.UI
         /// <summary>Invoked when <see cref="IsReadonly"/> changes.</summary>
         public event EventHandler<bool> ReadonlyChanged;
 
-        /// <summary>Note: This feature is not available for <see cref="MGPasswordBox"/></summary>
+        /// <summary>Note: This feature is not available for <see cref="MGPasswordBox"/>.<para/>
+        /// Default value: true</summary>
         public virtual bool AcceptsReturn { get; set; } = true;
-        /// <summary>Note: This feature is not available for <see cref="MGPasswordBox"/></summary>
+        /// <summary>Note: This feature is not available for <see cref="MGPasswordBox"/>.<para/>
+        /// Default value: true</summary>
         public virtual bool AcceptsTab { get; set; } = true;
         private const int TabSpacesCount = 4;
 
@@ -894,6 +896,7 @@ namespace MGUI.Core.UI
 
                 MouseHandler.DragStart += (sender, e) =>
                 {
+                    //TODO fix this if textbox is scrolled offscreen
                     if (e.IsLMB && !IsReadonly && TextRenderInfo.TryGetCharAtScreenPosition(e.AdjustedPosition(this), out CharRenderInfo CharInfo))
                     {
                         IsDraggingSelection = true;
@@ -1070,7 +1073,11 @@ namespace MGUI.Core.UI
                                         CurrentSelection = null;
                                         TextBlockElement.UpdateLines();
                                         _ = Caret.MoveToOriginalCharacterIndexOrEnd(SelectionStart, true);
+#if WINDOWS
+                                        System.Windows.Clipboard.SetText(SelectedText);
+#else
                                         Clipboard.Text = SelectedText;
+#endif
                                     }
                                 }
                                 Handled = true;
@@ -1081,13 +1088,21 @@ namespace MGUI.Core.UI
                                     int SelectionStart = CurrentSelection.Value.ActualStartIndex(Text);
                                     int SelectionEnd = CurrentSelection.Value.ActualEndIndex(Text);
                                     string SelectedText = Text.Substring(SelectionStart, SelectionEnd - SelectionStart); // Could use CurrentText instead of Text to allow PasswordBoxes to copy the underlying text instead of the password character *
+#if WINDOWS
+                                    System.Windows.Clipboard.SetText(SelectedText);
+#else
                                     Clipboard.Text = SelectedText;
+#endif
                                 }
                                 Handled = true;
                                 break;
                             case Keys.V when !IsReadonly:
                                 //  Paste
+#if WINDOWS
+                                string ClipboardText = System.Windows.Clipboard.GetText(System.Windows.TextDataFormat.Text);
+#else
                                 string ClipboardText = Clipboard.Text;
+#endif
                                 if (!string.IsNullOrEmpty(ClipboardText))
                                 {
                                     if (CurrentSelection.HasValue && CurrentSelection.Value.ActualLength(Text) > 0)
