@@ -511,13 +511,13 @@ namespace MGUI.Core.UI
                         Height = MinSize;
 
                         //  Ensure the Start/End are still within the outer bounds
-                        if (StartY < PaddedBounds.Left)
+                        if (StartY < PaddedBounds.Top)
                         {
-                            EndY += PaddedBounds.Left - StartY;
-                            StartY = PaddedBounds.Left;
+                            EndY += PaddedBounds.Top - StartY;
+                            StartY = PaddedBounds.Top;
                         }
-                        if (EndY > PaddedBounds.Right)
-                            EndY = PaddedBounds.Right;
+                        if (EndY > PaddedBounds.Bottom)
+                            EndY = PaddedBounds.Bottom;
                     }
 
                     PrimaryVisualState PrimaryState = IsVSBFocused ? PrimaryVisualState.Selected : VisualState.Primary;

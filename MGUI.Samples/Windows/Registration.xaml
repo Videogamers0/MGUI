@@ -6,7 +6,7 @@
         <DockPanel Padding="5,2">
             <Rectangle Dock="Left" Width="16" Height="16" Stroke="Gray" StrokeThickness="1" Fill="Black" Margin="0,0,5,0">
                 <Rectangle.ToolTip>
-                    <ToolTip Padding="0" Width="240" Height="30" TextForeground="RoyalBlue" Background="White * 0.85">
+                    <ToolTip Padding="8,4" MinHeight="0" SizeToContent="WidthAndHeight" TextForeground="RoyalBlue" Background="White * 0.85">
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="[b]Pretend this is a window icon[/b]" />
                     </ToolTip>
                 </Rectangle.ToolTip>
@@ -54,7 +54,7 @@
                         </HeaderedContentPresenter.Header>
                         <TextBox Name="TextBox_Username" PlaceholderText="[i][opacity=0.5]Username[/opacity][/i]" CharacterLimit="16" ShowCharacterCount="true" AcceptsReturn="false" AcceptsTab="false">
                             <TextBox.ToolTip>
-                                <ToolTip Width="320" Height="64" TextForeground="Red" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                <ToolTip SizeToContent="WidthAndHeight" TextForeground="Red" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
                                     <TextBlock WrapText="True" LinePadding="10" FontSize="10" Text="Must contain only alphanumeric characters.\nCannot exceed [b]16[/b] characters." />
                                 </ToolTip>
                             </TextBox.ToolTip>

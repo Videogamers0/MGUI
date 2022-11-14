@@ -4,6 +4,7 @@ using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Containers.Grids;
 using MGUI.Core.UI.Text;
 using MGUI.Core.UI.XAML;
+using MGUI.Shared.Helpers;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -28,16 +29,21 @@ namespace MGUI.Core.UI
             {
                 MGScrollViewer MarkupScrollViewer = new(ParentWindow);
                 this.MarkupTextBoxComponent = new(ParentWindow, null);
+                string SampleXAML = @"<Button Background=""Orange"" Padding=""8,5"" VerticalAlignment=""Center"" Content=""Hello World"" />";
+                MarkupTextBoxComponent.SetText(SampleXAML);
                 MarkupScrollViewer.SetContent(MarkupTextBoxComponent);
                 MarkupScrollViewer.CanChangeContent = false;
 
                 this.RefreshButton = new(ParentWindow);
+                RefreshButton.HorizontalAlignment = HorizontalAlignment.Center;
+                RefreshButton.Padding = new(10, 5);
                 RefreshButton.Margin = new(0, 0, 15, 0);
-                RefreshButton.SetContent("Refresh");
+                RefreshButton.SetContent("[b]Refresh[/b]");
                 RefreshButton.CanChangeContent = false;
                 RefreshButton.AddCommandHandler((btn, e) => { RefreshParsedContent(); });
 
                 MGTabControl TabControlComponent = new(ParentWindow);
+                TabControlComponent.Padding = new(8);
                 TabControlComponent.AddTab("From File", new MGTextBlock(ParentWindow, "Placeholder"));
                 TabControlComponent.AddTab("From String", MarkupScrollViewer);
 
@@ -62,6 +68,18 @@ namespace MGUI.Core.UI
                 this.MainContent = new(DockPanel, false, false, true, true, false, false, true,
                     (AvailableBounds, ComponentSize) => AvailableBounds);
                 AddComponent(MainContent);
+
+                SelfOrParentWindow.OnWindowPositionChanged += (sender, e) =>
+                {
+                    if (MarkupPresenter.Content is MGWindow XAMLWindow)
+                    {
+                        Rectangle PreviousLayoutBounds = LayoutBounds;
+                        Point Offset = new(e.NewValue.Left - e.PreviousValue.Left, e.NewValue.Top - e.PreviousValue.Top);
+                        XAMLWindow.TopLeft += Offset;
+                    }
+                };
+
+                RefreshParsedContent();
             }
         }
 
