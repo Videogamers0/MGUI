@@ -209,8 +209,8 @@ namespace MGUI.Core.UI
                     {
                         if (HasContent)
                         {
-                            int ActualAvailableWidth = HSBVisibility == ScrollBarVisibility.Disabled ? ActualContentBounds.Width : int.MaxValue;
-                            int ActualAvailableHeight = VSBVisibility == ScrollBarVisibility.Disabled ? ActualContentBounds.Height : int.MaxValue;
+                            int ActualAvailableWidth = HSBVisibility == ScrollBarVisibility.Disabled ? AlignedContentBounds.Width : int.MaxValue;
+                            int ActualAvailableHeight = VSBVisibility == ScrollBarVisibility.Disabled ? AlignedContentBounds.Height : int.MaxValue;
                             Size ActualAvailableSize = new(ActualAvailableWidth, ActualAvailableHeight);
                             Content.UpdateMeasurement(ActualAvailableSize, out _, out RequestedContentSize, out _, out _);
                         }
@@ -219,7 +219,7 @@ namespace MGUI.Core.UI
                     int ActualVSBWidth = VSBVisibility switch
                     {
                         ScrollBarVisibility.Disabled => 0,
-                        ScrollBarVisibility.Auto => RequestedContentSize.Height > ActualContentBounds.Height ? VSBWidth : 0,
+                        ScrollBarVisibility.Auto => RequestedContentSize.Height > AlignedContentBounds.Height ? VSBWidth : 0,
                         ScrollBarVisibility.Hidden => VSBWidth,
                         ScrollBarVisibility.Visible => VSBWidth,
                         ScrollBarVisibility.Collapsed => 0,
@@ -229,7 +229,7 @@ namespace MGUI.Core.UI
                     int ActualHSBHeight = HSBVisibility switch
                     {
                         ScrollBarVisibility.Disabled => 0,
-                        ScrollBarVisibility.Auto => RequestedContentSize.Width > ActualContentBounds.Width ? HSBHeight : 0,
+                        ScrollBarVisibility.Auto => RequestedContentSize.Width > AlignedContentBounds.Width ? HSBHeight : 0,
                         ScrollBarVisibility.Hidden => HSBHeight,
                         ScrollBarVisibility.Visible => HSBHeight,
                         ScrollBarVisibility.Collapsed => 0,
@@ -237,7 +237,7 @@ namespace MGUI.Core.UI
                     };
 
                     Size ScrollBarsSize = new(ActualVSBWidth, ActualHSBHeight);
-                    Size ContentSize = Content?.AllocatedBounds.Size.AsSize() ?? ActualContentBounds.Size.AsSize();
+                    Size ContentSize = Content?.AllocatedBounds.Size.AsSize() ?? AlignedContentBounds.Size.AsSize();
                     Size ViewportSize = LayoutBounds.Size.AsSize().Subtract(ScrollBarsSize, 0, 0).Subtract(PaddingSize, 0, 0);
                     ContentViewport = new(LayoutBounds.Left + Padding.Left, LayoutBounds.Top + Padding.Top, ViewportSize.Width, ViewportSize.Height);
 

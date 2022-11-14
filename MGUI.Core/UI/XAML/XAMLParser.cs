@@ -119,7 +119,7 @@ namespace MGUI.Core.UI.XAML
         {
             XAMLString = XAMLString.Trim();
 
-            int FirstLineBreakIndex = XAMLString.IndexOf('\n');
+            int FirstLineBreakIndex = XAMLString.IndexOfAny(new char[] { '\n', '\r' });
             string FirstLine = FirstLineBreakIndex < 0 ? XAMLString : XAMLString.Substring(0, FirstLineBreakIndex);
             if (!FirstLine.Contains(XMLNameSpaces))
             {

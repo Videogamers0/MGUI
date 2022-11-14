@@ -343,7 +343,7 @@ namespace MGUI.Core.UI
 
             QueuedToolTip = null;
 
-            ElementUpdateArgs UA = new(BA, true, false, true, Point.Zero);
+            ElementUpdateArgs UA = new(BA, true, false, true, Point.Zero, ValidScreenBounds);
 
             ActiveContextMenu?.Update(UA);
             ActiveToolTip?.Update(UA with { IsHitTestVisible = ActiveToolTip.ParentWindow.IsHitTestVisible });

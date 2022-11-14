@@ -270,6 +270,7 @@ namespace MGUI.Shared.Input.Keyboard
             Keys.OemAuto,
         }.ToHashSet();
 
+        /// <param name="EnterValue">Note: Windows typically uses "\r\n", Mac '\r', Linux '\n'.</param>
         public string KeyToTextInputString(Keys Key, string NonPrintableKeyValue = null, string TabValue = "    ", string EnterValue = "\n")
         {
             #region All Keys

@@ -19,7 +19,7 @@ using MGUI.Core.UI.Containers;
 
 namespace MGUI.Core.UI
 {
-    public readonly record struct ElementUpdateArgs(UpdateBaseArgs BA, bool IsEnabled, bool IsSelected, bool IsHitTestVisible, Point Offset)
+    public readonly record struct ElementUpdateArgs(UpdateBaseArgs BA, bool IsEnabled, bool IsSelected, bool IsHitTestVisible, Point Offset, Rectangle ActualLayoutBounds)
     {
         public TimeSpan TotalElapsed => BA.TotalElapsed;
         public TimeSpan FrameElapsed => BA.FrameElapsed;
@@ -558,7 +558,7 @@ namespace MGUI.Core.UI
 
 		protected IMouseViewport AsIViewport() => this;
         protected IMouseHandlerHost AsIMouseHandlerHost() => this;
-        bool IMouseViewport.IsInside(Vector2 Position) => LayoutBounds.ContainsInclusive(Position);
+        bool IMouseViewport.IsInside(Vector2 Position) => ActualLayoutBounds.ContainsInclusive(Position - BoundsOffset.ToVector2()); //LayoutBounds.ContainsInclusive(Position);
 		Vector2 IMouseViewport.GetOffset() => BoundsOffset.ToVector2();
 
         /// <summary>Applies the <see cref="IMouseViewport.GetOffset"/> value to the given <paramref name="Position"/>. Typically used when comparing a real screen position to a Rectangle bounds that hasn't already accounted for <see cref="IMouseViewport.GetOffset"/></summary>
@@ -716,7 +716,7 @@ namespace MGUI.Core.UI
 					this.RenderBounds = RenderBounds.GetTranslated(Offset);
 					this.LayoutBounds = LayoutBounds.GetTranslated(Offset);
 					this.StretchedContentBounds = StretchedContentBounds.GetTranslated(Offset);
-					this.ActualContentBounds = ActualContentBounds.GetTranslated(Offset);
+					this.AlignedContentBounds = AlignedContentBounds.GetTranslated(Offset);
 
 					OnLayoutBoundsChanged?.Invoke(this, new(PreviousLayoutBounds, LayoutBounds));
 #endif
@@ -760,6 +760,13 @@ namespace MGUI.Core.UI
         /// in which case the offset would be based on the <see cref="MGScrollViewer.HorizontalOffset"/> / <see cref="MGScrollViewer.VerticalOffset"/></summary>
         public Point BoundsOffset { get; private set; } = Point.Zero;
 
+        /// <summary>The screen space that this element is rendered to.<para/>
+        /// Unlike <see cref="LayoutBounds"/>, this value DOES account for <see cref="BoundsOffset"/>,<br/>
+        /// and also accounts for <see cref="ClipToBounds"/> by intersecting the bounds with the parent's <see cref="ActualLayoutBounds"/>.<para/>
+        /// This value will show Width=0/Height=0 for elements that are outside the visible viewport, even if they've technically been allocated non-zero dimensions.<para/>
+        /// See also: <see cref="LayoutBounds"/>, <see cref="BoundsOffset"/></summary>
+        public Rectangle ActualLayoutBounds { get; private set; }
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private DateTime? HoverStartTime = null;
 
@@ -769,7 +776,17 @@ namespace MGUI.Core.UI
             bool ComputedIsSelected = IsSelected || this.IsSelected;
             bool ComputedIsHitTestVisible = IsHitTestVisible && this.IsHitTestVisible;
 
-            UA = UA with { IsEnabled = ComputedIsEnabled, IsSelected = ComputedIsSelected, IsHitTestVisible = ComputedIsHitTestVisible };
+            UA = UA with { 
+                IsEnabled = ComputedIsEnabled, 
+                IsSelected = ComputedIsSelected, 
+                IsHitTestVisible = ComputedIsHitTestVisible, 
+                ActualLayoutBounds = Rectangle.Intersect(UA.ActualLayoutBounds, LayoutBounds.GetTranslated(Point.Zero - UA.Offset))
+            };
+            this.ActualLayoutBounds = UA.ActualLayoutBounds;
+            //TODO there's a bug with ActualLayoutBounds that I'm too lazy to fix:
+            //Rectangle.Intersect(Parent.ActualLayoutBounds, this.LayoutBounds.GetTranslated(-UA.Offset)) does NOT properly account for the parent's Padding.
+            //We can't simply compress the ActualLayoutBounds by the parent's Padding because not all element's pad all of their children.
+            //For example, an MGTabControl's padding isn't applied to the HeadersPanel that hosts the TabControl's Tab headers.
 
             PrimaryVisualState PrimaryVisualState = !ComputedIsEnabled ? PrimaryVisualState.Disabled : ComputedIsSelected ? PrimaryVisualState.Selected : PrimaryVisualState.Normal;
             SecondaryVisualState SecondaryVisualState = SelfOrParentWindow.HasModalWindow ? SecondaryVisualState.None : IsLMBPressed ? SecondaryVisualState.Pressed : IsHovered ? SecondaryVisualState.Hovered : SecondaryVisualState.None;
@@ -985,7 +1002,7 @@ namespace MGUI.Core.UI
                 this.RenderBounds = Rectangle.Empty;
                 this.LayoutBounds = Rectangle.Empty;
 				this.StretchedContentBounds = Rectangle.Empty;
-				this.ActualContentBounds = Rectangle.Empty;
+				this.AlignedContentBounds = Rectangle.Empty;
             }
             else
             {
@@ -1015,7 +1032,7 @@ namespace MGUI.Core.UI
 					this.RenderBounds = Rectangle.Empty;
 					this.LayoutBounds = Rectangle.Empty;
                     this.StretchedContentBounds = Rectangle.Empty;
-                    this.ActualContentBounds = Rectangle.Empty;
+                    this.AlignedContentBounds = Rectangle.Empty;
                 }
 				else
 				{
@@ -1028,7 +1045,7 @@ namespace MGUI.Core.UI
 					{
 						this.LayoutBounds = Rectangle.Empty;
                         this.StretchedContentBounds = Rectangle.Empty;
-                        this.ActualContentBounds = Rectangle.Empty;
+                        this.AlignedContentBounds = Rectangle.Empty;
                     }
 					else
 					{
@@ -1085,15 +1102,15 @@ namespace MGUI.Core.UI
                         //  Set bounds for content
                         if (ContentConsumedWidth <= 0 || ContentConsumedHeight <= 0)
                         {
-                            this.ActualContentBounds = Rectangle.Empty;
+                            this.AlignedContentBounds = Rectangle.Empty;
                         }
 						else
 						{
 							Size ContentSize = new(ContentConsumedWidth, ContentConsumedHeight);
-							this.ActualContentBounds = ApplyAlignment(StretchedContentBounds, HorizontalContentAlignment, VerticalContentAlignment, ContentSize);
+							this.AlignedContentBounds = ApplyAlignment(StretchedContentBounds, HorizontalContentAlignment, VerticalContentAlignment, ContentSize);
                         }
 
-                        UpdateContentLayout(ActualContentBounds);
+                        UpdateContentLayout(AlignedContentBounds);
                     }
 				}
 			}
@@ -1110,29 +1127,34 @@ namespace MGUI.Core.UI
 
         /// <summary>The screen space that was allocated to this <see cref="MGElement"/>.<br/>
         /// This <see cref="MGElement"/> may choose not to use all of the allocated space based on <see cref="HorizontalAlignment"/> and <see cref="VerticalAlignment"/>.<para/>
-		/// This value does not account for <see cref="BoundsOffset"/> and thus might not match the exact screen bounds where this <see cref="MGElement"/> was drawn.<br/>
-        /// See also: <see cref="AllocatedBounds"/>, <see cref="RenderBounds"/>, <see cref="LayoutBounds"/>, <see cref="StretchedContentBounds"/>, <see cref="ActualContentBounds"/></summary>
+		/// This value does not account for <see cref="BoundsOffset"/> and thus might not match the exact screen bounds where this <see cref="MGElement"/> was drawn.<para/>
+        /// See also: <br/><see cref="AllocatedBounds"/><br/><see cref="RenderBounds"/><br/><see cref="LayoutBounds"/><br/><see cref="StretchedContentBounds"/><br/>
+        /// <see cref="AlignedContentBounds"/><br/><see cref="ActualLayoutBounds"/></summary>
         public Rectangle AllocatedBounds { get; private set; }
         /// <summary>The screen space that this <see cref="MGElement"/> will render itself to.<br/>
         /// This value accounts for <see cref="HorizontalAlignment"/> and <see cref="VerticalAlignment"/>.<para/>
-		/// This value does not account for <see cref="BoundsOffset"/> and thus might not match the exact screen bounds where this <see cref="MGElement"/> was drawn.<br/>
-        /// See also: <see cref="AllocatedBounds"/>, <see cref="RenderBounds"/>, <see cref="LayoutBounds"/>, <see cref="StretchedContentBounds"/>, <see cref="ActualContentBounds"/></summary>
+		/// This value does not account for <see cref="BoundsOffset"/> and thus might not match the exact screen bounds where this <see cref="MGElement"/> was drawn.<para/>
+        /// See also: <br/><see cref="AllocatedBounds"/><br/><see cref="RenderBounds"/><br/><see cref="LayoutBounds"/><br/><see cref="StretchedContentBounds"/><br/>
+        /// <see cref="AlignedContentBounds"/><br/><see cref="ActualLayoutBounds"/></summary>
         public Rectangle RenderBounds { get; private set; }
         /// <summary>The screen space that this <see cref="MGElement"/> will render itself to, after accounting for <see cref="Margin"/>.<br/>
         /// The <see cref="BackgroundBrush"/> of this <see cref="MGElement"/> spans these bounds.<para/>
-		/// This value does not account for <see cref="BoundsOffset"/> and thus might not match the exact screen bounds where this <see cref="MGElement"/> was drawn.<br/>
-        /// See also: <see cref="AllocatedBounds"/>, <see cref="RenderBounds"/>, <see cref="LayoutBounds"/>, <see cref="StretchedContentBounds"/>, <see cref="ActualContentBounds"/></summary>
+		/// This value does not account for <see cref="BoundsOffset"/> and thus might not match the exact screen bounds where this <see cref="MGElement"/> was drawn.<para/>
+        /// See also: <br/><see cref="AllocatedBounds"/><br/><see cref="RenderBounds"/><br/><see cref="LayoutBounds"/><br/><see cref="StretchedContentBounds"/><br/>
+        /// <see cref="AlignedContentBounds"/><br/><see cref="ActualLayoutBounds"/></summary>
         public Rectangle LayoutBounds { get; private set; }
         /// <summary>The screen space that this <see cref="MGElement"/>'s contents will render to, before accounting for <see cref="HorizontalContentAlignment"/> and <see cref="VerticalContentAlignment"/>.<br/>
         /// This value accounts for <see cref="Margin"/>, <see cref="Padding"/>, and any other properties that affect this <see cref="MGElement"/>'s size (such as BorderThickness of a <see cref="MGBorder"/>).<para/>
-		/// This value does not account for <see cref="BoundsOffset"/> and thus might not match the exact screen bounds where this <see cref="MGElement"/> was drawn.<br/>
-        /// See also: <see cref="AllocatedBounds"/>, <see cref="RenderBounds"/>, <see cref="LayoutBounds"/>, <see cref="StretchedContentBounds"/>, <see cref="ActualContentBounds"/></summary>
+		/// This value does not account for <see cref="BoundsOffset"/> and thus might not match the exact screen bounds where this <see cref="MGElement"/> was drawn.<para/>
+        /// See also: <br/><see cref="AllocatedBounds"/><br/><see cref="RenderBounds"/><br/><see cref="LayoutBounds"/><br/><see cref="StretchedContentBounds"/><br/>
+        /// <see cref="AlignedContentBounds"/><br/><see cref="ActualLayoutBounds"/></summary>
         public Rectangle StretchedContentBounds { get; private set; }
         /// <summary>The screen space that this <see cref="MGElement"/>'s contents will render to, after accounting for <see cref="HorizontalContentAlignment"/> and <see cref="VerticalContentAlignment"/>.<br/>
         /// This value accounts for <see cref="Margin"/>, <see cref="Padding"/>, and any other properties that affect this <see cref="MGElement"/>'s size (such as BorderThickness of a <see cref="MGBorder"/>).<para/>
-		/// This value does not account for <see cref="BoundsOffset"/> and thus might not match the exact screen bounds where this <see cref="MGElement"/> was drawn.<br/>
-        /// See also: <see cref="AllocatedBounds"/>, <see cref="RenderBounds"/>, <see cref="LayoutBounds"/>, <see cref="StretchedContentBounds"/>, <see cref="ActualContentBounds"/></summary>
-        public Rectangle ActualContentBounds { get; private set; }
+		/// This value does not account for <see cref="BoundsOffset"/> and thus might not match the exact screen bounds where this <see cref="MGElement"/> was drawn.<para/>
+        /// See also: <br/><see cref="AllocatedBounds"/><br/><see cref="RenderBounds"/><br/><see cref="LayoutBounds"/><br/><see cref="StretchedContentBounds"/><br/>
+        /// <see cref="AlignedContentBounds"/><br/><see cref="ActualLayoutBounds"/></summary>
+        public Rectangle AlignedContentBounds { get; private set; }
 
         /// <summary>Note: This value does not include <see cref="Margin"/>. For a value with <see cref="Margin"/>, consider using <see cref="RenderBounds"/>.Width</summary>
         public int ActualWidth => LayoutBounds.Width;

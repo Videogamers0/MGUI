@@ -896,7 +896,6 @@ namespace MGUI.Core.UI
 
                 MouseHandler.DragStart += (sender, e) =>
                 {
-                    //TODO fix this if textbox is scrolled offscreen
                     if (e.IsLMB && !IsReadonly && TextRenderInfo.TryGetCharAtScreenPosition(e.AdjustedPosition(this), out CharRenderInfo CharInfo))
                     {
                         IsDraggingSelection = true;
