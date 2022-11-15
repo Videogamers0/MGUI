@@ -307,3 +307,15 @@
 /processorParam:TextureFormat=Color
 /build:Fonts/Arial/9_Normal.spritefont
 
+#begin Icons/AngryMeteor_MilitaryIconsSet.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Icons/AngryMeteor_MilitaryIconsSet.png
+

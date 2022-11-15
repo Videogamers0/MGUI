@@ -187,6 +187,7 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGTabItem _SelectedTab;
         public MGTabItem SelectedTab { get => _SelectedTab; }
+        public int SelectedTabIndex => _SelectedTab == null ? -1 : _Tabs.IndexOf(_SelectedTab);
 
         /// <summary>Invoked just before <see cref="SelectedTab"/> changes. Argument value is the new tab being selected. This event allows cancellation.</summary>
         public event EventHandler<CancelEventArgs<MGTabItem>> SelectedTabChanging;

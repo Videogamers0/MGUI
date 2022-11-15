@@ -214,7 +214,7 @@ namespace MGUI.Shared.Input.Keyboard
             new(Keys.Decimal, ".", ".")
         }.Union(Letters).ToDictionary(x => x.Key, x => x);
 
-        private static ReadOnlyCollection<Keys> FunctionKeys = Enumerable.Range((int)Keys.F1, (int)Keys.F24 - (int)Keys.F1 + 1).Select(x => (Keys)x).ToList().AsReadOnly();
+        private static readonly ReadOnlyCollection<Keys> FunctionKeys = Enumerable.Range((int)Keys.F1, (int)Keys.F24 - (int)Keys.F1 + 1).Select(x => (Keys)x).ToList().AsReadOnly();
 
         private static readonly HashSet<Keys> NonPrintableKeys = new List<Keys>()
         {

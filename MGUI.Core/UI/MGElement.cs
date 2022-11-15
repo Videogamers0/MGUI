@@ -96,14 +96,7 @@ namespace MGUI.Core.UI
     //		under the assumption each frame of the animation is same size. MGAnimatedImage(bool IsUniform) (if !IsUniform, has to invoke LayoutChanged)
     //chatbox
     //
-    //BasicXAMLDesigner : MGwindow
-    //      Content is Grid with 3 rows 1 column
-    //      top row is the parsed XAML element (height=*)
-    //      middle is horizontal gridsplitter (height= maybe 15)
-    //      bottom is a textbox and refresh button (height=*)
-    //      click refresh tries to parse the xaml from the textbox's text
-    //      if failed, top row's content is a textblock with the exception message
-    //      if success, top row's content = result of XAMLParser.Load
+    //MGDesigner
     //      override the functionality of the textbox
     //          typing an enter key should add a new line, but also add prepend enough spaces to set cursor near where previous line's text begins + 1 tab
     //          "<Window>
@@ -547,8 +540,8 @@ namespace MGUI.Core.UI
 
 		#region Input
 		protected InputTracker InputTracker => GetDesktop().InputTracker;
-		protected MouseHandler MouseHandler { get; }
-		protected KeyboardHandler KeyboardHandler { get; }
+		public MouseHandler MouseHandler { get; }
+        public KeyboardHandler KeyboardHandler { get; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsHovered => MouseHandler.IsHovered;
@@ -780,7 +773,7 @@ namespace MGUI.Core.UI
                 IsEnabled = ComputedIsEnabled, 
                 IsSelected = ComputedIsSelected, 
                 IsHitTestVisible = ComputedIsHitTestVisible, 
-                ActualLayoutBounds = Rectangle.Intersect(UA.ActualLayoutBounds, LayoutBounds.GetTranslated(Point.Zero - UA.Offset))
+                ActualLayoutBounds = Rectangle.Intersect(IsWindow ? GetDesktop().ValidScreenBounds : UA.ActualLayoutBounds, LayoutBounds.GetTranslated(Point.Zero - UA.Offset))
             };
             this.ActualLayoutBounds = UA.ActualLayoutBounds;
             //TODO there's a bug with ActualLayoutBounds that I'm too lazy to fix:

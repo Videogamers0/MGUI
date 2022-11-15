@@ -841,52 +841,49 @@ namespace MGUI.Core.UI
                 {
                     try
                     {
-                        if (!IsReadonly)
+                        AddMousePressHistory(e.AdjustedPosition(this), out bool IsDoublePress, out bool IsTriplePress, out bool IsQuadruplePress);
+
+                        GetDesktop().QueuedFocusedKeyboardHandler = this;
+
+                        Caret.MoveToApproximateScreenPosition(e.AdjustedPosition(this));
+
+                        CurrentSelection = null;
+                        if (TextRenderInfo.TryGetCharAtScreenPosition(e.AdjustedPosition(this), out CharRenderInfo CharInfo))
                         {
-                            AddMousePressHistory(e.AdjustedPosition(this), out bool IsDoublePress, out bool IsTriplePress, out bool IsQuadruplePress);
-
-                            GetDesktop().QueuedFocusedKeyboardHandler = this;
-
-                            Caret.MoveToApproximateScreenPosition(e.AdjustedPosition(this));
-
-                            CurrentSelection = null;
-                            if (TextRenderInfo.TryGetCharAtScreenPosition(e.AdjustedPosition(this), out CharRenderInfo CharInfo))
+                            if (IsQuadruplePress)
+                                SelectAll();
+                            else if (IsTriplePress)
+                                this.CurrentSelection = new(CharInfo.Line.FirstCharacter.IndexInOriginalText, CharInfo.Line.LastCharacter.IndexInOriginalText + 1);
+                            else if (IsDoublePress)
                             {
-                                if (IsQuadruplePress)
-                                    SelectAll();
-                                else if (IsTriplePress)
-                                    this.CurrentSelection = new(CharInfo.Line.FirstCharacter.IndexInOriginalText, CharInfo.Line.LastCharacter.IndexInOriginalText + 1);
-                                else if (IsDoublePress)
+                                int Index = CharInfo.IndexInOriginalText;
+                                bool ClickedWordCharacter = Regex.IsMatch(Text[Index].ToString(), @"\w");
+                                if (ClickedWordCharacter)
                                 {
-                                    int Index = CharInfo.IndexInOriginalText;
-                                    bool ClickedWordCharacter = Regex.IsMatch(Text[Index].ToString(), @"\w");
-                                    if (ClickedWordCharacter)
-                                    {
-                                        //  Get all word-characters to the left of the pressed character
-                                        int PreviousCharacters = Text.Substring(0, Index).Reverse().TakeWhile(x => Regex.IsMatch(x.ToString(), @"\w")).Count();
-                                        //  Get all word-characters to the right of the pressed character
-                                        int NextCharacters = Text.Skip(Index).TakeWhile(x => Regex.IsMatch(x.ToString(), @"\w")).Count();
+                                    //  Get all word-characters to the left of the pressed character
+                                    int PreviousCharacters = Text.Substring(0, Index).Reverse().TakeWhile(x => Regex.IsMatch(x.ToString(), @"\w")).Count();
+                                    //  Get all word-characters to the right of the pressed character
+                                    int NextCharacters = Text.Skip(Index).TakeWhile(x => Regex.IsMatch(x.ToString(), @"\w")).Count();
 
-                                        //  Also include the next space if it's the first non-word character we find while traversing to the right
-                                        if (CharInfo.IndexInOriginalText + NextCharacters < Text.Length && Text[CharInfo.IndexInOriginalText + NextCharacters] == ' ')
-                                            NextCharacters++;
+                                    //  Also include the next space if it's the first non-word character we find while traversing to the right
+                                    if (CharInfo.IndexInOriginalText + NextCharacters < Text.Length && Text[CharInfo.IndexInOriginalText + NextCharacters] == ' ')
+                                        NextCharacters++;
 
-                                        this.CurrentSelection = new(CharInfo.IndexInOriginalText - PreviousCharacters, Math.Min(Text.Length, CharInfo.IndexInOriginalText + NextCharacters));
-                                    }
-                                    else
-                                    {
-                                        //  Get all non-word characters to the left of the pressed character
-                                        int PreviousCharacters = Text.Substring(0, Index).Reverse().TakeWhile(x => Regex.IsMatch(x.ToString(), @"\W")).Count();
-                                        //  Get all non-word characters to the right of the pressed character
-                                        int NextCharacters = Text.Skip(Index).TakeWhile(x => Regex.IsMatch(x.ToString(), @"\W")).Count();
+                                    this.CurrentSelection = new(CharInfo.IndexInOriginalText - PreviousCharacters, Math.Min(Text.Length, CharInfo.IndexInOriginalText + NextCharacters));
+                                }
+                                else
+                                {
+                                    //  Get all non-word characters to the left of the pressed character
+                                    int PreviousCharacters = Text.Substring(0, Index).Reverse().TakeWhile(x => Regex.IsMatch(x.ToString(), @"\W")).Count();
+                                    //  Get all non-word characters to the right of the pressed character
+                                    int NextCharacters = Text.Skip(Index).TakeWhile(x => Regex.IsMatch(x.ToString(), @"\W")).Count();
 
-                                        this.CurrentSelection = new(CharInfo.IndexInOriginalText - PreviousCharacters, Math.Min(Text.Length, CharInfo.IndexInOriginalText + NextCharacters));
-                                    }
+                                    this.CurrentSelection = new(CharInfo.IndexInOriginalText - PreviousCharacters, Math.Min(Text.Length, CharInfo.IndexInOriginalText + NextCharacters));
                                 }
                             }
-
-                            e.SetHandled(this, false);
                         }
+
+                        e.SetHandled(this, false);
                     }
                     catch (Exception ex)
                     {
@@ -896,7 +893,7 @@ namespace MGUI.Core.UI
 
                 MouseHandler.DragStart += (sender, e) =>
                 {
-                    if (e.IsLMB && !IsReadonly && TextRenderInfo.TryGetCharAtScreenPosition(e.AdjustedPosition(this), out CharRenderInfo CharInfo))
+                    if (e.IsLMB && TextRenderInfo.TryGetCharAtScreenPosition(e.AdjustedPosition(this), out CharRenderInfo CharInfo))
                     {
                         IsDraggingSelection = true;
                         bool IsLeftEdge = e.AdjustedPosition(this).X <= CharInfo.CenterX;
@@ -971,28 +968,28 @@ namespace MGUI.Core.UI
                         TextEntryMode = TextEntryMode == TextEntryMode.Insert ? TextEntryMode.Overwrite : TextEntryMode.Insert;
                         break;
 
-                    case Keys.Left when !IsReadonly:
+                    case Keys.Left:
                         if (Caret.MoveLeft(1))
                             CurrentSelection = null;
                         break;
-                    case Keys.Right when !IsReadonly:
+                    case Keys.Right:
                         if (Caret.MoveRight(1))
                             CurrentSelection = null;
                         break;
-                    case Keys.Up when !IsReadonly:
+                    case Keys.Up:
                         if (Caret.MoveUp(1))
                             CurrentSelection = null;
                         break;
-                    case Keys.Down when !IsReadonly:
+                    case Keys.Down:
                         if (Caret.MoveDown(1))
                             CurrentSelection = null;
                         break;
 
-                    case Keys.Home when !IsReadonly:
+                    case Keys.Home:
                         if (Caret.MoveToStartOfCurrentLine())
                             CurrentSelection = null;
                         break;
-                    case Keys.End when !IsReadonly:
+                    case Keys.End:
                         if (Caret.MoveToEndOfCurrentLine())
                             CurrentSelection = null;
                         break;
