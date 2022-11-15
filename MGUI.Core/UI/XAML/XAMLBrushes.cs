@@ -53,7 +53,7 @@ namespace MGUI.Core.UI.XAML
         }
 
         private static readonly Regex RGBColorRegex = 
-            new($@"^(?i)RGB(?-i)\((?<RedComponent>\d{{1,3}}), ?(?<GreenComponent>\d{{1,3}}), ?(?<BlueComponent>\d{{1,3}})(, ?(?<AlphaComponent>\d{{1,3}}))?\)$"); // EX: "RGB(0,128,255)"
+            new($@"^(?i)RGBA?(?-i)\((?<RedComponent>\d{{1,3}}), ?(?<GreenComponent>\d{{1,3}}), ?(?<BlueComponent>\d{{1,3}})(, ?(?<AlphaComponent>\d{{1,3}}))?\)$"); // EX: "RGB(0,128,255)"
 
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {

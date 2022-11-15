@@ -92,7 +92,8 @@ namespace MGUI.Core.UI.Text
     /// <summary>Tokenizes a piece of formatted text that contains markdown into a list of <see cref="FTTokenType"/> tokens.</summary>
     public class FTTokenizer
     {
-        public const char EscapeOpenTagChar = '\\';
+        /// <summary>This character instructs the tokenizer to ignore the next <see cref="OpenTagChar"/> if <see cref="OpenTagChar"/> immediately follows.</summary>
+        public const char EscapeOpenTagChar = '¬';
         public const char OpenTagChar = '[';
         public const char CloseTagChar = ']';
 
@@ -257,10 +258,10 @@ namespace MGUI.Core.UI.Text
                 AsEnumerable<FTTokenType?>(null, FTTokenType.CloseTag, FTTokenType.EscapeMarkdown))
             );
 
-#if DEBUG
+#if NEVER // DEBUG
             try
             {
-                string sample = "H[b]e\nllo\\[bold]W[bg=Red]orld[color=Green][shadow=Red 1 2]def[/color]Test";
+                string sample = $"H[b]e\nllo{EscapeOpenTagChar}[bold]W[bg=Red]orld[color=Green][shadow=Red 1 2]def[/color]Test";
                 var result = Tokenize(sample, true).ToList();
                 //result = Tokenize(@"\nABC\nDEF\n", true).ToList();
             }
