@@ -120,12 +120,6 @@ namespace MGUI.Core.UI.Containers
 
         }
 
-        protected override void UpdateContents(ElementUpdateArgs UA)
-        {
-            foreach (MGElement Child in GetVisualTreeChildren().ToList())
-                Child.Update(UA);
-        }
-
         protected override void DrawContents(ElementDrawArgs DA)
         {
             foreach (MGElement Child in GetChildren())

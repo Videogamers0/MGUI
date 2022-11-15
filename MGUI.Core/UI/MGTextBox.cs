@@ -911,9 +911,22 @@ namespace MGUI.Core.UI
 
                 MouseHandler.Dragged += (sender, e) =>
                 {
-                    if (e.IsLMB && IsDraggingSelection)
+                    if (e.IsLMB && IsDraggingSelection && (Text?.Length ?? 0) > 0 && CurrentSelection.HasValue)
                     {
-                        if (TextRenderInfo.TryGetCharAtScreenPosition(e.AdjustedPosition(this), out CharRenderInfo CharInfo) && CurrentSelection.HasValue)
+                        Vector2 AdjustedPosition = e.AdjustedPosition(this);
+
+                        int LayoutBoundsVerticalPadding = 5;
+                        if (AdjustedPosition.Y < LayoutBounds.Top - LayoutBoundsVerticalPadding)
+                        {
+                            int SelectionIndex = TextRenderInfo.GetFirstChar().IndexInOriginalText;
+                            CurrentSelection = new(CurrentSelection.Value.Index1, SelectionIndex);
+                        }
+                        else if (AdjustedPosition.Y > LayoutBounds.Bottom + LayoutBoundsVerticalPadding)
+                        {
+                            int SelectionIndex = TextRenderInfo.GetLastChar().IndexInOriginalText + 1;
+                            CurrentSelection = new(CurrentSelection.Value.Index1, SelectionIndex);
+                        }
+                        else if (TextRenderInfo.TryGetCharAtScreenPosition(AdjustedPosition, out CharRenderInfo CharInfo))
                         {
                             bool IsLeftEdge = e.AdjustedPosition(this).X <= CharInfo.CenterX;
                             int SelectionIndex = IsLeftEdge ? CharInfo.IndexInOriginalText : CharInfo.IndexInOriginalText + 1;

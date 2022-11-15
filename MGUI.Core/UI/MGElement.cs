@@ -765,9 +765,9 @@ namespace MGUI.Core.UI
 
         public void Update(ElementUpdateArgs UA)
 		{ 
-            bool ComputedIsEnabled = IsEnabled && this.IsEnabled;
-            bool ComputedIsSelected = IsSelected || this.IsSelected;
-            bool ComputedIsHitTestVisible = IsHitTestVisible && this.IsHitTestVisible;
+            bool ComputedIsEnabled = UA.IsEnabled && this.IsEnabled;
+            bool ComputedIsSelected = UA.IsSelected || this.IsSelected;
+            bool ComputedIsHitTestVisible = UA.IsHitTestVisible && this.IsHitTestVisible;
 
             UA = UA with { 
                 IsEnabled = ComputedIsEnabled, 
@@ -828,7 +828,11 @@ namespace MGUI.Core.UI
             OnEndUpdate?.Invoke(this, UpdateEventArgs);
         }
 
-		protected virtual void UpdateContents(ElementUpdateArgs UA) { }
+		protected virtual void UpdateContents(ElementUpdateArgs UA)
+        {
+            foreach (MGElement Child in GetVisualTreeChildren().ToList())
+                Child.Update(UA);
+        }
 
         public event EventHandler<ElementUpdateEventArgs> OnBeginUpdate;
         public event EventHandler<ElementUpdateEventArgs> OnEndUpdate;

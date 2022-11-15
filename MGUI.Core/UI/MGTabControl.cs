@@ -331,7 +331,13 @@ namespace MGUI.Core.UI
 
         protected override void UpdateContents(ElementUpdateArgs UA)
         {
-            base.UpdateContents(UA);
+            foreach (MGElement Child in GetVisualTreeChildren().ToList())
+            {
+                if (Child == SelectedTab || !_Tabs.Contains(Child))
+                    Child.Update(UA);
+                else
+                    Child.Update(UA with { IsHitTestVisible = false });
+            }
         }
 
         public override void DrawBackground(ElementDrawArgs DA, Rectangle LayoutBounds)

@@ -158,12 +158,6 @@ namespace MGUI.Core.UI
             }
         }
 
-        protected override void UpdateContents(ElementUpdateArgs UA)
-        {
-            OuterHeaderPresenter.Update(UA);
-            base.UpdateContents(UA);
-        }
-
         private Size GetHeaderlessSize()
         {
             int Width = BorderThickness.Width + HeaderHorizontalMargin * 2 + HeaderHorizontalPadding * 2;

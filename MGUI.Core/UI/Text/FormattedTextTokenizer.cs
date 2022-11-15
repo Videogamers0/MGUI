@@ -11,8 +11,6 @@ namespace MGUI.Core.UI.Text
     /// <summary>A token parsed from a piece of formatted text that contains markdown. These tokens are used as a first-pass, prior to more detailed parsing performed via <see cref="FTParser"/>.</summary>
     public enum FTTokenType
     {
-        EscapeMarkdown,
-
         OpenTag,
         CloseTag,
 
@@ -66,9 +64,9 @@ namespace MGUI.Core.UI.Text
 
         public FTTokenMatch? Match(FTTokenType? Previous, string Input)
         {
-            if (PrecededBy.Any() && !PrecededBy.Any(x => x == null && !Previous.HasValue || x != null && Previous.HasValue && x.Value == Previous.Value))
+            if (PrecededBy.Any() && !PrecededBy.Any(x => (x == null && !Previous.HasValue) || (x != null && Previous.HasValue && x.Value == Previous.Value)))
                 return null;
-            if (NotPrecededBy.Any(x => x == null && !Previous.HasValue || x != null && Previous.HasValue && x.Value == Previous.Value))
+            if (NotPrecededBy.Any(x => (x == null && !Previous.HasValue) || (x != null && Previous.HasValue && x.Value == Previous.Value)))
                 return null;
 
             Match Match = Regex.Match(Input);
@@ -94,7 +92,7 @@ namespace MGUI.Core.UI.Text
     {
         /// <summary>If this character is immediately followed by <see cref="OpenTagChar"/>, then this character instructs the tokenizer to treat the following 
         /// <see cref="OpenTagChar"/> literally instead of as the start of a markdown formatting code.</summary>
-        public const char EscapeOpenTagChar = '¬';
+        public const char EscapeOpenTagChar = '\\';
         public const char OpenTagChar = '[';
         public const char CloseTagChar = ']';
 
@@ -135,20 +133,13 @@ namespace MGUI.Core.UI.Text
                 FTTokenType.ShadowValue
             };
 
-            string EscapedEscapeMarkdown = Regex.Escape(EscapeOpenTagChar.ToString());
             string EscapedOpenTag = Regex.Escape(OpenTagChar.ToString());
             string EscapedCloseTag = Regex.Escape(CloseTagChar.ToString());
 
-            //  Escape Markdown
-            Definitions.Add(new(FTTokenType.EscapeMarkdown, $@"^{EscapedEscapeMarkdown}(?={EscapedOpenTag})",
-                AsEnumerable<FTTokenType?>(null, FTTokenType.CloseTag), //PrecededBy 
-                AsEnumerable<FTTokenType?>(FTTokenType.InvalidToken))   //NotPrecededBy
-            );
-
             //  Open Tag
             Definitions.Add(new(FTTokenType.OpenTag, $@"^{EscapedOpenTag}",
-                AsEnumerable<FTTokenType?>(null, FTTokenType.CloseTag),
-                AsEnumerable<FTTokenType?>(FTTokenType.EscapeMarkdown, FTTokenType.InvalidToken))
+                AsEnumerable<FTTokenType?>(null, FTTokenType.CloseTag, FTTokenType.StringValue, FTTokenType.LineBreak), //PrecededBy
+                AsEnumerable<FTTokenType?>(FTTokenType.InvalidToken)) //NotPrecededBy
             );
 
             //  Close Tag
@@ -256,42 +247,17 @@ namespace MGUI.Core.UI.Text
             //  Invalid Token
             Definitions.Add(new(FTTokenType.InvalidToken, @"^.*",
                 Enumerable.Empty<FTTokenType?>(),
-                AsEnumerable<FTTokenType?>(null, FTTokenType.CloseTag, FTTokenType.EscapeMarkdown))
+                AsEnumerable<FTTokenType?>(null, FTTokenType.CloseTag, FTTokenType.StringValue, FTTokenType.LineBreak))
             );
 
-#if NEVER // DEBUG
+#if DEBUG
             try
             {
-                string sample = $"H[b]e\nllo{EscapeOpenTagChar}[bold]W[bg=Red]orld[color=Green][shadow=Red 1 2]def[/color]Test";
+                string sample = $"H{EscapeOpenTagChar}{EscapeOpenTagChar}[b]e\nllo{EscapeOpenTagChar}[bold]W[bg=Red]orld[color=Green][shadow=Red 1 2]def[/color]Test";
                 var result = Tokenize(sample, true).ToList();
-                //result = Tokenize(@"\nABC\nDEF\n", true).ToList();
             }
             catch (Exception) { }
 #endif
-        }
-
-        private static bool AreAllOpenTagsEscaped(string Text)
-        {
-            if (string.IsNullOrEmpty(Text))
-            {
-                return true;
-            }
-            else if (Text[0] == OpenTagChar)
-            {
-                return false;
-            }
-            else
-            {
-                char PreviousCharacter = Text[0];
-                foreach (char c in Text.Skip(1))
-                {
-                    if (c == OpenTagChar && PreviousCharacter != EscapeOpenTagChar)
-                        return false;
-                    PreviousCharacter = c;
-                }
-
-                return true;
-            }
         }
 
         /// <summary>Removes all formatted text markdown from the given <paramref name="Text"/> by prefixing all instances of <see cref="OpenTagChar"/> with <see cref="EscapeOpenTagChar"/>.<para/>
@@ -328,6 +294,14 @@ namespace MGUI.Core.UI.Text
             return !Result.Any(x => x.TokenType == FTTokenType.InvalidToken);
         }
 
+        private static readonly string EscapedEscapeOpenTagChar = Regex.Escape(EscapeOpenTagChar.ToString());
+        private static readonly string EscapedOpenTagChar = Regex.Escape(OpenTagChar.ToString());
+
+        private static readonly string SubPattern1 = $@"[^{EscapedEscapeOpenTagChar}{EscapedOpenTagChar}]";
+        private static readonly string SubPattern2 = $@"({EscapedEscapeOpenTagChar}(?!({EscapedEscapeOpenTagChar}|{EscapedOpenTagChar})))";
+        private static readonly string SubPattern3 = $@"({EscapedEscapeOpenTagChar}{EscapedOpenTagChar})";
+        private static readonly string Pattern = $"^({SubPattern1}|{SubPattern2}|{SubPattern3})*";
+
         /// <param name="ShouldTokenizeLineBreaks">If true, linebreaks '\n', '\r', "\r\n" will be tokenized as <see cref="FTTokenType.LineBreak"/>.<br/>
         /// If false, they will not be tokenized, and will instead remain as a substring inside a <see cref="FTTokenType.StringValue"/> token.<para/>
         /// Warning - A linebreak is treated as the character literals: '\n', '\r', "\r\n", as opposed to the escaped strings such as @"\n". Be sure not to accidentally use a literal escape character '\\', such as if prefixing a hard-coded string with @.</param>
@@ -336,51 +310,62 @@ namespace MGUI.Core.UI.Text
             if (string.IsNullOrEmpty(Text))
                 yield break;
 
-            if (AreAllOpenTagsEscaped(Text))
-            {
-                string LiteralText = Text.Replace($"{EscapeOpenTagChar}{OpenTagChar}", OpenTagChar.ToString());
-                foreach (FTTokenMatch Item in TokenizeLineBreaks(LiteralText, ShouldTokenizeLineBreaks))
-                    yield return Item;
-                yield break;
-            }
-
             string RemainingText = Text;
+            StringBuilder CurrentStringLiteral = new();
 
-            StringBuilder LiteralValue = new();
-            FTTokenType? Previous = null;
+            bool IsTokenizingFormattingCode = false;
+
+            FTTokenType? PreviousToken = null;
             while (!string.IsNullOrEmpty(RemainingText))
             {
-                FTTokenMatch? Match = Definitions.Select(x => x.Match(Previous, RemainingText)).FirstOrDefault(x => x != null);
-                if (Match != null)
+                if (!IsTokenizingFormattingCode)
                 {
-                    if (LiteralValue.Length > 0)
+                    Match Match = Regex.Match(RemainingText, Pattern);
+                    if (Match.Success && !string.IsNullOrEmpty(Match.Value))
                     {
-                        foreach (FTTokenMatch Item in TokenizeLineBreaks(LiteralValue.ToString(), ShouldTokenizeLineBreaks))
-                            yield return Item;
-                        LiteralValue.Clear();
+                        string StringLiteral = Match.Value.Replace($"{EscapeOpenTagChar}{OpenTagChar}", $"{OpenTagChar}");
+                        CurrentStringLiteral.Append(StringLiteral);
+                        RemainingText = RemainingText.Substring(Match.Length);
                     }
-
-                    yield return Match.Value;
-                    RemainingText = Match.Value.RemainingText;
-                    Previous = Match.Value.TokenType;
-
-                    if (Match.Value.TokenType == FTTokenType.InvalidToken)
+                    else if (RemainingText.StartsWith(string.Join("", Enumerable.Repeat(EscapeOpenTagChar, 2))))
                     {
-                        yield break;
+                        CurrentStringLiteral.Append(EscapeOpenTagChar);
+                        RemainingText = RemainingText.Substring(2);
+                    }
+                    else
+                    {
+                        if (CurrentStringLiteral.Length > 0)
+                        {
+                            foreach (FTTokenMatch Item in TokenizeLineBreaks(CurrentStringLiteral.ToString(), ShouldTokenizeLineBreaks))
+                                yield return Item;
+                            PreviousToken = FTTokenType.StringValue;
+                        }
+
+                        CurrentStringLiteral.Clear();
+                        IsTokenizingFormattingCode = true;
                     }
                 }
                 else
                 {
-                    LiteralValue.Append(RemainingText[0]);
-                    RemainingText = RemainingText.Substring(1);
-                    if (Previous.HasValue && Previous.Value == FTTokenType.EscapeMarkdown)
-                        Previous = null;
+                    FTTokenMatch Match = Definitions.Select(x => x.Match(PreviousToken, RemainingText)).First(x => x != null).Value;
+                    yield return Match;
+                    RemainingText = Match.RemainingText;
+                    PreviousToken = Match.TokenType;
+
+                    if (Match.TokenType == FTTokenType.InvalidToken)
+                    {
+                        yield break;
+                    }
+                    else if (Match.TokenType == FTTokenType.CloseTag)
+                    {
+                        IsTokenizingFormattingCode = false;
+                    }
                 }
             }
 
-            if (LiteralValue.Length > 0)
+            if (CurrentStringLiteral.Length > 0)
             {
-                foreach (FTTokenMatch Item in TokenizeLineBreaks(LiteralValue.ToString(), ShouldTokenizeLineBreaks))
+                foreach (FTTokenMatch Item in TokenizeLineBreaks(CurrentStringLiteral.ToString(), ShouldTokenizeLineBreaks))
                     yield return Item;
             }
         }

@@ -91,10 +91,6 @@ namespace MGUI.Core.UI.Text
         {
             this.Definitions = new List<FTActionDefinition>();
 
-            //  Escape markdown
-            Definitions.Add(new(FTActionType.Ignore, FTTokenType.EscapeMarkdown,
-                FTTokenType.EscapeMarkdown));
-
             //  Bold
             Definitions.Add(new(FTActionType.EnableBold, FTTokenType.BoldOpenTagType, 
                 FTTokenType.OpenTag, FTTokenType.BoldOpenTagType, FTTokenType.CloseTag));
