@@ -1,8 +1,8 @@
 # MGUI
 
-MGUI is a UI framework for [MonoGame](https://www.monogame.net/) that features a powerful layout engine similar to WPF, and a robust set of controls to build your UI with. 
+MGUI is a UI framework for [MonoGame](https://www.monogame.net/) ([Src](https://github.com/MonoGame/MonoGame)) that features a powerful layout engine similar to WPF, and a robust set of controls to build your UI with. 
 
-All control names are prefixed with 'MG' and have similar names and properties to what you would expect from WPF. Currently supported controls:
+All control names are prefixed with 'MG' and have similar names and properties to what you might find in WPF. Currently supported controls:
 - 'Container'-like Controls that define their own logic for arranging their children:
   - MGDockPanel
   - MGGrid
@@ -15,6 +15,7 @@ All control names are prefixed with 'MG' and have similar names and properties t
   - MGComboBox
   - MGContextMenu
   - MGContextMenuItem
+  - MGDesigner
   - MGExpander
   - MGGroupBox
   - MGListBox
@@ -267,6 +268,9 @@ A simple registration window created with MGUI:
 </details>
 
 ![Register.png](assets/samples/Sample_Debug_Window.png)
+  
+MGUI can also parse and render your XAML markup at runtime using the MGDesigner control:
+![XAML Designer](assets/samples/Sample_XAML_Designer_Window.gif)
   
 # Getting Started:
 
