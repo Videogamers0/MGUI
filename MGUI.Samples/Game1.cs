@@ -46,6 +46,7 @@ namespace MGUI.Samples
             this.MGUIRenderer = new(new GameRenderHost<Game1>(this));
             this.Desktop = new(MGUIRenderer);
 
+            //  Note: If reading XAML markup from .xaml files, make sure they're set to BuildAction=EmbeddedResource
             Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
             MGWindow XAMLDesigner = LoadDesignerWindow(CurrentAssembly, Desktop);
             Desktop.Windows.Add(XAMLDesigner);
@@ -54,6 +55,7 @@ namespace MGUI.Samples
             Desktop.Windows.Add(LoadCharacterStatsWindow(CurrentAssembly, Desktop));
             Desktop.Windows.Add(LoadInventoryWindow(CurrentAssembly, Desktop));
             //Desktop.Windows.Add(LoadStylesTestWindow(CurrentAssembly, Desktop));
+            Desktop.Windows.Add(LoadNamespaceTestWindow(CurrentAssembly, Desktop));
 
             Desktop.BringToFront(XAMLDesigner);
 
@@ -69,7 +71,7 @@ namespace MGUI.Samples
 
         private static MGWindow LoadDesignerWindow(Assembly CurrentAssembly, MGDesktop Desktop)
         {
-            MGWindow Window = new(Desktop, 0, 0, 500, 500);
+            MGWindow Window = new(Desktop, 150, 20, 500, 500);
             Window.SetContent(new MGDesigner(Window));
             if (Window.BackgroundBrush.NormalValue is MGSolidFillBrush SolidFill)
                 Window.BackgroundBrush.NormalValue = SolidFill * 0.5f;
@@ -252,7 +254,7 @@ namespace MGUI.Samples
 </Window>
             ";
 
-            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, xaml);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, xaml, true);
             //XAMLWindow.MakeInvisible();
 
             if (Window.TryGetElementByName("LV1", out MGListView<double> LV))
@@ -332,7 +334,7 @@ namespace MGUI.Samples
             //  Parse the XAML markup into an MGWindow instance
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Registration.xaml";
             string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
-            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, true);
 
             //  Retrieve named elements from the window
             MGTextBox TextBox_Email = Window.GetElementByName<MGTextBox>("TextBox_Email");
@@ -379,7 +381,7 @@ namespace MGUI.Samples
             //  Parse the XAML markup into an MGWindow instance
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.CharacterStats.xaml";
             string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
-            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, true);
 
             return Window;
         }
@@ -389,7 +391,7 @@ namespace MGUI.Samples
             //  Parse the XAML markup into an MGWindow instance
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Inventory.xaml";
             string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
-            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, true);
 
             MGButton Button_Close = Window.GetElementByName<MGButton>("Button_Close");
             Button_Close.AddCommandHandler((Button, e) =>
@@ -434,7 +436,17 @@ namespace MGUI.Samples
             //  Parse the XAML markup into an MGWindow instance
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.StylesTest.xaml";
             string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
-            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, true);
+
+            return Window;
+        }
+
+        private static MGWindow LoadNamespaceTestWindow(Assembly CurrentAssembly, MGDesktop Desktop)
+        {
+            //  Parse the XAML markup into an MGWindow instance
+            string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.NamespaceTest.xaml";
+            string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, false);
 
             return Window;
         }

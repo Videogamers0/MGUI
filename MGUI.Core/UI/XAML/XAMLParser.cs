@@ -119,6 +119,8 @@ namespace MGUI.Core.UI.XAML
         {
             XAMLString = XAMLString.Trim();
 
+            //  TODO: First line might not be an XElement. Could be something like a comment,
+            //  so we should use more robust logic to insert the namespaces
             int FirstLineBreakIndex = XAMLString.IndexOfAny(new char[] { '\n', '\r' });
             string FirstLine = FirstLineBreakIndex < 0 ? XAMLString : XAMLString.Substring(0, FirstLineBreakIndex);
             if (!FirstLine.Contains(XMLNameSpaces))
@@ -186,11 +188,12 @@ namespace MGUI.Core.UI.XAML
         /// <param name="SanitizeXAMLString">If true, the given <paramref name="XAMLString"/> will be pre-processed via the following logic:<para/>
         /// 1. Trim leading and trailing whitespace<br/>
         /// 2. Insert required XML namespaces (such as "xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation")<br/>
-        /// 3. Replace aliased type names with their fully-qualified type names, such as "Button" -> "MGUI:XAMLButton" where the "MGUI" namespace prefix points to the URI defined by <see cref="XMLLocalNameSpaceUri"/></param>
+        /// 3. Replace aliased type names with their fully-qualified type names, such as "Button" -> "MGUI:XAMLButton" where the "MGUI" namespace prefix points to the URI defined by <see cref="XMLLocalNameSpaceUri"/><para/>
+        /// If your XAML isn't using any aliased element names, you probably should set this to false.</param>
         /// <param name="ReplaceLinebreakLiterals">If true, the literal string @"\n" will be replaced with "&#38;#x0a;", which is the XAML representation of the linebreak character '\n'.<br/>
         /// If false, setting the text of an <see cref="MGTextBlock"/> requires encoding the '\n' character as ""&#38;#x0a;""<para/>
         /// See also: <see href="https://stackoverflow.com/a/183435/11689514"/></param>
-        public static T Load<T>(MGWindow Window, string XAMLString, bool SanitizeXAMLString = true, bool ReplaceLinebreakLiterals = true)
+        public static T Load<T>(MGWindow Window, string XAMLString, bool SanitizeXAMLString, bool ReplaceLinebreakLiterals = true)
             where T : MGElement
         {
             if (SanitizeXAMLString)
@@ -205,11 +208,12 @@ namespace MGUI.Core.UI.XAML
         /// <param name="SanitizeXAMLString">If true, the given <paramref name="XAMLString"/> will be pre-processed via the following logic:<para/>
         /// 1. Trim leading and trailing whitespace<br/>
         /// 2. Insert required XML namespaces (such as "xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation")<br/>
-        /// 3. Replace aliased type names with their fully-qualified type names, such as "Button" -> "MGUI:XAMLButton" where the "MGUI" namespace prefix points to the URI defined by <see cref="XMLLocalNameSpaceUri"/></param>
+        /// 3. Replace aliased type names with their fully-qualified type names, such as "Button" -> "MGUI:XAMLButton" where the "MGUI" namespace prefix points to the URI defined by <see cref="XMLLocalNameSpaceUri"/><para/>
+        /// If your XAML isn't using any aliased element names, you probably should set this to false.</param>
         /// <param name="ReplaceLinebreakLiterals">If true, the literal string @"\n" will be replaced with the "v", which is the XAML representation of the linebreak character '\n'.<br/>
         /// If false, setting the text of an <see cref="MGTextBlock"/> requires encoding the '\n' character as ""&#38;#x0a;""<para/>
         /// See also: <see href="https://stackoverflow.com/a/183435/11689514"/></param>
-        public static MGWindow LoadRootWindow(MGDesktop Desktop, string XAMLString, bool SanitizeXAMLString = true, bool ReplaceLinebreakLiterals = true)
+        public static MGWindow LoadRootWindow(MGDesktop Desktop, string XAMLString, bool SanitizeXAMLString, bool ReplaceLinebreakLiterals = true)
         {
             if (SanitizeXAMLString)
                 XAMLString = ValidateXAMLString(XAMLString);

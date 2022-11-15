@@ -92,7 +92,8 @@ namespace MGUI.Core.UI.Text
     /// <summary>Tokenizes a piece of formatted text that contains markdown into a list of <see cref="FTTokenType"/> tokens.</summary>
     public class FTTokenizer
     {
-        /// <summary>This character instructs the tokenizer to ignore the next <see cref="OpenTagChar"/> if <see cref="OpenTagChar"/> immediately follows.</summary>
+        /// <summary>If this character is immediately followed by <see cref="OpenTagChar"/>, then this character instructs the tokenizer to treat the following 
+        /// <see cref="OpenTagChar"/> literally instead of as the start of a markdown formatting code.</summary>
         public const char EscapeOpenTagChar = '¬';
         public const char OpenTagChar = '[';
         public const char CloseTagChar = ']';

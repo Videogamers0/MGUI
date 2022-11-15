@@ -5,7 +5,6 @@ using MGUI.Core.UI.Containers.Grids;
 using MGUI.Core.UI.Text;
 using MGUI.Core.UI.XAML;
 using MGUI.Shared.Helpers;
-using Microsoft.Win32;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -14,6 +13,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+#if WINDOWS
+using Microsoft.Win32;
+#endif
 
 namespace MGUI.Core.UI
 {
@@ -25,22 +27,27 @@ namespace MGUI.Core.UI
         public MGContentPresenter MarkupPresenter { get; }
         public MGTabControl TabControlComponent { get; }
 
+        /// <summary>True if the input xaml is being read from the file at <see cref="FromFilePath"/>.<br/>
+        /// False if it's being read from the <see cref="FromStringTextBoxComponent"/>'s Text.</summary>
+        public bool IsReadingInputFromFile => TabControlComponent.SelectedTabIndex == 0 && !string.IsNullOrEmpty(FromFilePath) && File.Exists(FromFilePath);
+
         public MGTextBox FromStringTextBoxComponent { get; }
         public MGTextBox FromFileTextBoxComponent { get; }
 
         public MGCheckBox FromFileAutoRefreshCheckBox { get; }
+        public bool IsAutoRefreshing => FromFileAutoRefreshCheckBox.IsChecked == true;
 
         public MGDesigner(MGWindow ParentWindow)
             : base(ParentWindow, MGElementType.Designer)
         {
             using (BeginInitializing())
             {
+                //  Detect when the selected file is saved, and auto-refresh the parsed content if necessary
                 this.FileWatcher = new();
                 FileWatcher.NotifyFilter = NotifyFilters.LastWrite;
                 FileWatcher.Changed += (sender, e) =>
                 {
-                    if (TabControlComponent.SelectedTabIndex == 0 && FromFileAutoRefreshCheckBox.IsChecked == true &&
-                        !string.IsNullOrEmpty(FromFilePath) && e.FullPath.Equals(FromFilePath, StringComparison.InvariantCultureIgnoreCase))
+                    if (IsAutoRefreshing && IsReadingInputFromFile && e.FullPath.Equals(FromFilePath, StringComparison.InvariantCultureIgnoreCase))
                     {
                         RefreshParsedContent();
                     }
@@ -70,7 +77,18 @@ namespace MGUI.Core.UI
                 //  Create the 'From File' browse button and textbox
                 MGButton FilePathBrowseButton = new(ParentWindow, btn =>
                 {
-                    string InitialDirectory = !string.IsNullOrEmpty(FromFilePath) ? Path.GetDirectoryName(FromFilePath) : Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    string InitialDirectory;
+                    if (!string.IsNullOrEmpty(FromFilePath))
+                        InitialDirectory = Path.GetDirectoryName(FromFilePath);
+                    else
+                    {
+                        string AssemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+#if DEBUG
+                        InitialDirectory = Path.GetFullPath(Path.Combine(AssemblyDirectory, "..", "..", ".."));
+#else
+                        InitialDirectory = AssemblyDirectory;
+#endif
+                    }
                     if (TryBrowseFilePath(InitialDirectory, out string SelectedFilePath))
                         FromFileTextBoxComponent.SetText(SelectedFilePath);
                 });
@@ -88,7 +106,7 @@ namespace MGUI.Core.UI
                 FromFileAutoRefreshCheckBox.SetContent("Auto-refresh parsed content");
                 MGToolTip AutoRefreshToolTip = new MGToolTip(ParentWindow, FromFileAutoRefreshCheckBox, 0, 0);
                 AutoRefreshToolTip.DefaultTextForeground.SetAll(Color.Black);
-                AutoRefreshToolTip.SetContent("[shadow=white 1 1]If checked, the parsed content will automatically refresh whenever the file is saved.");
+                AutoRefreshToolTip.SetContent("[shadow=white 1 1]If checked, the parsed content will automatically refresh whenever the selected file is saved.");
                 AutoRefreshToolTip.ApplySizeToContent(SizeToContent.WidthAndHeight, 50, 50, 350, null, false);
                 FromFileAutoRefreshCheckBox.ToolTip = AutoRefreshToolTip;
 
@@ -117,7 +135,7 @@ namespace MGUI.Core.UI
                 Tmp.CanChangeContent = false;
 
                 MGGrid MainGrid = new(ParentWindow);
-                MainGrid.AddRows(ConstrainedGridLength.ParseMultiple("*[150,],15,142[120,]"));
+                MainGrid.AddRows(ConstrainedGridLength.ParseMultiple("*[150,],15,142[140,]"));
                 MainGrid.AddColumn(GridLength.CreateWeightedLength(1.0));
                 MainGrid.TryAddChild(0, 0, MarkupPresenter);
                 MainGrid.TryAddChild(2, 0, Tmp);
@@ -168,6 +186,7 @@ namespace MGUI.Core.UI
 
         private bool TryBrowseFilePath(string InitialDirectory, out string FilePath)
         {
+#if WINDOWS
             OpenFileDialog FileBrowser = new();
             FileBrowser.Filter = "Xaml Files|*.xaml";
             if (!string.IsNullOrEmpty(InitialDirectory) && Directory.Exists(InitialDirectory))
@@ -183,6 +202,10 @@ namespace MGUI.Core.UI
                 FilePath = null;
                 return false;
             }
+#else
+            FilePath = null;
+            return false;
+#endif
         }
 
         private void RefreshParsedContent()
@@ -191,7 +214,7 @@ namespace MGUI.Core.UI
             try
             {
                 string Markup;
-                if (TabControlComponent.SelectedTabIndex == 0 && !string.IsNullOrEmpty(FromFilePath) && File.Exists(FromFilePath))
+                if (IsReadingInputFromFile)
                     Markup = File.ReadAllText(FromFilePath);
                 else
                     Markup = FromStringTextBoxComponent.Text;
