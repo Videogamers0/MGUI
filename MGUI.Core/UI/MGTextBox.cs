@@ -159,6 +159,42 @@ namespace MGUI.Core.UI
                 int ActualStartIndex = Math.Clamp(CurrentSelection.Value.StartIndex, 0, EscapedIndices.Count - 1);
                 int ActualEndIndex = Math.Clamp(CurrentSelection.Value.EndIndex, ActualStartIndex, EscapedIndices.Count - 1);
 
+                //  '\\' is an escape character for '[', so strings like @"Hello\[b]World" are rendered as: "Hello[b]World",
+                //  treating the formatting code that follows the escape character as a literal string value.
+                //  Since we are about to insert a '[' character, we must double-escape any escape characters that precede the inserted markdown.
+                //  EX: @"Hello\World" -> @"Hello\\[fg=white][bg=black]World[/bg][/fg]"
+                void DoubleEscapeAtIndex(int Index)
+                {
+                    int CurrentIndex = Index;
+                    int UnescapedCount = 0;
+                    while (CurrentIndex >= 0 && CurrentIndex < Text.Length && Text[CurrentIndex] == FTTokenizer.EscapeOpenTagChar)
+                    {
+                        UnescapedCount++;
+                        CurrentIndex--;
+                    }
+                    CurrentIndex++;
+
+                    if (UnescapedCount > 0)
+                    {
+                        string InsertionValue = string.Concat(Enumerable.Repeat(FTTokenizer.EscapeOpenTagChar, UnescapedCount));
+                        FormattedText = FormattedText.Insert(Index, InsertionValue);
+
+                        //TODO: There's still a bug with this logic. Set the textbox's text to: @"A\\B",
+                        //Then try selecting just the 2nd backslash, and there's some kind of off-by-one issue with the escaped indices.
+                        //Since it only happens when there's multiple consecutive backslashes, and only when selecting just the backslashes, I don't really care enough to fix it
+                        for (int i = CurrentIndex + 1; i < CurrentIndex + 1 + UnescapedCount; i++)
+                        {
+                            for (int j = i; j < EscapedIndices.Count; j++)
+                            {
+                                EscapedIndices[j]++;
+                            }
+                        }
+                    }
+                }
+
+                DoubleEscapeAtIndex(ActualStartIndex - 1);
+                DoubleEscapeAtIndex(ActualEndIndex - 1);
+
                 FormattedText = FormattedText.Insert(EscapedIndices[ActualStartIndex], SelectionStartMarkdown);
                 FormattedText = FormattedText.Insert(EscapedIndices[ActualEndIndex] + SelectionStartMarkdown.Length, SelectionEndMarkdown);
             }

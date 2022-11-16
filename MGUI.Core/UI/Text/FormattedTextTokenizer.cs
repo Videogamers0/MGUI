@@ -250,7 +250,7 @@ namespace MGUI.Core.UI.Text
                 AsEnumerable<FTTokenType?>(null, FTTokenType.CloseTag, FTTokenType.StringValue, FTTokenType.LineBreak))
             );
 
-#if DEBUG
+#if NEVER //DEBUG
             try
             {
                 string sample = $"H{EscapeOpenTagChar}{EscapeOpenTagChar}[b]e\nllo{EscapeOpenTagChar}[bold]W[bg=Red]orld[color=Green][shadow=Red 1 2]def[/color]Test";
@@ -298,7 +298,7 @@ namespace MGUI.Core.UI.Text
         private static readonly string EscapedOpenTagChar = Regex.Escape(OpenTagChar.ToString());
 
         private static readonly string SubPattern1 = $@"[^{EscapedEscapeOpenTagChar}{EscapedOpenTagChar}]";
-        private static readonly string SubPattern2 = $@"({EscapedEscapeOpenTagChar}(?!({EscapedEscapeOpenTagChar}|{EscapedOpenTagChar})))";
+        private static readonly string SubPattern2 = $@"({EscapedEscapeOpenTagChar}({EscapedEscapeOpenTagChar}*)(?!({EscapedEscapeOpenTagChar}|{EscapedOpenTagChar})))";
         private static readonly string SubPattern3 = $@"({EscapedEscapeOpenTagChar}{EscapedOpenTagChar})";
         private static readonly string Pattern = $"^({SubPattern1}|{SubPattern2}|{SubPattern3})*";
 
