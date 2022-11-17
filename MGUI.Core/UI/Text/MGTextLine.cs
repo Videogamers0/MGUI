@@ -73,7 +73,7 @@ namespace MGUI.Core.UI.Text
                     WrappableRun Current = WrappableRuns[i];
                     WrappableRun Next = i == WrappableRuns.Count - 1 ? null : WrappableRuns[i + 1];
 
-                    if (Next != null && !Current.IsLineBreak && !Next.IsLineBreak)
+                    if (Next != null && !Current.IsLineBreak && !Next.IsLineBreak && !Current.IsImage && !Next.IsImage)
                     {
                         WrappableRunWord LastWordOfCurrent = Current.OriginalWords[^1];
                         WrappableRunWord FirstWordOfNext = Next.OriginalWords[0];
@@ -106,6 +106,8 @@ namespace MGUI.Core.UI.Text
             public readonly bool IsLineBreak;
             /// <summary>The number of characters used to specify the line break. For example, on Windows this is usually 2 ("\r\n") but on Mac / Linux it's usually 1 ('\r' / '\n')</summary>
             public readonly int LineBreakCharacterCount;
+            public readonly bool IsImage;
+            public readonly MGTextRunImage ImageSettings;
 
             public readonly List<WrappableRunWord> OriginalWords;
             public readonly List<WrappableRunWord> RemainingWords;
@@ -116,6 +118,8 @@ namespace MGUI.Core.UI.Text
                 this.Settings = OriginalRun.Settings;
                 this.IsLineBreak = OriginalRun.IsLineBreak;
                 this.LineBreakCharacterCount = 0;
+                this.IsImage = OriginalRun.IsImage;
+                this.ImageSettings = OriginalRun.ImageSettings;
 
                 if (IsLineBreak)
                 {
@@ -135,7 +139,7 @@ namespace MGUI.Core.UI.Text
                 this.RemainingWords = new List<WrappableRunWord>(OriginalWords);
             }
 
-            public MGTextRun AsRun(string Text) => new(Text, IsLineBreak, Settings);
+            public MGTextRun AsRun(string Text) => new(Text, IsLineBreak, IsImage, ImageSettings, Settings);
             public string GetAllRemainingText() => string.Join("", RemainingWords.Select(x => x.Text));
 
             public WrappableRunWord GetNext(WrappableRunWord Current)
@@ -221,7 +225,11 @@ namespace MGUI.Core.UI.Text
                 for (int i = 0; i < CurrentLine.Count; i++)
                 {
                     MGTextRun Run = CurrentLine[i];
-                    Vector2 RunSize = Measurer.MeasureText(Run.Text, Run.Settings.IsBold, Run.Settings.IsItalic, i == 0);
+                    Vector2 RunSize;
+                    if (Run.IsImage)
+                        RunSize = new(Run.ImageSettings.TargetWidth, Run.ImageSettings.TargetHeight);
+                    else
+                        RunSize = Measurer.MeasureText(Run.Text, Run.Settings.IsBold, Run.Settings.IsItalic, i == 0);
                     RunSizes.Add(RunSize);
                 }
                 Size2 LineSize = new(Math.Max(CurrentX, RunSizes.Sum(x => x.X)), Math.Max(MinLineHeight, RunSizes.DefaultIfEmpty(Vector2.Zero).Max(x => x.Y)));
@@ -243,15 +251,31 @@ namespace MGUI.Core.UI.Text
                 if (Run.IsLineBreak)
                 {
                     if (!CurrentLine.Any())
-                        CurrentLine.Add(new("", false, Run.Settings));
+                        CurrentLine.Add(new("", false, false, MGTextRunImage.Empty, Run.Settings));
                     yield return FlushLine(true, Run.LineBreakCharacterCount);
+                }
+                else if (Run.IsImage)
+                {
+                    if (!WrapText || MaxLineWidth == double.MaxValue || MaxLineWidth >= 100000)
+                    {
+                        CurrentLine.Add(new("", false, true, Run.ImageSettings, Run.Settings));
+                    }
+                    else
+                    {
+                        int ImgWidth = Run.ImageSettings.TargetWidth;
+                        if (CurrentLine.Any() && CurrentX + ImgWidth > MaxLineWidth)
+                            yield return FlushLine(false);
+
+                        CurrentLine.Add(new("", false, true, Run.ImageSettings, Run.Settings));
+                        CurrentX += ImgWidth;
+                    }
                 }
                 else
                 {
                     if (!WrapText || MaxLineWidth == double.MaxValue || MaxLineWidth >= 100000)
                     {
                         string Text = Run.GetAllRemainingText();
-                        CurrentLine.Add(new(Text, false, Run.Settings));
+                        CurrentLine.Add(new(Text, false, false, MGTextRunImage.Empty, Run.Settings));
                         foreach (char c in Text)
                         {
                             CurrentIndicesMap.Add(CurrentIndexInOriginalText);
@@ -291,7 +315,7 @@ namespace MGUI.Core.UI.Text
                             {
                                 if (UnwrappedText.ToString().Length > 0)
                                 {
-                                    MGTextRun NewRun = new(UnwrappedText.ToString(), false, Run.Settings);
+                                    MGTextRun NewRun = new(UnwrappedText.ToString(), false, false, MGTextRunImage.Empty, Run.Settings);
                                     CurrentLine.Add(NewRun);
                                 }
 
@@ -398,12 +422,8 @@ namespace MGUI.Core.UI.Text
                 }
             }
 
-            //  Form a line from any leftover runs that didn't span an entire line
-            //if (CurrentLine.Any())
-            //    yield return FlushLine(false);
-
             if (!CurrentLine.Any())
-                CurrentLine.Add(new("", false, Runs.Last().Settings));
+                CurrentLine.Add(new("", false, false, MGTextRunImage.Empty, Runs.Last().Settings));
             yield return FlushLine(false);
         }
     }

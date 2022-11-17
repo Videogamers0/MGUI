@@ -15,6 +15,7 @@ using MGUI.Shared.Rendering;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
+using System.IO;
 
 namespace MGUI.Core.UI
 {
@@ -293,6 +294,8 @@ namespace MGUI.Core.UI
         /// See also:<br/><see cref="AddNamedTexture(string, Texture2D)"/><br/><see cref="RemoveNamedTexture(string)"/><br/><see cref="NamedRegions"/></summary>
         public IReadOnlyDictionary<string, Texture2D> NamedTextures => _NamedTextures;
 
+        /// <param name="Name">Recommended to avoid names containing spaces, <see cref="Text.FTTokenizer.OpenTagChar"/>, or <see cref="Text.FTTokenizer.CloseTagChar"/>,<br/>
+        /// since the parsing logic in <see cref="Text.FTTokenizer.Tokenize(string, bool)"/> isn't robust enough to handle such cases unambiguously.</param>
         public void AddNamedTexture(string Name, Texture2D Texture) => _NamedTextures.Add(Name, Texture);
         public void RemoveNamedTexture(string Name)
         {
@@ -308,13 +311,30 @@ namespace MGUI.Core.UI
         /// See also:<br/><see cref="AddNamedRegion(NamedTextureRegion)"/><br/><see cref="RemoveNamedRegion(string)"/><br/><see cref="NamedTextures"/></summary>
         public IReadOnlyDictionary<string, NamedTextureRegion> NamedRegions => _NamedRegions;
 
+        /// <param name="Region">Recommended to avoid <see cref="NamedTextureRegion.RegionName"/>s containing spaces, <see cref="Text.FTTokenizer.OpenTagChar"/>, or <see cref="Text.FTTokenizer.CloseTagChar"/>,<br/>
+        /// since the parsing logic in <see cref="Text.FTTokenizer.Tokenize(string, bool)"/> isn't robust enough to handle such cases unambiguously.</param>
         public void AddNamedRegion(NamedTextureRegion Region)
         {
-            if (!_NamedRegions.ContainsKey(Region.TextureName))
+            if (!_NamedTextures.ContainsKey(Region.TextureName))
                 throw new InvalidOperationException($"{nameof(MGDesktop)}.{nameof(NamedTextures)} does not contain an entry for {nameof(NamedTextureRegion.TextureName)}={Region.TextureName}");
             _NamedRegions.Add(Region.RegionName, Region);
         }
         public void RemoveNamedRegion(string RegionName) => _NamedRegions.Remove(RegionName);
+
+        public void DrawNamedRegion(DrawTransaction DT, string RegionName, Point Position, int? Width, int? Height)
+        {
+            if (_NamedRegions.ContainsKey(RegionName))
+            {
+                NamedTextureRegion Region = _NamedRegions[RegionName];
+                Texture2D Texture = _NamedTextures[Region.TextureName];
+
+                int ActualWidth = Width ?? Texture.Width;
+                int ActualHeight = Height ?? Texture.Height;
+                Rectangle Destination = new(Position.X, Position.Y, ActualWidth, ActualHeight);
+
+                DT.DrawTextureTo(Texture, Region.SourceRect, Destination, Region.Color ?? Color.White);
+            }
+        }
 
         public MGDesktop(MainRenderer Renderer)
         {
@@ -324,6 +344,27 @@ namespace MGUI.Core.UI
 
             this._NamedTextures = new();
             this._NamedRegions = new();
+
+            #region Sample Icons
+            Texture2D AngryMeteor_MilitaryIconsSet = Renderer.Content.Load<Texture2D>(Path.Combine("Icons", "AngryMeteor_MilitaryIconsSet"));
+            _NamedTextures.Add("AngryMeteor", AngryMeteor_MilitaryIconsSet);
+
+            int TextureTopMargin = 6;
+            int TextureSpacing = 1;
+            int TextureIconSize = 16;
+            List<(string Name, int Row, int Column)> Icons = new()
+            {
+                ("ArrowRightGreen", 0, 0),
+                ("ArrowDownGreen", 0, 1),
+                ("ArrowLeftGreen", 1, 0),
+                ("ArrowUpGreen", 1, 1)
+            };
+            foreach (var (Name, Row, Column) in Icons)
+            {
+                Rectangle SourceRect = new(Column * (TextureIconSize + TextureSpacing), TextureTopMargin + Row * (TextureIconSize + TextureSpacing), TextureIconSize, TextureIconSize);
+                AddNamedRegion(new("AngryMeteor", $"{Name}_16x16", SourceRect, null));
+            }
+            #endregion Sample Icons
 
             this.ToolTipShowDelay = DefaultToolTipShowDelay;
 

@@ -198,10 +198,13 @@ namespace MGUI.Core.UI.XAML
                     XAMLFillBrush FillBrush = (XAMLFillBrush)FillBrushStringConverter.ConvertFrom(context, culture, fillBrushStrings[0]);
                     return new XAMLUniformBorderBrush(FillBrush);
                 }
-                else if (fillBrushStrings.Length == 4)
+                else if (fillBrushStrings.Length is 2 or 4)
                 {
                     XAMLFillBrush[] FillBrushes = fillBrushStrings.Select(x => (XAMLFillBrush)FillBrushStringConverter.ConvertFrom(context, culture, x)).ToArray();
-                    return new XAMLDockedBorderBrush(FillBrushes[0], FillBrushes[1], FillBrushes[2], FillBrushes[3]);
+                    if (FillBrushes.Length == 2)
+                        return new XAMLDockedBorderBrush(FillBrushes[0], FillBrushes[1], FillBrushes[1], FillBrushes[0]);
+                    else
+                        return new XAMLDockedBorderBrush(FillBrushes[0], FillBrushes[1], FillBrushes[2 % FillBrushes.Length], FillBrushes[3 % FillBrushes.Length]);
                 }
             }
 

@@ -33,6 +33,8 @@ namespace MGUI.Core.UI.Text
         SetShadowing,
         RevertShadowing,
 
+        Image,
+
         StringLiteral,
 
         LineBreak
@@ -132,6 +134,10 @@ namespace MGUI.Core.UI.Text
                 FTTokenType.OpenTag, FTTokenType.ShadowOpenTagType, FTTokenType.ShadowValue, FTTokenType.CloseTag));
             Definitions.Add(new(FTActionType.RevertShadowing, FTTokenType.ShadowCloseTagType,
                 FTTokenType.OpenTag, FTTokenType.ShadowCloseTagType, FTTokenType.CloseTag));
+
+            //  Image
+            Definitions.Add(new(FTActionType.Image, FTTokenType.ImageValue,
+                FTTokenType.OpenTag, FTTokenType.ImageOpenTagType, FTTokenType.ImageValue, FTTokenType.CloseTag));
 
             //  String value
             Definitions.Add(new(FTActionType.StringLiteral, FTTokenType.StringValue,

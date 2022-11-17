@@ -417,6 +417,7 @@ namespace MGUI.Core.UI
 
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
         {
+            MGDesktop Desktop = GetDesktop();
             DrawTransaction DT = DA.DT;
             float Opacity = DA.Opacity;
             Color DefaultForeground = this.ActualForeground;
@@ -432,37 +433,48 @@ namespace MGUI.Core.UI
 
                 foreach (MGTextRun Run in Line.Runs)
                 {
-                    bool IsBold = Run.Settings.IsBold;
-                    bool IsItalic = Run.Settings.IsItalic;
-                    SpriteFont SF = GetFont(IsBold, IsItalic, out _);
-
-                    float ActualOpacity = Opacity * Run.Settings.Opacity;
-                    Color Foreground = (Run.Settings.Foreground ?? DefaultForeground) * ActualOpacity;
-
-                    Vector2 TextSize = MeasureText(Run.Text, IsBold, IsItalic, IsStartOfLine);
-                    Run.Settings.Background?.Draw(DA.SetOpacity(ActualOpacity), this, new((int)CurrentX, (int)CurrentY, (int)TextSize.X, (int)Line.LineSize.Height));
-
-                    if (Run.Settings.IsUnderlined)
+                    if (Run.IsImage)
                     {
-                        DT.FillRectangle(DA.Offset.ToVector2(), new(CurrentX, CurrentY + Line.LineSize.Height - 2, TextSize.X, 1), Foreground);
-                    }
-
-                    Vector2 Position = new Vector2(CurrentX, CurrentY) + DA.Offset.ToVector2();
-                    if (Run.Settings.IsShadowed)
-                    {
-                        Color ShadowColor = (Run.Settings.ShadowColor ?? DefaultForeground) * ActualOpacity;
-                        Vector2 ShadowOffset = Run.Settings.ShadowOffset ?? new(1, 1);
-
-                        DT.DrawSpriteFontText(SF, Run.Text, Position + ShadowOffset, ShadowColor, FontOrigin, FontScale, FontScale);
-                        DT.DrawSpriteFontText(SF, Run.Text, Position, Foreground, FontOrigin, FontScale, FontScale);
+                        int ImgWidth = Run.ImageSettings.TargetWidth;
+                        int ImgHeight = Run.ImageSettings.TargetHeight;
+                        int YPosition = ApplyAlignment(LineBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new Size(ImgWidth, ImgHeight)).Top;
+                        Desktop.DrawNamedRegion(DT, Run.ImageSettings.RegionName, new Point((int)CurrentX, YPosition), ImgWidth, ImgHeight);
+                        CurrentX += ImgWidth;
                     }
                     else
                     {
-                        DT.DrawSpriteFontText(SF, Run.Text, Position, Foreground, FontOrigin, FontScale, FontScale);
-                    }
+                        bool IsBold = Run.Settings.IsBold;
+                        bool IsItalic = Run.Settings.IsItalic;
+                        SpriteFont SF = GetFont(IsBold, IsItalic, out _);
 
-                    CurrentX += TextSize.X;
-                    IsStartOfLine = false;
+                        float ActualOpacity = Opacity * Run.Settings.Opacity;
+                        Color Foreground = (Run.Settings.Foreground ?? DefaultForeground) * ActualOpacity;
+
+                        Vector2 TextSize = MeasureText(Run.Text, IsBold, IsItalic, IsStartOfLine);
+                        Run.Settings.Background?.Draw(DA.SetOpacity(ActualOpacity), this, new((int)CurrentX, (int)CurrentY, (int)TextSize.X, (int)Line.LineSize.Height));
+
+                        if (Run.Settings.IsUnderlined)
+                        {
+                            DT.FillRectangle(DA.Offset.ToVector2(), new(CurrentX, CurrentY + Line.LineSize.Height - 2, TextSize.X, 1), Foreground);
+                        }
+
+                        Vector2 Position = new Vector2(CurrentX, CurrentY) + DA.Offset.ToVector2();
+                        if (Run.Settings.IsShadowed)
+                        {
+                            Color ShadowColor = (Run.Settings.ShadowColor ?? DefaultForeground) * ActualOpacity;
+                            Vector2 ShadowOffset = Run.Settings.ShadowOffset ?? new(1, 1);
+
+                            DT.DrawSpriteFontText(SF, Run.Text, Position + ShadowOffset, ShadowColor, FontOrigin, FontScale, FontScale);
+                            DT.DrawSpriteFontText(SF, Run.Text, Position, Foreground, FontOrigin, FontScale, FontScale);
+                        }
+                        else
+                        {
+                            DT.DrawSpriteFontText(SF, Run.Text, Position, Foreground, FontOrigin, FontScale, FontScale);
+                        }
+
+                        CurrentX += TextSize.X;
+                        IsStartOfLine = false;
+                    }
                 }
 
                 CurrentY += Line.LineSize.Height + LinePadding;

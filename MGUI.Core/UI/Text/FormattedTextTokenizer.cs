@@ -39,6 +39,9 @@ namespace MGUI.Core.UI.Text
         ShadowCloseTagType,
         ShadowValue,
 
+        ImageOpenTagType,
+        ImageValue,
+
         InvalidToken,
 
         StringValue,
@@ -113,7 +116,8 @@ namespace MGUI.Core.UI.Text
                 FTTokenType.OpacityOpenTagType,
                 FTTokenType.ForegroundOpenTagType,
                 FTTokenType.BackgroundOpenTagType,
-                FTTokenType.ShadowOpenTagType
+                FTTokenType.ShadowOpenTagType,
+                FTTokenType.ImageOpenTagType
             };
 
             List<FTTokenType> CloseTagTypes = new() {
@@ -130,7 +134,8 @@ namespace MGUI.Core.UI.Text
                 FTTokenType.OpacityValue,
                 FTTokenType.ForegroundValue,
                 FTTokenType.BackgroundValue,
-                FTTokenType.ShadowValue
+                FTTokenType.ShadowValue,
+                FTTokenType.ImageValue
             };
 
             string EscapedOpenTag = Regex.Escape(OpenTagChar.ToString());
@@ -219,6 +224,12 @@ namespace MGUI.Core.UI.Text
                 Enumerable.Empty<FTTokenType?>())
             );
 
+            string ImageTypePattern = $@"(?i)(image|img)(?=\=)(?-i)";
+            Definitions.Add(new(FTTokenType.ImageOpenTagType, $@"^{ImageTypePattern}",
+                AsEnumerable<FTTokenType?>(FTTokenType.OpenTag),
+                Enumerable.Empty<FTTokenType?>())
+            );
+
             //  Tag Values
             string OpacityPattern = $@"0?\.\d\d?";
             Definitions.Add(new(FTTokenType.OpacityValue, $@"^={OpacityPattern}",
@@ -238,9 +249,14 @@ namespace MGUI.Core.UI.Text
                 Enumerable.Empty<FTTokenType?>())
             );
 
-            string ShadowValuePattern = $@"{ColorPattern}( -?\d{{1,2}} -?\d{{1,2}})?";
+            string ShadowValuePattern = $@"{ColorPattern}( -?\d{{1,2}}( |,)-?\d{{1,2}})?";
             Definitions.Add(new(FTTokenType.ShadowValue, $@"^={ShadowValuePattern}",
                 AsEnumerable<FTTokenType?>(FTTokenType.ShadowOpenTagType),
+                Enumerable.Empty<FTTokenType?>())
+            );
+
+            Definitions.Add(new(FTTokenType.ImageValue, $@"^={ImageValuePattern}",
+                AsEnumerable<FTTokenType?>(FTTokenType.ImageOpenTagType),
                 Enumerable.Empty<FTTokenType?>())
             );
 
@@ -253,11 +269,27 @@ namespace MGUI.Core.UI.Text
 #if NEVER //DEBUG
             try
             {
-                string sample = $"H{EscapeOpenTagChar}{EscapeOpenTagChar}[b]e\nllo{EscapeOpenTagChar}[bold]W[bg=Red]orld[color=Green][shadow=Red 1 2]def[/color]Test";
+                string sample = $"H{EscapeOpenTagChar}{EscapeOpenTagChar}[b]e\nllo[img=Test 32x64][bold]W[bg=Red]orld[color=Green][shadow=Red 1 2]def[/color]Test";
                 var result = Tokenize(sample, true).ToList();
             }
             catch (Exception) { }
 #endif
+        }
+
+        //  The name to reference the texture by, followed by an optional target size X Y
+        //  EX: "[img=Gold.png 32x16]" would reference a texture by name="Gold.png", and draw it with Width=32, Height=16
+        private static readonly string ImageValuePattern = $@"(?<RegionName>.+?) (?<Width>\d{{1,4}})( |,|x|X)(?<Height>\d{{1,4}})(?=({Regex.Escape(CloseTagChar.ToString())}|$))";
+        private static readonly Regex ImageValueParser = new(ImageValuePattern);
+
+        internal static (string RegionName, int TargetWidth, int TargetHeight) ParseImageValue(string Value)
+        {
+            Match Match = ImageValueParser.Match(Value);
+
+            string RegionName = Match.Groups["RegionName"].Value;
+            int Width = int.Parse(Match.Groups["Width"].Value);
+            int Height = int.Parse(Match.Groups["Height"].Value);
+
+            return (RegionName, Width, Height);
         }
 
         /// <summary>Removes all formatted text markdown from the given <paramref name="Text"/> by prefixing all instances of <see cref="OpenTagChar"/> with <see cref="EscapeOpenTagChar"/>.<para/>

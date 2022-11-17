@@ -100,6 +100,10 @@ namespace MGUI.Core.UI.Text
                         ShadowOffset = RemoveLast(PreviousShadowOffsets, null)
                     };
 
+                //  Image
+                case FTActionType.Image:
+                    return this;
+
                 //  String value
                 case FTActionType.StringLiteral:
                     return this;
@@ -112,7 +116,12 @@ namespace MGUI.Core.UI.Text
         }
     }
 
-    public record struct MGTextRun(string Text, bool IsLineBreak, MGTextRunConfig Settings)
+    public readonly record struct MGTextRunImage(string RegionName, int TargetWidth, int TargetHeight)
+    {
+        public static readonly MGTextRunImage Empty = new(null, 0, 0);
+    }
+
+    public readonly record struct MGTextRun(string Text, bool IsLineBreak, bool IsImage, MGTextRunImage ImageSettings, MGTextRunConfig Settings)
     {
         public static readonly FTParser Parser = new();
         public static readonly FTTokenizer Tokenizer = new();
@@ -196,10 +205,15 @@ namespace MGUI.Core.UI.Text
                     }
                     i--;
 
-                    yield return new(LiteralValue.ToString(), false, CurrentState);
+                    yield return new(LiteralValue.ToString(), false, false, MGTextRunImage.Empty, CurrentState);
                 }
                 else if (CurrentAction.ActionType == FTActionType.LineBreak)
-                    yield return new(CurrentAction.Parameter, true, CurrentState);
+                    yield return new(CurrentAction.Parameter, true, false, MGTextRunImage.Empty, CurrentState);
+                else if (CurrentAction.ActionType == FTActionType.Image)
+                {
+                    var (RegionName, TargetWidth, TargetHeight) = FTTokenizer.ParseImageValue(CurrentAction.Parameter.Substring(1));
+                    yield return new(CurrentAction.Parameter, false, true, new MGTextRunImage(RegionName, TargetWidth, TargetHeight), CurrentState);
+                }
             }
         }
     }

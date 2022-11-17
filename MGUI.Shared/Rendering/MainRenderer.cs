@@ -78,7 +78,7 @@ namespace MGUI.Shared.Rendering
         public PrimitiveBatch PrimitiveBatch { get; }
         public PrimitiveBatch PB => PrimitiveBatch;
 
-        private ContentManager Content { get; }
+        public ContentManager Content { get; }
 
         public FontManager FontManager { get; }
 
