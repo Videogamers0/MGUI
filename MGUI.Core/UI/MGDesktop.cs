@@ -288,14 +288,13 @@ namespace MGUI.Core.UI
 
         public MGTheme Theme { get; }
 
+        #region Named Textures / Regions
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Dictionary<string, Texture2D> _NamedTextures { get; }
         /// <summary>This dictionary is commonly used by <see cref="MGImage"/> to reference textures by a string key value.<para/>
         /// See also:<br/><see cref="AddNamedTexture(string, Texture2D)"/><br/><see cref="RemoveNamedTexture(string)"/><br/><see cref="NamedRegions"/></summary>
         public IReadOnlyDictionary<string, Texture2D> NamedTextures => _NamedTextures;
 
-        /// <param name="Name">Recommended to avoid names containing spaces, <see cref="Text.FTTokenizer.OpenTagChar"/>, or <see cref="Text.FTTokenizer.CloseTagChar"/>,<br/>
-        /// since the parsing logic in <see cref="Text.FTTokenizer.Tokenize(string, bool)"/> isn't robust enough to handle such cases unambiguously.</param>
         public void AddNamedTexture(string Name, Texture2D Texture) => _NamedTextures.Add(Name, Texture);
         public void RemoveNamedTexture(string Name)
         {
@@ -311,7 +310,7 @@ namespace MGUI.Core.UI
         /// See also:<br/><see cref="AddNamedRegion(NamedTextureRegion)"/><br/><see cref="RemoveNamedRegion(string)"/><br/><see cref="NamedTextures"/></summary>
         public IReadOnlyDictionary<string, NamedTextureRegion> NamedRegions => _NamedRegions;
 
-        /// <param name="Region">Recommended to avoid <see cref="NamedTextureRegion.RegionName"/>s containing spaces, <see cref="Text.FTTokenizer.OpenTagChar"/>, or <see cref="Text.FTTokenizer.CloseTagChar"/>,<br/>
+        /// <param name="Region">Recommended to avoid <see cref="NamedTextureRegion.RegionName"/>s containing <see cref="Text.FTTokenizer.CloseTagChar"/>,<br/>
         /// since the parsing logic in <see cref="Text.FTTokenizer.Tokenize(string, bool)"/> isn't robust enough to handle such cases unambiguously.</param>
         public void AddNamedRegion(NamedTextureRegion Region)
         {
@@ -321,20 +320,22 @@ namespace MGUI.Core.UI
         }
         public void RemoveNamedRegion(string RegionName) => _NamedRegions.Remove(RegionName);
 
-        public void DrawNamedRegion(DrawTransaction DT, string RegionName, Point Position, int? Width, int? Height)
+        public bool TryDrawNamedRegion(DrawTransaction DT, string RegionName, Point Position, int? Width, int? Height)
         {
-            if (_NamedRegions.ContainsKey(RegionName))
+            if (_NamedRegions.TryGetValue(RegionName, out NamedTextureRegion Region) && _NamedTextures.TryGetValue(Region.TextureName, out Texture2D Texture))
             {
-                NamedTextureRegion Region = _NamedRegions[RegionName];
-                Texture2D Texture = _NamedTextures[Region.TextureName];
-
                 int ActualWidth = Width ?? Texture.Width;
                 int ActualHeight = Height ?? Texture.Height;
                 Rectangle Destination = new(Position.X, Position.Y, ActualWidth, ActualHeight);
 
                 DT.DrawTextureTo(Texture, Region.SourceRect, Destination, Region.Color ?? Color.White);
+
+                return true;
             }
+            else
+                return false;
         }
+        #endregion Named Textures / Regions
 
         public MGDesktop(MainRenderer Renderer)
         {
@@ -357,12 +358,39 @@ namespace MGUI.Core.UI
                 ("ArrowRightGreen", 0, 0),
                 ("ArrowDownGreen", 0, 1),
                 ("ArrowLeftGreen", 1, 0),
-                ("ArrowUpGreen", 1, 1)
+                ("ArrowUpGreen", 1, 1),
+
+                ("GoldBullion", 1, 4),
+                ("SilverBullion", 1, 5),
+                ("BronzeBullion", 1, 6),
+
+                ("SkullOpen", 1, 7),
+                ("SkullClosed", 1, 8),
+                ("SkullAndCrossbones", 4, 3),
+
+                ("Wrench", 1, 10),
+                ("Gear", 8, 3),
+
+                ("Backpack", 1, 11),
+
+                ("Diamond", 2, 9),
+                ("Emerald", 2, 10),
+                ("Ruby", 2, 11),
+
+                ("GoldMedal", 2, 4),
+                ("SilverMedal", 2, 5),
+                ("BronzeMedal", 2, 6),
+
+                ("Delete", 5, 3),
+                ("CheckMarkGreen", 5, 4),
+
+                ("Computer", 4, 10),
+                ("Save", 4, 11)
             };
             foreach (var (Name, Row, Column) in Icons)
             {
                 Rectangle SourceRect = new(Column * (TextureIconSize + TextureSpacing), TextureTopMargin + Row * (TextureIconSize + TextureSpacing), TextureIconSize, TextureIconSize);
-                AddNamedRegion(new("AngryMeteor", $"{Name}_16x16", SourceRect, null));
+                AddNamedRegion(new("AngryMeteor", Name, SourceRect, null));
             }
             #endregion Sample Icons
 

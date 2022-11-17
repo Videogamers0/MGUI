@@ -186,7 +186,7 @@ namespace MGUI.Core.UI.Text
             {
                 bool IsLeftEdge = ScreenPosition.X <= CharInfo.CenterX || !CharInfo.Line.HasCharacters || CharInfo.Line.Source == null;
                 if (!IsLeftEdge)
-                    IsLeftEdge = CharInfo.Line.Source?.Runs.All(x => string.IsNullOrEmpty(x.Text)) != false;
+                    IsLeftEdge = CharInfo.Line.Source?.Runs.All(x => x is MGTextRunText r && string.IsNullOrEmpty(r.Text)) != false;
                 return MoveToCharacter(CharInfo, IsLeftEdge);
             }
             else

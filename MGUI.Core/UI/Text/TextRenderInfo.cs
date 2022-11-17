@@ -63,7 +63,7 @@ namespace MGUI.Core.UI.Text
             float CurrentY = LayoutBounds.Top + Padding.Top;
             if (!TextBlockElement.Lines.Any())
             {
-                LineRenderInfo LineInfo = new(this, null, LineIndex, CurrentY, TextBlockElement.MeasureText("|", false, false, false).Y); //LayoutBounds.Height - Padding.Height);
+                LineRenderInfo LineInfo = new(this, null, LineIndex, CurrentY, TextBlockElement.MeasureText("|", false, false, false).Y);
                 _Lines.Add(LineInfo);
 
                 float X = LayoutBounds.Left + Padding.Left;
@@ -74,21 +74,25 @@ namespace MGUI.Core.UI.Text
                 foreach (MGTextLine Line in TextBlockElement.Lines)
                 {
                     int CharacterIndexInWrappedLines = 0;
-                    Rectangle LineBounds = new(LayoutBounds.Left + Padding.Left, (int)CurrentY, LayoutBounds.Width - TextBox.PaddingSize.Width, (int)Line.LineSize.Height);
-                    float CurrentX = MGElement.ApplyAlignment(LineBounds, TextBlockElement.TextAlignment, VerticalAlignment.Center, new Size((int)Line.LineSize.Width, (int)Line.LineSize.Height)).Left;
+                    Rectangle LineBounds = new(LayoutBounds.Left + Padding.Left, (int)CurrentY, LayoutBounds.Width - TextBox.PaddingSize.Width, (int)Line.LineTotalHeight);
+                    float CurrentX = MGElement.ApplyAlignment(LineBounds, TextBlockElement.TextAlignment, VerticalAlignment.Center, new Size((int)Line.LineWidth, (int)Line.LineTotalHeight)).Left;
 
-                    LineRenderInfo LineInfo = new(this, Line, LineIndex, LineBounds.Top, Line.LineSize.Height);
+                    LineRenderInfo LineInfo = new(this, Line, LineIndex, LineBounds.Top, Line.LineTotalHeight);
                     _Lines.Add(LineInfo);
                     LineIndex++;
 
-                    if (!Line.Runs.Any(x => !string.IsNullOrEmpty(x.Text)))
+                    if (!Line.Runs.All(x => x.RunType == TextRunType.Text))
+                        throw new NotImplementedException($"{nameof(TextRenderInfo)}.{nameof(UpdateLines)} can only handle {nameof(MGTextLine)}s which consist only of {nameof(MGTextRun)}s of type={nameof(TextRunType)}.{nameof(TextRunType.Text)}");
+
+                    List<MGTextRunText> Runs = Line.Runs.Cast<MGTextRunText>().ToList();
+                    if (!Runs.Any(x => !string.IsNullOrEmpty(x.Text)))
                     {
                         LineInfo.AddCharacter(Line.OriginalCharacterIndices[CharacterIndexInWrappedLines], CharCounter, CurrentX, DefaultCharacterWidth);
                         //CharacterIndexInWrappedLines++;
                     }
                     else
                     {
-                        foreach (MGTextRun Run in Line.Runs)
+                        foreach (MGTextRunText Run in Runs)
                         {
                             bool IsStartOfLine = true;
 
@@ -117,7 +121,7 @@ namespace MGUI.Core.UI.Text
                         }
                     }
 
-                    CurrentY += Line.LineSize.Height + LinePadding;
+                    CurrentY += Line.LineTotalHeight + LinePadding;
                 }
             }
         }

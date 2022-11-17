@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
+using Microsoft.Xna.Framework.Graphics;
+using MGUI.Shared.Rendering;
 
 namespace MGUI.Core.UI.Text
 {
@@ -116,42 +118,25 @@ namespace MGUI.Core.UI.Text
         }
     }
 
-    public readonly record struct MGTextRunImage(string RegionName, int TargetWidth, int TargetHeight)
+    public enum TextRunType
     {
-        public static readonly MGTextRunImage Empty = new(null, 0, 0);
+        Text,
+        LineBreak,
+        Image
     }
 
-    public readonly record struct MGTextRun(string Text, bool IsLineBreak, bool IsImage, MGTextRunImage ImageSettings, MGTextRunConfig Settings)
+    /// <summary>Represents data that can be rendered in-line with other <see cref="MGTextRun"/>s.<para/>
+    /// See also:<br/><see cref="MGTextRunText"/><br/><see cref="MGTextRunLineBreak"/><br/><see cref="MGTextRunImage"/></summary>
+    public abstract class MGTextRun
     {
         public static readonly FTParser Parser = new();
         public static readonly FTTokenizer Tokenizer = new();
 
-        public string FirstWord(params char[] WordDelimiters)
-            => new string(Text.TakeWhile(x => !WordDelimiters.Contains(x)).ToArray());
+        public readonly TextRunType RunType;
 
-        public bool HasAny(params char[] characters)
+        protected MGTextRun(TextRunType RunType)
         {
-            foreach (char c in characters)
-            {
-                if (Text.Contains(c))
-                    return true;
-            }
-
-            return false;
-        }
-
-        public bool StartsWithAny(params char[] characters)
-        {
-            if (string.IsNullOrEmpty(Text))
-                return false;
-
-            foreach (char c in characters)
-            {
-                if (Text.StartsWith(c))
-                    return true;
-            }
-
-            return false;
+            this.RunType = RunType;
         }
 
         public static IEnumerable<MGTextRun> ParseRuns(string FormattedText, MGTextRunConfig DefaultSettings)
@@ -205,16 +190,97 @@ namespace MGUI.Core.UI.Text
                     }
                     i--;
 
-                    yield return new(LiteralValue.ToString(), false, false, MGTextRunImage.Empty, CurrentState);
+                    yield return new MGTextRunText(LiteralValue.ToString(), CurrentState);
                 }
                 else if (CurrentAction.ActionType == FTActionType.LineBreak)
-                    yield return new(CurrentAction.Parameter, true, false, MGTextRunImage.Empty, CurrentState);
+                    yield return new MGTextRunLineBreak(CurrentAction.Parameter?.Length ?? 1);
                 else if (CurrentAction.ActionType == FTActionType.Image)
                 {
                     var (RegionName, TargetWidth, TargetHeight) = FTTokenizer.ParseImageValue(CurrentAction.Parameter.Substring(1));
-                    yield return new(CurrentAction.Parameter, false, true, new MGTextRunImage(RegionName, TargetWidth, TargetHeight), CurrentState);
+                    yield return new MGTextRunImage(RegionName, TargetWidth, TargetHeight);
                 }
             }
         }
+    }
+
+    /// <summary>An <see cref="MGTextRun"/> that renders a piece of text with the given <see cref="MGTextRunConfig"/> settings.</summary>
+    public class MGTextRunText : MGTextRun
+    {
+        public readonly string Text;
+        public readonly MGTextRunConfig Settings;
+
+        public MGTextRunText(string Text, MGTextRunConfig Settings)
+            : base(TextRunType.Text)
+        {
+            this.Text = Text;
+            this.Settings = Settings;
+        }
+
+        public string FirstWord(params char[] WordDelimiters) => new string(Text.TakeWhile(x => !WordDelimiters.Contains(x)).ToArray());
+
+        public bool HasAny(params char[] characters)
+        {
+            foreach (char c in characters)
+            {
+                if (Text.Contains(c))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool StartsWithAny(params char[] characters)
+        {
+            if (string.IsNullOrEmpty(Text))
+                return false;
+
+            foreach (char c in characters)
+            {
+                if (Text.StartsWith(c))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public override string ToString() => $"{nameof(MGTextRunLineBreak)}: {(((Text?.Length ?? 0) > 50) ? Text.Substring(0, 50) : Text)} ({Settings})";
+    }
+
+    /// <summary>An <see cref="MGTextRun"/> that instructs the renderer to move to the start of a new line.</summary>
+    public class MGTextRunLineBreak : MGTextRun
+    {
+        /// <summary>The number of characters used to specify the linebreak.<para/>
+        /// Windows typically uses "\r\n" (2 characters) while Mac and Linux typically uses '\r' and '\n' (1 character)</summary>
+        public readonly int LineBreakCharacterCount;
+
+        /// <param name="LineBreakCharactersCount">The number of characters used to specify the linebreak.<para/>
+        /// Windows typically uses "\r\n" (2 characters) while Mac and Linux typically uses '\r' and '\n' (1 character)</param>
+        public MGTextRunLineBreak(int LineBreakCharactersCount)
+            : base(TextRunType.LineBreak)
+        {
+            this.LineBreakCharacterCount = LineBreakCharactersCount;
+        }
+
+        public override string ToString() => $"{nameof(MGTextRunLineBreak)}: {LineBreakCharacterCount} characters";
+    }
+
+    /// <summary>An <see cref="MGTextRun"/> that renders a specific portion of a <see cref="Texture2D"/> with a given size.</summary>
+    public class MGTextRunImage : MGTextRun
+    {
+        /// <summary>The name of the <see cref="NamedTextureRegion"/> to render.<para/>
+        /// See also:<br/><see cref="MGDesktop.NamedRegions"/><br/><see cref="MGDesktop.AddNamedRegion(NamedTextureRegion)"/><br/><see cref="MGDesktop.TryDrawNamedRegion(DrawTransaction, string, Point, int?, int?)"/></summary>
+        public readonly string RegionName;
+        public readonly int TargetWidth;
+        public readonly int TargetHeight;
+
+        public MGTextRunImage(string RegionName, int TargetWidth, int TargetHeight)
+            : base(TextRunType.Image)
+        {
+            this.RegionName = RegionName;
+            this.TargetWidth = TargetWidth;
+            this.TargetHeight = TargetHeight;
+        }
+
+        public override string ToString() => $"{nameof(MGTextRunImage)}: {RegionName} - {TargetWidth},{TargetHeight}";
     }
 }

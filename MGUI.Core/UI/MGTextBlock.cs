@@ -293,6 +293,7 @@ namespace MGUI.Core.UI
                 this.LinePadding = 2;
                 this.TextAlignment = HorizontalAlignment.Left;
                 this.Padding = new(1,2,1,1);
+                this.VerticalContentAlignment = VerticalAlignment.Center;
 
                 OnLayoutUpdated += (sender, e) => { UpdateLines(); };
             }
@@ -407,7 +408,7 @@ namespace MGUI.Core.UI
                 return CachedMeasurement.Value;
 
             List<MGTextLine> Lines = MGTextLine.ParseLines(this, RemainingSize.Width, WrapText, Runs).ToList();
-            Vector2 Size = new(Lines.Select(x => x.LineSize.Width).DefaultIfEmpty(0).Max(), Lines.Sum(x => x.LineSize.Height) + LinePadding * (Lines.Count - 1));
+            Vector2 Size = new(Lines.Select(x => x.LineWidth).DefaultIfEmpty(0).Max(), Lines.Sum(x => x.LineTotalHeight) + LinePadding * (Lines.Count - 1));
             Thickness Measurement = new((int)Math.Ceiling(Size.X), (int)Math.Ceiling(Size.Y), 0, 0);
 
             ElementMeasurement SelfMeasurement = new(RemainingSize, Measurement, SharedSize, new(0));
@@ -426,58 +427,61 @@ namespace MGUI.Core.UI
 
             foreach (MGTextLine Line in this.Lines)
             {
-                Rectangle LineBounds = new(LayoutBounds.Left + Padding.Left, (int)CurrentY, LayoutBounds.Width - PaddingSize.Width, (int)Line.LineSize.Height);
-                float CurrentX = ApplyAlignment(LineBounds, TextAlignment, VerticalAlignment.Center, new Size((int)Line.LineSize.Width, (int)Line.LineSize.Height)).Left;
+                Rectangle LineBounds = new(LayoutBounds.Left + Padding.Left, (int)CurrentY, LayoutBounds.Width - PaddingSize.Width, (int)Line.LineTotalHeight);
+                float CurrentX = ApplyAlignment(LineBounds, TextAlignment, VerticalContentAlignment, new Size((int)Line.LineWidth, (int)Line.LineTotalHeight)).Left;
+                float TextYPosition = ApplyAlignment(LineBounds, TextAlignment, VerticalContentAlignment, new Size((int)Line.LineWidth, (int)Line.LineTextHeight)).Y;
 
                 bool IsStartOfLine = true;
 
                 foreach (MGTextRun Run in Line.Runs)
                 {
-                    if (Run.IsImage)
+                    if (Run.RunType == TextRunType.Image && Run is MGTextRunImage ImageRun)
                     {
-                        int ImgWidth = Run.ImageSettings.TargetWidth;
-                        int ImgHeight = Run.ImageSettings.TargetHeight;
-                        int YPosition = ApplyAlignment(LineBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new Size(ImgWidth, ImgHeight)).Top;
-                        Desktop.DrawNamedRegion(DT, Run.ImageSettings.RegionName, new Point((int)CurrentX, YPosition), ImgWidth, ImgHeight);
+                        int ImgWidth = ImageRun.TargetWidth;
+                        int ImgHeight = ImageRun.TargetHeight;
+                        int YPosition = ApplyAlignment(LineBounds, HorizontalAlignment.Center, VerticalContentAlignment, new Size(ImgWidth, ImgHeight)).Top;
+                        Desktop.TryDrawNamedRegion(DT, ImageRun.RegionName, new Point((int)CurrentX, YPosition), ImgWidth, ImgHeight);
                         CurrentX += ImgWidth;
                     }
-                    else
+                    else if (Run.RunType == TextRunType.Text && Run is MGTextRunText TextRun)
                     {
-                        bool IsBold = Run.Settings.IsBold;
-                        bool IsItalic = Run.Settings.IsItalic;
+                        bool IsBold = TextRun.Settings.IsBold;
+                        bool IsItalic = TextRun.Settings.IsItalic;
                         SpriteFont SF = GetFont(IsBold, IsItalic, out _);
 
-                        float ActualOpacity = Opacity * Run.Settings.Opacity;
-                        Color Foreground = (Run.Settings.Foreground ?? DefaultForeground) * ActualOpacity;
+                        float ActualOpacity = Opacity * TextRun.Settings.Opacity;
+                        Color Foreground = (TextRun.Settings.Foreground ?? DefaultForeground) * ActualOpacity;
 
-                        Vector2 TextSize = MeasureText(Run.Text, IsBold, IsItalic, IsStartOfLine);
-                        Run.Settings.Background?.Draw(DA.SetOpacity(ActualOpacity), this, new((int)CurrentX, (int)CurrentY, (int)TextSize.X, (int)Line.LineSize.Height));
+                        Vector2 TextSize = MeasureText(TextRun.Text, IsBold, IsItalic, IsStartOfLine);
+                        TextRun.Settings.Background?.Draw(DA.SetOpacity(ActualOpacity), this, new((int)CurrentX, (int)TextYPosition, (int)TextSize.X, (int)Line.LineTextHeight));
 
-                        if (Run.Settings.IsUnderlined)
+                        if (TextRun.Settings.IsUnderlined)
                         {
-                            DT.FillRectangle(DA.Offset.ToVector2(), new(CurrentX, CurrentY + Line.LineSize.Height - 2, TextSize.X, 1), Foreground);
+                            DT.FillRectangle(DA.Offset.ToVector2(), new(CurrentX, TextYPosition + Line.LineTextHeight - 2, TextSize.X, 1), Foreground);
                         }
 
-                        Vector2 Position = new Vector2(CurrentX, CurrentY) + DA.Offset.ToVector2();
-                        if (Run.Settings.IsShadowed)
+                        Vector2 Position = new Vector2(CurrentX, TextYPosition) + DA.Offset.ToVector2();
+                        if (TextRun.Settings.IsShadowed)
                         {
-                            Color ShadowColor = (Run.Settings.ShadowColor ?? DefaultForeground) * ActualOpacity;
-                            Vector2 ShadowOffset = Run.Settings.ShadowOffset ?? new(1, 1);
+                            Color ShadowColor = (TextRun.Settings.ShadowColor ?? DefaultForeground) * ActualOpacity;
+                            Vector2 ShadowOffset = TextRun.Settings.ShadowOffset ?? new(1, 1);
 
-                            DT.DrawSpriteFontText(SF, Run.Text, Position + ShadowOffset, ShadowColor, FontOrigin, FontScale, FontScale);
-                            DT.DrawSpriteFontText(SF, Run.Text, Position, Foreground, FontOrigin, FontScale, FontScale);
+                            DT.DrawSpriteFontText(SF, TextRun.Text, Position + ShadowOffset, ShadowColor, FontOrigin, FontScale, FontScale);
+                            DT.DrawSpriteFontText(SF, TextRun.Text, Position, Foreground, FontOrigin, FontScale, FontScale);
                         }
                         else
                         {
-                            DT.DrawSpriteFontText(SF, Run.Text, Position, Foreground, FontOrigin, FontScale, FontScale);
+                            DT.DrawSpriteFontText(SF, TextRun.Text, Position, Foreground, FontOrigin, FontScale, FontScale);
                         }
 
                         CurrentX += TextSize.X;
                         IsStartOfLine = false;
                     }
+                    else
+                        throw new NotImplementedException($"{nameof(MGTextBlock)}.{nameof(DrawSelf)} does not support rendering {nameof(MGTextRun)}s of type={nameof(TextRunType)}.{Run.RunType}");
                 }
 
-                CurrentY += Line.LineSize.Height + LinePadding;
+                CurrentY += Line.LineTotalHeight + LinePadding;
             }
         }
     }

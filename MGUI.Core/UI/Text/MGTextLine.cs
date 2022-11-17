@@ -28,7 +28,27 @@ namespace MGUI.Core.UI.Text
     public record class MGTextLine
     {
         public ReadOnlyCollection<MGTextRun> Runs { get; }
-        public Size2 LineSize { get; }
+
+        public float LineWidth { get; }
+
+        /// <summary>The height of the text-content of this line.<para/>
+        /// If the line only includes text-content (See: <see cref="MGTextRunText"/>), then this value is typically equivalent to <see cref="LineTotalHeight"/> (unless the line has a MinimumHeight, which is usually the height of a space ' ' character).<br/>
+        /// If the line includes images (See: <see cref="MGTextRunImage"/>), then this value may differ from <see cref="LineTotalHeight"/>, depending on if the tallest image is taller than the tallest piece of text.</summary>
+        public float LineTextHeight { get; }
+
+        /// <summary>The height of the image-content of this line.<para/>
+        /// If the line only includes image-content (See: <see cref="MGTextRunImage"/>), then this value is equivalent to <see cref="LineTotalHeight"/> (unless the line has a MinimumHeight, which is usually the height of a space ' ' character).<br/>
+        /// If the line includes text (See: <see cref="MGTextRunText"/>), then this value may differ from <see cref="LineTotalHeight"/>, depending on if the tallest piece of text is taller than the tallest image.</summary>
+        public float LineImageHeight { get; }
+
+        /// <summary>The total height of all content of this line.<para/>
+        /// If the line only includes text-content (See: <see cref="MGTextRunText"/>), then this value is typically equivalent to <see cref="LineTextHeight"/>.<br/>
+        /// If the line only includes image-content (See: <see cref="MGTextRunImage"/>), then this value is typically equivalent to <see cref="LineImageHeight"/>.<br/>
+        /// If the line includes both text and images, then represents the larger value of <see cref="LineTextHeight"/> and <see cref="LineImageHeight"/>.<para/>
+        /// Note: In some cases, the line may have a MinimumHeight (usually the height of a space ' ' character)<br/>
+        /// which may cause this value to be larger than <see cref="LineTextHeight"/> and/or <see cref="LineImageHeight"/></summary>
+        public float LineTotalHeight { get; }
+
         /// <summary>The 1-based line number. This value does not use 0-based indexing.</summary>
         public int LineNumber { get; }
 
@@ -42,10 +62,12 @@ namespace MGUI.Core.UI.Text
         /// Notice that a '-' character was automatically inserted at the end of the first line, so now the wrapped text at index=5 is '-', while the wrapped text in the input "ABC12345" at index=5 is '3'.<br/>
         /// So the indices mapping in this case would be: [ 0, 1, 2, 3, 4, 4, 5, 6, 7 ]<para/>
         /// This parameter is intended to know to which character in the original input corresponds to each character in the wrapped output.</param>
-        public MGTextLine(IEnumerable<MGTextRun> Runs, Size2 LineSize, int LineNumber, bool EndsInLinebreakCharacter, IEnumerable<int> Indices)
+        public MGTextLine(IEnumerable<MGTextRun> Runs, float LineWidth, float LineTextHeight, float LineImageHeight, float LineTotalHeight, int LineNumber, bool EndsInLinebreakCharacter, IEnumerable<int> Indices)
         {
             this.Runs = Runs.ToList().AsReadOnly();
-            this.LineSize = LineSize;
+            this.LineWidth = LineWidth;
+            this.LineTextHeight = LineTextHeight;
+            this.LineTotalHeight = LineTotalHeight;
             this.LineNumber = LineNumber;
             this.EndsInLinebreakCharacter = EndsInLinebreakCharacter;
             this.OriginalCharacterIndices = Indices.ToList().AsReadOnly();
@@ -65,7 +87,7 @@ namespace MGUI.Core.UI.Text
                 this.WordDelimiters = WordDelimiters.ToList().AsReadOnly();
                 this.OriginalRuns = OriginalRuns.ToList().AsReadOnly();
 
-                this.WrappableRuns = OriginalRuns.Where(x => x.IsLineBreak || !string.IsNullOrEmpty(x.Text))
+                this.WrappableRuns = OriginalRuns.Where(x => x.RunType != TextRunType.Text || (!string.IsNullOrEmpty(((MGTextRunText)x).Text)))
                     .Select(Run => new WrappableRun(this, Run)).ToList().AsReadOnly();
 
                 for (int i = 0; i < WrappableRuns.Count; i++)
@@ -73,7 +95,7 @@ namespace MGUI.Core.UI.Text
                     WrappableRun Current = WrappableRuns[i];
                     WrappableRun Next = i == WrappableRuns.Count - 1 ? null : WrappableRuns[i + 1];
 
-                    if (Next != null && !Current.IsLineBreak && !Next.IsLineBreak && !Current.IsImage && !Next.IsImage)
+                    if (Next != null && Current.IsText && Next.IsText)
                     {
                         WrappableRunWord LastWordOfCurrent = Current.OriginalWords[^1];
                         WrappableRunWord FirstWordOfNext = Next.OriginalWords[0];
@@ -102,12 +124,12 @@ namespace MGUI.Core.UI.Text
         private class WrappableRun
         {
             public readonly WrappableRunGroup Group;
-            public readonly MGTextRunConfig Settings;
-            public readonly bool IsLineBreak;
-            /// <summary>The number of characters used to specify the line break. For example, on Windows this is usually 2 ("\r\n") but on Mac / Linux it's usually 1 ('\r' / '\n')</summary>
-            public readonly int LineBreakCharacterCount;
-            public readonly bool IsImage;
-            public readonly MGTextRunImage ImageSettings;
+            public readonly MGTextRun OriginalRun;
+
+            public TextRunType RunType => OriginalRun.RunType;
+            public bool IsText => RunType == TextRunType.Text;
+            public bool IsLineBreak => RunType == TextRunType.LineBreak;
+            public bool IsImage => RunType == TextRunType.Image;
 
             public readonly List<WrappableRunWord> OriginalWords;
             public readonly List<WrappableRunWord> RemainingWords;
@@ -115,31 +137,27 @@ namespace MGUI.Core.UI.Text
             public WrappableRun(WrappableRunGroup Group, MGTextRun OriginalRun)
             {
                 this.Group = Group;
-                this.Settings = OriginalRun.Settings;
-                this.IsLineBreak = OriginalRun.IsLineBreak;
-                this.LineBreakCharacterCount = 0;
-                this.IsImage = OriginalRun.IsImage;
-                this.ImageSettings = OriginalRun.ImageSettings;
+                this.OriginalRun = OriginalRun;
 
-                if (IsLineBreak)
+                if (OriginalRun is MGTextRunText TextRun)
                 {
-                    OriginalWords = new List<WrappableRunWord>();
-#if DEBUG
-                    if (OriginalRun.Text == null)
-                        throw new Exception($"{nameof(MGTextRun)}.{nameof(MGTextRun.Text)} is null in a run that indicates a linebreak. This means the number of linebreak characters is ambiguous (it could be \\r\\n, \\r, or \\n) and may break parsing logic.");
-#endif
-                    LineBreakCharacterCount = OriginalRun.Text?.Length ?? 1;
+                    List<string> Words = TextRun.Text.SplitAndKeepDelimiters(Group.WordDelimiters).ToList();
+                    OriginalWords = Words.Select(x => new WrappableRunWord(this, x, TextRun.Settings, false)).ToList();
                 }
                 else
-                {
-                    List<string> Words = OriginalRun.Text.SplitAndKeepDelimiters(Group.WordDelimiters).ToList();
-                    OriginalWords = Words.Select(x => new WrappableRunWord(this, x, false)).ToList();
-                }
+                    OriginalWords = new();
 
                 this.RemainingWords = new List<WrappableRunWord>(OriginalWords);
             }
 
-            public MGTextRun AsRun(string Text) => new(Text, IsLineBreak, IsImage, ImageSettings, Settings);
+            public MGTextRunText AsTextRun(string Text)
+            {
+                if (!IsText)
+                    throw new InvalidOperationException();
+                else
+                    return new MGTextRunText(Text, ((MGTextRunText)OriginalRun).Settings);
+            }
+
             public string GetAllRemainingText() => string.Join("", RemainingWords.Select(x => x.Text));
 
             public WrappableRunWord GetNext(WrappableRunWord Current)
@@ -152,7 +170,14 @@ namespace MGUI.Core.UI.Text
                     return Group.GetNext(this).RemainingWords[0];
             }
 
-            public override string ToString() => IsLineBreak ? $"{nameof(WrappableRun)}: LineBreak" : $"{nameof(WrappableRun)}: {GetAllRemainingText()}";
+            public override string ToString() =>
+                RunType switch
+                {
+                    TextRunType.Text => $"{nameof(WrappableRun)}: {GetAllRemainingText()}",
+                    TextRunType.LineBreak => $"{nameof(WrappableRun)}: LineBreak",
+                    TextRunType.Image => $"{nameof(WrappableRun)}: Image",
+                    _ => throw new NotImplementedException($"Unrecognized {nameof(TextRunType)}: {RunType}")
+                };
         }
 
         private class WrappableRunWord
@@ -161,13 +186,15 @@ namespace MGUI.Core.UI.Text
             public readonly string Text;
             public bool HasNext { get; set; }
 
-            public bool IsBold => Run.Settings.IsBold;
-            public bool IsItalic => Run.Settings.IsItalic;
+            private readonly MGTextRunConfig Settings;
+            public bool IsBold => Settings.IsBold;
+            public bool IsItalic => Settings.IsItalic;
 
-            public WrappableRunWord(WrappableRun Run, string Text, bool HasNext)
+            public WrappableRunWord(WrappableRun Run, string Text, MGTextRunConfig Settings, bool HasNext)
             {
                 this.Run = Run;
                 this.Text = Text;
+                this.Settings = Settings;
                 this.HasNext = HasNext;
             }
 
@@ -192,12 +219,13 @@ namespace MGUI.Core.UI.Text
         public static IEnumerable<MGTextLine> ParseLines(ITextMeasurer Measurer, double MaxLineWidth, bool WrapText, IEnumerable<MGTextRun> Runs)
             => ParseLines(Measurer, MaxLineWidth, WrapText, Runs, ' ', '-');
 
+        /// <param name="WordDelimiters">Recommended: ' ' (space) and '-' (hyphen)</param>
         public static IEnumerable<MGTextLine> ParseLines(ITextMeasurer Measurer, double MaxLineWidth, bool WrapText, IEnumerable<MGTextRun> Runs, params char[] WordDelimiters)
         {
             if (Runs?.Any() != true || MaxLineWidth < 1)
                 yield break;
 
-            const string MultiLineWordSuffix = "-";
+            const string MultiLineWordSuffix = "-"; // A suffix to append to the end of a line, when the line only consists of a single word that must wrap across multiple lines
 
             float MinLineHeight = (float)Math.Ceiling(Measurer.MeasureText(" ", false, false, false).Y);
             int LineNumber = 1;
@@ -208,6 +236,9 @@ namespace MGUI.Core.UI.Text
 
             MGTextLine FlushLine(bool EndsInLinebreakCharacter, int LineBreakCharacterCount = 1)
             {
+                if (!CurrentLine.Any())
+                    throw new InvalidOperationException($"Cannot create an {nameof(MGTextLine)} with no {nameof(MGTextRun)}s.");
+
                 if (EndsInLinebreakCharacter)
                 {
                     for (int i = 0; i < LineBreakCharacterCount; i++)
@@ -216,24 +247,22 @@ namespace MGUI.Core.UI.Text
                         CurrentIndexInOriginalText++;
                     }
                 }
-                else if (CurrentLine.Count > 0 && CurrentLine.All(x => string.IsNullOrEmpty(x.Text)))
+                else if (CurrentLine.Where(x => x.RunType == TextRunType.Text && x is MGTextRunText).Cast<MGTextRunText>().All(x => string.IsNullOrEmpty(x.Text)))
                 {
                     CurrentIndicesMap.Add(CurrentIndexInOriginalText);
                 }
 
-                List<Vector2> RunSizes = new();
-                for (int i = 0; i < CurrentLine.Count; i++)
-                {
-                    MGTextRun Run = CurrentLine[i];
-                    Vector2 RunSize;
-                    if (Run.IsImage)
-                        RunSize = new(Run.ImageSettings.TargetWidth, Run.ImageSettings.TargetHeight);
-                    else
-                        RunSize = Measurer.MeasureText(Run.Text, Run.Settings.IsBold, Run.Settings.IsItalic, i == 0);
-                    RunSizes.Add(RunSize);
-                }
-                Size2 LineSize = new(Math.Max(CurrentX, RunSizes.Sum(x => x.X)), Math.Max(MinLineHeight, RunSizes.DefaultIfEmpty(Vector2.Zero).Max(x => x.Y)));
-                MGTextLine Line = new(CurrentLine, LineSize, LineNumber, EndsInLinebreakCharacter, CurrentIndicesMap);
+                List<Vector2> TextRunSizes = CurrentLine.Where(x => x.RunType == TextRunType.Text).Cast<MGTextRunText>()
+                    .Select((x, index) => Measurer.MeasureText(x.Text, x.Settings.IsBold, x.Settings.IsItalic, index == 0)).ToList();
+                List<Vector2> ImageRunSizes = CurrentLine.Where(x => x.RunType == TextRunType.Image).Cast<MGTextRunImage>()
+                    .Select(x => new Vector2(x.TargetWidth, x.TargetHeight)).ToList();
+
+                float LineWidth = Math.Max(CurrentX, TextRunSizes.Sum(x => x.X) + ImageRunSizes.Sum(x => x.X));
+                float LineTextHeight = TextRunSizes.DefaultIfEmpty(Vector2.Zero).Max(x => x.Y);
+                float LineImageHeight = ImageRunSizes.DefaultIfEmpty(Vector2.Zero).Max(x => x.Y);
+                float LineTotalHeight = GeneralUtils.Max(MinLineHeight, LineTextHeight, LineImageHeight);
+
+                MGTextLine Line = new(CurrentLine, LineWidth, LineTextHeight, LineImageHeight, LineTotalHeight, LineNumber, EndsInLinebreakCharacter, CurrentIndicesMap);
                 LineNumber++;
                 CurrentLine.Clear();
                 CurrentIndicesMap.Clear();
@@ -248,34 +277,34 @@ namespace MGUI.Core.UI.Text
                 WrappableRun Run = Group.RemainingRuns.First();
                 Group.RemainingRuns.RemoveAt(0);
 
-                if (Run.IsLineBreak)
+                if (Run.IsLineBreak && Run.OriginalRun is MGTextRunLineBreak LineBreakRun)
                 {
                     if (!CurrentLine.Any())
-                        CurrentLine.Add(new("", false, false, MGTextRunImage.Empty, Run.Settings));
-                    yield return FlushLine(true, Run.LineBreakCharacterCount);
+                        CurrentLine.Add(new MGTextRunText("", new MGTextRunConfig(false)));
+                    yield return FlushLine(true, LineBreakRun.LineBreakCharacterCount);
                 }
-                else if (Run.IsImage)
+                else if (Run.IsImage && Run.OriginalRun is MGTextRunImage ImageRun)
                 {
                     if (!WrapText || MaxLineWidth == double.MaxValue || MaxLineWidth >= 100000)
                     {
-                        CurrentLine.Add(new("", false, true, Run.ImageSettings, Run.Settings));
+                        CurrentLine.Add(ImageRun);
                     }
                     else
                     {
-                        int ImgWidth = Run.ImageSettings.TargetWidth;
+                        int ImgWidth = ImageRun.TargetWidth;
                         if (CurrentLine.Any() && CurrentX + ImgWidth > MaxLineWidth)
                             yield return FlushLine(false);
 
-                        CurrentLine.Add(new("", false, true, Run.ImageSettings, Run.Settings));
+                        CurrentLine.Add(ImageRun);
                         CurrentX += ImgWidth;
                     }
                 }
-                else
+                else if (Run.IsText && Run.OriginalRun is MGTextRunText TextRun)
                 {
                     if (!WrapText || MaxLineWidth == double.MaxValue || MaxLineWidth >= 100000)
                     {
                         string Text = Run.GetAllRemainingText();
-                        CurrentLine.Add(new(Text, false, false, MGTextRunImage.Empty, Run.Settings));
+                        CurrentLine.Add(Run.AsTextRun(Text));
                         foreach (char c in Text)
                         {
                             CurrentIndicesMap.Add(CurrentIndexInOriginalText);
@@ -294,7 +323,7 @@ namespace MGUI.Core.UI.Text
                             //  Measure the next chunk to calculate word-wrapping on
                             //  This may be several consecutive items.
                             //  EX: "Hello[b]World" results in 2 runs: Run1="Hello", Run2="World" but there is no word delimiter (space) between them so it's a single world "HelloWorld"
-                            List<Vector2> Measurements = CurrentAndNext.Select((Word, Index) => 
+                            List<Vector2> Measurements = CurrentAndNext.Select((Word, Index) =>
                                 Measurer.MeasureText(Word.Text, Word.IsBold, Word.IsItalic, CurrentLine.Count == 0 && Index == 0 && UnwrappedText.Length == 0)).ToList();
                             float CurrentWidth = Measurements[0].X;
                             float TotalWidth = Measurements.Sum(x => x.X);
@@ -315,7 +344,7 @@ namespace MGUI.Core.UI.Text
                             {
                                 if (UnwrappedText.ToString().Length > 0)
                                 {
-                                    MGTextRun NewRun = new(UnwrappedText.ToString(), false, false, MGTextRunImage.Empty, Run.Settings);
+                                    MGTextRun NewRun = Run.AsTextRun(UnwrappedText.ToString());
                                     CurrentLine.Add(NewRun);
                                 }
 
@@ -392,7 +421,7 @@ namespace MGUI.Core.UI.Text
                                                             }
                                                         }
 
-                                                        CurrentLine.Add(WordsByRun.Key.AsRun(UnwrappedText.ToString()));
+                                                        CurrentLine.Add(WordsByRun.Key.AsTextRun(UnwrappedText.ToString()));
                                                         yield return FlushLine(false);
                                                         UnwrappedText.Clear();
                                                         CharIndex--;
@@ -403,7 +432,7 @@ namespace MGUI.Core.UI.Text
 
                                         if (UnwrappedText.Length > 0)
                                         {
-                                            CurrentLine.Add(WordsByRun.Key.AsRun(UnwrappedText.ToString()));
+                                            CurrentLine.Add(WordsByRun.Key.AsTextRun(UnwrappedText.ToString()));
                                             UnwrappedText.Clear();
                                         }
                                     }
@@ -417,13 +446,15 @@ namespace MGUI.Core.UI.Text
                         }
 
                         if (UnwrappedText.ToString().Length > 0)
-                            CurrentLine.Add(Run.AsRun(UnwrappedText.ToString()));
+                            CurrentLine.Add(Run.AsTextRun(UnwrappedText.ToString()));
                     }
                 }
+                else
+                    throw new NotImplementedException($"Unrecognized {nameof(TextRunType)}: {Run.RunType}");
             }
 
             if (!CurrentLine.Any())
-                CurrentLine.Add(new("", false, false, MGTextRunImage.Empty, Runs.Last().Settings));
+                CurrentLine.Add(new MGTextRunText("", new MGTextRunConfig(false)));
             yield return FlushLine(false);
         }
     }

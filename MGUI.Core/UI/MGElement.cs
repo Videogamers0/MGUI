@@ -406,7 +406,7 @@ namespace MGUI.Core.UI
         /// This value includes <see cref="Margin"/>.<para/>
         /// See also: <see cref="MinSize"/>, <see cref="MaxSize"/>, <see cref="MaxSizeIncludingMargin"/></summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public Size MinSizeIncludingMargin => new((MinWidth ?? 0) + HorizontalMargin, (MinHeight ?? 0) + VerticalMargin);
+        public Size MinSizeIncludingMargin => new(MinWidth.HasValue ? MinWidth.Value + HorizontalMargin : 0, MinHeight.HasValue ? MinHeight.Value + VerticalMargin : 0);
 
         /// <summary>Combination of <see cref="MinWidth"/> and <see cref="MinHeight"/>. Uses <see cref="int.MaxValue"/> if value is not specified.<para/>
         /// This value does not include <see cref="Margin"/>.<para/>
@@ -1240,7 +1240,7 @@ namespace MGUI.Core.UI
 			}
 
 			AvailableSize = AvailableSize.AsZeroOrGreater();
-			Size RemainingSize = AvailableSize;
+			Size RemainingSize = new(Math.Clamp(AvailableSize.Width, 0, MaxSizeIncludingMargin.Width), Math.Clamp(AvailableSize.Height, 0, MaxSizeIncludingMargin.Height)); ;
 
 			if (!TryGetRecentSelfMeasurement(RemainingSize, out SelfSize, out SharedSize, out ContentSize))
 			{
@@ -1291,7 +1291,7 @@ namespace MGUI.Core.UI
 			}
 
 			Thickness Total = new(0);
-			Size RemainingSize = AvailableSize;
+            Size RemainingSize = AvailableSize;
 
 			Thickness MarginAndPadding = Margin.Add(Padding);
 			Total = Total.Add(MarginAndPadding);
