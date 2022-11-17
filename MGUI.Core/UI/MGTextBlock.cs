@@ -123,7 +123,7 @@ namespace MGUI.Core.UI
                     _IsBold = value;
                     if (!string.IsNullOrEmpty(Text))
                     {
-                        Runs = MGTextRun.ParseRuns(Text, DefaultTextRunSettings).ToList().AsReadOnly();
+                        UpdateRuns();
                         InvokeLayoutChanged();
                     }
                 }
@@ -141,7 +141,7 @@ namespace MGUI.Core.UI
                     _IsItalic = value;
                     if (!string.IsNullOrEmpty(Text))
                     {
-                        Runs = MGTextRun.ParseRuns(Text, DefaultTextRunSettings).ToList().AsReadOnly();
+                        UpdateRuns();
                         InvokeLayoutChanged();
                     }
                 }
@@ -159,7 +159,7 @@ namespace MGUI.Core.UI
                     _IsUnderlined = value;
                     if (!string.IsNullOrEmpty(Text))
                     {
-                        Runs = MGTextRun.ParseRuns(Text, DefaultTextRunSettings).ToList().AsReadOnly();
+                        UpdateRuns();
                         UpdateLines();
                     }
                 }
@@ -178,6 +178,24 @@ namespace MGUI.Core.UI
 
         public Color ActualForeground => Foreground.GetValue(VisualState.Primary) ?? DerivedDefaultTextForeground ?? GetTheme().TextBlockFallbackForeground.GetValue(false).GetValue(VisualState.Primary);
 
+        private bool _AllowsInlineFormatting = true;
+        /// <summary>If true, <see cref="Text"/> can contain formatting codes such as "[bold]...[/bold]" or "[color=green]...[/color]" etc.<br/>
+        /// If false, all formatting codes within <see cref="Text"/> will be treated as literal strings instead of affecting how the text is rendered.<para/>
+        /// Default value: true</summary>
+        public bool AllowsInlineFormatting
+        {
+            get => _AllowsInlineFormatting;
+            set
+            {
+                if (_AllowsInlineFormatting != value)
+                {
+                    _AllowsInlineFormatting = value;
+                    UpdateRuns();
+                    InvokeLayoutChanged();
+                }
+            }
+        }
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _Text;
         public string Text
@@ -194,11 +212,22 @@ namespace MGUI.Core.UI
             if (_Text != Value)
             {
                 _Text = Value;
-                Runs = MGTextRun.ParseRuns(Text, DefaultTextRunSettings).ToList().AsReadOnly();
+                UpdateRuns();
                 if (!SuppressLayoutChanged)
                     InvokeLayoutChanged();
                 else
                     UpdateLines();
+            }
+        }
+
+        private void UpdateRuns()
+        {
+            if (AllowsInlineFormatting)
+                Runs = MGTextRun.ParseRuns(Text, DefaultTextRunSettings).ToList().AsReadOnly();
+            else
+            {
+                List<FTTokenMatch> Tokens = FTTokenizer.TokenizeLineBreaks(Text, true).ToList();
+                Runs = MGTextRun.ParseRuns(Tokens, DefaultTextRunSettings).ToList().AsReadOnly();
             }
         }
 

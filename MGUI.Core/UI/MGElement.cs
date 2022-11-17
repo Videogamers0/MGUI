@@ -96,20 +96,6 @@ namespace MGUI.Core.UI
     //		under the assumption each frame of the animation is same size. MGAnimatedImage(bool IsUniform) (if !IsUniform, has to invoke LayoutChanged)
     //chatbox
     //
-    //MGDesigner
-    //      override the functionality of the textbox
-    //          typing an enter key should add a new line, but also add prepend enough spaces to set cursor near where previous line's text begins + 1 tab
-    //          "<Window>
-    //          "    <Window.Resources>
-    //          "        <...>
-    //          so if cursor is on line2, line2's text starts at index=4
-    //              pushing enter prepends (4/TabSize + 1)*TabSize = 8 spaces
-    //              or maybe just PreviousLineIndex+TabSize ? that seems to be what WPF designer does.
-    //      could also try to have basic syntax highlighting like coloring specific keyboards "Grid","Button","CheckBox" etc...
-    //              quoted values in blue, comments in green, property names in red, element names in brown
-    //      maybe option to load from a file instead. so u just use your own text editor instead of a shitty built-in one.
-    //      when the file path is set, the code listens for changes to the file, autorefresh on save
-    //
     //Add support for in-line images in TextBlocks? Uses the NamedTextures to retrieve and draw them. Markup could be:
     //      "[img=RegionName Width,Height]".
     //      "Hello World [img=HelloImg 16,16]" means we take the sourcerect corresponding to regionname="HelloImg" and draw it with target size=16,16 (maybe we always vertically center in the line)

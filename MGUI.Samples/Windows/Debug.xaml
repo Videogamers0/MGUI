@@ -1,0 +1,171 @@
+﻿<XAMLWindow xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            Left="500" Top="50" Width="400" Height="600" TitleText="[b]Window Title Text[/b]">
+    <!--<XAMLWindow.TitleBar>
+        <XAMLDockPanel BG="LightGreen" Padding="16,4">
+            <XAMLTextBlock Text="ABC" Dock="Left" />
+            <XAMLCheckBox IsChecked="true" Dock="Right" HA="Right">
+                <XAMLTextBlock Text="Checkable Content" />
+            </XAMLCheckBox>
+        </XAMLDockPanel>
+    </XAMLWindow.TitleBar>-->
+    <XAMLDockPanel Margin="5">
+        <!--<XAMLButton BG="LightBlue" BorderBrush="Crimson" BT="2" Padding="20,4" Dock="Left">
+            <XAMLTextBlock Text="Last Child of DockPanel" />
+        </Button>
+        <XAMLOverlayPanel Dock="Left">
+            <XAMLButton Offset="10,10,5,5" BG="LightBlue" MinWidth="50" />
+            <XAMLButton Offset="0,30" BG="Crimson" MinWidth="50" />
+        </XAMLOverlayPanel>
+        <XAMLListView Name="TestLV" Dock="Right" HA="Right" xmlns:System="clr-namespace:System;assembly=mscorlib" ItemType="{x:Type System:Double}">
+            <XAMLListViewColumn Width="55px">
+                <XAMLListViewColumn.Header>
+                    <XAMLButton Content="Test" BG="LightGray" />
+                </XAMLListViewColumn.Header>
+            </XAMLListViewColumn>
+            <XAMLListViewColumn Header="Test" Width="*" />
+        </XAMLListView>
+        <XAMLTabControl Name="TC1" Dock="Left" MinWidth="150" VA="Top">
+            <XAMLTabItem Header="Tab1">
+                <XAMLButton Content="Test" />
+            </XAMLTabItem>
+            <XAMLTabItem Header="Tab2" />
+        </XAMLTabControl>-->
+
+        <!--<XAMLGrid RowLengths="Auto,1.5*,2*,60" ColumnLengths="Auto,15,*">
+            <XAMLButton BG="Red" GridRow="0" GridColumn="0" MinWidth="26" MinHeight="30" />
+            <XAMLButton BG="Orange" GridRow="1" GridColumn="0" MinWidth="36" />
+            <XAMLButton BG="Purple" GridRow="2" GridColumn="0" MinWidth="50" />
+            <XAMLButton BG="Yellow" GridRow="3" GridColumn="0" MinWidth="10" />
+            <XAMLButton BG="LightGreen" GridRow="0" GridColumn="2" MinHeight="75" />
+            <XAMLButton BG="Cyan" GridRow="1" GridColumn="2" />
+            <XAMLButton BG="Crimson" GridRow="2" GridColumn="2" />
+            <XAMLButton BG="Blue" GridRow="3" GridColumn="2" />
+            <XAMLGridSplitter GridRow="0" GridColumn="1" />
+        </XAMLGrid>-->
+
+        <XAMLTabControl Dock="Bottom">
+            <XAMLTabItem>
+                <XAMLTabItem.Header>
+                    <XAMLStackPanel Orientation="Horizontal">
+                        <XAMLRectangleElement Width="16" Height="16" Fill="LightBlue" />
+                        <XAMLSpacer Width="5" />
+                        <XAMLTextBlock Text="Tab #1" />
+                    </XAMLStackPanel>
+                </XAMLTabItem.Header>
+
+                <XAMLDockPanel>
+                    <XAMLStackPanel Orientation="Vertical" Dock="Top" Spacing="5">
+                        <XAMLCheckBox Content="CheckBox #1" />
+                        <XAMLRadioButton Content="RadioButton #1" />
+                        <XAMLHeaderedContentPresenter Spacing="5" HeaderPosition="Left">
+                            <XAMLHeaderedContentPresenter.Header>
+                                <XAMLRectangleElement Width="16" Height="16" Fill="RoyalBlue" HA="Center" />
+                            </XAMLHeaderedContentPresenter.Header>
+                            <XAMLTextBlock Text="Hello World" />
+                        </XAMLHeaderedContentPresenter>
+                    </XAMLStackPanel>
+                </XAMLDockPanel>
+            </XAMLTabItem>
+            <XAMLTabItem Header="Tab #2" Name="Tab#2">
+                <XAMLScrollViewer Dock="Top">
+                    <XAMLStackPanel Orientation="Vertical" Spacing="5">
+                        <XAMLButton Content="Hello World" />
+                        <XAMLSlider UseDiscreteValues="true" DiscreteValueInterval="5" TickFrequency="20" DrawTicks="true" />
+                        <XAMLComboBox Name="CB" />
+                        <XAMLProgressBar Name="TestProgressBar" ShowValue="true">
+                            <XAMLProgressBar.ContextMenu>
+                                <XAMLContextMenu Name="CM1">
+                                    <XAMLContextMenuButton Name="CMB1" Content="ABC" />
+                                    <XAMLContextMenuButton>
+                                        <XAMLContextMenuButton.Submenu>
+                                            <XAMLContextMenu>
+                                                <XAMLContextMenuToggle Content="Toggle Me" />
+                                            </XAMLContextMenu>
+                                        </XAMLContextMenuButton.Submenu>
+                                        <XAMLRectangleElement Width="16" VA="Stretch" Fill="Blue" />
+                                    </XAMLContextMenuButton>
+                                </XAMLContextMenu>
+                            </XAMLProgressBar.ContextMenu>
+                        </XAMLProgressBar>
+                        <XAMLGroupBox Name="GB1" IsExpandable="true" Header="Header of GroupBox">
+                            <XAMLStackPanel Orientation="Vertical" Spacing="5">
+                                <XAMLGrid RowLengths="auto" ColumnLengths="*,8,*">
+                                    <XAMLStopwatch Column="0" IsRunning="true" />
+                                    <XAMLTimer Column="2" IsPaused="false" />
+                                </XAMLGrid>
+                                <XAMLToggleButton Name="TB1" Content="Toggle me" />
+                            </XAMLStackPanel>
+                        </XAMLGroupBox>
+                    </XAMLStackPanel>
+                </XAMLScrollViewer>
+            </XAMLTabItem>
+        </XAMLTabControl>
+
+        <!--<XAMLUniformGrid Name="UG1" Rows="6" Columns="4" CellSize="32,40" HeaderRowHeight="20" HeaderColumnWidth="16" GridLinesVisibility="All" BG="LightBlue"
+                    HorizontalGridLineBrush = "Red" VerticalGridLineBrush="Green" RowSpacing="5" ColumnSpacing="8" GridLineMargin="2" SelectionMode="None">
+            <XAMLButton BG="Red" GridRow="0" GridColumn="0" />
+            <XAMLButton BG="Orange" GridRow="1" GridColumn="1" />
+            <XAMLButton BG="Purple" GridRow="2" GridColumn="2" />
+            <XAMLButton BG="Yellow" GridRow="3" GridColumn="3" />
+            <XAMLButton BG="Green" GridRow="2" GridColumn="0" />
+            <XAMLButton BG="YellowGreen" GridRow="3" GridColumn="1" />
+            <XAMLButton BG="GreenYellow" GridRow="4" GridColumn="2" />
+            <XAMLButton BG="OrangeRed" GridRow="5" GridColumn="3" />
+        </XAMLUniformGrid>-->
+
+        <!--<XAMLGrid Padding="10" Name="TestGrid2" RowLengths="30,50,40,50,60,30" ColumnLengths="40,50,60,70" GridLinesVisibility="All" BG="LightBlue"
+                    HorizontalGridLineBrush = "Red" VerticalGridLineBrush="Green" RowSpacing="5" ColumnSpacing="8" GridLineMargin="2" SelectionMode="None">
+            <XAMLButton BG="Red" GridRow="0" GridColumn="0" />
+            <XAMLButton BG="Orange" GridRow="1" GridColumn="1" />
+            <XAMLButton BG="Purple" GridRow="2" GridColumn="2" />
+            <XAMLButton BG="Yellow" GridRow="3" GridColumn="3" />
+            <XAMLButton BG="Green" GridRow="2" GridColumn="0" />
+            <XAMLButton BG="YellowGreen" GridRow="3" GridColumn="1" />
+            <XAMLButton BG="GreenYellow" GridRow="4" GridColumn="2" />
+            <XAMLButton BG="OrangeRed" GridRow="5" GridColumn="3" />
+        </XAMLGrid>-->
+
+        <!--<XAMLListView Name="LV1" xmlns:System="clr-namespace:System;assembly=mscorlib" ItemType="{x:Type System:Double}">
+            <XAMLListViewColumn Width="80px">
+                <XAMLListViewColumn.Header>
+                    <XAMLButton Content="Test" />
+                </XAMLListViewColumn.Header>
+            </XAMLListViewColumn>
+            <XAMLListViewColumn Header="Test" Width="*" />
+        </XAMLListView>-->
+
+        <XAMLListBox IsTitleVisible="True" xmlns:System="clr-namespace:System;assembly=mscorlib" ItemType="{x:Type System:String}">
+            <XAMLListBox.Header>
+                <XAMLHeaderedContentPresenter Spacing="5" HeaderPosition="Left">
+                    <XAMLHeaderedContentPresenter.Header>
+                        <XAMLRectangleElement Width="16" Height="16" Fill="RoyalBlue" HA="Center" />
+                    </XAMLHeaderedContentPresenter.Header>
+                    <XAMLTextBlock Text="Hello World" />
+                </XAMLHeaderedContentPresenter>
+            </XAMLListBox.Header>
+            <System:String>Hello!</System:String>
+            <System:String>Baz</System:String>
+            <System:String>Foo</System:String>
+            <System:Double>115.0</System:Double>
+            <System:String>Bar</System:String>
+            <System:String>Long string that may require textwrapping</System:String>
+            <System:String>hello world</System:String>
+            <System:String>string\n with linebreaks</System:String>
+            <System:String>Bar2</System:String>
+        </XAMLListBox>
+
+        <!--<XAMLGrid Name="TestGrid" RowLengths="100[50,],16,*[80,]" ColumnLengths="1*[50,150],16,1.5*[50,60],1.2*">
+            <XAMLTextBlock BG="Red" GridRow="0" GridColumn="0" />
+            <XAMLTextBlock BG="Yellow" GridRow="2" GridColumn="2" />
+            <XAMLTextBlock BG="Purple" GridRow="0" GridColumn="3" />
+            <XAMLTextBlock BG="Green" GridRow="2" GridColumn="0" />
+            <XAMLTextBlock BG="Cyan" GridRow="0" GridColumn="2" />
+            <XAMLTextBlock BG="Crimson" GridRow="2" GridColumn="3" />
+
+            <XAMLGridSplitter GridRow="0" GridColumn="1" GridRowSpan="3"  />
+            <XAMLGridSplitter GridRow="1" GridColumn="0" GridColumnSpan="4" />
+
+            <XAMLTextBox GridRow="2" GridColumn="3" />
+        </XAMLGrid>-->
+    </XAMLDockPanel>
+</XAMLWindow>

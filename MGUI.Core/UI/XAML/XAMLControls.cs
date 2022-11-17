@@ -1045,6 +1045,8 @@ namespace MGUI.Core.UI.XAML
         public bool? IsItalic { get; set; }
         public bool? IsUnderlined { get; set; }
 
+        public bool? AllowsInlineFormatting { get; set; }
+
         public XAMLColor? Foreground { get; set; }
         public string Text { get; set; }
         public bool? WrapText { get; set; }
@@ -1066,6 +1068,9 @@ namespace MGUI.Core.UI.XAML
                 TextBlock.IsItalic = IsItalic.Value;
             if (IsUnderlined.HasValue)
                 TextBlock.IsUnderlined = IsUnderlined.Value;
+
+            if (AllowsInlineFormatting.HasValue)
+                TextBlock.AllowsInlineFormatting = AllowsInlineFormatting.Value;
 
             if (Foreground.HasValue)
                 TextBlock.Foreground.NormalValue = Foreground.Value.ToXNAColor();

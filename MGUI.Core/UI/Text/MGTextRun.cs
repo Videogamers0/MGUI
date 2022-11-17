@@ -150,13 +150,19 @@ namespace MGUI.Core.UI.Text
             if (string.IsNullOrEmpty(FormattedText))
                 yield break;
 
-            MGTextRunConfig CurrentState = DefaultSettings with { };
-
             if (!Tokenizer.TryTokenize(FormattedText, true, out List<FTTokenMatch> Tokens))
             {
                 FTTokenMatch InvalidToken = Tokens.First(x => x.TokenType == FTTokenType.InvalidToken);
                 throw new InvalidDataException($"Formatted text does not match valid format: {FormattedText}\n\nError at token #{Tokens.IndexOf(InvalidToken) + 1} with value: {InvalidToken.Value}");
             }
+
+            foreach (MGTextRun Run in ParseRuns(Tokens, DefaultSettings))
+                yield return Run;
+        }
+
+        public static IEnumerable<MGTextRun> ParseRuns(List<FTTokenMatch> Tokens, MGTextRunConfig DefaultSettings)
+        {
+            MGTextRunConfig CurrentState = DefaultSettings with { };
 
             List<float> PreviousOpacities = new();
             List<Color?> PreviousForegrounds = new();
@@ -173,7 +179,7 @@ namespace MGUI.Core.UI.Text
 
                 if (CurrentAction.ActionType == FTActionType.StringLiteral)
                 {
-                    StringBuilder LiteralValue = new StringBuilder();
+                    StringBuilder LiteralValue = new();
 
                     bool HasNextAction = true;
                     FTAction NextAction = CurrentAction;

@@ -1118,11 +1118,7 @@ namespace MGUI.Core.UI
                                         CurrentSelection = null;
                                         TextBlockElement.UpdateLines();
                                         _ = Caret.MoveToOriginalCharacterIndexOrEnd(SelectionStart, true);
-#if WINDOWS
-                                        System.Windows.Clipboard.SetText(SelectedText);
-#else
                                         Clipboard.Text = SelectedText;
-#endif
                                     }
                                 }
                                 Handled = true;
@@ -1133,21 +1129,13 @@ namespace MGUI.Core.UI
                                     int SelectionStart = CurrentSelection.Value.ActualStartIndex(Text);
                                     int SelectionEnd = CurrentSelection.Value.ActualEndIndex(Text);
                                     string SelectedText = Text.Substring(SelectionStart, SelectionEnd - SelectionStart); // Could use CurrentText instead of Text to allow PasswordBoxes to copy the underlying text instead of the password character *
-#if WINDOWS
-                                    System.Windows.Clipboard.SetText(SelectedText);
-#else
                                     Clipboard.Text = SelectedText;
-#endif
                                 }
                                 Handled = true;
                                 break;
                             case Keys.V when !IsReadonly:
                                 //  Paste
-#if WINDOWS
-                                string ClipboardText = System.Windows.Clipboard.GetText(System.Windows.TextDataFormat.Text);
-#else
                                 string ClipboardText = Clipboard.Text;
-#endif
                                 if (!string.IsNullOrEmpty(ClipboardText))
                                 {
                                     if (CurrentSelection.HasValue && CurrentSelection.Value.ActualLength(Text) > 0)

@@ -282,6 +282,16 @@ namespace MGUI.Core.UI.Text
                 PreviousCharacter = c;
             }
 
+            //TODO: This method should also handle cases where open brackets immediately follow double-escaped characters
+            //EX:
+            //  Unescaped:                  @"Hello\\[]World"
+            //  Escaped:                    @"Hello\\\[]World"
+            //  Literal rendered string:    @"Hello\[]World"
+            //The @"\\" is treated as a backslash literal, rather than the 2nd backslash being treated as an escape character for the open bracket.
+            //The current logic thinks the open bracket is already escaped because it's immediately after the escape character.
+            //So it's not validating that the escape character isn't also escaped.
+            //I guess we need to check if each open bracket has an odd number of escape characters immediately before it.
+
             return Result.ToString();
         }
 
@@ -374,7 +384,7 @@ namespace MGUI.Core.UI.Text
 
         /// <param name="Enabled">True if '\n', '\r', and "\r\n" characters should be tokenized as <see cref="FTTokenType.LineBreak"/>.<br/>
         /// False if the entire <paramref name="Text"/> should be returned as a single <see cref="FTTokenType.StringValue"/> token.</param>
-        private static IEnumerable<FTTokenMatch> TokenizeLineBreaks(string Text, bool Enabled)
+        public static IEnumerable<FTTokenMatch> TokenizeLineBreaks(string Text, bool Enabled = true)
         {
             if (string.IsNullOrEmpty(Text))
                 yield break;
