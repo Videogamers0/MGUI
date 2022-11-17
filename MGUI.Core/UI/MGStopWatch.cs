@@ -49,14 +49,7 @@ namespace MGUI.Core.UI
 
             //  Assume the required size of this element hasn't changed if the text length stayed the same
             //  This assumption may be incorrect for non-monospaced font
-            if (ForceLayoutRefresh || (ValueElement.Text?.Length ?? 0) != ValueDisplayString.Length)
-            {
-                ValueElement.Text = ValueDisplayString;
-            }
-            else
-            {
-                ValueElement.SetText(ValueDisplayString, true);
-            }
+            ValueElement.SetText(ValueDisplayString, !ForceLayoutRefresh && (ValueElement.Text?.Length ?? 0) == ValueDisplayString.Length);
         }
 
         public const string DefaultValueDisplayFormat = $"[b][shadow=Black 1 1]{{{{{nameof(Elapsed)}}}}}[/shadow][/b]";

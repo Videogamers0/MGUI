@@ -1001,8 +1001,8 @@ namespace MGUI.Core.UI
 					UpdateMeasurement(BoundsSize, out RequestedSelfSize, out RequestedFullSize, out SharedSize, out RequestedContentSize);
 				}
 
-				int ConsumedWidth = HorizontalAlignment == HorizontalAlignment.Stretch ? BoundsSize.Width : Math.Min(BoundsSize.Width, RequestedFullSize.Width);
-                int ConsumedHeight = VerticalAlignment == VerticalAlignment.Stretch ? BoundsSize.Height : Math.Min(BoundsSize.Height, RequestedFullSize.Height);
+				int ConsumedWidth = Math.Min(MaxSizeIncludingMargin.Width, HorizontalAlignment == HorizontalAlignment.Stretch ? BoundsSize.Width : Math.Min(BoundsSize.Width, RequestedFullSize.Width));
+                int ConsumedHeight = Math.Min(MaxSizeIncludingMargin.Height, VerticalAlignment == VerticalAlignment.Stretch ? BoundsSize.Height : Math.Min(BoundsSize.Height, RequestedFullSize.Height));
 				if (ConsumedWidth <= 0 || ConsumedHeight <= 0)
 				{
 					this.RenderBounds = Rectangle.Empty;
@@ -1012,10 +1012,18 @@ namespace MGUI.Core.UI
                 }
 				else
 				{
-                    Size RenderSize = new(ConsumedWidth, ConsumedHeight);
-					this.RenderBounds = ApplyAlignment(AllocatedBounds, HorizontalAlignment, VerticalAlignment, RenderSize);
+                    //  Account for cases where stretching horizontally or vertically would cause the bounds to exceed MaxWidth and/or MaxHeight
+                    HorizontalAlignment ActualHorizontalAlignment = MaxWidth.HasValue && HorizontalAlignment == HorizontalAlignment.Stretch && AllocatedBounds.Width > MaxWidth.Value + HorizontalMargin ?
+                        HorizontalAlignment.Center :
+                        HorizontalAlignment;
+                    VerticalAlignment ActualVerticalAlignment = MaxHeight.HasValue && VerticalAlignment == VerticalAlignment.Stretch && AllocatedBounds.Height > MaxHeight.Value + VerticalMargin ?
+                        VerticalAlignment.Center :
+                        VerticalAlignment;
 
-					this.LayoutBounds = new(RenderBounds.Left + Margin.Left, RenderBounds.Top + Margin.Top,
+                    Size RenderSize = new(ConsumedWidth, ConsumedHeight);
+                    this.RenderBounds = ApplyAlignment(AllocatedBounds, ActualHorizontalAlignment, ActualVerticalAlignment, RenderSize);
+
+                    this.LayoutBounds = new(RenderBounds.Left + Margin.Left, RenderBounds.Top + Margin.Top,
 						RenderBounds.Width - HorizontalMargin, RenderBounds.Height - VerticalMargin);
 					if (LayoutBounds.Width <= 0 || LayoutBounds.Height <= 0)
 					{

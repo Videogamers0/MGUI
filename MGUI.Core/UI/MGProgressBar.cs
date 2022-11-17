@@ -147,7 +147,7 @@ namespace MGUI.Core.UI
                     }
                 }
 
-                ValueElement.SetText(FormattedValue, ForceLayoutRefresh || (ValueElement.Text?.Length ?? 0) != FormattedValue.Length);
+                ValueElement.SetText(FormattedValue, !ForceLayoutRefresh && (ValueElement.Text?.Length ?? 0) == FormattedValue.Length);
             }
         }
 
