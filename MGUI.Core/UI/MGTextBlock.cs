@@ -236,7 +236,7 @@ namespace MGUI.Core.UI
 
         internal void UpdateLines()
         {
-            this.Lines = MGTextLine.ParseLines(this, LayoutBounds.Width - Padding.Width, WrapText, Runs).ToList().AsReadOnly();
+            this.Lines = MGTextLine.ParseLines(this, LayoutBounds.Width - Padding.Width, WrapText, Runs, IgnoreEmptySpaceLines).ToList().AsReadOnly();
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -394,6 +394,9 @@ namespace MGUI.Core.UI
             LayoutChanged(this, true);
         }
 
+        /// <summary>If true, lines that consist of only a single whitespace character will be ignored when rendering wrapped text content.</summary>
+        private const bool IgnoreEmptySpaceLines = true;
+
         public override Thickness MeasureSelfOverride(Size AvailableSize, out Thickness SharedSize)
         {
             Size PaddedSize = AvailableSize.Subtract(PaddingSize, 0, 0);
@@ -407,7 +410,7 @@ namespace MGUI.Core.UI
             if (TryGetCachedSelfMeasurement(RemainingSize, out Thickness? CachedMeasurement))
                 return CachedMeasurement.Value;
 
-            List<MGTextLine> Lines = MGTextLine.ParseLines(this, RemainingSize.Width, WrapText, Runs).ToList();
+            List<MGTextLine> Lines = MGTextLine.ParseLines(this, RemainingSize.Width, WrapText, Runs, IgnoreEmptySpaceLines).ToList();
             Vector2 Size = new(Lines.Select(x => x.LineWidth).DefaultIfEmpty(0).Max(), Lines.Sum(x => x.LineTotalHeight) + LinePadding * (Lines.Count - 1));
             Thickness Measurement = new((int)Math.Ceiling(Size.X), (int)Math.Ceiling(Size.Y), 0, 0);
 

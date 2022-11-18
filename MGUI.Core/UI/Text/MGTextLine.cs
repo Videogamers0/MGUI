@@ -216,11 +216,41 @@ namespace MGUI.Core.UI.Text
             public override string ToString() => $"{Text} ({nameof(HasNext)}={HasNext})";
         }
 
-        public static IEnumerable<MGTextLine> ParseLines(ITextMeasurer Measurer, double MaxLineWidth, bool WrapText, IEnumerable<MGTextRun> Runs)
-            => ParseLines(Measurer, MaxLineWidth, WrapText, Runs, ' ', '-');
+        /// <param name="IgnoreEmptySpaceLines">If true, lines consisting of only a single space character will be ignored, unless it is the first line or if it immediately follows a linebreak.<para/>
+        /// For example, if the line could fit exactly 5 characters, and the text is "Hello World", the result would normally be:
+        /// <code>
+        /// -------<br/>
+        /// |Hello|<br/>
+        /// | ....| (This line only contains a space)<br/>
+        /// |World|<br/>
+        /// -------</code>
+        /// If <paramref name="IgnoreEmptySpaceLines"/> is true, it would instead result in:
+        /// <code>
+        /// -------<br/>
+        /// |Hello|<br/>
+        /// |World|<br/>
+        /// -------</code>
+        /// Note that lines consisting of multiple consecutive spaces will still be returned.</param>
+        public static IEnumerable<MGTextLine> ParseLines(ITextMeasurer Measurer, double MaxLineWidth, bool WrapText, IEnumerable<MGTextRun> Runs, bool IgnoreEmptySpaceLines)
+            => ParseLines(Measurer, MaxLineWidth, WrapText, Runs, IgnoreEmptySpaceLines, ' ', '-');
 
+        /// <param name="IgnoreEmptySpaceLines">If true, lines consisting of only a single space character will be ignored, unless it is the first line or if it immediately follows a linebreak.<para/>
+        /// For example, if the line could fit exactly 5 characters, and the text is "Hello World", the result would normally be:
+        /// <code>
+        /// -------<br/>
+        /// |Hello|<br/>
+        /// | ....| (This line only contains a space)<br/>
+        /// |World|<br/>
+        /// -------</code>
+        /// If <paramref name="IgnoreEmptySpaceLines"/> is true, it would instead result in:
+        /// <code>
+        /// -------<br/>
+        /// |Hello|<br/>
+        /// |World|<br/>
+        /// -------</code>
+        /// Note that lines consisting of multiple consecutive spaces will still be returned.</param>
         /// <param name="WordDelimiters">Recommended: ' ' (space) and '-' (hyphen)</param>
-        public static IEnumerable<MGTextLine> ParseLines(ITextMeasurer Measurer, double MaxLineWidth, bool WrapText, IEnumerable<MGTextRun> Runs, params char[] WordDelimiters)
+        public static IEnumerable<MGTextLine> ParseLines(ITextMeasurer Measurer, double MaxLineWidth, bool WrapText, IEnumerable<MGTextRun> Runs, bool IgnoreEmptySpaceLines, params char[] WordDelimiters)
         {
             if (Runs?.Any() != true || MaxLineWidth < 1)
                 yield break;
@@ -234,7 +264,9 @@ namespace MGUI.Core.UI.Text
             List<int> CurrentIndicesMap = new();
             int CurrentIndexInOriginalText = 0;
 
-            MGTextLine FlushLine(bool EndsInLinebreakCharacter, int LineBreakCharacterCount = 1)
+            MGTextLine PreviousLine = null;
+
+            bool FlushLine(out MGTextLine Line, bool EndsInLinebreakCharacter, int LineBreakCharacterCount = 1)
             {
                 if (!CurrentLine.Any())
                     throw new InvalidOperationException($"Cannot create an {nameof(MGTextLine)} with no {nameof(MGTextRun)}s.");
@@ -262,14 +294,19 @@ namespace MGUI.Core.UI.Text
                 float LineImageHeight = ImageRunSizes.DefaultIfEmpty(Vector2.Zero).Max(x => x.Y);
                 float LineTotalHeight = GeneralUtils.Max(MinLineHeight, LineTextHeight, LineImageHeight);
 
-                MGTextLine Line = new(CurrentLine, LineWidth, LineTextHeight, LineImageHeight, LineTotalHeight, LineNumber, EndsInLinebreakCharacter, CurrentIndicesMap);
+                Line = new(CurrentLine, LineWidth, LineTextHeight, LineImageHeight, LineTotalHeight, LineNumber, EndsInLinebreakCharacter, CurrentIndicesMap);
                 LineNumber++;
                 CurrentLine.Clear();
                 CurrentIndicesMap.Clear();
                 CurrentX = 0;
-                return Line;
+
+                bool IsIgnoreable = IgnoreEmptySpaceLines && PreviousLine != null && !PreviousLine.EndsInLinebreakCharacter &&
+                    Line.Runs.Count == 1 && Line.Runs.First() is MGTextRunText TextRun && TextRun.Text == " ";
+                PreviousLine = Line;
+                return !IsIgnoreable;
             }
 
+            MGTextLine Line;
             WrappableRunGroup Group = new(WordDelimiters, Runs);
 
             while (Group.RemainingRuns.Any())
@@ -281,7 +318,8 @@ namespace MGUI.Core.UI.Text
                 {
                     if (!CurrentLine.Any())
                         CurrentLine.Add(new MGTextRunText("", new MGTextRunConfig(false)));
-                    yield return FlushLine(true, LineBreakRun.LineBreakCharacterCount);
+                    if (FlushLine(out Line, true, LineBreakRun.LineBreakCharacterCount))
+                        yield return Line;
                 }
                 else if (Run.IsImage && Run.OriginalRun is MGTextRunImage ImageRun)
                 {
@@ -292,8 +330,8 @@ namespace MGUI.Core.UI.Text
                     else
                     {
                         int ImgWidth = ImageRun.TargetWidth;
-                        if (CurrentLine.Any() && CurrentX + ImgWidth > MaxLineWidth)
-                            yield return FlushLine(false);
+                        if (CurrentLine.Any() && CurrentX + ImgWidth > MaxLineWidth && FlushLine(out Line, false))
+                            yield return Line;
 
                         CurrentLine.Add(ImageRun);
                         CurrentX += ImgWidth;
@@ -348,8 +386,8 @@ namespace MGUI.Core.UI.Text
                                     CurrentLine.Add(NewRun);
                                 }
 
-                                if (CurrentLine.Any())
-                                    yield return FlushLine(false);
+                                if (CurrentLine.Any() && FlushLine(out Line, false))
+                                    yield return Line;
                                 UnwrappedText.Clear();
 
                                 if (TotalWidth <= MaxLineWidth)
@@ -370,8 +408,8 @@ namespace MGUI.Core.UI.Text
                                     double MaxLineSuffixWidth = string.IsNullOrEmpty(MultiLineWordSuffix) ? 0 : CurrentAndNext.Max(x => Measurer.MeasureText(MultiLineWordSuffix, x.IsBold, x.IsItalic, false).X);
                                     if (MaxLineSuffixWidth >= MaxLineWidth)
                                     {
-                                        if (CurrentLine.Any())
-                                            yield return FlushLine(false);
+                                        if (CurrentLine.Any() && FlushLine(out Line, false))
+                                            yield return Line;
                                         yield break;
 
                                         //string ErrorMsg = $"{nameof(MGTextLine)}.{nameof(ParseLines)} could not be evaluated because zero characters could fit on an entire line. " +
@@ -422,7 +460,8 @@ namespace MGUI.Core.UI.Text
                                                         }
 
                                                         CurrentLine.Add(WordsByRun.Key.AsTextRun(UnwrappedText.ToString()));
-                                                        yield return FlushLine(false);
+                                                        if (FlushLine(out Line, false))
+                                                            yield return Line;
                                                         UnwrappedText.Clear();
                                                         CharIndex--;
                                                     }
@@ -455,7 +494,8 @@ namespace MGUI.Core.UI.Text
 
             if (!CurrentLine.Any())
                 CurrentLine.Add(new MGTextRunText("", new MGTextRunConfig(false)));
-            yield return FlushLine(false);
+            if (FlushLine(out Line, false))
+                yield return Line;
         }
     }
 }
