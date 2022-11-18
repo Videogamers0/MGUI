@@ -72,6 +72,7 @@ namespace MGUI.Samples
         private static MGWindow LoadDesignerWindow(Assembly CurrentAssembly, MGDesktop Desktop)
         {
             MGWindow Window = new(Desktop, 150, 20, 500, 500);
+            Window.TitleText = "XAML Designer";
             Window.SetContent(new MGDesigner(Window));
             if (Window.BackgroundBrush.NormalValue is MGSolidFillBrush SolidFill)
                 Window.BackgroundBrush.NormalValue = SolidFill * 0.5f;

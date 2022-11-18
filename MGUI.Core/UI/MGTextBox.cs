@@ -1229,7 +1229,7 @@ namespace MGUI.Core.UI
                             CurrentSelection = null;
                             TextBlockElement.UpdateLines();
                             int NumCharactersInserted = IsTab ? TabSpacesCount : 1;
-                            _ = Caret.MoveToOriginalCharacterIndexOrEnd(SelectionStart + NumCharactersInserted, true);
+                            _ = Caret.MoveToOriginalCharacterIndexOrEnd(SelectionStart + NumCharactersInserted - 1, false);
                         }
                     }
                     else if (Caret.HasPosition)
@@ -1262,7 +1262,10 @@ namespace MGUI.Core.UI
                         if (SetText(NewText))
                             TextBlockElement.UpdateLines();
                         int NumCharactersInserted = IsTab ? TabSpacesCount : 1;
-                        _ = Caret.MoveToOriginalCharacterIndexOrRight(Caret.Position.Value.IndexInOriginalText + NumCharactersInserted - 1, false);
+                        if (IsEnter)
+                            _ = Caret.MoveToOriginalCharacterIndexOrLeft(Caret.Position.Value.IndexInOriginalText + NumCharactersInserted, true);
+                        else
+                            _ = Caret.MoveToOriginalCharacterIndexOrRight(Caret.Position.Value.IndexInOriginalText + NumCharactersInserted - 1, false);
                     }
                 }
             }

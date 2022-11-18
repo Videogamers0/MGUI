@@ -512,7 +512,7 @@ namespace MGUI.Core.UI
                 CloseButtonElement.SetContent(new MGTextBlock(this, "[b][shadow=Black 1 1]x[/shadow][/b]", Color.White));
                 //CloseButtonElement.CanChangeContent = false;
 
-                this.TitleBarTextBlockElement = new(this, null, Color.White)
+                this.TitleBarTextBlockElement = new(this, null, Color.White, Theme.FontSettings.SmallFontSize)
                 {
                     Margin = new(4,0),
                     Padding = new(0),
