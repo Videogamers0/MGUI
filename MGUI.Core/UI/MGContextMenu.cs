@@ -110,9 +110,27 @@ namespace MGUI.Core.UI
         public float? AutoCloseThreshold { get; set; }
         #endregion Close Conditions
 
+        public MGButton CreateDefaultDropdownButton()
+        {
+            MGButton Button = new(this, new(0), MGUniformBorderBrush.Gray);
+
+            Button.Padding = new(5, 3, 20, 3);
+            Button.Margin = new(0);
+
+            Button.HorizontalContentAlignment = HorizontalAlignment.Left;
+            Button.VerticalContentAlignment = VerticalAlignment.Center;
+            Button.HorizontalAlignment = HorizontalAlignment.Stretch;
+            Button.VerticalAlignment = VerticalAlignment.Stretch;
+
+            Button.BackgroundBrush = GetTheme().ComboBoxDropdownItemBackground.GetValue(true);
+
+            return Button;
+        }
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<MGButton> _ButtonWrapperTemplate;
-        /// <summary>Every <see cref="MGContextMenuButton"/> and <see cref="MGContextMenuToggle"/> within <see cref="Items"/> will be automatically wrapped in an <see cref="MGButton"/> created by this function.</summary>
+        /// <summary>Every <see cref="MGContextMenuButton"/> and <see cref="MGContextMenuToggle"/> within <see cref="Items"/> will be automatically wrapped in an <see cref="MGButton"/> created by this function.<para/>
+        /// Default value: <see cref="CreateDefaultDropdownButton"/></summary>
         public Func<MGButton> ButtonWrapperTemplate
         {
             get => _ButtonWrapperTemplate;
@@ -482,22 +500,7 @@ namespace MGUI.Core.UI
                 ContextMenuOpening += (sender, e) => { SV.InvalidateLayout(); };
                 #endregion Bug Workaround
 
-                this.ButtonWrapperTemplate = () =>
-                {
-                    MGButton Button = new(this, new(0), MGUniformBorderBrush.Gray);
-
-                    Button.Padding = new(5,3,20,3);
-                    Button.Margin = new(0);
-
-                    Button.HorizontalContentAlignment = HorizontalAlignment.Left;
-                    Button.VerticalContentAlignment = VerticalAlignment.Center;
-                    Button.HorizontalAlignment = HorizontalAlignment.Stretch;
-                    Button.VerticalAlignment = VerticalAlignment.Stretch;
-
-                    Button.BackgroundBrush = GetTheme().ComboBoxDropdownItemBackground.GetValue(true);
-
-                    return Button;
-                };
+                this.ButtonWrapperTemplate = CreateDefaultDropdownButton;
 
                 MouseHandler.MovedOutside += (sender, e) =>
                 {

@@ -184,9 +184,9 @@ namespace MGUI.Core.UI
         private readonly List<MGListViewColumn<TItemType>> _Columns;
         public IReadOnlyList<MGListViewColumn<TItemType>> Columns => _Columns;
 
-        public MGListViewColumn<TItemType> AddColumn(ListViewColumnWidth Width, MGElement Header, Func<TItemType, MGElement> DataTemplate)
+        public MGListViewColumn<TItemType> AddColumn(ListViewColumnWidth Width, MGElement Header, Func<TItemType, MGElement> ItemTemplate)
         {
-            MGListViewColumn<TItemType> Column = new(this, Width, Header, DataTemplate);
+            MGListViewColumn<TItemType> Column = new(this, Width, Header, ItemTemplate);
             _Columns.Add(Column);
             return Column;
         }
@@ -383,7 +383,7 @@ namespace MGUI.Core.UI
         public RowDefinition DataRow { get; }
 
         /// <summary>The data object used as a parameter to generate the content of each cell in the <see cref="DataRow"/>.<para/>
-        /// See also: <see cref="MGListViewColumn{TItemType}.DataTemplate"/></summary>
+        /// See also: <see cref="MGListViewColumn{TItemType}.ItemTemplate"/></summary>
         public TItemType Data { get; }
 
         public Dictionary<MGListViewColumn<TItemType>, MGElement> GetRowContents()
@@ -420,9 +420,9 @@ namespace MGUI.Core.UI
                 DataGrid.ClearRowContent(DataRow);
                 foreach (MGListViewColumn<TItemType> Column in ListView.Columns)
                 {
-                    if (Column.DataTemplate != null)
+                    if (Column.ItemTemplate != null)
                     {
-                        MGElement CellContent = Column.DataTemplate(Data);
+                        MGElement CellContent = Column.ItemTemplate(Data);
                         DataGrid.TryAddChild(DataRow, Column.DataColumn, CellContent);
                     }
                 }
@@ -466,16 +466,16 @@ namespace MGUI.Core.UI
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Func<TItemType, MGElement> _DataTemplate;
+        private Func<TItemType, MGElement> _ItemTemplate;
         /// <summary>This function is invoked to instantiate the content of each cell in this column</summary>
-        public Func<TItemType, MGElement> DataTemplate
+        public Func<TItemType, MGElement> ItemTemplate
         {
-            get => _DataTemplate;
+            get => _ItemTemplate;
             set
             {
-                if (_DataTemplate != value)
+                if (_ItemTemplate != value)
                 {
-                    _DataTemplate = value;
+                    _ItemTemplate = value;
                     RefreshColumnContent();
                 }
             }
@@ -486,19 +486,19 @@ namespace MGUI.Core.UI
             using (DataGrid.AllowChangingContentTemporarily())
             {
                 DataGrid.ClearColumnContent(DataColumn);
-                if (ListView.RowItems != null && DataTemplate != null)
+                if (ListView.RowItems != null && ItemTemplate != null)
                 {
                     for (int i = 0; i < ListView.RowItems.Count; i++)
                     {
                         MGListViewItem<TItemType> RowItem = ListView.RowItems[i];
-                        MGElement CellContent = DataTemplate(RowItem.Data);
+                        MGElement CellContent = ItemTemplate(RowItem.Data);
                         DataGrid.TryAddChild(RowItem.DataRow, DataColumn, CellContent);
                     }
                 }
             }
         }
 
-        internal MGListViewColumn(MGListView<TItemType> ListView, ListViewColumnWidth Width, MGElement Header, Func<TItemType, MGElement> DataTemplate)
+        internal MGListViewColumn(MGListView<TItemType> ListView, ListViewColumnWidth Width, MGElement Header, Func<TItemType, MGElement> ItemTemplate)
         {
             this.ListView = ListView;
             this.Width = Width;
@@ -514,7 +514,7 @@ namespace MGUI.Core.UI
 
             this.Header = Header;
 
-            this.DataTemplate = DataTemplate;
+            this.ItemTemplate = ItemTemplate;
         }
     }
 }

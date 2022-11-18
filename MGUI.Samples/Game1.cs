@@ -91,7 +91,7 @@ namespace MGUI.Samples
             if (Window.TryGetElementByName("LV1", out MGListView<double> LV))
             {
                 LV.SetItemsSource(new List<double>() { 5, 25.5, 101.11, 0.0, -52.6, -18, 12345, -99.3, 0 });
-                LV.Columns[1].DataTemplate = (double val) =>
+                LV.Columns[1].ItemTemplate = (double val) =>
                 {
                     if (val > 0)
                         return new MGTextBlock(Window, "Positive", Color.Green);

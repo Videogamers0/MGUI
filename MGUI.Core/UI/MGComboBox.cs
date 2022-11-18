@@ -234,10 +234,32 @@ namespace MGUI.Core.UI
         /// <summary>The default amount of padding in each item within the dropdown.</summary>
         public static Thickness DefaultDropdownItemPadding = new(8, 5, 8, 5);
 
+        public MGButton CreateDefaultDropdownButton()
+        {
+            MGButton Button = new(Dropdown, new(0), null);
+            Button.Padding = DefaultDropdownItemPadding;
+            Button.Margin = 0;
+            Button.BackgroundBrush = GetTheme().ComboBoxDropdownItemBackground.GetValue(true);
+            Button.HorizontalAlignment = HorizontalAlignment.Stretch;
+            Button.HorizontalContentAlignment = HorizontalAlignment.Left;
+            Button.VerticalAlignment = VerticalAlignment.Stretch;
+            Button.VerticalContentAlignment = VerticalAlignment.Center;
+            return Button;
+        }
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<TItemType, MGButton> _DropdownItemTemplate;
         /// <summary>The template to use for items inside the dropdown.<br/>
-        /// Highly recommend to use an <see cref="MGElement"/> with Padding, such as '8,5,8,5'. See also: <see cref="DefaultDropdownItemPadding"/></summary>
+        /// Highly recommend to use an <see cref="MGElement"/> with Padding, such as '8,5,8,5'. See also: <see cref="DefaultDropdownItemPadding"/><para/>
+        /// Default value: <see cref="CreateDefaultDropdownButton"/>, which is then populated with an <see cref="MGTextBlock"/> whose Text is given by the <typeparamref name="TItemType"/>'s <see cref="object.ToString"/><para/>
+        /// <code>
+        /// DropdownItemTemplate = item =>
+        /// {
+        ///     <see cref="MGButton"/> Button = <see cref="CreateDefaultDropdownButton"/>;
+        ///     Button.SetContent(item.ToString());
+        ///     return Button;
+        /// }
+        /// </code></summary>
         public Func<TItemType, MGButton> DropdownItemTemplate
         {
             get => _DropdownItemTemplate;
@@ -260,7 +282,11 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<TItemType, MGElement> _SelectedItemTemplate;
-        /// <summary>The template to use for the selected item</summary>
+        /// <summary>The template to use for the selected item<para/>
+        /// Default value:<para/>
+        /// <code>
+        /// SelectedItemTemplate = item => new <see cref="MGTextBlock"/>(Window, item.ToString()) { WrapText = false, VerticalAlignment = <see cref="VerticalAlignment.Center"/> };
+        /// </code></summary>
         public Func<TItemType, MGElement> SelectedItemTemplate
         {
             get => _SelectedItemTemplate;
@@ -449,20 +475,13 @@ namespace MGUI.Core.UI
                 Dropdown.SetContent(DropdownSV);
                 Dropdown.CanChangeContent = false;
 
-                DropdownItemTemplate = x =>
+                DropdownItemTemplate = item =>
                 {
-                    MGButton Button = new(Dropdown, new(0), null);
-                    Button.Padding = DefaultDropdownItemPadding;
-                    Button.Margin = 0;
-                    Button.BackgroundBrush = GetTheme().ComboBoxDropdownItemBackground.GetValue(true);
-                    Button.HorizontalAlignment = HorizontalAlignment.Stretch;
-                    Button.HorizontalContentAlignment = HorizontalAlignment.Left;
-                    Button.VerticalAlignment = VerticalAlignment.Stretch;
-                    Button.VerticalContentAlignment = VerticalAlignment.Center;
-                    Button.SetContent(x.ToString());
+                    MGButton Button = CreateDefaultDropdownButton();
+                    Button.SetContent(item.ToString());
                     return Button;
                 };
-                SelectedItemTemplate = x => new MGTextBlock(Window, x.ToString()) { WrapText = false, VerticalAlignment = VerticalAlignment.Center };
+                SelectedItemTemplate = item => new MGTextBlock(Window, item.ToString()) { WrapText = false, VerticalAlignment = VerticalAlignment.Center };
 
                 MouseHandler.LMBReleasedInside += (sender, e) =>
                 {

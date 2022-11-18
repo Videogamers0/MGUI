@@ -388,22 +388,22 @@ namespace MGUI.Core.UI
             }
         }
 
-        private Func<TItemType, MGElement> _DataTemplate;
+        private Func<TItemType, MGElement> _ItemTemplate;
         /// <summary>This function is invoked to instantiate the <see cref="MGListBoxItem{TItemType}.Content"/> of each <see cref="MGListBoxItem{TItemType}"/> in this <see cref="MGListBox{TItemType}"/></summary>
-        public Func<TItemType, MGElement> DataTemplate
+        public Func<TItemType, MGElement> ItemTemplate
         {
-            get => _DataTemplate;
+            get => _ItemTemplate;
             set
             {
-                if (_DataTemplate != value)
+                if (_ItemTemplate != value)
                 {
-                    _DataTemplate = value;
-                    DataTemplateChanged?.Invoke(this, EventArgs.Empty);
+                    _ItemTemplate = value;
+                    ItemTemplateChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
 
-        public event EventHandler<EventArgs> DataTemplateChanged;
+        public event EventHandler<EventArgs> ItemTemplateChanged;
 
         private Action<MGBorder> _ItemContainerStyle;
         /// <summary>An action that will be invoked on every <see cref="MGBorder"/> that wraps each <see cref="MGListBoxItem{TItemType}"/>'s content.<para/>
@@ -510,7 +510,7 @@ namespace MGUI.Core.UI
                     contentPresenter.Padding = new(6, 4);
                     contentPresenter.BackgroundBrush = GetTheme().ListBoxItemBackground.GetValue(true);
                 };
-                this.DataTemplate = (item) => new MGTextBlock(ParentWindow, item.ToString()) { Padding = new(1,0) };
+                this.ItemTemplate = (item) => new MGTextBlock(ParentWindow, item.ToString()) { Padding = new(1,0) };
 
                 this.SelectedItems = new List<MGListBoxItem<TItemType>>().AsReadOnly();
                 this.SelectionMode = ListBoxSelectionMode.Single;
@@ -632,14 +632,14 @@ namespace MGUI.Core.UI
         public MGListBox<TItemType> ListBox { get; }
 
         /// <summary>The data object used as a parameter to generate the content of this item.<para/>
-        /// See also: <see cref="MGListBox{TItemType}.DataTemplate"/></summary>
+        /// See also: <see cref="MGListBox{TItemType}.ItemTemplate"/></summary>
         public TItemType Data { get; }
 
         /// <summary>The wrapper element that hosts this item's content</summary>
         public MGBorder ContentPresenter { get; }
 
         private MGElement _Content;
-        /// <summary>This <see cref="MGElement"/> is automatically generated via <see cref="MGListBox{TItemType}.DataTemplate"/> using this.<see cref="Data"/> as the parameter.<para/>
+        /// <summary>This <see cref="MGElement"/> is automatically generated via <see cref="MGListBox{TItemType}.ItemTemplate"/> using this.<see cref="Data"/> as the parameter.<para/>
         /// See also: <see cref="ContentPresenter"/></summary>
         public MGElement Content
         {
@@ -664,8 +664,8 @@ namespace MGUI.Core.UI
             this.Data = Data ?? throw new ArgumentNullException(nameof(Data));
             this.ContentPresenter = new(ListBox.SelfOrParentWindow);
 
-            ListBox.DataTemplateChanged += (sender, e) => { this.Content = ListBox.DataTemplate?.Invoke(this.Data); };
-            this.Content = ListBox.DataTemplate?.Invoke(this.Data);
+            ListBox.ItemTemplateChanged += (sender, e) => { this.Content = ListBox.ItemTemplate?.Invoke(this.Data); };
+            this.Content = ListBox.ItemTemplate?.Invoke(this.Data);
             ContentPresenter.CanChangeContent = false;
 
             ListBox.ItemContainerStyleChanged += (sender, e) => { ListBox.ItemContainerStyle?.Invoke(this.ContentPresenter); };
