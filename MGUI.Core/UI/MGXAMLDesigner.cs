@@ -220,7 +220,7 @@ namespace MGUI.Core.UI
                     Markup = File.ReadAllText(FromFilePath);
                 else
                     Markup = FromStringTextBoxComponent.Text;
-                Result = XAMLParser.Load<MGElement>(SelfOrParentWindow, Markup, true, true);
+                Result = XAMLParser.Load<MGElement>(SelfOrParentWindow, Markup, !IsReadingInputFromFile, true);
             }
             catch (Exception ex)
             {
