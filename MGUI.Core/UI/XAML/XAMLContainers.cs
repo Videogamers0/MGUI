@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MonoGame.Extended;
-using System.Reflection.Metadata;
 
 #if UseWPF
 using System.Windows.Markup;
@@ -21,19 +20,19 @@ namespace MGUI.Core.UI.XAML
 #if UseWPF
     [ContentProperty(nameof(Children))]
 #endif
-    public abstract class XAMLMultiContentHost : XAMLElement
+    public abstract class MultiContentHost : Element
     {
-        public List<XAMLElement> Children { get; set; } = new();
+        public List<Element> Children { get; set; } = new();
 
-        protected internal override IEnumerable<XAMLElement> GetChildren() => Children;
+        protected internal override IEnumerable<Element> GetChildren() => Children;
     }
 
 #if UseWPF
     [ContentProperty(nameof(Content))]
 #endif
-    public abstract class XAMLSingleContentHost : XAMLElement
+    public abstract class SingleContentHost : Element
     {
-        public XAMLElement Content { get; set; }
+        public Element Content { get; set; }
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
@@ -44,36 +43,36 @@ namespace MGUI.Core.UI.XAML
             }
         }
 
-        protected internal override IEnumerable<XAMLElement> GetChildren()
+        protected internal override IEnumerable<Element> GetChildren()
         {
             if (Content != null)
                 yield return Content;
         }
     }
 
-    public struct XAMLColumnDefinition
+    public struct ColumnDefinition
     {
         public GridLength Length { get; set; }
         public int? MinWidth { get; set; }
         public int? MaxWidth { get; set; }
-        public override string ToString() => $"{nameof(XAMLColumnDefinition)}: {Length}";
+        public override string ToString() => $"{nameof(ColumnDefinition)}: {Length}";
     }
 
-    public struct XAMLRowDefinition
+    public struct RowDefinition
     {
         public GridLength Length { get; set; }
         public int? MinHeight { get; set; }
         public int? MaxHeight { get; set; }
-        public override string ToString() => $"{nameof(XAMLRowDefinition)}: {Length}";
+        public override string ToString() => $"{nameof(RowDefinition)}: {Length}";
     }
 
-    public class XAMLGridSplitter : XAMLElement
+    public class GridSplitter : Element
     {
         public override MGElementType ElementType => MGElementType.GridSplitter;
 
         public int? Size { get; set; }
-        public XAMLSize? TickSize { get; set; }
-        public XAMLFillBrush Foreground { get; set; }
+        public Size? TickSize { get; set; }
+        public FillBrush Foreground { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGGridSplitter(Window);
 
@@ -89,28 +88,28 @@ namespace MGUI.Core.UI.XAML
                 GridSplitter.Foreground.NormalValue = Foreground.ToFillBrush();
         }
 
-        protected internal override IEnumerable<XAMLElement> GetChildren() => Enumerable.Empty<XAMLElement>();
+        protected internal override IEnumerable<Element> GetChildren() => Enumerable.Empty<Element>();
     }
 
-    public class XAMLGrid : XAMLMultiContentHost
+    public class Grid : MultiContentHost
     {
         public override MGElementType ElementType => MGElementType.Grid;
 
         public string RowLengths { get; set; }
         public string ColumnLengths { get; set; }
-        public List<XAMLRowDefinition> RowDefinitions { get; set; } = new();
-        public List<XAMLColumnDefinition> ColumnDefinitions { get; set; } = new();
+        public List<RowDefinition> RowDefinitions { get; set; } = new();
+        public List<ColumnDefinition> ColumnDefinitions { get; set; } = new();
 
         public GridSelectionMode? SelectionMode { get; set; }
         public bool? CanDeselectByClickingSelectedCell { get; set; }
-        public XAMLFillBrush SelectionBackground { get; set; }
-        public XAMLFillBrush SelectionOverlay { get; set; }
+        public FillBrush SelectionBackground { get; set; }
+        public FillBrush SelectionOverlay { get; set; }
 
         public GridLineIntersection? GridLineIntersectionHandling { get; set; }
         public GridLinesVisibility? GridLinesVisibility { get; set; }
         public int? GridLineMargin { get; set; }
-        public XAMLFillBrush HorizontalGridLineBrush { get; set; }
-        public XAMLFillBrush VerticalGridLineBrush { get; set; }
+        public FillBrush HorizontalGridLineBrush { get; set; }
+        public FillBrush VerticalGridLineBrush { get; set; }
 
         public int? RowSpacing { get; set; }
         public int? ColumnSpacing { get; set; }
@@ -131,15 +130,15 @@ namespace MGUI.Core.UI.XAML
                 Grid.AddColumns(ConstrainedGridLength.ParseMultiple(ColumnLengths));
             }
 
-            foreach (XAMLRowDefinition RowDefinition in RowDefinitions)
+            foreach (RowDefinition RowDefinition in RowDefinitions)
             {
-                RowDefinition RD = Grid.AddRow(RowDefinition.Length);
+                Containers.Grids.RowDefinition RD = Grid.AddRow(RowDefinition.Length);
                 RD.SetSizeConstraints(RowDefinition.MinHeight, RowDefinition.MaxHeight);
             }
 
-            foreach (XAMLColumnDefinition ColumnDefinition in ColumnDefinitions)
+            foreach (ColumnDefinition ColumnDefinition in ColumnDefinitions)
             {
-                ColumnDefinition CD = Grid.AddColumn(ColumnDefinition.Length);
+                Containers.Grids.ColumnDefinition CD = Grid.AddColumn(ColumnDefinition.Length);
                 CD.SetSizeConstraints(ColumnDefinition.MinWidth, ColumnDefinition.MaxWidth);
             }
 
@@ -168,7 +167,7 @@ namespace MGUI.Core.UI.XAML
             if (ColumnSpacing.HasValue)
                 Grid.ColumnSpacing = ColumnSpacing.Value;
 
-            foreach (XAMLElement Child in Children)
+            foreach (Element Child in Children)
             {
                 MGElement ChildElement = Child.ToElement<MGElement>(Grid.SelfOrParentWindow, Grid);
                 Grid.TryAddChild(Child.GridRow, Child.GridColumn, new GridSpan(Child.GridRowSpan, Child.GridColumnSpan, Child.GridAffectsMeasure), ChildElement);
@@ -176,33 +175,33 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLUniformGrid : XAMLMultiContentHost
+    public class UniformGrid : MultiContentHost
     {
         public override MGElementType ElementType => MGElementType.UniformGrid;
 
         public int? Rows { get; set; }
         public int? Columns { get; set; }
-        public XAMLSize? CellSize { get; set; }
+        public Size? CellSize { get; set; }
         public int? HeaderRowHeight { get; set; }
         public int? HeaderColumnWidth { get; set; }
 
         public GridSelectionMode? SelectionMode { get; set; }
         public bool? CanDeselectByClickingSelectedCell { get; set; }
-        public XAMLFillBrush SelectionBackground { get; set; }
-        public XAMLFillBrush SelectionOverlay { get; set; }
+        public FillBrush SelectionBackground { get; set; }
+        public FillBrush SelectionOverlay { get; set; }
 
         public GridLineIntersection? GridLineIntersectionHandling { get; set; }
         public GridLinesVisibility? GridLinesVisibility { get; set; }
         public int? GridLineMargin { get; set; }
-        public XAMLFillBrush HorizontalGridLineBrush { get; set; }
-        public XAMLFillBrush VerticalGridLineBrush { get; set; }
+        public FillBrush HorizontalGridLineBrush { get; set; }
+        public FillBrush VerticalGridLineBrush { get; set; }
 
         public int? RowSpacing { get; set; }
         public int? ColumnSpacing { get; set; }
 
-        public XAMLFillBrush CellBackground { get; set; }
+        public FillBrush CellBackground { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGUniformGrid(Window, Rows ?? 0, Columns ?? 0, CellSize?.ToSize() ?? Size.Empty);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGUniformGrid(Window, Rows ?? 0, Columns ?? 0, CellSize?.ToSize() ?? MonoGame.Extended.Size.Empty);
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
@@ -247,7 +246,7 @@ namespace MGUI.Core.UI.XAML
             if (CellBackground != null)
                 Grid.CellBackground.NormalValue = CellBackground.ToFillBrush();
 
-            foreach (XAMLElement Child in Children)
+            foreach (Element Child in Children)
             {
                 MGElement ChildElement = Child.ToElement<MGElement>(Grid.SelfOrParentWindow, Grid);
                 Grid.TryAddChild(Child.GridRow, Child.GridColumn, ChildElement);
@@ -255,7 +254,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLDockPanel : XAMLMultiContentHost
+    public class DockPanel : MultiContentHost
     {
         public override MGElementType ElementType => MGElementType.DockPanel;
 
@@ -265,7 +264,7 @@ namespace MGUI.Core.UI.XAML
         {
             MGDockPanel DockPanel = Element as MGDockPanel;
 
-            foreach (XAMLElement Child in Children)
+            foreach (Element Child in Children)
             {
                 MGElement ChildElement = Child.ToElement<MGElement>(DockPanel.ParentWindow, DockPanel);
                 DockPanel.TryAddChild(ChildElement, Child.Dock);
@@ -273,7 +272,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLStackPanel : XAMLMultiContentHost
+    public class StackPanel : MultiContentHost
     {
         public override MGElementType ElementType => MGElementType.StackPanel;
 
@@ -291,7 +290,7 @@ namespace MGUI.Core.UI.XAML
             if (Spacing.HasValue)
                 StackPanel.Spacing = Spacing.Value;
 
-            foreach (XAMLElement Child in Children)
+            foreach (Element Child in Children)
             {
                 MGElement ChildElement = Child.ToElement<MGElement>(StackPanel.ParentWindow, StackPanel);
                 StackPanel.TryAddChild(ChildElement);
@@ -299,7 +298,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLOverlayPanel : XAMLMultiContentHost
+    public class OverlayPanel : MultiContentHost
     {
         public override MGElementType ElementType => MGElementType.OverlayPanel;
 
@@ -309,7 +308,7 @@ namespace MGUI.Core.UI.XAML
         {
             MGOverlayPanel OverlayPanel = Element as MGOverlayPanel;
 
-            foreach (XAMLElement Child in Children)
+            foreach (Element Child in Children)
             {
                 MGElement ChildElement = Child.ToElement<MGElement>(OverlayPanel.ParentWindow, OverlayPanel);
                 OverlayPanel.TryAddChild(ChildElement, Child.Offset.ToThickness());

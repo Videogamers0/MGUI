@@ -12,14 +12,14 @@ using System.Threading.Tasks;
 namespace MGUI.Core.UI.XAML
 {
     [TypeConverter(typeof(XAMLElementStringConverter))]
-    public abstract class XAMLElement
+    public abstract class Element
     {
         public abstract MGElementType ElementType { get; }
 
         public string Name { get; set; }
 
-        public XAMLThickness? Margin { get; set; }
-        public XAMLThickness? Padding { get; set; }
+        public Thickness? Margin { get; set; }
+        public Thickness? Padding { get; set; }
 
         public HorizontalAlignment? HorizontalAlignment { get; set; }
         public VerticalAlignment? VerticalAlignment { get; set; }
@@ -42,8 +42,8 @@ namespace MGUI.Core.UI.XAML
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int? Width { get => PreferredWidth; set => PreferredWidth = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int? Height { get => PreferredHeight; set => PreferredHeight = value; }
 
-        public XAMLToolTip ToolTip { get; set; }
-        public XAMLContextMenu ContextMenu { get; set; }
+        public ToolTip ToolTip { get; set; }
+        public ContextMenu ContextMenu { get; set; }
 
         public bool? CanHandleInputsWhileHidden { get; set; }
         public bool? IsHitTestVisible { get; set; }
@@ -52,9 +52,9 @@ namespace MGUI.Core.UI.XAML
         public bool? IsEnabled { get; set; }
 
         //public VisualStateBrush Background
-        public XAMLFillBrush Background { get; set; }
+        public FillBrush Background { get; set; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public XAMLFillBrush BG { get => Background; set => Background = value; }
+        public FillBrush BG { get => Background; set => Background = value; }
         public XAMLColor? TextForeground { get; set; }
 
         public Visibility? Visibility { get; set; }
@@ -63,34 +63,34 @@ namespace MGUI.Core.UI.XAML
 
         public float? Opacity { get; set; }
 
-        /// <summary>Used by <see cref="XAMLDockPanel"/>'s children</summary>
+        /// <summary>Used by <see cref="DockPanel"/>'s children</summary>
         public Dock Dock { get; set; } = Dock.Top;
-        /// <summary>Used by <see cref="XAMLGrid"/>'s children</summary>
+        /// <summary>Used by <see cref="Grid"/>'s children</summary>
         public int GridRow { get; set; } = 0;
-        /// <summary>Used by <see cref="XAMLGrid"/>'s children</summary>
+        /// <summary>Used by <see cref="Grid"/>'s children</summary>
         public int GridColumn { get; set; } = 0;
-        /// <summary>Used by <see cref="XAMLGrid"/>'s children</summary>
+        /// <summary>Used by <see cref="Grid"/>'s children</summary>
         public int GridRowSpan { get; set; } = 1;
-        /// <summary>Used by <see cref="XAMLGrid"/>'s children</summary>
+        /// <summary>Used by <see cref="Grid"/>'s children</summary>
         public int GridColumnSpan { get; set; } = 1;
-        /// <summary>Used by <see cref="XAMLGrid"/>'s children</summary>
+        /// <summary>Used by <see cref="Grid"/>'s children</summary>
         public bool GridAffectsMeasure { get; set; } = true;
-        /// <summary>Used by <see cref="XAMLOverlayPanel"/>'s children</summary>
-        public XAMLThickness Offset { get; set; } = new();
+        /// <summary>Used by <see cref="OverlayPanel"/>'s children</summary>
+        public Thickness Offset { get; set; } = new();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int Row { get => GridRow; set => GridRow = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int Column { get => GridColumn; set => GridColumn = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int RowSpan { get => GridRowSpan; set => GridRowSpan = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int ColumnSpan { get => GridColumnSpan; set => GridColumnSpan = value; }
 
-        /// <summary>If true, this object can have <see cref="XAMLStyleSetter"/>s applied to its properties.<para/>
+        /// <summary>If true, this object can have <see cref="Setter"/>s applied to its properties.<para/>
         /// Default value: true</summary>
         public bool IsStyleable { get; set; } = true;
-        public List<XAMLStyle> Styles { get; set; } = new();
-        /// <summary>The names of the named <see cref="XAMLStyle"/>s that should be applied to this <see cref="XAMLElement"/>.<br/>
+        public List<Style> Styles { get; set; } = new();
+        /// <summary>The names of the named <see cref="Style"/>s that should be applied to this <see cref="Element"/>.<br/>
         /// Use a comma to delimit multiple names, such as: "Style1,Style2<br/>
-        /// to apply <see cref="XAMLStyle"/> with <see cref="XAMLStyle.Name"/>="Style1" and <see cref="XAMLStyle"/> with <see cref="XAMLStyle.Name"/>="Style2" to this <see cref="XAMLElement"/><para/>
-        /// See also: <see cref="XAMLStyle.Name"/></summary>
+        /// to apply <see cref="Style"/> with <see cref="Style.Name"/>="Style1" and <see cref="Style"/> with <see cref="Style.Name"/>="Style2" to this <see cref="Element"/><para/>
+        /// See also: <see cref="Style.Name"/></summary>
         public string StyleNames { get; set; }
 
         public Dictionary<string, object> AttachedProperties { get; set; } = new();
@@ -180,15 +180,15 @@ namespace MGUI.Core.UI.XAML
         protected abstract MGElement CreateElementInstance(MGWindow Window, MGElement Parent);
         protected internal abstract void ApplyDerivedSettings(MGElement Parent, MGElement Element);
 
-        protected internal abstract IEnumerable<XAMLElement> GetChildren();
+        protected internal abstract IEnumerable<Element> GetChildren();
 
-        protected internal void ProcessStyles() => ProcessStyles(new Dictionary<string, XAMLStyle>(), new Dictionary<MGElementType, Dictionary<string, List<object>>>());
-        private void ProcessStyles(Dictionary<string, XAMLStyle> StylesByName, Dictionary<MGElementType, Dictionary<string, List<object>>> StylesByType)
+        protected internal void ProcessStyles() => ProcessStyles(new Dictionary<string, Style>(), new Dictionary<MGElementType, Dictionary<string, List<object>>>());
+        private void ProcessStyles(Dictionary<string, Style> StylesByName, Dictionary<MGElementType, Dictionary<string, List<object>>> StylesByType)
         {
             Dictionary<string, List<object>> ValuesByProperty;
 
             //  Append current style setters to indexed data
-            foreach (XAMLStyle Style in this.Styles.Where(x => x.Setters.Any()))
+            foreach (Style Style in this.Styles.Where(x => x.Setters.Any()))
             {
                 if (Style.Name != null)
                 {
@@ -203,7 +203,7 @@ namespace MGUI.Core.UI.XAML
                         StylesByType.Add(Type, ValuesByProperty);
                     }
 
-                    foreach (XAMLStyleSetter Setter in Style.Setters)
+                    foreach (Setter Setter in Style.Setters)
                     {
                         string Property = Setter.Property;
                         if (!ValuesByProperty.TryGetValue(Property, out List<object> Values))
@@ -232,7 +232,7 @@ namespace MGUI.Core.UI.XAML
 #if DEBUG
                         //  Sanity check
                         if (KVP.Value.Count == 0)
-                            throw new InvalidOperationException($"{nameof(XAMLElement)}.{nameof(ProcessStyles)}.{nameof(ValuesByProperty)} should never be empty. The indexed data might not be properly updated.");
+                            throw new InvalidOperationException($"{nameof(Element)}.{nameof(ProcessStyles)}.{nameof(ValuesByProperty)} should never be empty. The indexed data might not be properly updated.");
 #endif
 
                         string PropertyName = KVP.Key;
@@ -260,7 +260,7 @@ namespace MGUI.Core.UI.XAML
                 if (StyleNames != null)
                 {
                     string[] Names = StyleNames.Split(',');
-                    List<XAMLStyle> ExplicitStyles = Names.Select(x => StylesByName[x]).ToList();
+                    List<Style> ExplicitStyles = Names.Select(x => StylesByName[x]).ToList();
 
                     //  Get all the properties that the explicit styles will modify
                     HashSet<string> PropertyNames = ExplicitStyles.SelectMany(x => x.Setters).Select(x => x.Property).ToHashSet();
@@ -278,9 +278,9 @@ namespace MGUI.Core.UI.XAML
                     }
 
                     //  Apply the values of each setter
-                    foreach (XAMLStyle Style in ExplicitStyles)
+                    foreach (Style Style in ExplicitStyles)
                     {
-                        foreach (XAMLStyleSetter Setter in Style.Setters)
+                        foreach (Setter Setter in Style.Setters)
                         {
                             string PropertyName = Setter.Property;
                             if (PropertiesByName.TryGetValue(PropertyName, out PropertyInfo PropertyInfo))
@@ -299,13 +299,13 @@ namespace MGUI.Core.UI.XAML
             }
 
             //  Recursively process all children
-            foreach (XAMLElement Child in GetChildren())
+            foreach (Element Child in GetChildren())
             {
                 Child.ProcessStyles(StylesByName, StylesByType);
             }
 
             //  Remove current style setters from indexed data
-            foreach (XAMLStyle Style in this.Styles.Where(x => x.Setters.Any()))
+            foreach (Style Style in this.Styles.Where(x => x.Setters.Any()))
             {
                 if (Style.Name != null)
                 {
@@ -316,7 +316,7 @@ namespace MGUI.Core.UI.XAML
                     MGElementType Type = Style.TargetType;
                     if (StylesByType.TryGetValue(Type, out ValuesByProperty))
                     {
-                        foreach (XAMLStyleSetter Setter in Style.Setters)
+                        foreach (Setter Setter in Style.Setters)
                         {
                             string Property = Setter.Property;
                             if (ValuesByProperty.TryGetValue(Property, out List<object> Values))
@@ -348,7 +348,7 @@ namespace MGUI.Core.UI.XAML
         {
             if (value is string stringValue)
             {
-                XAMLTextBlock TextBlock = new() { Text = stringValue };
+                TextBlock TextBlock = new() { Text = stringValue };
                 return TextBlock;
             }
 

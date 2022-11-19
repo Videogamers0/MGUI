@@ -13,6 +13,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Thickness = MonoGame.Extended.Thickness;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace MGUI.Core.UI
 {
@@ -591,7 +593,7 @@ namespace MGUI.Core.UI
 
         //  This method is invoked via reflection in XAMLListView.ApplyDerivedSettings.
         //  Do not modify the method signature.
-        internal void LoadSettings(XAMLListBox Settings)
+        internal void LoadSettings(ListBox Settings)
         {
             Settings.OuterBorder.ApplySettings(this, OuterBorder);
             Settings.InnerBorder.ApplySettings(this, InnerBorder);

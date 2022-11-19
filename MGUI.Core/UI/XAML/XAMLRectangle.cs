@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MGUI.Core.UI.XAML
 {
-    [TypeConverter(typeof(XAMLRectangleStringConverter))]
+    [TypeConverter(typeof(RectangleStringConverter))]
     public struct XAMLRectangle
     {
         public int Left { get; set; }
@@ -30,10 +30,10 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(XAMLRectangle)}: ({Left},{Top},{Width},{Height})";
 
-        public Rectangle ToRectangle() => new Rectangle(Left, Top, Width, Height);
+        public Microsoft.Xna.Framework.Rectangle ToRectangle() => new Microsoft.Xna.Framework.Rectangle(Left, Top, Width, Height);
     }
 
-    public class XAMLRectangleStringConverter : TypeConverter
+    public class RectangleStringConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
@@ -50,8 +50,8 @@ namespace MGUI.Core.UI.XAML
                 return values.Length switch
                 {
                     0 => new XAMLRectangle(),
-                    2 => new XAMLThickness(values[0], values[1]),
-                    4 => new XAMLThickness(values[0], values[1], values[2], values[3]),
+                    2 => new Thickness(values[0], values[1]),
+                    4 => new Thickness(values[0], values[1], values[2], values[3]),
                     _ => throw new ArgumentException(stringValue)
                 };
             }

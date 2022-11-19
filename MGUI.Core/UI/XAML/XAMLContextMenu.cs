@@ -15,7 +15,7 @@ namespace MGUI.Core.UI.XAML
 #if UseWPF
     [ContentProperty(nameof(Items))]
 #endif
-    public class XAMLContextMenu : XAMLWindow
+    public class ContextMenu : Window
     {
         public override MGElementType ElementType => MGElementType.ContextMenu;
 
@@ -24,10 +24,10 @@ namespace MGUI.Core.UI.XAML
         public bool? StaysOpenOnItemToggled { get; set; }
         public float? AutoCloseThreshold { get; set; }
 
-        public List<XAMLContextMenuItem> Items { get; set; } = new();
+        public List<ContextMenuItem> Items { get; set; } = new();
 
-        public XAMLScrollViewer ScrollViewer { get; set; } = new();
-        public XAMLStackPanel ItemsPanel { get; set; } = new();
+        public ScrollViewer ScrollViewer { get; set; } = new();
+        public StackPanel ItemsPanel { get; set; } = new();
 
         public int? HeaderWidth { get; set; }
         public int? HeaderHeight { get; set; }
@@ -60,7 +60,7 @@ namespace MGUI.Core.UI.XAML
             if (HeaderWidth.HasValue || HeaderHeight.HasValue)
                 ContextMenu.HeaderSize = new(HeaderWidth ?? ContextMenu.HeaderSize.Width, HeaderHeight ?? ContextMenu.HeaderSize.Height);
 
-            foreach (XAMLContextMenuItem Item in Items)
+            foreach (ContextMenuItem Item in Items)
             {
                 _ = Item.ToElement<MGContextMenuItem>(Element.SelfOrParentWindow, ContextMenu);
             }
@@ -68,27 +68,27 @@ namespace MGUI.Core.UI.XAML
             base.ApplyDerivedSettings(Parent, Element);
         }
 
-        protected internal override IEnumerable<XAMLElement> GetChildren()
+        protected internal override IEnumerable<Element> GetChildren()
         {
-            foreach (XAMLElement Element in base.GetChildren())
+            foreach (Element Element in base.GetChildren())
                 yield return Element;
 
             yield return ScrollViewer;
             yield return ItemsPanel;
 
-            foreach (XAMLContextMenuItem Item in Items)
+            foreach (ContextMenuItem Item in Items)
                 yield return Item;
         }
     }
 
-    public abstract class XAMLContextMenuItem : XAMLSingleContentHost
+    public abstract class ContextMenuItem : SingleContentHost
     {
 
     }
 
-    public abstract class XAMLWrappedContextMenuItem : XAMLContextMenuItem
+    public abstract class WrappedContextMenuItem : ContextMenuItem
     {
-        public XAMLContextMenu Submenu { get; set; }
+        public ContextMenu Submenu { get; set; }
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
@@ -101,11 +101,11 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLContextMenuButton : XAMLWrappedContextMenuItem
+    public class ContextMenuButton : WrappedContextMenuItem
     {
         public override MGElementType ElementType => MGElementType.ContextMenuItem;
 
-        public XAMLImage Icon { get; set; }
+        public Image Icon { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
@@ -128,9 +128,9 @@ namespace MGUI.Core.UI.XAML
             base.ApplyDerivedSettings(Parent, Element);
         }
 
-        protected internal override IEnumerable<XAMLElement> GetChildren()
+        protected internal override IEnumerable<Element> GetChildren()
         {
-            foreach (XAMLElement Element in base.GetChildren())
+            foreach (Element Element in base.GetChildren())
                 yield return Element;
 
             if (Icon != null)
@@ -138,7 +138,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLContextMenuToggle : XAMLWrappedContextMenuItem
+    public class ContextMenuToggle : WrappedContextMenuItem
     {
         public override MGElementType ElementType => MGElementType.ContextMenuItem;
 
@@ -166,11 +166,11 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLContextMenuSeparator : XAMLContextMenuItem
+    public class ContextMenuSeparator : ContextMenuItem
     {
         public override MGElementType ElementType => MGElementType.ContextMenuItem;
 
-        public XAMLSeparator Separator { get; set; } = new();
+        public Separator Separator { get; set; } = new();
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
@@ -189,9 +189,9 @@ namespace MGUI.Core.UI.XAML
             base.ApplyDerivedSettings(Parent, Element);
         }
 
-        protected internal override IEnumerable<XAMLElement> GetChildren()
+        protected internal override IEnumerable<Element> GetChildren()
         {
-            foreach (XAMLElement Element in base.GetChildren())
+            foreach (Element Element in base.GetChildren())
                 yield return Element;
 
             yield return Separator;

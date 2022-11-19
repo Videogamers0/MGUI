@@ -9,19 +9,19 @@ using System.Threading.Tasks;
 
 namespace MGUI.Core.UI.XAML
 {
-    [TypeConverter(typeof(XAMLThicknessStringConverter))]
-    public struct XAMLThickness
+    [TypeConverter(typeof(ThicknessStringConverter))]
+    public struct Thickness
     {
         public int Left { get; set; }
         public int Top { get; set; }
         public int Right { get; set; }
         public int Bottom { get; set; }
 
-        public XAMLThickness() : this(0, 0, 0, 0) { }
-        public XAMLThickness(int All) : this(All, All, All, All) { }
-        public XAMLThickness(int LeftRight, int TopBottom) : this(LeftRight, TopBottom, LeftRight, TopBottom) { }
+        public Thickness() : this(0, 0, 0, 0) { }
+        public Thickness(int All) : this(All, All, All, All) { }
+        public Thickness(int LeftRight, int TopBottom) : this(LeftRight, TopBottom, LeftRight, TopBottom) { }
 
-        public XAMLThickness(int Left, int Top, int Right, int Bottom)
+        public Thickness(int Left, int Top, int Right, int Bottom)
         {
             this.Left = Left;
             this.Top = Top;
@@ -29,12 +29,12 @@ namespace MGUI.Core.UI.XAML
             this.Bottom = Bottom;
         }
 
-        public override string ToString() => $"{nameof(XAMLThickness)}: ({Left},{Top},{Right},{Bottom})";
+        public override string ToString() => $"{nameof(Thickness)}: ({Left},{Top},{Right},{Bottom})";
 
-        public Thickness ToThickness() => new Thickness(Left, Top, Right, Bottom);
+        public MonoGame.Extended.Thickness ToThickness() => new MonoGame.Extended.Thickness(Left, Top, Right, Bottom);
     }
 
-    public class XAMLThicknessStringConverter : TypeConverter
+    public class ThicknessStringConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
@@ -50,10 +50,10 @@ namespace MGUI.Core.UI.XAML
                 int[] values = stringValue.Split(',').Select(x => int.Parse(x)).ToArray();
                 return values.Length switch
                 {
-                    0 => new XAMLThickness(0),
-                    1 => new XAMLThickness(values[0]),
-                    2 => new XAMLThickness(values[0], values[1]),
-                    4 => new XAMLThickness(values[0], values[1], values[2], values[3]),
+                    0 => new Thickness(0),
+                    1 => new Thickness(values[0]),
+                    2 => new Thickness(values[0], values[1]),
+                    4 => new Thickness(values[0], values[1], values[2], values[3]),
                     _ => throw new ArgumentException(stringValue)
                 };
             }

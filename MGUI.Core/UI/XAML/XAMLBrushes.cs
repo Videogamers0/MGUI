@@ -15,7 +15,7 @@ using System.Text.RegularExpressions;
 namespace MGUI.Core.UI.XAML
 {
     #region Color
-    [TypeConverter(typeof(XAMLColorStringConverter))]
+    [TypeConverter(typeof(ColorStringConverter))]
     public struct XAMLColor
     {
         public byte R { get; set; }
@@ -43,7 +43,7 @@ namespace MGUI.Core.UI.XAML
         public Color ToXNAColor() => new(R, G, B, A);
     }
 
-    public class XAMLColorStringConverter : TypeConverter
+    public class ColorStringConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
@@ -99,15 +99,15 @@ namespace MGUI.Core.UI.XAML
     #endregion Color
 
     #region Fill Brush
-    [TypeConverter(typeof(XAMLFillBrushStringConverter))]
-    public abstract class XAMLFillBrush
+    [TypeConverter(typeof(FillBrushStringConverter))]
+    public abstract class FillBrush
     {
         public abstract IFillBrush ToFillBrush();
     }
 
-    public class XAMLFillBrushStringConverter : TypeConverter
+    public class FillBrushStringConverter : TypeConverter
     {
-        private readonly XAMLColorStringConverter ColorStringConverter = new();
+        private readonly ColorStringConverter ColorStringConverter = new();
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
             => ColorStringConverter.CanConvertFrom(context, sourceType) || base.CanConvertFrom(context, sourceType);
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
@@ -118,7 +118,7 @@ namespace MGUI.Core.UI.XAML
                 if (colorStrings.Length == 1)
                 {
                     XAMLColor Color = (XAMLColor)ColorStringConverter.ConvertFrom(context, culture, colorStrings[0]);
-                    return new XAMLSolidFillBrush(Color);
+                    return new SolidFillBrush(Color);
                 }
                 else if (colorStrings.Length == 2)
                 {
@@ -126,12 +126,12 @@ namespace MGUI.Core.UI.XAML
                     XAMLColor Color2 = (XAMLColor)ColorStringConverter.ConvertFrom(context, culture, colorStrings[1]);
                     Color Lerped = Color.Lerp(Color1.ToXNAColor(), Color2.ToXNAColor(), 0.5f);
                     XAMLColor Diagonals = new XAMLColor(Lerped.R, Lerped.G, Lerped.B, Lerped.A);
-                    return new XAMLGradientFillBrush(Color1, Diagonals, Color2, Diagonals);
+                    return new GradientFillBrush(Color1, Diagonals, Color2, Diagonals);
                 }
                 else if (colorStrings.Length == 4)
                 {
                     XAMLColor[] Colors = colorStrings.Select(x => (XAMLColor)ColorStringConverter.ConvertFrom(context, culture, x)).ToArray();
-                    return new XAMLGradientFillBrush(Colors[0], Colors[1], Colors[2], Colors[3]);
+                    return new GradientFillBrush(Colors[0], Colors[1], Colors[2], Colors[3]);
                 }
             }
 
@@ -139,30 +139,30 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLSolidFillBrush : XAMLFillBrush
+    public class SolidFillBrush : FillBrush
     {
         public XAMLColor Color { get; set; }
 
-        public XAMLSolidFillBrush() : this(new XAMLColor()) { }
-        public XAMLSolidFillBrush(XAMLColor Color)
+        public SolidFillBrush() : this(new XAMLColor()) { }
+        public SolidFillBrush(XAMLColor Color)
         {
             this.Color = Color;
         }
 
-        public override string ToString() => $"{nameof(XAMLSolidFillBrush)}: {Color}";
+        public override string ToString() => $"{nameof(SolidFillBrush)}: {Color}";
 
         public override IFillBrush ToFillBrush() => new MGSolidFillBrush(Color.ToXNAColor());
     }
 
-    public class XAMLGradientFillBrush : XAMLFillBrush
+    public class GradientFillBrush : FillBrush
     {
         public XAMLColor TopLeftColor { get; set; }
         public XAMLColor TopRightColor { get; set; }
         public XAMLColor BottomLeftColor { get; set; }
         public XAMLColor BottomRightColor { get; set; }
 
-        public XAMLGradientFillBrush() : this(new XAMLColor(), new XAMLColor(), new XAMLColor(), new XAMLColor()) { }
-        public XAMLGradientFillBrush(XAMLColor TopLeft, XAMLColor TopRight, XAMLColor BottomRight, XAMLColor BottomLeft)
+        public GradientFillBrush() : this(new XAMLColor(), new XAMLColor(), new XAMLColor(), new XAMLColor()) { }
+        public GradientFillBrush(XAMLColor TopLeft, XAMLColor TopRight, XAMLColor BottomRight, XAMLColor BottomLeft)
         {
             this.TopLeftColor = TopLeft;
             this.TopRightColor = TopRight;
@@ -170,22 +170,22 @@ namespace MGUI.Core.UI.XAML
             this.BottomLeftColor = BottomLeft;
         }
 
-        public override string ToString() => $"{nameof(XAMLGradientFillBrush)}: {TopLeftColor} {TopRightColor} {BottomRightColor} {BottomLeftColor}";
+        public override string ToString() => $"{nameof(GradientFillBrush)}: {TopLeftColor} {TopRightColor} {BottomRightColor} {BottomLeftColor}";
 
         public override IFillBrush ToFillBrush() => new MGGradientFillBrush(TopLeftColor.ToXNAColor(), TopRightColor.ToXNAColor(), BottomRightColor.ToXNAColor(), BottomLeftColor.ToXNAColor());
     }
     #endregion Fill Brush
 
     #region Border Brush
-    [TypeConverter(typeof(XAMLBorderBrushStringConverter))]
-    public abstract class XAMLBorderBrush
+    [TypeConverter(typeof(BorderBrushStringConverter))]
+    public abstract class BorderBrush
     {
         public abstract IBorderBrush ToBorderBrush();
     }
 
-    public class XAMLBorderBrushStringConverter : TypeConverter
+    public class BorderBrushStringConverter : TypeConverter
     {
-        private readonly XAMLFillBrushStringConverter FillBrushStringConverter = new();
+        private readonly FillBrushStringConverter FillBrushStringConverter = new();
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
             => FillBrushStringConverter.CanConvertFrom(context, sourceType) || base.CanConvertFrom(context, sourceType);
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
@@ -195,16 +195,16 @@ namespace MGUI.Core.UI.XAML
                 string[] fillBrushStrings = stringValue.Split('-');
                 if (fillBrushStrings.Length == 1)
                 {
-                    XAMLFillBrush FillBrush = (XAMLFillBrush)FillBrushStringConverter.ConvertFrom(context, culture, fillBrushStrings[0]);
-                    return new XAMLUniformBorderBrush(FillBrush);
+                    FillBrush FillBrush = (FillBrush)FillBrushStringConverter.ConvertFrom(context, culture, fillBrushStrings[0]);
+                    return new UniformBorderBrush(FillBrush);
                 }
                 else if (fillBrushStrings.Length is 2 or 4)
                 {
-                    XAMLFillBrush[] FillBrushes = fillBrushStrings.Select(x => (XAMLFillBrush)FillBrushStringConverter.ConvertFrom(context, culture, x)).ToArray();
+                    FillBrush[] FillBrushes = fillBrushStrings.Select(x => (FillBrush)FillBrushStringConverter.ConvertFrom(context, culture, x)).ToArray();
                     if (FillBrushes.Length == 2)
-                        return new XAMLDockedBorderBrush(FillBrushes[0], FillBrushes[1], FillBrushes[1], FillBrushes[0]);
+                        return new DockedBorderBrush(FillBrushes[0], FillBrushes[1], FillBrushes[1], FillBrushes[0]);
                     else
-                        return new XAMLDockedBorderBrush(FillBrushes[0], FillBrushes[1], FillBrushes[2 % FillBrushes.Length], FillBrushes[3 % FillBrushes.Length]);
+                        return new DockedBorderBrush(FillBrushes[0], FillBrushes[1], FillBrushes[2 % FillBrushes.Length], FillBrushes[3 % FillBrushes.Length]);
                 }
             }
 
@@ -212,30 +212,30 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLUniformBorderBrush : XAMLBorderBrush
+    public class UniformBorderBrush : BorderBrush
     {
-        public XAMLFillBrush Brush { get; set; }
+        public FillBrush Brush { get; set; }
 
-        public XAMLUniformBorderBrush() : this(null) { }
-        public XAMLUniformBorderBrush(XAMLFillBrush Brush)
+        public UniformBorderBrush() : this(null) { }
+        public UniformBorderBrush(FillBrush Brush)
         {
             this.Brush = Brush;
         }
 
-        public override string ToString() => $"{nameof(XAMLUniformBorderBrush)}: {Brush}";
+        public override string ToString() => $"{nameof(UniformBorderBrush)}: {Brush}";
 
         public override IBorderBrush ToBorderBrush() => new MGUniformBorderBrush(Brush.ToFillBrush());
     }
 
-    public class XAMLDockedBorderBrush : XAMLBorderBrush
+    public class DockedBorderBrush : BorderBrush
     {
-        public XAMLFillBrush Left { get; set; }
-        public XAMLFillBrush Top { get; set; }
-        public XAMLFillBrush Right { get; set; }
-        public XAMLFillBrush Bottom { get; set; }
+        public FillBrush Left { get; set; }
+        public FillBrush Top { get; set; }
+        public FillBrush Right { get; set; }
+        public FillBrush Bottom { get; set; }
 
-        public XAMLDockedBorderBrush() : this(null, null, null, null) { }
-        public XAMLDockedBorderBrush(XAMLFillBrush Left, XAMLFillBrush Top, XAMLFillBrush Right, XAMLFillBrush Bottom)
+        public DockedBorderBrush() : this(null, null, null, null) { }
+        public DockedBorderBrush(FillBrush Left, FillBrush Top, FillBrush Right, FillBrush Bottom)
         {
             this.Left = Left;
             this.Top = Top;
@@ -244,7 +244,7 @@ namespace MGUI.Core.UI.XAML
         }
 
 
-        public override string ToString() => $"{nameof(XAMLDockedBorderBrush)}: {Left}, {Top}, {Right}, {Bottom}";
+        public override string ToString() => $"{nameof(DockedBorderBrush)}: {Left}, {Top}, {Right}, {Bottom}";
 
         public override IBorderBrush ToBorderBrush() => new MGDockedBorderBrush(Left.ToFillBrush(), Top.ToFillBrush(), Right.ToFillBrush(), Bottom.ToFillBrush());
     }

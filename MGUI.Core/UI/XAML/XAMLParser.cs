@@ -14,10 +14,10 @@ using System.IO;
 using System.Xml;
 using System.Xml.Linq;
 using MGUI.Shared.Helpers;
+using MonoGame.Extended.Timers;
 
 #if UseWPF
 using System.Xaml;
-using System.Windows.Markup;
 #endif
 
 namespace MGUI.Core.UI.XAML
@@ -29,90 +29,90 @@ namespace MGUI.Core.UI.XAML
         public const string XMLLocalNameSpacePrefix = "MGUI";
         public static readonly string XMLLocalNameSpaceUri = $"clr-namespace:{nameof(MGUI)}.{nameof(Core)}.{nameof(UI)}.{nameof(XAML)};assembly={nameof(MGUI)}.{nameof(Core)}";
 
-        private static readonly string XMLNameSpaces = 
+        private static readonly string XMLNameSpaces =
             $"xmlns=\"{XMLNameSpaceBaseUri}\" xmlns:x=\"http://schemas.microsoft.com/winfx/2006/xaml\" xmlns:{XMLLocalNameSpacePrefix}=\"{XMLLocalNameSpaceUri}\"";
-            //$"xmlns:x=\"{XMLNameSpaceBaseUri}\" xmlns=\"{XMLLocalNameSpaceUri}\""; // This URI avoids using a prefix for the MGUI namespace
+            //$"xmlns=\"{XMLLocalNameSpaceUri}\" xmlns:x=\"{XMLNameSpaceBaseUri}\""; // This URI avoids using a prefix for the MGUI namespace
 
         private static readonly Dictionary<string, string> ElementNameAliases = new()
         {
-            { "ContentPresenter", nameof(XAMLContentPresenter) },
-            { "HeaderedContentPresenter", nameof(XAMLHeaderedContentPresenter) },
+            { "ContentPresenter", nameof(ContentPresenter) },
+            { "HeaderedContentPresenter", nameof(HeaderedContentPresenter) },
 
-            { "Border", nameof(XAMLBorder) },
-            { "Button", nameof(XAMLButton) },
-            { "CheckBox", nameof(XAMLCheckBox) },
-            { "ComboBox", nameof(XAMLComboBox) },
+            { "Border", nameof(Border) },
+            { "Button", nameof(Button) },
+            { "CheckBox", nameof(CheckBox) },
+            { "ComboBox", nameof(ComboBox) },
 
-            { "ContextMenu", nameof(XAMLContextMenu) },
-            { "ContextMenuButton", nameof(XAMLContextMenuButton) },
-            { "ContextMenuToggle", nameof(XAMLContextMenuToggle) },
-            { "ContextMenuSeparator", nameof(XAMLContextMenuSeparator) },
+            { "ContextMenu", nameof(ContextMenu) },
+            { "ContextMenuButton", nameof(ContextMenuButton) },
+            { "ContextMenuToggle", nameof(ContextMenuToggle) },
+            { "ContextMenuSeparator", nameof(ContextMenuSeparator) },
 
-            { "Expander", nameof(XAMLExpander) },
-            { "GroupBox", nameof(XAMLGroupBox) },
-            { "Image", nameof(XAMLImage) },
-            { "ListBox", nameof(XAMLListBox) },
-            { "ListView", nameof(XAMLListView) },
-            { "ListViewColumn", nameof(XAMLListViewColumn) },
-            { "PasswordBox", nameof(XAMLPasswordBox) },
-            { "ProgressBar", nameof(XAMLProgressBar) },
-            { "RadioButton", nameof(XAMLRadioButton) },
-            { "RatingControl", nameof(XAMLRatingControl) },
-            { "Rectangle", nameof(XAMLRectangleElement) },
-            { "ResizeGrip", nameof(XAMLResizeGrip) },
-            { "ScrollViewer", nameof(XAMLScrollViewer) },
-            { "Separator", nameof(XAMLSeparator) },
-            { "Slider", nameof(XAMLSlider) },
-            { "Spacer", nameof(XAMLSpacer) },
-            { "Spoiler", nameof(XAMLSpoiler) },
-            { "Stopwatch", nameof(XAMLStopwatch) },
-            { "TabControl", nameof(XAMLTabControl) },
-            { "TabItem", nameof(XAMLTabItem) },
-            { "TextBlock", nameof(XAMLTextBlock) },
-            { "TextBox", nameof(XAMLTextBox) },
-            { "Timer", nameof(XAMLTimer) },
-            { "ToggleButton", nameof(XAMLToggleButton) },
-            { "ToolTip", nameof(XAMLToolTip) },
-            { "Window", nameof(XAMLWindow) },
+            { "Expander", nameof(Expander) },
+            { "GroupBox", nameof(GroupBox) },
+            { "Image", nameof(Image) },
+            { "ListBox", nameof(ListBox) },
+            { "ListView", nameof(ListView) },
+            { "ListViewColumn", nameof(ListViewColumn) },
+            { "PasswordBox", nameof(PasswordBox) },
+            { "ProgressBar", nameof(ProgressBar) },
+            { "RadioButton", nameof(RadioButton) },
+            { "RatingControl", nameof(RatingControl) },
+            { "Rectangle", nameof(Rectangle) },
+            { "ResizeGrip", nameof(ResizeGrip) },
+            { "ScrollViewer", nameof(ScrollViewer) },
+            { "Separator", nameof(Separator) },
+            { "Slider", nameof(Slider) },
+            { "Spacer", nameof(Spacer) },
+            { "Spoiler", nameof(Spoiler) },
+            { "Stopwatch", nameof(Stopwatch) },
+            { "TabControl", nameof(TabControl) },
+            { "TabItem", nameof(TabItem) },
+            { "TextBlock", nameof(TextBlock) },
+            { "TextBox", nameof(TextBox) },
+            { "Timer", nameof(Timer) },
+            { "ToggleButton", nameof(ToggleButton) },
+            { "ToolTip", nameof(ToolTip) },
+            { "Window", nameof(Window) },
 
-            { "RowDefinition", nameof(XAMLRowDefinition) },
-            { "ColumnDefinition", nameof(XAMLColumnDefinition) },
-            { "GridSplitter", nameof(XAMLGridSplitter) },
-            { "Grid", nameof(XAMLGrid) },
-            { "UniformGrid", nameof(XAMLUniformGrid) },
-            { "DockPanel", nameof(XAMLDockPanel) },
-            { "StackPanel", nameof(XAMLStackPanel) },
-            { "OverlayPanel", nameof(XAMLOverlayPanel) },
+            { "RowDefinition", nameof(RowDefinition) },
+            { "ColumnDefinition", nameof(ColumnDefinition) },
+            { "GridSplitter", nameof(GridSplitter) },
+            { "Grid", nameof(Grid) },
+            { "UniformGrid", nameof(UniformGrid) },
+            { "DockPanel", nameof(DockPanel) },
+            { "StackPanel", nameof(StackPanel) },
+            { "OverlayPanel", nameof(OverlayPanel) },
 
-            { "Style", nameof(XAMLStyle) },
-            { "Setter", nameof(XAMLStyleSetter) },
+            { "Style", nameof(Style) },
+            { "Setter", nameof(Setter) },
 
             //  Abbreviated names
-            { "CP", nameof(XAMLContentPresenter) },
-            { "HCP", nameof(XAMLHeaderedContentPresenter) },
-            { "CM", nameof(XAMLContextMenu) },
-            { "CMB", nameof(XAMLContextMenuButton) },
-            { "CMT", nameof(XAMLContextMenuToggle) },
-            { "CMS", nameof(XAMLContextMenuSeparator) },
-            { "GB", nameof(XAMLGroupBox) },
-            { "LB", nameof(XAMLListBox) },
-            { "LV", nameof(XAMLListView) },
-            { "LVC", nameof(XAMLListViewColumn) },
-            { "RB", nameof(XAMLRadioButton) },
-            { "RC", nameof(XAMLRatingControl) },
-            { "RG", nameof(XAMLResizeGrip) },
-            { "SV", nameof(XAMLScrollViewer) },
-            { "TC", nameof(XAMLTabControl) },
-            { "TI", nameof(XAMLTabItem) },
-            { "TB", nameof(XAMLTextBlock) },
-            { "TT", nameof(XAMLToolTip) },
-            { "RD", nameof(XAMLRowDefinition) },
-            { "CD", nameof(XAMLColumnDefinition) },
-            { "GS", nameof(XAMLGridSplitter) },
-            { "UG", nameof(XAMLUniformGrid) },
-            { "DP", nameof(XAMLDockPanel) },
-            { "SP", nameof(XAMLStackPanel) },
-            { "OP", nameof(XAMLOverlayPanel) }
+            { "CP", nameof(ContentPresenter) },
+            { "HCP", nameof(HeaderedContentPresenter) },
+            { "CM", nameof(ContextMenu) },
+            { "CMB", nameof(ContextMenuButton) },
+            { "CMT", nameof(ContextMenuToggle) },
+            { "CMS", nameof(ContextMenuSeparator) },
+            { "GB", nameof(GroupBox) },
+            { "LB", nameof(ListBox) },
+            { "LV", nameof(ListView) },
+            { "LVC", nameof(ListViewColumn) },
+            { "RB", nameof(RadioButton) },
+            { "RC", nameof(RatingControl) },
+            { "RG", nameof(ResizeGrip) },
+            { "SV", nameof(ScrollViewer) },
+            { "TC", nameof(TabControl) },
+            { "TI", nameof(TabItem) },
+            { "TB", nameof(TextBlock) },
+            { "TT", nameof(ToolTip) },
+            { "RD", nameof(RowDefinition) },
+            { "CD", nameof(ColumnDefinition) },
+            { "GS", nameof(GridSplitter) },
+            { "UG", nameof(UniformGrid) },
+            { "DP", nameof(DockPanel) },
+            { "SP", nameof(StackPanel) },
+            { "OP", nameof(OverlayPanel) }
         };
 
         private static string ValidateXAMLString(string XAMLString)
@@ -136,12 +136,11 @@ namespace MGUI.Core.UI.XAML
                 }
             }
 
-            //  Replace all element names with their fully-qualified, aliased name, such as:
-            //  "<Button/>"                 --> "<MGUI:XAMLButton/>"
-            //  "<Button Content="Foo" />"  --> "<MGUI:XAMLButton Content="Foo" />"
-            //  "<Button.Content>"          --> "<MGUI:XAMLButton.Content>"
-            //  ("XAMLButton" is the aliased name for "Button", and the type exists in the xml namespace referenced by the "MGUI" prefix)
-#if true
+            //  Replace all element names with their fully-qualified name, such as:
+            //  "<Button/>"                 --> "<MGUI:Button/>"
+            //  "<Button Content="Foo" />"  --> "<MGUI:Button Content="Foo" />"
+            //  "<Button.Content>"          --> "<MGUI:Button.Content>"
+            //  Where the "MGUI" XML namespace prefix refers to the XMLLocalNameSpaceUri static string
             XDocument Document = XDocument.Parse(XAMLString);
 
             foreach (var Element in Document.Descendants())
@@ -167,40 +166,25 @@ namespace MGUI.Core.UI.XAML
                 string Result = SW.ToString();
                 return Result;
             }
-#else
-            StringBuilder SB = new(XAMLString);
-            foreach (KeyValuePair<string, string> KVP in ElementNameAliases)
-            {
-                SB.Replace($"<{KVP.Key} ", $"<{XMLLocalNameSpacePrefix}:{KVP.Value} ");
-                SB.Replace($"<{KVP.Key}.", $"<{XMLLocalNameSpacePrefix}:{KVP.Value}.");
-                SB.Replace($"<{KVP.Key}/", $"<{XMLLocalNameSpacePrefix}:{KVP.Value}/");
-                SB.Replace($"<{KVP.Key}>", $"<{XMLLocalNameSpacePrefix}:{KVP.Value}>");
-
-                SB.Replace($"</{KVP.Key} ", $"</{XMLLocalNameSpacePrefix}:{KVP.Value} ");
-                SB.Replace($"</{KVP.Key}.", $"</{XMLLocalNameSpacePrefix}:{KVP.Value}.");
-                SB.Replace($"</{KVP.Key}>", $"</{XMLLocalNameSpacePrefix}:{KVP.Value}>");
-            }
-            return SB.ToString();
-#endif
         }
 
 #if UseWPF
         /// <param name="SanitizeXAMLString">If true, the given <paramref name="XAMLString"/> will be pre-processed via the following logic:<para/>
         /// 1. Trim leading and trailing whitespace<br/>
         /// 2. Insert required XML namespaces (such as "xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation")<br/>
-        /// 3. Replace aliased type names with their fully-qualified type names, such as "Button" -> "MGUI:XAMLButton" where the "MGUI" namespace prefix points to the URI defined by <see cref="XMLLocalNameSpaceUri"/><para/>
-        /// If your XAML isn't using any aliased element names, you probably should set this to false.</param>
-        /// <param name="ReplaceLinebreakLiterals">If true, the literal string @"\n" will be replaced with "&#38;#x0a;", which is the XAML representation of the linebreak character '\n'.<br/>
+        /// 3. Replace type names with their fully-qualified names, such as "Button" -> "MGUI:Button" where the "MGUI" namespace prefix points to the URI defined by <see cref="XMLLocalNameSpaceUri"/><para/>
+        /// If your XAML already contains fully-qualified types, you probably should set this to false.</param>
+        /// <param name="ReplaceLinebreakLiterals">If true, the literal string @"\n" will be replaced with "&#38;#x0a;", which is the XAML encoding of the linebreak character '\n'.<br/>
         /// If false, setting the text of an <see cref="MGTextBlock"/> requires encoding the '\n' character as ""&#38;#x0a;""<para/>
         /// See also: <see href="https://stackoverflow.com/a/183435/11689514"/></param>
-        public static T Load<T>(MGWindow Window, string XAMLString, bool SanitizeXAMLString, bool ReplaceLinebreakLiterals = true)
+        public static T Load<T>(MGWindow Window, string XAMLString, bool SanitizeXAMLString = false, bool ReplaceLinebreakLiterals = true)
             where T : MGElement
         {
             if (SanitizeXAMLString)
                 XAMLString = ValidateXAMLString(XAMLString);
             if (ReplaceLinebreakLiterals)
                 XAMLString = XAMLString.Replace(@"\n", "&#x0a;");
-            XAMLElement Parsed = (XAMLElement)XamlServices.Parse(XAMLString);
+            Element Parsed = (Element)XamlServices.Parse(XAMLString);
             Parsed.ProcessStyles();
             return Parsed.ToElement<T>(Window, null);
         }
@@ -208,18 +192,18 @@ namespace MGUI.Core.UI.XAML
         /// <param name="SanitizeXAMLString">If true, the given <paramref name="XAMLString"/> will be pre-processed via the following logic:<para/>
         /// 1. Trim leading and trailing whitespace<br/>
         /// 2. Insert required XML namespaces (such as "xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation")<br/>
-        /// 3. Replace aliased type names with their fully-qualified type names, such as "Button" -> "MGUI:XAMLButton" where the "MGUI" namespace prefix points to the URI defined by <see cref="XMLLocalNameSpaceUri"/><para/>
-        /// If your XAML isn't using any aliased element names, you probably should set this to false.</param>
-        /// <param name="ReplaceLinebreakLiterals">If true, the literal string @"\n" will be replaced with the "v", which is the XAML representation of the linebreak character '\n'.<br/>
+        /// 3. Replace type names with their fully-qualified names, such as "Button" -> "MGUI:Button" where the "MGUI" namespace prefix points to the URI defined by <see cref="XMLLocalNameSpaceUri"/><para/>
+        /// If your XAML already contains fully-qualified types, you probably should set this to false.</param>
+        /// <param name="ReplaceLinebreakLiterals">If true, the literal string @"\n" will be replaced with "&#38;#x0a;", which is the XAML encoding of the linebreak character '\n'.<br/>
         /// If false, setting the text of an <see cref="MGTextBlock"/> requires encoding the '\n' character as ""&#38;#x0a;""<para/>
         /// See also: <see href="https://stackoverflow.com/a/183435/11689514"/></param>
-        public static MGWindow LoadRootWindow(MGDesktop Desktop, string XAMLString, bool SanitizeXAMLString, bool ReplaceLinebreakLiterals = true)
+        public static MGWindow LoadRootWindow(MGDesktop Desktop, string XAMLString, bool SanitizeXAMLString = false, bool ReplaceLinebreakLiterals = true)
         {
             if (SanitizeXAMLString)
                 XAMLString = ValidateXAMLString(XAMLString);
             if (ReplaceLinebreakLiterals)
                 XAMLString = XAMLString.Replace(@"\n", "&#x0a;");
-            XAMLWindow Parsed = (XAMLWindow)XamlServices.Parse(XAMLString);
+            Window Parsed = (Window)XamlServices.Parse(XAMLString);
             Parsed.ProcessStyles();
             return Parsed.ToElement(Desktop);
         }

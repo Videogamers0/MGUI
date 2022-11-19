@@ -1,15 +1,15 @@
-﻿<!-- If you set the root namespace to "clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core", then Visual Studios XAML text editor can use intellisense/autocomplete -->
-<!-- But you will need to use the real underlying class names, such as "XAMLButton" instead of the aliased names like "Button" -->
-<XAMLWindow xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core" BorderBrush="RoyalBlue" Background="LightBlue" Left="50" Top="600" Width="200" Height="120" Padding="10"
-            TitleText="XML Namespace Test">
-    <XAMLWindow.TitleBarTextBlock>
-        <XAMLTextBlock FontSize="9" />
-    </XAMLWindow.TitleBarTextBlock>
+﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        BorderBrush="RoyalBlue" Background="LightBlue" Left="50" Top="600" Width="200" Height="120" Padding="10"
+        TitleText="XML Namespace Test">
+    <Window.TitleBarTextBlock>
+        <TextBlock FontSize="9" />
+    </Window.TitleBarTextBlock>
     
-    <XAMLHeaderedContentPresenter HeaderPosition="Top" Spacing="6">
-        <XAMLHeaderedContentPresenter.Header>
-            <XAMLTextBlock HorizontalAlignment="Center" Text="Header Content:" Foreground="Black" FontSize="14" IsBold="True" />
-        </XAMLHeaderedContentPresenter.Header>
-        <XAMLButton BorderBrush="Black" BorderThickness="2" Content="Hello World" />
-    </XAMLHeaderedContentPresenter>
-</XAMLWindow>
+    <HeaderedContentPresenter HeaderPosition="Top" Spacing="6">
+        <HeaderedContentPresenter.Header>
+            <TextBlock HorizontalAlignment="Center" Text="Header Content:" Foreground="Black" FontSize="14" IsBold="True" />
+        </HeaderedContentPresenter.Header>
+        <Button BorderBrush="Black" BorderThickness="2" Content="Hello World" />
+    </HeaderedContentPresenter>
+</Window>

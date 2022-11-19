@@ -1,22 +1,22 @@
-﻿<XAMLWindow xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core" 
+﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core" 
             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
             Left="1100" Top="580" Width="300" Height="300"
             TitleText="ListView Sample">
-    <XAMLListView Name="ListView_Sample1" xmlns:local="clr-namespace:MGUI.Samples;assembly=MGUI.Samples" ItemType="{x:Type local:Person}">
-        <XAMLListViewColumn Width="50">
-            <XAMLListViewColumn.Header>
-                <XAMLTextBlock IsBold="True" TextAlignment="Center" Text="Id" />
-            </XAMLListViewColumn.Header>
-        </XAMLListViewColumn>
-        <XAMLListViewColumn Width="*">
-            <XAMLListViewColumn.Header>
-                <XAMLTextBlock IsBold="True" TextAlignment="Center" Text="First Name" />
-            </XAMLListViewColumn.Header>
-        </XAMLListViewColumn>
-        <XAMLListViewColumn Width="*">
-            <XAMLListViewColumn.Header>
-                <XAMLTextBlock IsBold="True" TextAlignment="Center" Text="Last Name" />
-            </XAMLListViewColumn.Header>
-        </XAMLListViewColumn>
-    </XAMLListView>
-</XAMLWindow>
+    <ListView Name="ListView_Sample1" xmlns:local="clr-namespace:MGUI.Samples;assembly=MGUI.Samples" ItemType="{x:Type local:Person}">
+        <ListViewColumn Width="50">
+            <ListViewColumn.Header>
+                <TextBlock IsBold="True" TextAlignment="Center" Text="Id" />
+            </ListViewColumn.Header>
+        </ListViewColumn>
+        <ListViewColumn Width="*">
+            <ListViewColumn.Header>
+                <TextBlock IsBold="True" TextAlignment="Center" Text="First Name" />
+            </ListViewColumn.Header>
+        </ListViewColumn>
+        <ListViewColumn Width="*">
+            <ListViewColumn.Header>
+                <TextBlock IsBold="True" TextAlignment="Center" Text="Last Name" />
+            </ListViewColumn.Header>
+        </ListViewColumn>
+    </ListView>
+</Window>

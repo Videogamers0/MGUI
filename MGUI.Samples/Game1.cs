@@ -132,9 +132,9 @@ namespace MGUI.Samples
             {
                 TestGrid.OnLayoutUpdated += (sender, e) =>
                 {
-                    foreach (ColumnDefinition CD in TestGrid.Columns)
+                    foreach (Core.UI.Containers.Grids.ColumnDefinition CD in TestGrid.Columns)
                     {
-                        foreach (RowDefinition RD in TestGrid.Rows)
+                        foreach (Core.UI.Containers.Grids.RowDefinition RD in TestGrid.Rows)
                         {
                             foreach (MGElement Element in TestGrid.GetCellContent(RD, CD))
                             {
@@ -167,7 +167,7 @@ namespace MGUI.Samples
             //  Parse the XAML markup into an MGWindow instance
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Registration.xaml";
             string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
-            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, true);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, false);
 
             //  Retrieve named elements from the window
             MGTextBox TextBox_Email = Window.GetElementByName<MGTextBox>("TextBox_Email");
@@ -214,7 +214,7 @@ namespace MGUI.Samples
             //  Parse the XAML markup into an MGWindow instance
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.CharacterStats.xaml";
             string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
-            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, true);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, false);
 
             return Window;
         }
@@ -224,7 +224,7 @@ namespace MGUI.Samples
             //  Parse the XAML markup into an MGWindow instance
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Inventory.xaml";
             string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
-            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, true);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, false);
 
             MGButton Button_Close = Window.GetElementByName<MGButton>("Button_Close");
             Button_Close.AddCommandHandler((Button, e) =>

@@ -9,7 +9,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using System.Reflection.PortableExecutable;
 
 #if UseWPF
 using System.Windows.Markup;
@@ -20,7 +19,7 @@ namespace MGUI.Core.UI.XAML
 #if UseWPF
     [ContentProperty(nameof(Items))]
 #endif
-    public class XAMLListBox : XAMLMultiContentHost
+    public class ListBox : MultiContentHost
     {
         public override MGElementType ElementType => MGElementType.ListBox;
 
@@ -33,33 +32,33 @@ namespace MGUI.Core.UI.XAML
         public Type ItemType { get; set; } = typeof(object);
 
         #region Borders
-        public XAMLBorder OuterBorder { get; set; } = new();
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public XAMLBorderBrush OuterBorderBrush { get => OuterBorder.BorderBrush; set => OuterBorder.BorderBrush = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public XAMLBorderBrush OuterBB { get => OuterBorderBrush; set => OuterBorderBrush = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public XAMLThickness? OuterBorderThickness { get => OuterBorder.BorderThickness; set => OuterBorder.BorderThickness = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public XAMLThickness? OuterBT { get => OuterBorderThickness; set => OuterBorderThickness = value; }
+        public Border OuterBorder { get; set; } = new();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public BorderBrush OuterBorderBrush { get => OuterBorder.BorderBrush; set => OuterBorder.BorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public BorderBrush OuterBB { get => OuterBorderBrush; set => OuterBorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public Thickness? OuterBorderThickness { get => OuterBorder.BorderThickness; set => OuterBorder.BorderThickness = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public Thickness? OuterBT { get => OuterBorderThickness; set => OuterBorderThickness = value; }
 
-        public XAMLBorder InnerBorder { get; set; } = new();
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public XAMLBorderBrush InnerBorderBrush { get => InnerBorder.BorderBrush; set => InnerBorder.BorderBrush = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public XAMLBorderBrush InnerBB { get => InnerBorderBrush; set => InnerBorderBrush = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public XAMLThickness? InnerBorderThickness { get => InnerBorder.BorderThickness; set => InnerBorder.BorderThickness = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public XAMLThickness? InnerBT { get => InnerBorderThickness; set => InnerBorderThickness = value; }
+        public Border InnerBorder { get; set; } = new();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public BorderBrush InnerBorderBrush { get => InnerBorder.BorderBrush; set => InnerBorder.BorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public BorderBrush InnerBB { get => InnerBorderBrush; set => InnerBorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public Thickness? InnerBorderThickness { get => InnerBorder.BorderThickness; set => InnerBorder.BorderThickness = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public Thickness? InnerBT { get => InnerBorderThickness; set => InnerBorderThickness = value; }
 
-        public XAMLBorder TitleBorder { get; set; } = new();
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public XAMLBorderBrush TitleBorderBrush { get => TitleBorder.BorderBrush; set => TitleBorder.BorderBrush = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public XAMLBorderBrush TitleBB { get => TitleBorderBrush; set => TitleBorderBrush = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public XAMLThickness? TitleBorderThickness { get => TitleBorder.BorderThickness; set => TitleBorder.BorderThickness = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public XAMLThickness? TitleBT { get => TitleBorderThickness; set => TitleBorderThickness = value; }
+        public Border TitleBorder { get; set; } = new();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public BorderBrush TitleBorderBrush { get => TitleBorder.BorderBrush; set => TitleBorder.BorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public BorderBrush TitleBB { get => TitleBorderBrush; set => TitleBorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public Thickness? TitleBorderThickness { get => TitleBorder.BorderThickness; set => TitleBorder.BorderThickness = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public Thickness? TitleBT { get => TitleBorderThickness; set => TitleBorderThickness = value; }
         #endregion Borders
 
-        public XAMLContentPresenter TitlePresenter { get; set; } = new();
+        public ContentPresenter TitlePresenter { get; set; } = new();
 
         public bool? IsTitleVisible { get; set; }
 
-        public XAMLScrollViewer ScrollViewer { get; set; } = new();
-        public XAMLStackPanel ItemsPanel { get; set; } = new();
+        public ScrollViewer ScrollViewer { get; set; } = new();
+        public StackPanel ItemsPanel { get; set; } = new();
 
-        public XAMLElement Header { get; set; }
+        public Element Header { get; set; }
 
         public List<object> Items { get; set; } = new();
 
@@ -77,9 +76,9 @@ namespace MGUI.Core.UI.XAML
             Method.Invoke(Element, new object[] { this });
         }
 
-        protected internal override IEnumerable<XAMLElement> GetChildren()
+        protected internal override IEnumerable<Element> GetChildren()
         {
-            foreach (XAMLElement Element in base.GetChildren())
+            foreach (Element Element in base.GetChildren())
                 yield return Element;
 
             yield return OuterBorder;
@@ -97,7 +96,7 @@ namespace MGUI.Core.UI.XAML
 #if UseWPF
     [ContentProperty(nameof(Columns))]
 #endif
-    public class XAMLListView : XAMLMultiContentHost
+    public class ListView : MultiContentHost
     {
         public override MGElementType ElementType => MGElementType.ListView;
 
@@ -109,12 +108,12 @@ namespace MGUI.Core.UI.XAML
         /// Default value: <code>typeof(object)</code></summary>
         public Type ItemType { get; set; } = typeof(object);
 
-        public List<XAMLListViewColumn> Columns { get; set; } = new();
+        public List<ListViewColumn> Columns { get; set; } = new();
         public int? RowHeight { get; set; }
 
-        public XAMLGrid HeaderGrid { get; set; } = new();
-        public XAMLScrollViewer ScrollViewer { get; set; } = new();
-        public XAMLGrid DataGrid { get; set; } = new();
+        public Grid HeaderGrid { get; set; } = new();
+        public ScrollViewer ScrollViewer { get; set; } = new();
+        public Grid DataGrid { get; set; } = new();
 
         public GridSelectionMode? SelectionMode { get; set; }
 
@@ -132,9 +131,9 @@ namespace MGUI.Core.UI.XAML
             Method.Invoke(Element, new object[] { this });
         }
 
-        protected internal override IEnumerable<XAMLElement> GetChildren()
+        protected internal override IEnumerable<Element> GetChildren()
         {
-            foreach (XAMLElement Element in base.GetChildren())
+            foreach (Element Element in base.GetChildren())
                 yield return Element;
 
             yield return HeaderGrid;
@@ -146,43 +145,43 @@ namespace MGUI.Core.UI.XAML
 #if UseWPF
     [ContentProperty(nameof(Header))]
 #endif
-    public class XAMLListViewColumn
+    public class ListViewColumn
     {
-        public XAMLListViewColumnWidth Width { get; set; }
-        public XAMLElement Header { get; set; }
+        public ListViewColumnWidth Width { get; set; }
+        public Element Header { get; set; }
     }
 
     [TypeConverter(typeof(XAMLListViewColumnWidthStringConverter))]
-    public class XAMLListViewColumnWidth
+    public class ListViewColumnWidth
     {
         public int? WidthPixels { get; set; }
         public double? WidthWeight { get; set; }
 
-        public ListViewColumnWidth ToWidth()
+        public UI.ListViewColumnWidth ToWidth()
         {
             if (WidthPixels.HasValue)
-                return new ListViewColumnWidth(WidthPixels.Value);
+                return new UI.ListViewColumnWidth(WidthPixels.Value);
             else if (WidthWeight.HasValue)
-                return new ListViewColumnWidth(WidthWeight.Value);
+                return new UI.ListViewColumnWidth(WidthWeight.Value);
             else
-                throw new InvalidOperationException($"{nameof(XAMLListViewColumnWidth)} must define either an integral value for {nameof(WidthPixels)} or a double value for {nameof(WidthWeight)}");
+                throw new InvalidOperationException($"{nameof(ListViewColumnWidth)} must define either an integral value for {nameof(WidthPixels)} or a double value for {nameof(WidthWeight)}");
         }
 
-        public override string ToString() => $"{nameof(XAMLListViewColumnWidth)}: {(WidthPixels.HasValue ? WidthPixels + "px" : WidthWeight + "*")}";
+        public override string ToString() => $"{nameof(ListViewColumnWidth)}: {(WidthPixels.HasValue ? WidthPixels + "px" : WidthWeight + "*")}";
 
-        public static XAMLListViewColumnWidth Parse(string Value)
+        public static ListViewColumnWidth Parse(string Value)
         {
             if (Value.EndsWith('*'))
             {
                 string WeightString = Value.Substring(0, Value.Length - 1);
                 double Weight = WeightString == string.Empty ? 1.0 : double.Parse(WeightString);
-                return new XAMLListViewColumnWidth() { WidthWeight = Weight };
+                return new ListViewColumnWidth() { WidthWeight = Weight };
             }
             else
             {
                 string PixelsString = Value.Replace("px", "", StringComparison.CurrentCultureIgnoreCase);
                 int Pixels = int.Parse(PixelsString);
-                return new XAMLListViewColumnWidth() { WidthPixels = Pixels };
+                return new ListViewColumnWidth() { WidthPixels = Pixels };
             }
         }
     }
@@ -200,7 +199,7 @@ namespace MGUI.Core.UI.XAML
         {
             if (value is string stringValue)
             {
-                XAMLListViewColumnWidth Width = XAMLListViewColumnWidth.Parse(stringValue);
+                ListViewColumnWidth Width = ListViewColumnWidth.Parse(stringValue);
                 return Width;
             }
 

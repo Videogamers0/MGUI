@@ -13,6 +13,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
+
 #if WINDOWS
 using Microsoft.Win32;
 #endif

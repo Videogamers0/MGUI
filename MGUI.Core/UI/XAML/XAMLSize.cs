@@ -9,26 +9,26 @@ using System.Threading.Tasks;
 
 namespace MGUI.Core.UI.XAML
 {
-    [TypeConverter(typeof(XAMLSizeStringConverter))]
-    public struct XAMLSize
+    [TypeConverter(typeof(SizeStringConverter))]
+    public struct Size
     {
         public int Width { get; set; }
         public int Height { get; set; }
 
-        public XAMLSize() : this(0, 0) { }
-        public XAMLSize(int Both) : this(Both, Both) { }
-        public XAMLSize(int Width, int Height)
+        public Size() : this(0, 0) { }
+        public Size(int Both) : this(Both, Both) { }
+        public Size(int Width, int Height)
         {
             this.Width = Width;
             this.Height = Height;
         }
 
-        public override string ToString() => $"{nameof(XAMLSize)}: ({Width},{Height})";
+        public override string ToString() => $"{nameof(Size)}: ({Width},{Height})";
 
-        public Size ToSize() => new Size(Width, Height);
+        public MonoGame.Extended.Size ToSize() => new MonoGame.Extended.Size(Width, Height);
     }
 
-    public class XAMLSizeStringConverter : TypeConverter
+    public class SizeStringConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
@@ -44,9 +44,9 @@ namespace MGUI.Core.UI.XAML
                 int[] values = stringValue.Split(',').Select(x => int.Parse(x)).ToArray();
                 return values.Length switch
                 {
-                    0 => new XAMLSize(0),
-                    1 => new XAMLSize(values[0]),
-                    2 => new XAMLSize(values[0], values[1]),
+                    0 => new Size(0),
+                    1 => new Size(values[0]),
+                    2 => new Size(values[0], values[1]),
                     _ => throw new ArgumentException(stringValue)
                 };
             }

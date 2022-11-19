@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 using MGUI.Shared.Helpers;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MonoGame.Extended;
+using Thickness = MonoGame.Extended.Thickness;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace MGUI.Core.UI
 {
@@ -134,7 +136,7 @@ namespace MGUI.Core.UI
                 int CurrentIndex = e.NewStartingIndex;
                 foreach (TItemType Item in e.NewItems)
                 {
-                    RowDefinition NewRow = DataGrid.InsertRow(CurrentIndex, RowLength);
+                    Containers.Grids.RowDefinition NewRow = DataGrid.InsertRow(CurrentIndex, RowLength);
                     MGListViewItem<TItemType> NewRowItem = new(this, Item, NewRow);
                     InternalRowItems.Insert(CurrentIndex, NewRowItem);
                     CurrentIndex++;
@@ -218,7 +220,7 @@ namespace MGUI.Core.UI
 
                     if (DataGrid != null)
                     {
-                        foreach (RowDefinition Row in DataGrid.Rows)
+                        foreach (Containers.Grids.RowDefinition Row in DataGrid.Rows)
                         {
                             Row.Length = RowLength;
                         }
@@ -350,13 +352,13 @@ namespace MGUI.Core.UI
 
         //  This method is invoked via reflection in XAMLListView.ApplyDerivedSettings.
         //  Do not modify the method signature.
-        internal void LoadSettings(XAMLListView Settings)
+        internal void LoadSettings(ListView Settings)
         {
             Settings.HeaderGrid.ApplySettings(this, HeaderGrid);
             Settings.ScrollViewer.ApplySettings(this, ScrollViewer);
             Settings.DataGrid.ApplySettings(this, DataGrid);
 
-            foreach (XAMLListViewColumn ColumnDefinition in Settings.Columns)
+            foreach (ListViewColumn ColumnDefinition in Settings.Columns)
             {
                 ListViewColumnWidth Width = ColumnDefinition.Width.ToWidth();
                 MGElement Header = ColumnDefinition.Header.ToElement<MGElement>(SelfOrParentWindow, this);
@@ -419,7 +421,7 @@ namespace MGUI.Core.UI
         public MGListView<TItemType> ListView { get; }
 
         public MGGrid DataGrid => ListView.DataGrid;
-        public RowDefinition DataRow { get; }
+        public Containers.Grids.RowDefinition DataRow { get; }
 
         /// <summary>The data object used as a parameter to generate the content of each cell in the <see cref="DataRow"/>.<para/>
         /// See also: <see cref="MGListViewColumn{TItemType}.ItemTemplate"/></summary>
@@ -428,7 +430,7 @@ namespace MGUI.Core.UI
         public Dictionary<MGListViewColumn<TItemType>, MGElement> GetRowContents()
         {
             Dictionary<MGListViewColumn<TItemType>, MGElement> Cells = new();
-            IReadOnlyDictionary<ColumnDefinition, IReadOnlyList<MGElement>> RowContentByColumn = DataGrid.GetRowContent(DataRow);
+            IReadOnlyDictionary<Containers.Grids.ColumnDefinition, IReadOnlyList<MGElement>> RowContentByColumn = DataGrid.GetRowContent(DataRow);
             foreach (MGListViewColumn<TItemType> Column in ListView.Columns)
             {
                 if (RowContentByColumn.TryGetValue(Column.DataColumn, out var Elements) && Elements.Count > 0)
@@ -445,7 +447,7 @@ namespace MGUI.Core.UI
             return Cells;
         }
 
-        internal MGListViewItem(MGListView<TItemType> ListView, TItemType Data, RowDefinition Row)
+        internal MGListViewItem(MGListView<TItemType> ListView, TItemType Data, Containers.Grids.RowDefinition Row)
         {
             this.ListView = ListView ?? throw new ArgumentNullException(nameof(ListView));
             this.Data = Data ?? throw new ArgumentNullException(nameof(Data));
@@ -475,9 +477,9 @@ namespace MGUI.Core.UI
         public ListViewColumnWidth Width { get; }
 
         public MGGrid HeaderGrid => ListView.HeaderGrid;
-        public ColumnDefinition HeaderColumn { get; }
+        public Containers.Grids.ColumnDefinition HeaderColumn { get; }
         public MGGrid DataGrid => ListView.DataGrid;
-        public ColumnDefinition DataColumn { get; }
+        public Containers.Grids.ColumnDefinition DataColumn { get; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGElement _Header;
@@ -491,7 +493,7 @@ namespace MGUI.Core.UI
                 {
                     _Header = value;
 
-                    RowDefinition HeaderRow = HeaderGrid.Rows.First();
+                    Containers.Grids.RowDefinition HeaderRow = HeaderGrid.Rows.First();
                     using (HeaderGrid.AllowChangingContentTemporarily())
                     {
                         HeaderGrid.ClearCellContent(HeaderRow, HeaderColumn);

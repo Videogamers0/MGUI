@@ -15,6 +15,8 @@ using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Core.UI.XAML;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
+using Thickness = MonoGame.Extended.Thickness;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace MGUI.Core.UI
 {
@@ -417,7 +419,7 @@ namespace MGUI.Core.UI
                 DropdownArrowElement.OnEndDraw += (sender, e) =>
                 {
                     Rectangle ArrowElementFullBounds = DropdownArrowElement.LayoutBounds;
-                    Rectangle ArrowPartBounds = ApplyAlignment(ArrowElementFullBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new Size(DropdownArrowWidth, DropdownArrowHeight));
+                    Rectangle ArrowPartBounds = ApplyAlignment(ArrowElementFullBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new MonoGame.Extended.Size(DropdownArrowWidth, DropdownArrowHeight));
                     List<Vector2> ArrowVertices = new() {
                         ArrowPartBounds.TopLeft().ToVector2(), ArrowPartBounds.TopRight().ToVector2(), new(ArrowPartBounds.Center.X, ArrowPartBounds.Bottom)
                     };
@@ -513,7 +515,7 @@ namespace MGUI.Core.UI
 
         //  This method is invoked via reflection in XAMLControls.XAMLComboBox.ApplyDerivedSettings.
         //  Do not modify the method signature.
-        internal void LoadSettings(XAMLComboBox Settings)
+        internal void LoadSettings(ComboBox Settings)
         {
             Settings.Border.ApplySettings(this, BorderComponent.Element);
             Settings.DropdownArrow.ApplySettings(this, DropdownArrowComponent.Element);
