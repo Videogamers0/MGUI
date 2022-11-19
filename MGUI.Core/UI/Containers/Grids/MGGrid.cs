@@ -212,6 +212,14 @@ namespace MGUI.Core.UI.Containers.Grids
             return Column;
         }
 
+        public ColumnDefinition InsertColumn(int Index, GridLength Length) => InsertColumn(Index, new ConstrainedGridLength(Length, null, null));
+        public ColumnDefinition InsertColumn(int Index, ConstrainedGridLength Length)
+        {
+            ColumnDefinition Column = new(this, Length.Length, Length.MinSize, Length.MaxSize);
+            _Columns.Insert(Index, Column);
+            return Column;
+        }
+
         public void RemoveColumn(ColumnDefinition Column)
         {
             if (!CanChangeContent)

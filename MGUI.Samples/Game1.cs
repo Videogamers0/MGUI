@@ -18,6 +18,8 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace MGUI.Samples
 {
+    public readonly record struct Person(int Id, string FirstName, string LastName, bool IsMale);
+
     public class Game1 : Game, IObservableUpdate
     {
         private GraphicsDeviceManager _graphics;
@@ -56,6 +58,7 @@ namespace MGUI.Samples
             Desktop.Windows.Add(LoadInventoryWindow(CurrentAssembly, Desktop));
             //Desktop.Windows.Add(LoadStylesTestWindow(CurrentAssembly, Desktop));
             //Desktop.Windows.Add(LoadNamespaceTestWindow(CurrentAssembly, Desktop));
+            Desktop.Windows.Add(LoadListViewSampleWindow(CurrentAssembly, Desktop));
 
             Desktop.BringToFront(XAMLDesigner);
 
@@ -267,7 +270,7 @@ namespace MGUI.Samples
             //  Parse the XAML markup into an MGWindow instance
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.StylesTest.xaml";
             string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
-            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, true);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, false);
 
             return Window;
         }
@@ -278,8 +281,41 @@ namespace MGUI.Samples
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.NamespaceTest.xaml";
             string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
             MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, false);
-
             return Window;
+        }
+
+        private static MGWindow LoadListViewSampleWindow(Assembly CurrentAssembly, MGDesktop Desktop)
+        {
+            //  Parse the XAML markup into an MGWindow instance
+            string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.ListViewSample.xaml";
+            string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
+            MGWindow Window1 = XAMLParser.LoadRootWindow(Desktop, XAML, false);
+
+            //  Get the ListView
+            MGListView<Person> ListView_Sample1 = Window1.GetElementByName<MGListView<Person>>("ListView_Sample1");
+
+            //  Set the ItemTemplate of each column
+            ListView_Sample1.Columns[0].ItemTemplate = (person) => new MGTextBlock(Window1, person.Id.ToString()) { HorizontalAlignment = HorizontalAlignment.Center };
+            ListView_Sample1.Columns[1].ItemTemplate = (person) => new MGTextBlock(Window1, person.FirstName, person.IsMale ? Color.Blue : Color.Pink);
+            ListView_Sample1.Columns[2].ItemTemplate = (person) => new MGTextBlock(Window1, person.LastName, person.IsMale ? Color.Blue : Color.Pink);
+
+            //  Set the row data of the ListView
+            List<Person> People = new()
+            {
+                new(1, "John", "Smith", true),
+                new(2, "James", "Johnson", true),
+                new(3, "Emily", "Doe", false),
+                new(4, "Chris", "Brown", true),
+                new(5, "Melissa", "Wilson", false),
+                new(6, "Richard", "Anderson", true),
+                new(7, "Taylor", "Moore", false),
+                new(8, "Tom", "Lee", true),
+                new(9, "Joe", "White", true),
+                new(10, "Alice", "Wright", false)
+            };
+            ListView_Sample1.SetItemsSource(People);
+
+            return Window1;
         }
 
         protected override void LoadContent()

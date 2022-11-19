@@ -76,10 +76,43 @@ namespace MGUI.Core.UI
         }
 
         public Rectangle ContentViewport { get; private set; }
-        public Rectangle? VSBBounds { get; private set; }
+
+        private Rectangle? _VSBBounds;
+        public Rectangle? VSBBounds
+        {
+            get => _VSBBounds;
+            private set
+            {
+                if (_VSBBounds != value)
+                {
+                    Rectangle? Previous = VSBBounds;
+                    _VSBBounds = value;
+                    VerticalScrollBarBoundsChanged?.Invoke(Previous, VSBBounds);
+                }
+            }
+        }
+        public event EventHandler<Rectangle?> VerticalScrollBarBoundsChanged;
+
         /// <summary>The screen bounds that the vertical scrollbar will be rendered to, after applying the <see cref="ScrollBarPadding"/></summary>
         public Rectangle? PaddedVSBBounds => VSBBounds?.GetCompressed(ScrollBarPadding);
-        public Rectangle? HSBBounds { get; private set; }
+
+        private Rectangle? _HSBBounds;
+        public Rectangle? HSBBounds
+        {
+            get => _HSBBounds;
+            private set
+            {
+                if (_HSBBounds != value)
+                {
+                    Rectangle? Previous = HSBBounds;
+                    _HSBBounds = value;
+                    HorizontalScrollBarBoundsChanged?.Invoke(Previous, HSBBounds);
+                }
+            }
+        }
+
+        public event EventHandler<Rectangle?> HorizontalScrollBarBoundsChanged;
+
         /// <summary>The screen bounds that the horizontal scrollbar will be rendered to, after applying the <see cref="ScrollBarPadding"/></summary>
         public Rectangle? PaddedHSBBounds => HSBBounds?.GetCompressed(ScrollBarPadding);
 

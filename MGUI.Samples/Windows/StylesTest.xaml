@@ -1,25 +1,25 @@
-﻿<Window Left="50" Top="50" Width="200" Height="300">
-    <StackPanel Orientation="Vertical">
-        <StackPanel.Styles>
-            <Style TargetType="TextBlock">
-                <Setter Property="HorizontalAlignment" Value="Right" />
-            </Style>
-        </StackPanel.Styles>
+﻿<XAMLWindow xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+            Left="50" Top="50" Width="200" Height="200" IsUserResizable="False" TitleText="Styles Sample">
+    <XAMLStackPanel Orientation="Vertical">
+        <XAMLStackPanel.Styles>
+            <XAMLStyle TargetType="TextBlock">
+                <XAMLStyleSetter Property="HorizontalAlignment" Value="Right" />
+            </XAMLStyle>
+        </XAMLStackPanel.Styles>
 
-        <TextBlock Text="One" IsStyleable="False" />
-        <TextBlock Text="Two" />
-        <StackPanel Orientation="Vertical">
-            <StackPanel.Styles>
-                <Style TargetType="TextBlock" Name="Test1">
-                    <Setter Property="HorizontalAlignment" Value="Center" />
-                    <Setter Property="Foreground" Value="Red" />
-                </Style>
-            </StackPanel.Styles>
-            <TextBlock Text="Three" StyleNames="Test1" />
-            <TextBlock Text="Four" StyleNames="Test1" Foreground="Orange" />
-            <TextBlock Text="Five" Foreground="Blue" />
-        </StackPanel>
-        <TextBlock Text="Six" />
-        <TextBlock Text="Seven" />
-    </StackPanel>
-</Window>
+        <XAMLTextBlock Text="One" IsStyleable="False" />
+        <XAMLTextBlock Text="Two" />
+        <XAMLStackPanel Orientation="Vertical">
+            <XAMLStackPanel.Styles>
+                <XAMLStyle TargetType="TextBlock" Name="Test1">
+                    <XAMLStyleSetter Property="HorizontalAlignment" Value="Center" />
+                    <XAMLStyleSetter Property="Foreground" Value="Red" />
+                </XAMLStyle>
+            </XAMLStackPanel.Styles>
+            <XAMLTextBlock Text="Three" StyleNames="Test1" />
+            <XAMLTextBlock Text="Four" StyleNames="Test1" Foreground="Orange" />
+            <XAMLTextBlock Text="Five" Foreground="Blue" />
+        </XAMLStackPanel>
+        <XAMLTextBlock Text="Six" />
+    </XAMLStackPanel>
+</XAMLWindow>

@@ -961,146 +961,154 @@ namespace MGUI.Core.UI
         public bool IsLayoutValid { get; private set; }
 
 #region Arrange
+        protected internal bool IsUpdatingLayout { get; private set; }
+
         internal protected void UpdateLayout(Rectangle Bounds)
         {
-			if (!IsLayoutValid)
-			{
-                RecentMeasurementsSelfOnly.Clear();
-                RecentMeasurementsFull.Clear();
-            }
-
-			Rectangle PreviousLayoutBounds = this.LayoutBounds;
-
-            if (Bounds.Width <= 0 || Bounds.Height <= 0)
+            try
             {
-                this.AllocatedBounds = Rectangle.Empty;
-                this.RenderBounds = Rectangle.Empty;
-                this.LayoutBounds = Rectangle.Empty;
-				this.StretchedContentBounds = Rectangle.Empty;
-				this.AlignedContentBounds = Rectangle.Empty;
-            }
-            else
-            {
-                this.AllocatedBounds = Bounds;
+                IsUpdatingLayout = true;
 
-                Size BoundsSize = new(Bounds.Width, Bounds.Height);
-				Thickness RequestedSelfSize;
-				Thickness RequestedFullSize;
-				Thickness SharedSize;
-                Thickness RequestedContentSize;
-                if (TryGetCachedMeasurement(BoundsSize, out ElementMeasurement SelfMeasurement, out ElementMeasurement FullMeasurement))
-				{
-					RequestedSelfSize = SelfMeasurement.RequestedSize;
-					RequestedFullSize = FullMeasurement.RequestedSize;
-					SharedSize = SelfMeasurement.SharedSize;
-                    RequestedContentSize = FullMeasurement.ContentSize;
-				}
-				else
-				{
-					UpdateMeasurement(BoundsSize, out RequestedSelfSize, out RequestedFullSize, out SharedSize, out RequestedContentSize);
-				}
+                if (!IsLayoutValid)
+                {
+                    RecentMeasurementsSelfOnly.Clear();
+                    RecentMeasurementsFull.Clear();
+                }
 
-				int ConsumedWidth = Math.Min(MaxSizeIncludingMargin.Width, HorizontalAlignment == HorizontalAlignment.Stretch ? BoundsSize.Width : Math.Min(BoundsSize.Width, RequestedFullSize.Width));
-                int ConsumedHeight = Math.Min(MaxSizeIncludingMargin.Height, VerticalAlignment == VerticalAlignment.Stretch ? BoundsSize.Height : Math.Min(BoundsSize.Height, RequestedFullSize.Height));
-				if (ConsumedWidth <= 0 || ConsumedHeight <= 0)
-				{
-					this.RenderBounds = Rectangle.Empty;
-					this.LayoutBounds = Rectangle.Empty;
+                Rectangle PreviousLayoutBounds = this.LayoutBounds;
+
+                if (Bounds.Width <= 0 || Bounds.Height <= 0)
+                {
+                    this.AllocatedBounds = Rectangle.Empty;
+                    this.RenderBounds = Rectangle.Empty;
+                    this.LayoutBounds = Rectangle.Empty;
                     this.StretchedContentBounds = Rectangle.Empty;
                     this.AlignedContentBounds = Rectangle.Empty;
                 }
-				else
-				{
-                    //  Account for cases where stretching horizontally or vertically would cause the bounds to exceed MaxWidth and/or MaxHeight
-                    HorizontalAlignment ActualHorizontalAlignment = MaxWidth.HasValue && HorizontalAlignment == HorizontalAlignment.Stretch && AllocatedBounds.Width > MaxWidth.Value + HorizontalMargin ?
-                        HorizontalAlignment.Center :
-                        HorizontalAlignment;
-                    VerticalAlignment ActualVerticalAlignment = MaxHeight.HasValue && VerticalAlignment == VerticalAlignment.Stretch && AllocatedBounds.Height > MaxHeight.Value + VerticalMargin ?
-                        VerticalAlignment.Center :
-                        VerticalAlignment;
+                else
+                {
+                    this.AllocatedBounds = Bounds;
 
-                    Size RenderSize = new(ConsumedWidth, ConsumedHeight);
-                    this.RenderBounds = ApplyAlignment(AllocatedBounds, ActualHorizontalAlignment, ActualVerticalAlignment, RenderSize);
+                    Size BoundsSize = new(Bounds.Width, Bounds.Height);
+                    Thickness RequestedSelfSize;
+                    Thickness RequestedFullSize;
+                    Thickness SharedSize;
+                    Thickness RequestedContentSize;
+                    if (TryGetCachedMeasurement(BoundsSize, out ElementMeasurement SelfMeasurement, out ElementMeasurement FullMeasurement))
+                    {
+                        RequestedSelfSize = SelfMeasurement.RequestedSize;
+                        RequestedFullSize = FullMeasurement.RequestedSize;
+                        SharedSize = SelfMeasurement.SharedSize;
+                        RequestedContentSize = FullMeasurement.ContentSize;
+                    }
+                    else
+                    {
+                        UpdateMeasurement(BoundsSize, out RequestedSelfSize, out RequestedFullSize, out SharedSize, out RequestedContentSize);
+                    }
 
-                    this.LayoutBounds = new(RenderBounds.Left + Margin.Left, RenderBounds.Top + Margin.Top,
-						RenderBounds.Width - HorizontalMargin, RenderBounds.Height - VerticalMargin);
-					if (LayoutBounds.Width <= 0 || LayoutBounds.Height <= 0)
-					{
-						this.LayoutBounds = Rectangle.Empty;
+                    int ConsumedWidth = Math.Min(MaxSizeIncludingMargin.Width, HorizontalAlignment == HorizontalAlignment.Stretch ? BoundsSize.Width : Math.Min(BoundsSize.Width, RequestedFullSize.Width));
+                    int ConsumedHeight = Math.Min(MaxSizeIncludingMargin.Height, VerticalAlignment == VerticalAlignment.Stretch ? BoundsSize.Height : Math.Min(BoundsSize.Height, RequestedFullSize.Height));
+                    if (ConsumedWidth <= 0 || ConsumedHeight <= 0)
+                    {
+                        this.RenderBounds = Rectangle.Empty;
+                        this.LayoutBounds = Rectangle.Empty;
                         this.StretchedContentBounds = Rectangle.Empty;
                         this.AlignedContentBounds = Rectangle.Empty;
                     }
-					else
-					{
-                        Rectangle RemainingComponentBounds = LayoutBounds;
-                        foreach (MGComponentBase Component in this.Components)
+                    else
+                    {
+                        //  Account for cases where stretching horizontally or vertically would cause the bounds to exceed MaxWidth and/or MaxHeight
+                        HorizontalAlignment ActualHorizontalAlignment = MaxWidth.HasValue && HorizontalAlignment == HorizontalAlignment.Stretch && AllocatedBounds.Width > MaxWidth.Value + HorizontalMargin ?
+                            HorizontalAlignment.Center :
+                            HorizontalAlignment;
+                        VerticalAlignment ActualVerticalAlignment = MaxHeight.HasValue && VerticalAlignment == VerticalAlignment.Stretch && AllocatedBounds.Height > MaxHeight.Value + VerticalMargin ?
+                            VerticalAlignment.Center :
+                            VerticalAlignment;
+
+                        Size RenderSize = new(ConsumedWidth, ConsumedHeight);
+                        this.RenderBounds = ApplyAlignment(AllocatedBounds, ActualHorizontalAlignment, ActualVerticalAlignment, RenderSize);
+
+                        this.LayoutBounds = new(RenderBounds.Left + Margin.Left, RenderBounds.Top + Margin.Top,
+                            RenderBounds.Width - HorizontalMargin, RenderBounds.Height - VerticalMargin);
+                        if (LayoutBounds.Width <= 0 || LayoutBounds.Height <= 0)
                         {
-                            Component.BaseElement.UpdateMeasurement(RemainingComponentBounds.Size, out _, out Thickness ComponentSize, out _, out _);
-                            Rectangle ComponentBounds = Component.Arrange(RemainingComponentBounds, ComponentSize);
-                            Component.BaseElement.UpdateLayout(ComponentBounds);
-    
-                            int Left = RemainingComponentBounds.Left;
-                            int Right = RemainingComponentBounds.Right;
-                            int Top = RemainingComponentBounds.Top;
-                            int Bottom = RemainingComponentBounds.Bottom;
-
-							Thickness ConsumedSpace = Component.ConsumesAnySpace ? Component.Arrange(ComponentSize) : new(0);
-							if (!Component.IsWidthSharedWithContent)
-							{
-								Left += ConsumedSpace.Left;
-								Right -= ConsumedSpace.Right;
-							}
-
-							if (!Component.IsHeightSharedWithContent)
-							{
-								Top += ConsumedSpace.Top;
-								Bottom -= ConsumedSpace.Bottom;
-							}
-
-							RemainingComponentBounds = new(Left, Top, Right - Left, Bottom - Top);
-                        }
-
-                        int ContentBoundsLeft = Math.Min(RenderBounds.Right, RenderBounds.Left + RequestedSelfSize.Left - SharedSize.Left);
-                        int ContentBoundsTop = Math.Min(RenderBounds.Bottom, RenderBounds.Top + RequestedSelfSize.Top - SharedSize.Top);
-                        int ContentBoundsRight = Math.Max(RenderBounds.Left, RenderBounds.Right - RequestedSelfSize.Right - SharedSize.Right);
-                        int ContentBoundsBottom = Math.Max(RenderBounds.Top, RenderBounds.Bottom - RequestedSelfSize.Bottom - SharedSize.Bottom);
-
-						this.StretchedContentBounds = new(ContentBoundsLeft, ContentBoundsTop,
-							Math.Max(0, ContentBoundsRight - ContentBoundsLeft), Math.Max(0, ContentBoundsBottom - ContentBoundsTop));
-
-                        //  Determine how much space the content consumes based on VerticalContentAlignment / HorizontalContentAlignment
-                        int ContentConsumedWidth;
-                        int ContentConsumedHeight;
-                        if (HorizontalContentAlignment == HorizontalAlignment.Stretch && VerticalContentAlignment == VerticalAlignment.Stretch)
-                        {
-                            ContentConsumedWidth = StretchedContentBounds.Width;
-                            ContentConsumedHeight = StretchedContentBounds.Height;
+                            this.LayoutBounds = Rectangle.Empty;
+                            this.StretchedContentBounds = Rectangle.Empty;
+                            this.AlignedContentBounds = Rectangle.Empty;
                         }
                         else
                         {
-                            ContentConsumedWidth = HorizontalContentAlignment == HorizontalAlignment.Stretch ? StretchedContentBounds.Width : Math.Min(StretchedContentBounds.Width, RequestedContentSize.Width);
-                            ContentConsumedHeight = VerticalContentAlignment == VerticalAlignment.Stretch ? StretchedContentBounds.Height : Math.Min(StretchedContentBounds.Height, RequestedContentSize.Height);
-                        }
+                            Rectangle RemainingComponentBounds = LayoutBounds;
+                            foreach (MGComponentBase Component in this.Components)
+                            {
+                                Component.BaseElement.UpdateMeasurement(RemainingComponentBounds.Size, out _, out Thickness ComponentSize, out _, out _);
+                                Rectangle ComponentBounds = Component.Arrange(RemainingComponentBounds, ComponentSize);
+                                Component.BaseElement.UpdateLayout(ComponentBounds);
 
-                        //  Set bounds for content
-                        if (ContentConsumedWidth <= 0 || ContentConsumedHeight <= 0)
-                        {
-                            this.AlignedContentBounds = Rectangle.Empty;
-                        }
-						else
-						{
-							Size ContentSize = new(ContentConsumedWidth, ContentConsumedHeight);
-							this.AlignedContentBounds = ApplyAlignment(StretchedContentBounds, HorizontalContentAlignment, VerticalContentAlignment, ContentSize);
-                        }
+                                int Left = RemainingComponentBounds.Left;
+                                int Right = RemainingComponentBounds.Right;
+                                int Top = RemainingComponentBounds.Top;
+                                int Bottom = RemainingComponentBounds.Bottom;
 
-                        UpdateContentLayout(AlignedContentBounds);
+                                Thickness ConsumedSpace = Component.ConsumesAnySpace ? Component.Arrange(ComponentSize) : new(0);
+                                if (!Component.IsWidthSharedWithContent)
+                                {
+                                    Left += ConsumedSpace.Left;
+                                    Right -= ConsumedSpace.Right;
+                                }
+
+                                if (!Component.IsHeightSharedWithContent)
+                                {
+                                    Top += ConsumedSpace.Top;
+                                    Bottom -= ConsumedSpace.Bottom;
+                                }
+
+                                RemainingComponentBounds = new(Left, Top, Right - Left, Bottom - Top);
+                            }
+
+                            int ContentBoundsLeft = Math.Min(RenderBounds.Right, RenderBounds.Left + RequestedSelfSize.Left - SharedSize.Left);
+                            int ContentBoundsTop = Math.Min(RenderBounds.Bottom, RenderBounds.Top + RequestedSelfSize.Top - SharedSize.Top);
+                            int ContentBoundsRight = Math.Max(RenderBounds.Left, RenderBounds.Right - RequestedSelfSize.Right - SharedSize.Right);
+                            int ContentBoundsBottom = Math.Max(RenderBounds.Top, RenderBounds.Bottom - RequestedSelfSize.Bottom - SharedSize.Bottom);
+
+                            this.StretchedContentBounds = new(ContentBoundsLeft, ContentBoundsTop,
+                                Math.Max(0, ContentBoundsRight - ContentBoundsLeft), Math.Max(0, ContentBoundsBottom - ContentBoundsTop));
+
+                            //  Determine how much space the content consumes based on VerticalContentAlignment / HorizontalContentAlignment
+                            int ContentConsumedWidth;
+                            int ContentConsumedHeight;
+                            if (HorizontalContentAlignment == HorizontalAlignment.Stretch && VerticalContentAlignment == VerticalAlignment.Stretch)
+                            {
+                                ContentConsumedWidth = StretchedContentBounds.Width;
+                                ContentConsumedHeight = StretchedContentBounds.Height;
+                            }
+                            else
+                            {
+                                ContentConsumedWidth = HorizontalContentAlignment == HorizontalAlignment.Stretch ? StretchedContentBounds.Width : Math.Min(StretchedContentBounds.Width, RequestedContentSize.Width);
+                                ContentConsumedHeight = VerticalContentAlignment == VerticalAlignment.Stretch ? StretchedContentBounds.Height : Math.Min(StretchedContentBounds.Height, RequestedContentSize.Height);
+                            }
+
+                            //  Set bounds for content
+                            if (ContentConsumedWidth <= 0 || ContentConsumedHeight <= 0)
+                            {
+                                this.AlignedContentBounds = Rectangle.Empty;
+                            }
+                            else
+                            {
+                                Size ContentSize = new(ContentConsumedWidth, ContentConsumedHeight);
+                                this.AlignedContentBounds = ApplyAlignment(StretchedContentBounds, HorizontalContentAlignment, VerticalContentAlignment, ContentSize);
+                            }
+
+                            UpdateContentLayout(AlignedContentBounds);
+                        }
                     }
-				}
-			}
+                }
 
-			IsLayoutValid = true;
-			OnLayoutUpdated?.Invoke(this, EventArgs.Empty);
-			OnLayoutBoundsChanged?.Invoke(this, new(PreviousLayoutBounds, LayoutBounds));
+                IsLayoutValid = true;
+                OnLayoutUpdated?.Invoke(this, EventArgs.Empty);
+                OnLayoutBoundsChanged?.Invoke(this, new(PreviousLayoutBounds, LayoutBounds));
+            }
+            finally { IsUpdatingLayout = false; }
         }
 
 		public event EventHandler<EventArgs> OnLayoutUpdated;

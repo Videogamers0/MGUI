@@ -21,6 +21,7 @@
     <None Remove="Windows\CharacterStats.xaml" />
     <None Remove="Windows\Debug.xaml" />
     <None Remove="Windows\Inventory.xaml" />
+    <None Remove="Windows\ListViewSample.xaml" />
     <None Remove="Windows\NamespaceTest.xaml" />
     <None Remove="Windows\Registration.xaml" />
     <None Remove="Windows\StylesTest.xaml" />
@@ -33,6 +34,9 @@
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Inventory.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\ListViewSample.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\NamespaceTest.xaml">

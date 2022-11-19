@@ -12,19 +12,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MGUI.Shared.Helpers;
+using MGUI.Core.UI.Brushes.Border_Brushes;
+using MonoGame.Extended;
 
 namespace MGUI.Core.UI
 {
     /// <typeparam name="TItemType">The type that the ItemsSource will be bound to.</typeparam>
     public class MGListView<TItemType> : MGSingleContentHost
     {
-        //TODO
-        //we probably also want to listen for changes to scrollviewercomponent's computed verticalscrollbarvisibility
-        //      silently set HeaderGrid's right margin to the computed vsb width and then invoke HeaderGrid.updatelayout?
-        //      might get messy with recursive layout changes, like if setting the margin makes a column header taller, which in turn affects the scrollviewer's vsb visibility etc
-        //      so maybe we ignore this. not really a big deal if the last column header is wider than the last column of the actual data rows.
-        //
-
         #region Items Source
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ObservableCollection<MGListViewItem<TItemType>> _InternalRowItems;
@@ -249,6 +245,8 @@ namespace MGUI.Core.UI
         /// enumerate <see cref="GridSelection"/>, and for each <see cref="GridCell"/>, call <see cref="GridSelection.Grid"/>'s <see cref="MGGrid.GetCellContent(GridCell)"/></summary>
         public GridSelection? SelectedData => DataGrid.CurrentSelection;
 
+        private bool IsWindowLayoutRefreshPending = false;
+
         public MGListView(MGWindow Window)
             : this(Window, 8, 3) { }
 
@@ -281,12 +279,47 @@ namespace MGUI.Core.UI
                 DataGrid.VerticalGridLineBrush = GridLineBrush;
                 DataGrid.CanChangeContent = false;
 
+                //  Create a content-less element that will be placed to the right of the HeaderGrid, whose width will always match the width of the vertical scrollbar.
+                //  If the DataGrid needs to reserve width on the right edge for a vertical scrollbar, this width will also be reserved in the HeaderGrid
+                int TopRightCornerBorderThickness = Math.Max(0, Spacing - GridLineMargin * 2);
+                MGBorder TopRightCornerPlaceholder = new(Window, new Thickness(0, TopRightCornerBorderThickness, 0, TopRightCornerBorderThickness), null as IBorderBrush);
+                TopRightCornerPlaceholder.BackgroundBrush = HeaderGrid.BackgroundBrush;
+
                 this.ScrollViewer = new(Window, ScrollBarVisibility.Auto, ScrollBarVisibility.Disabled);
                 ScrollViewer.SetContent(DataGrid);
                 ScrollViewer.CanChangeContent = false;
+                ScrollViewer.VerticalScrollBarBoundsChanged += (sender, e) =>
+                {
+                    int DesiredWidth = e?.Width ?? 0;
+                    if (TopRightCornerPlaceholder.PreferredWidth != DesiredWidth)
+                    {
+                        TopRightCornerPlaceholder.PreferredWidth = DesiredWidth;
+
+                        //  Setting PreferredWidth of the top right corner element will set Window.IsLayoutValid=false
+                        //  But if the Window is already in the process of updating its layout, it will overwrite this with Window.IsLayoutValid=true at the end
+                        //  So we must queue up a call to InvalidateLayout on the next update tick
+                        if (Window.IsUpdatingLayout)
+                            IsWindowLayoutRefreshPending = true;
+                    }
+                };
+
+                Window.OnBeginUpdate += (sender, e) =>
+                {
+                    try
+                    {
+                        if (IsWindowLayoutRefreshPending)
+                            Window.InvalidateLayout();
+                    }
+                    finally { IsWindowLayoutRefreshPending = false; }
+                };
+
+                MGDockPanel HeaderGridWrapper = new(Window);
+                HeaderGridWrapper.TryAddChild(TopRightCornerPlaceholder, Dock.Right);
+                HeaderGridWrapper.TryAddChild(HeaderGrid, Dock.Left);
+                HeaderGridWrapper.CanChangeContent = false;
 
                 this.DockPanelElement = new(Window);
-                DockPanelElement.TryAddChild(HeaderGrid, Dock.Top);
+                DockPanelElement.TryAddChild(HeaderGridWrapper, Dock.Top);
                 DockPanelElement.TryAddChild(ScrollViewer, Dock.Bottom);
                 //DockPanelElement.VerticalAlignment = VerticalAlignment.Top;
                 DockPanelElement.CanChangeContent = false;
@@ -307,6 +340,12 @@ namespace MGUI.Core.UI
 
                 SelectionMode = GridSelectionMode.None;
             }
+        }
+
+        public override void DrawBackground(ElementDrawArgs DA, Rectangle LayoutBounds)
+        {
+            base.DrawBackground(DA, HeaderGrid.LayoutBounds);
+            base.DrawBackground(DA, DataGrid.LayoutBounds);
         }
 
         //  This method is invoked via reflection in XAMLListView.ApplyDerivedSettings.
