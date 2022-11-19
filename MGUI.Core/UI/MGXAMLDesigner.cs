@@ -22,7 +22,7 @@ using Microsoft.Win32;
 namespace MGUI.Core.UI
 {
     /// <summary>A simple XAML designer that allows you to parse and render XAML markup at runtime.</summary>
-    public class MGDesigner : MGElement
+    public class MGXAMLDesigner : MGElement
     {
         private MGComponent<MGDockPanel> MainContent { get; }
         public MGButton RefreshButton { get; }
@@ -39,8 +39,8 @@ namespace MGUI.Core.UI
         public MGCheckBox FromFileAutoRefreshCheckBox { get; }
         public bool IsAutoRefreshing => FromFileAutoRefreshCheckBox.IsChecked == true;
 
-        public MGDesigner(MGWindow ParentWindow)
-            : base(ParentWindow, MGElementType.Designer)
+        public MGXAMLDesigner(MGWindow ParentWindow)
+            : base(ParentWindow, MGElementType.XAMLDesigner)
         {
             using (BeginInitializing())
             {

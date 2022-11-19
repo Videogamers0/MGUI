@@ -73,7 +73,7 @@ namespace MGUI.Core.UI
         //  Other
         Rectangle,
 
-        Designer,
+        XAMLDesigner,
         /// <summary>Represents an element that doesn't fit any other category</summary>
         Misc,
         Custom,

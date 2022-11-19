@@ -64,10 +64,6 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.Border;
 
-        //public static readonly DependencyProperty BorderThicknessProperty = DependencyProperty.RegisterAttached(nameof(BorderThickness), typeof(XAMLThickness?), typeof(XAMLBorder));
-        //public static XAMLThickness? GetBorderThickness(DependencyObject element) => ((XAMLThickness?)element.GetValue(BorderThicknessProperty));
-        //public static void SetBorderThickness(DependencyObject element, XAMLThickness? borderThickness) => element.SetValue(BorderThicknessProperty, borderThickness);
-
         public BorderBrush BorderBrush { get; set; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }

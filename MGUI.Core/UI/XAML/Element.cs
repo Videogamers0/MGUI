@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MGUI.Core.UI.XAML
 {
-    [TypeConverter(typeof(XAMLElementStringConverter))]
+    [TypeConverter(typeof(ElementStringConverter))]
     public abstract class Element
     {
         public abstract MGElementType ElementType { get; }
@@ -335,7 +335,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLElementStringConverter : TypeConverter
+    public class ElementStringConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {

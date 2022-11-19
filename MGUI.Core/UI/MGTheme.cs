@@ -174,7 +174,7 @@ namespace MGUI.Core.UI
                 MGElementType.ContentPresenter,
                 MGElementType.ContextMenuItem,
                 MGElementType.Custom,
-                MGElementType.Designer,
+                MGElementType.XAMLDesigner,
                 MGElementType.DockPanel,
                 MGElementType.Expander,
                 MGElementType.Grid,

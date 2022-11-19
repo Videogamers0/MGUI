@@ -151,7 +151,7 @@ namespace MGUI.Core.UI.XAML
         public Element Header { get; set; }
     }
 
-    [TypeConverter(typeof(XAMLListViewColumnWidthStringConverter))]
+    [TypeConverter(typeof(ListViewColumnWidthStringConverter))]
     public class ListViewColumnWidth
     {
         public int? WidthPixels { get; set; }
@@ -186,7 +186,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-    public class XAMLListViewColumnWidthStringConverter : TypeConverter
+    public class ListViewColumnWidthStringConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
