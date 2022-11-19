@@ -1,25 +1,44 @@
 ﻿<XAMLWindow xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-            Left="50" Top="50" Width="200" Height="200" IsUserResizable="False" TitleText="Styles Sample">
-    <XAMLStackPanel Orientation="Vertical">
+            Left="50" Top="50" Width="200" Height="150" IsUserResizable="False" TitleText="Styles Sample">
+    
+    <XAMLStackPanel Orientation="Vertical" Spacing="5">
         <XAMLStackPanel.Styles>
+            <!-- This is an implicit style. Since it doesn't have a Name, it will affect ALL child TextBlocks 
+            (unless the TextBlock explicitly opts out of styling by setting IsStyleable="false") -->
             <XAMLStyle TargetType="TextBlock">
                 <XAMLStyleSetter Property="HorizontalAlignment" Value="Right" />
             </XAMLStyle>
         </XAMLStackPanel.Styles>
 
-        <XAMLTextBlock Text="One" IsStyleable="False" />
-        <XAMLTextBlock Text="Two" />
+        <!-- This textblock ignores all styles because IsStyleable="false" -->
+        <!-- Its HorizontalAlignment remains at the default value of "Stretch" -->
+        <XAMLTextBlock Background="RGB(40,40,40)" Text="One" IsStyleable="False" />
+        
+        <!-- This textblock inherits HorizontalAlignment="Right" from the implicit style defined above -->
+        <XAMLTextBlock Background="RGB(40,40,40)" Text="Two" />
+
         <XAMLStackPanel Orientation="Vertical">
+            <!-- These styles have an explicit name. They will only affect TextBlocks where StyleNames contains the name -->
             <XAMLStackPanel.Styles>
-                <XAMLStyle TargetType="TextBlock" Name="Test1">
+                <XAMLStyle TargetType="TextBlock" Name="Explicit1">
                     <XAMLStyleSetter Property="HorizontalAlignment" Value="Center" />
                     <XAMLStyleSetter Property="Foreground" Value="Red" />
                 </XAMLStyle>
+                <XAMLStyle TargetType="TextBlock" Name="Explicit2">
+                    <XAMLStyleSetter Property="HorizontalAlignment" Value="Left" />
+                </XAMLStyle>
             </XAMLStackPanel.Styles>
-            <XAMLTextBlock Text="Three" StyleNames="Test1" />
-            <XAMLTextBlock Text="Four" StyleNames="Test1" Foreground="Orange" />
-            <XAMLTextBlock Text="Five" Foreground="Blue" />
+
+            <!-- This TextBlock is affected by the implicit style and the "Explicit1" style, in that order. -->
+            <!-- So HorizontalAlignment="Right" is applied first, then HorizontalAlignment="Center" and Foreground="Red" are applied -->
+            <XAMLTextBlock Background="RGB(40,40,40)" Text="Three" StyleNames="Explicit1" />
+            
+            <!-- This TextBlock uses a comma delimiter to specify multiple explicit style names that are applied to it. -->
+            <!-- The "Explicit1" style sets Foreground="Red", but that value is overridden with Foreground="Orange" -->
+            <XAMLTextBlock Background="RGB(40,40,40)" Text="Four" StyleNames="Explicit1,Explicit2" Foreground="Orange" />
+            
+            <!-- This TextBlock didn't opt in to either Explicit style, so it's only affected by the outer implicit style, setting HorizontalAlignment="Right" -->
+            <XAMLTextBlock Background="RGB(40,40,40)" Text="Five" Foreground="Blue" />
         </XAMLStackPanel>
-        <XAMLTextBlock Text="Six" />
     </XAMLStackPanel>
 </XAMLWindow>
