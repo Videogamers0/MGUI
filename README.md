@@ -8,6 +8,7 @@ All control names are prefixed with 'MG' and have similar names and properties t
   - MGGrid
   - MGOverlayPanel
   - MGStackPanel
+  - MGUniformGrid
 - Controls that can have child Content:
   - MGBorder
   - MGButton
@@ -15,7 +16,7 @@ All control names are prefixed with 'MG' and have similar names and properties t
   - MGComboBox
   - MGContextMenu
   - MGContextMenuItem
-  - MGDesigner
+  - MGXAMLDesigner
   - MGExpander
   - MGGroupBox
   - MGListBox
@@ -50,7 +51,9 @@ A simple registration window created with MGUI:
   <summary>XAML Markup:</summary>
   
 ```xaml
-<Window Left="50" Top="50" Width="300" Height="380">
+<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Left="50" Top="50" Width="300" Height="380">
     
     <!-- Replace the window's Title bar with custom content -->
     <Window.TitleBar>
@@ -140,7 +143,9 @@ A simple registration window created with MGUI:
   <summary>XAML Markup</summary>
 
 ```xaml
-<Window Left="300" Top="400" Width="800" Height="500" IsUserResizable="False">
+<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Left="300" Top="400" Width="800" Height="500" IsUserResizable="False">
     <OverlayPanel TextForeground="Black" HorizontalAlignment="Center" VerticalAlignment="Center">
         <Button Name="Button_Close" HorizontalAlignment="Right" VerticalAlignment="Top" Content="[b]X" TextForeground="Red" Padding="3,2,3,0"
                 BorderBrush="RGB(91,43,42)" BorderThickness="2" Background="rgb(242,191,114)" />
@@ -269,7 +274,7 @@ A simple registration window created with MGUI:
 
 ![Register.png](assets/samples/Sample_Debug_Window.png)
   
-MGUI can also parse and render your XAML markup at runtime using the MGDesigner control:
+MGUI can also parse and render your XAML markup at runtime using the MGXAMLDesigner control:
 ![XAML Designer](assets/samples/Sample_XAML_Designer_Window.gif)
   
 # Getting Started:
@@ -376,11 +381,13 @@ MGUI.Core targets `net6.0-windows` by default. If you wish to use MGUI on anothe
 
 The following is valid if targeting `net6.0-windows` with `<UseWPF>True</UseWPF>`:
 ```c#
-string XAMLWindow =
-@"<Window Left=""50"" Top=""100"" Width=""150"" Height=""150"" Background=""Orange"" Padding=""10"">
+string XAMLString =
+@"<Window xmlns=""clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core""
+          xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
+          Left=""50"" Top=""100"" Width=""150"" Height=""150"" Background=""Orange"" Padding=""10"">
     <Button Padding=""10,5"" HorizontalAlignment=""Center"" VerticalAlignment=""Center"" Content=""Hello World"" />
 </Window>";
-MGWindow Window1 = XAMLParser.LoadRootWindow(Desktop, XAMLWindow);
+MGWindow Window1 = XAMLParser.LoadRootWindow(Desktop, XAMLString);
 Desktop.Windows.Add(Window1);
 ```
 
@@ -398,6 +405,8 @@ Window1.SetContent(Button);
 Desktop.Windows.Add(Window1);
 ```
 <sub>Everything that can be done in XAML can be also done with c# code, but not everything that can be done with c# can be done with XAML. XAML is generally more concise and convenient to use though.</sub>
+
+[More details about working with XAML](https://github.com/Videogamers0/MGUI/wiki/XAML)
 
 # Input Handling
 
