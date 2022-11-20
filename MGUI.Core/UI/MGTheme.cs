@@ -203,9 +203,26 @@ namespace MGUI.Core.UI
             if (ThemeType == BuiltInTheme.Dark_Blue)
             {
                 Color PrimaryColor = new(0, 108, 214);
-                MGSolidFillBrush PrimaryBG = new(PrimaryColor);
                 Color BrightNeutralColor = new(11, 28, 72);
-                IFillBrush BrightNeutralBrush = new MGSolidFillBrush(BrightNeutralColor);
+                Color AccentColor = new(0, 60, 119);
+                Color ToggleButtonSelectedColor = new(0, 60, 119);
+                Color ToolTipBGColor = new(255, 255, 210);
+                Color DimNeutralColor = new(0, 10, 18);
+                Color ListItemSelectedColor = Color.Yellow;
+                Color ListItemHoveredColor = Color.LightBlue;
+                Color DropdownArrowColor = Color.White;
+                Color CheckMarkColor = Color.Black;
+                Color ScrollBarBorderColor = new(0, 44, 112); // could use BrightNeutralColor
+                Color TextColor = Color.White;
+                Color TextBoxFocusedSelectionBG = Color.Black;
+                Color TextBoxUnfocusedSelectionBG = new(210, 240, 255);
+                Color TitleBG = new(0, 52, 96);
+
+                MGSolidFillBrush PrimaryBG = PrimaryColor.AsFillBrush();
+                IFillBrush BrightNeutralBrush = BrightNeutralColor.AsFillBrush();
+                IFillBrush AccentBrush = AccentColor.AsFillBrush();
+                IFillBrush DimNeutralBackground = DimNeutralColor.AsFillBrush();
+                MGSolidFillBrush SpoilerUnpsoiledBG = MGSolidFillBrush.SemiBlack;
 
                 //  Button/ComboBox
                 ThemeManagedVisualStateFillBrush ButtonBG =
@@ -259,8 +276,6 @@ namespace MGUI.Core.UI
                 _Backgrounds[MGElementType.TextBox] = new ThemeManagedVisualStateFillBrush(TextBoxBG.GetValue(true));
 
                 //  Separator/Stopwatch/Timer
-                Color AccentColor = new Color(0, 60, 119);
-                IFillBrush AccentBrush = AccentColor.AsFillBrush();
                 ThemeManagedVisualStateFillBrush AccentBG =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
@@ -275,7 +290,7 @@ namespace MGUI.Core.UI
                 ThemeManagedVisualStateFillBrush ToggleButtonBG =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
-                            PrimaryBG, new Color(0, 60, 119).AsFillBrush(), PrimaryBG * 0.5f,
+                            PrimaryBG, ToggleButtonSelectedColor.AsFillBrush(), PrimaryBG * 0.5f,
                             Color.White * 0.12f, PressedModifierType.Darken, 0.06f)
                     );
                 _Backgrounds[MGElementType.ToggleButton] = new ThemeManagedVisualStateFillBrush(ToggleButtonBG.GetValue(true));
@@ -284,14 +299,12 @@ namespace MGUI.Core.UI
                 ThemeManagedVisualStateFillBrush ToolTipBG =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
-                            (new Color(255, 255, 210) * 0.75f).AsFillBrush(),
+                            (ToolTipBGColor * 0.75f).AsFillBrush(),
                             null, PressedModifierType.Darken, 0.06f)
                     );
                 _Backgrounds[MGElementType.ToolTip] = new ThemeManagedVisualStateFillBrush(ToolTipBG.GetValue(true));
 
                 //  Window
-                Color DimNeutralColor = new Color(0, 10, 18);
-                IFillBrush DimNeutralBackground = new MGSolidFillBrush(DimNeutralColor);
                 ThemeManagedVisualStateFillBrush WindowBG =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
@@ -309,17 +322,17 @@ namespace MGUI.Core.UI
                 this.ComboBoxDropdownItemBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
-                            null, Color.Yellow.AsFillBrush() * 0.65f, null,
-                            Color.LightBlue * 0.4f, PressedModifierType.Darken, 0.06f)
+                            null, ListItemSelectedColor.AsFillBrush() * 0.65f, null,
+                            ListItemHoveredColor * 0.4f, PressedModifierType.Darken, 0.06f)
                     );
 
-                this.DropdownArrowColor = Color.White;
+                this.DropdownArrowColor = DropdownArrowColor;
 
                 this.ListBoxItemBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
-                            null, Color.Yellow.AsFillBrush() * 0.65f, null,
-                            Color.LightBlue * 0.18f, PressedModifierType.Darken, 0.04f)
+                            null, ListItemSelectedColor.AsFillBrush() * 0.65f, null,
+                            ListItemHoveredColor * 0.18f, PressedModifierType.Darken, 0.04f)
                     );
                 this.ListBoxItemAlternatingRowBackgrounds = new List<ThemeManagedFillBrush>()
                 {
@@ -347,7 +360,7 @@ namespace MGUI.Core.UI
                             Color.White * 0.01f, PressedModifierType.Darken, 0f)
                     );
 
-                this.CheckMarkColor = Color.Black;
+                this.CheckMarkColor = CheckMarkColor;
                 this.RadioButtonBubbleBackground =
                     new ThemeManagedVisualStateColorBrush(
                         new VisualStateColorBrush(
@@ -362,7 +375,6 @@ namespace MGUI.Core.UI
                             PrimaryColor, Color.White * 0.36f, PressedModifierType.Brighten, 0.2f)
                     );
 
-                Color ScrollBarBorderColor = new Color(0, 44, 112); // could use BrightNeutralColor
                 this.ScrollBarOuterBrush =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
@@ -403,25 +415,25 @@ namespace MGUI.Core.UI
                 this.SpoilerUnspoiledBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
-                            MGSolidFillBrush.SemiBlack,
+                            SpoilerUnpsoiledBG,
                             Color.White * 0.15f, PressedModifierType.Darken, 0.06f)
                     );
 
-                this.TextBoxFocusedSelectionForeground = Color.White;
-                this.TextBoxFocusedSelectionBackground = Color.Black;
-                this.TextBoxUnfocusedSelectionForeground = Color.White;
-                this.TextBoxUnfocusedSelectionBackground = new Color(210, 240, 255) * 0.4f;
+                this.TextBoxFocusedSelectionForeground = TextColor;
+                this.TextBoxFocusedSelectionBackground = TextBoxFocusedSelectionBG;
+                this.TextBoxUnfocusedSelectionForeground = TextColor;
+                this.TextBoxUnfocusedSelectionBackground = TextBoxUnfocusedSelectionBG * 0.4f;
 
                 this.TitleBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
-                            new MGSolidFillBrush(new Color(0, 52, 96)),
+                            new MGSolidFillBrush(TitleBG),
                             Color.White * 0.05f, PressedModifierType.Darken, 0.06f)
                     );
 
                 this.TextBlockFallbackForeground =
                     new ThemeManagedVisualStateColorBrush(
-                        new VisualStateColorBrush(Color.White)
+                        new VisualStateColorBrush(TextColor)
                     );
             }
             else if (ThemeType == BuiltInTheme.Light_Gray)

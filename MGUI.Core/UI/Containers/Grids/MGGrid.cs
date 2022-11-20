@@ -952,15 +952,26 @@ namespace MGUI.Core.UI.Containers.Grids
                     }
                     else
                     {
-                        //  Measure every element in this column and take the maximum width
+                        //  Note: If we're measuring the content (pre-processing phase), rather than allocating space to the content, we need to know the minimum dimensions required to show the content.
+                        //  So weighted columns are treated like Auto-sized columns (with their width capped at what the weighted width would be)
+                        int WeightedWidth = int.MaxValue;
+                        if (IsWeightedWidth)
+                        {
+                            double ColumnWeight = Column.Length.Weight;
+                            WeightedWidth = Math.Clamp((int)Math.Round(RemainingColumnWidth * (ColumnWeight / RemainingColumnWeight), MidpointRounding.ToEven), Column.MinWidth ?? 0, Column.MaxWidth ?? int.MaxValue);
+                            RemainingColumnWeight -= ColumnWeight;
+                        }
+
+                        //  Measure every element in this column
                         List<int> ColumnChildWidths = new();
+                        int CellAvailableWidth = GeneralUtils.Min(RemainingColumnWidth, WeightedWidth, Column.MaxWidth ?? int.MaxValue);
                         foreach (RowDefinition Row in Rows)
                         {
                             GridCell Cell = new(Row, Column);
                             if (!RowHeights.TryGetValue(Row, out int RowHeight))
                                 RowHeight = RemainingRowHeight; // Lazy 'solution' because I'm too dumb to come up with the actual correct logic that avoids circular dependencies...
 
-                            Size CellAvailableSize = new(RemainingColumnWidth, RowHeight);
+                            Size CellAvailableSize = new(CellAvailableWidth, RowHeight);
                             foreach (MGElement Element in GetMeasurableCellContent(Cell))
                             {
                                 Element.UpdateMeasurement(CellAvailableSize, out _, out Thickness ElementSize, out _, out _);
@@ -968,6 +979,7 @@ namespace MGUI.Core.UI.Containers.Grids
                             }
                         }
 
+                        //  Take the maximum width of the row items in this column
                         ColumnWidth = Math.Max(Column.MinWidth ?? 0, ColumnChildWidths.DefaultIfEmpty(0).Max());
                     }
                 }
@@ -1005,15 +1017,26 @@ namespace MGUI.Core.UI.Containers.Grids
                     }
                     else
                     {
-                        //  Measure every element in this row and take the maximum height
+                        //  Note: If we're measuring the content (pre-processing phase), rather than allocating space to the content, we need to know the minimum dimensions required to show the content.
+                        //  So weighted rows are treated like Auto-sized rows (with their height capped at what the weighted height would be)
+                        int WeightedHeight = int.MaxValue;
+                        if (IsWeightedHeight)
+                        {
+                            double RowWeight = Row.Length.Weight;
+                            WeightedHeight = Math.Clamp((int)Math.Round(RemainingRowHeight * (RowWeight / RemainingRowWeight), MidpointRounding.ToEven), Row.MinHeight ?? 0, Row.MaxHeight ?? int.MaxValue);
+                            RemainingRowWeight -= RowWeight;
+                        }
+
+                        //  Measure every element in this row
                         List<int> RowChildHeights = new();
+                        int CellAvailableHeight = GeneralUtils.Min(RemainingRowHeight, WeightedHeight, Row.MaxHeight ?? int.MaxValue);
                         for (int ColumnIndex = 0; ColumnIndex < _Columns.Count; ColumnIndex++)
                         {
                             ColumnDefinition Column = _Columns[ColumnIndex];
                             GridCell Cell = new(Row, Column);
                             int ColumnWidth = ColumnWidths[Column];
 
-                            Size CellAvailableSize = new(ColumnWidth, RemainingRowHeight);
+                            Size CellAvailableSize = new(ColumnWidth, CellAvailableHeight);
                             foreach (MGElement Element in GetMeasurableCellContent(Cell))
                             {
                                 int AvailableWidth = CellAvailableSize.Width;
@@ -1030,6 +1053,7 @@ namespace MGUI.Core.UI.Containers.Grids
                             }
                         }
 
+                        //  Take the maximum height of the items in this row
                         RowHeight = Math.Max(Row.MinHeight ?? 0, RowChildHeights.DefaultIfEmpty(0).Max());
                     }
                 }

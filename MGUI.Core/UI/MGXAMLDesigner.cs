@@ -224,7 +224,7 @@ namespace MGUI.Core.UI
             }
             catch (Exception ex)
             {
-                MGScrollViewer SV = new MGScrollViewer(SelfOrParentWindow);
+                MGScrollViewer SV = new(SelfOrParentWindow);
                 SV.Padding = new(5);
                 string Message = FTTokenizer.EscapeMarkdown($"{ex.Message}\n\n{ex}");
                 SV.SetContent(Message);

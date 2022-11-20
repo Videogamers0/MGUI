@@ -14,6 +14,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using ColumnDefinition = MGUI.Core.UI.Containers.Grids.ColumnDefinition;
+using RowDefinition = MGUI.Core.UI.Containers.Grids.RowDefinition;
 
 namespace MGUI.Samples
 {
@@ -56,7 +58,6 @@ namespace MGUI.Samples
             Desktop.Windows.Add(LoadCharacterStatsWindow(CurrentAssembly, Desktop));
             Desktop.Windows.Add(LoadInventoryWindow(CurrentAssembly, Desktop));
             //Desktop.Windows.Add(LoadStylesTestWindow(CurrentAssembly, Desktop));
-            //Desktop.Windows.Add(LoadNamespaceTestWindow(CurrentAssembly, Desktop));
             Desktop.Windows.Add(LoadListViewSampleWindow(CurrentAssembly, Desktop));
 
             Desktop.BringToFront(XAMLDesigner);
@@ -132,9 +133,9 @@ namespace MGUI.Samples
             {
                 TestGrid.OnLayoutUpdated += (sender, e) =>
                 {
-                    foreach (Core.UI.Containers.Grids.ColumnDefinition CD in TestGrid.Columns)
+                    foreach (ColumnDefinition CD in TestGrid.Columns)
                     {
-                        foreach (Core.UI.Containers.Grids.RowDefinition RD in TestGrid.Rows)
+                        foreach (RowDefinition RD in TestGrid.Rows)
                         {
                             foreach (MGElement Element in TestGrid.GetCellContent(RD, CD))
                             {
@@ -274,15 +275,6 @@ namespace MGUI.Samples
             return Window;
         }
 
-        private static MGWindow LoadNamespaceTestWindow(Assembly CurrentAssembly, MGDesktop Desktop)
-        {
-            //  Parse the XAML markup into an MGWindow instance
-            string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.NamespaceTest.xaml";
-            string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
-            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, false);
-            return Window;
-        }
-
         private static MGWindow LoadListViewSampleWindow(Assembly CurrentAssembly, MGDesktop Desktop)
         {
             //  Parse the XAML markup into an MGWindow instance
@@ -294,9 +286,9 @@ namespace MGUI.Samples
             MGListView<Person> ListView_Sample1 = Window1.GetElementByName<MGListView<Person>>("ListView_Sample1");
 
             //  Set the ItemTemplate of each column
-            ListView_Sample1.Columns[0].ItemTemplate = (person) => new MGTextBlock(Window1, person.Id.ToString()) { HorizontalAlignment = HorizontalAlignment.Center };
-            ListView_Sample1.Columns[1].ItemTemplate = (person) => new MGTextBlock(Window1, person.FirstName, person.IsMale ? Color.Blue : Color.Pink);
-            ListView_Sample1.Columns[2].ItemTemplate = (person) => new MGTextBlock(Window1, person.LastName, person.IsMale ? Color.Blue : Color.Pink);
+            ListView_Sample1.Columns[0].ItemTemplate = (person) => new MGTextBlock(Window1, person.Id.ToString(), Color.LightYellow) { HorizontalAlignment = HorizontalAlignment.Center };
+            ListView_Sample1.Columns[1].ItemTemplate = (person) => new MGTextBlock(Window1, person.FirstName, person.IsMale ? Color.CornflowerBlue : Color.HotPink);
+            ListView_Sample1.Columns[2].ItemTemplate = (person) => new MGTextBlock(Window1, person.LastName, person.IsMale ? Color.CornflowerBlue : Color.HotPink);
 
             //  Set the row data of the ListView
             List<Person> People = new()

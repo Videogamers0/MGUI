@@ -2,13 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using MonoGame.Extended;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
-using System.ComponentModel;
 using System.Collections.ObjectModel;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Shared.Rendering;

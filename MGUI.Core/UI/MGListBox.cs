@@ -591,7 +591,7 @@ namespace MGUI.Core.UI
             base.DrawSelf(DA, LayoutBounds);
         }
 
-        //  This method is invoked via reflection in XAMLListView.ApplyDerivedSettings.
+        //  This method is invoked via reflection in MGUI.Core.UI.XAML.Lists.ListBox.ApplyDerivedSettings.
         //  Do not modify the method signature.
         internal void LoadSettings(ListBox Settings)
         {
