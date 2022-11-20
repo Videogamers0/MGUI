@@ -286,7 +286,7 @@ namespace MGUI.Core.UI
                 //  Create a content-less element that will be placed to the right of the HeaderGrid, whose width will always match the width of the vertical scrollbar.
                 //  If the DataGrid needs to reserve width on the right edge for a vertical scrollbar, this width will also be reserved in the HeaderGrid
                 int TopRightCornerBorderThickness = Math.Max(0, Spacing - GridLineMargin * 2);
-                MGBorder TopRightCornerPlaceholder = new(Window, new Thickness(0, TopRightCornerBorderThickness, 0, TopRightCornerBorderThickness), null as IBorderBrush);
+                MGBorder TopRightCornerPlaceholder = new(Window, new Thickness(0, TopRightCornerBorderThickness, TopRightCornerBorderThickness, TopRightCornerBorderThickness), MGUniformBorderBrush.Black); //null as IBorderBrush);
                 TopRightCornerPlaceholder.BackgroundBrush = HeaderGrid.BackgroundBrush;
 
                 this.ScrollViewer = new(Window, ScrollBarVisibility.Auto, ScrollBarVisibility.Disabled);

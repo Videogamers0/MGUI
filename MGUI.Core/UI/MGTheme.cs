@@ -155,7 +155,18 @@ namespace MGUI.Core.UI
         public enum BuiltInTheme
         {
             Light_Gray,
-            Dark_Blue
+
+            Dark_Gray,
+            Dark_Red,
+            Dark_Green,
+            Dark_Blue,
+
+            Dark_Purple,
+            Dark_Pink,
+            Dark_Yellow,
+            Dark_Turquoise,
+            Dark_OrangeBrown,
+            Dark_LightBrown
         }
 
         public MGTheme(string DefaultFontFamily)
@@ -200,23 +211,102 @@ namespace MGUI.Core.UI
                 _Backgrounds[Type] = new ThemeManagedVisualStateFillBrush(new VisualStateFillBrush(null));
             }
 
-            if (ThemeType == BuiltInTheme.Dark_Blue)
+            if (ThemeType != BuiltInTheme.Light_Gray)
             {
-                Color PrimaryColor = new(0, 108, 214);
-                Color BrightNeutralColor = new(11, 28, 72);
-                Color AccentColor = new(0, 60, 119);
-                Color ToggleButtonSelectedColor = new(0, 60, 119);
                 Color ToolTipBGColor = new(255, 255, 210);
-                Color DimNeutralColor = new(0, 10, 18);
+
                 Color ListItemSelectedColor = Color.Yellow;
                 Color ListItemHoveredColor = Color.LightBlue;
-                Color DropdownArrowColor = Color.White;
-                Color CheckMarkColor = Color.Black;
-                Color ScrollBarBorderColor = new(0, 44, 112); // could use BrightNeutralColor
+
                 Color TextColor = Color.White;
                 Color TextBoxFocusedSelectionBG = Color.Black;
                 Color TextBoxUnfocusedSelectionBG = new(210, 240, 255);
-                Color TitleBG = new(0, 52, 96);
+
+                Color CheckMarkColor = Color.Black;
+
+                Color PrimaryColor, BrightNeutralColor, DropdownArrowColor;
+                float TitleShadowIntensity;
+                if (ThemeType == BuiltInTheme.Dark_Gray)
+                {
+                    PrimaryColor = new(188, 188, 188);
+                    BrightNeutralColor = new(84, 84, 84);
+                    DropdownArrowColor = Color.Black;
+                    TitleShadowIntensity = 0.76f;
+                }
+                else if (ThemeType == BuiltInTheme.Dark_Red)
+                {
+                    PrimaryColor = new(204, 0, 36);
+                    BrightNeutralColor = new(60, 8, 12);
+                    DropdownArrowColor = Color.White;
+                    TitleShadowIntensity = 0.48f;
+                }
+                else if (ThemeType == BuiltInTheme.Dark_Green)
+                {
+                    PrimaryColor = new(18, 168, 30);
+                    BrightNeutralColor = new(24, 56, 10);
+                    DropdownArrowColor = Color.White;
+                    TitleShadowIntensity = 0.48f;
+                }
+                else if (ThemeType == BuiltInTheme.Dark_Blue)
+                {
+                    PrimaryColor = new(0, 108, 214);
+                    BrightNeutralColor = new(11, 28, 72);
+                    DropdownArrowColor = Color.White;
+                    TitleShadowIntensity = 0.48f;
+                }
+                else if (ThemeType == BuiltInTheme.Dark_Purple)
+                {
+                    PrimaryColor = new(154, 16, 184);
+                    BrightNeutralColor = new(50, 24, 70);
+                    DropdownArrowColor = Color.White;
+                    TitleShadowIntensity = 0.48f;
+                }
+                else if (ThemeType == BuiltInTheme.Dark_Pink)
+                {
+                    PrimaryColor = new(255, 32, 188);
+                    BrightNeutralColor = new(136, 0, 96);
+                    DropdownArrowColor = Color.Black;
+                    TitleShadowIntensity = 0.70f;
+                }
+                else if (ThemeType == BuiltInTheme.Dark_Yellow)
+                {
+                    PrimaryColor = new(250, 230, 18);
+                    BrightNeutralColor = new(144, 130, 10);
+                    DropdownArrowColor = Color.Black;
+                    TitleShadowIntensity = .72f;
+
+                    TextColor = Color.Black;
+                    TextBoxFocusedSelectionBG = Color.White;
+                }
+                else if (ThemeType == BuiltInTheme.Dark_Turquoise)
+                {
+                    PrimaryColor = new(60, 210, 192);
+                    BrightNeutralColor = new(4, 66, 52);
+                    DropdownArrowColor = Color.Black;
+                    TitleShadowIntensity = 0.25f;
+                }
+                else if (ThemeType == BuiltInTheme.Dark_OrangeBrown)
+                {
+                    PrimaryColor = new(236, 150, 12);
+                    BrightNeutralColor = new(62, 42, 12);
+                    DropdownArrowColor = Color.Black;
+                    TitleShadowIntensity = 0.70f;
+                }
+                else if (ThemeType == BuiltInTheme.Dark_LightBrown)
+                {
+                    PrimaryColor = new(228, 178, 130);
+                    BrightNeutralColor = new(106, 84, 64);
+                    DropdownArrowColor = Color.Black;
+                    TitleShadowIntensity = 0.7f;
+                }
+                else
+                    throw new NotImplementedException();
+
+                Color DimNeutralColor = new(0, 10, 18);
+                Color AccentColor = Color.Lerp(Color.Black, PrimaryColor, 0.55f);
+                Color ToggleButtonUnselected = AccentColor;
+                Color TitleBG = Color.Lerp(Color.Black, PrimaryColor, TitleShadowIntensity);
+                Color ScrollBarBorderColor = Color.Lerp(BrightNeutralColor, Color.White, 0.06f);
 
                 MGSolidFillBrush PrimaryBG = PrimaryColor.AsFillBrush();
                 IFillBrush BrightNeutralBrush = BrightNeutralColor.AsFillBrush();
@@ -290,7 +380,7 @@ namespace MGUI.Core.UI
                 ThemeManagedVisualStateFillBrush ToggleButtonBG =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
-                            PrimaryBG, ToggleButtonSelectedColor.AsFillBrush(), PrimaryBG * 0.5f,
+                            ToggleButtonUnselected.AsFillBrush(), PrimaryBG, ToggleButtonUnselected.AsFillBrush() * 0.5f,
                             Color.White * 0.12f, PressedModifierType.Darken, 0.06f)
                     );
                 _Backgrounds[MGElementType.ToggleButton] = new ThemeManagedVisualStateFillBrush(ToggleButtonBG.GetValue(true));
