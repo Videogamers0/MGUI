@@ -19,8 +19,8 @@ namespace MGUI.Core.UI
         /// Default value: false</summary>
         public bool ShowOnDisabled { get; set; }
 
-        public MGToolTip(MGWindow Window, MGElement Host, int Width, int Height)
-            : base(Window.Desktop, Window, MGElementType.ToolTip, 0, 0, Width, Height)
+        public MGToolTip(MGWindow Window, MGElement Host, int Width, int Height, MGTheme Theme = null)
+            : base(Window.Desktop, Theme, Window, MGElementType.ToolTip, 0, 0, Width, Height)
         {
             using (BeginInitializing())
             {

@@ -144,7 +144,7 @@ namespace MGUI.Core.UI
 
         /// <summary>The <see cref="Color"/> to use when filling in the checkable bubble part when <see cref="IsChecked"/> is true.<para/>
         /// Default value: <see cref="MGTheme.RadioButtonCheckedFillColor"/><para/>
-        /// See also: <see cref="MGDesktop.Theme"/></summary>
+        /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/></summary>
         public Color BubbleCheckedColor { get; set; }
 
         /// <summary>The reserved empty width between the checkable part of this <see cref="MGRadioButton"/> and its <see cref="MGSingleContentHost.Content"/>.<para/>

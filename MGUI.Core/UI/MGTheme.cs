@@ -68,6 +68,11 @@ namespace MGUI.Core.UI
         /// EX: "Arial". If not null, the <see cref="FontManager"/> must contain a <see cref="FontSet"/> with <see cref="FontSet.Name"/> that matches this value.</summary>
         public string DefaultFontFamily { get; set; }
 
+        /// <summary>The fallback value to use for <see cref="MGTextBlock.ShadowOffset"/> when <see cref="MGTextBlock.ShadowOffset"/> is null.</summary>
+        public Point DefaultFontShadowOffset { get; set; } = new(1, 1);
+        /// <summary>The fallback value to use for <see cref="MGTextBlock.ShadowColor"/> when <see cref="MGTextBlock.ShadowColor"/> is null.</summary>
+        public Color DefaultFontShadowColor { get; set; } = Color.Black;
+
         public ThemeFontSettings(string FontFamily)
         {
             this.DefaultFontFamily = FontFamily;

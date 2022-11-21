@@ -197,7 +197,8 @@ namespace MGUI.Core.UI.XAML
         /// <param name="ReplaceLinebreakLiterals">If true, the literal string @"\n" will be replaced with "&#38;#x0a;", which is the XAML encoding of the linebreak character '\n'.<br/>
         /// If false, setting the text of an <see cref="MGTextBlock"/> requires encoding the '\n' character as ""&#38;#x0a;""<para/>
         /// See also: <see href="https://stackoverflow.com/a/183435/11689514"/></param>
-        public static MGWindow LoadRootWindow(MGDesktop Desktop, string XAMLString, bool SanitizeXAMLString = false, bool ReplaceLinebreakLiterals = true)
+        /// <param name="Theme">A value to use for <see cref="MGWindow.Theme"/>. Can be null.</param>
+        public static MGWindow LoadRootWindow(MGDesktop Desktop, string XAMLString, bool SanitizeXAMLString = false, bool ReplaceLinebreakLiterals = true, MGTheme Theme = null)
         {
             if (SanitizeXAMLString)
                 XAMLString = ValidateXAMLString(XAMLString);
@@ -205,7 +206,7 @@ namespace MGUI.Core.UI.XAML
                 XAMLString = XAMLString.Replace(@"\n", "&#x0a;");
             Window Parsed = (Window)XamlServices.Parse(XAMLString);
             Parsed.ProcessStyles();
-            return Parsed.ToElement(Desktop);
+            return Parsed.ToElement(Desktop, Theme);
         }
 #endif
     }

@@ -382,7 +382,7 @@ namespace MGUI.Core.UI
 
         /// <summary>The color of the inverted triangle on the right-side of this <see cref="MGComboBox{TItemType}"/>.<para/>
         /// Default value: <see cref="MGTheme.DropdownArrowColor"/><para/>
-        /// See also: <see cref="MGDesktop.Theme"/></summary>
+        /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/></summary>
         public Color DropdownArrowColor { get; set; }
 
         private void ManagedSetContent(MGElement Content)
@@ -435,7 +435,7 @@ namespace MGUI.Core.UI
 
                 this.CanChangeContent = false;
 
-                Dropdown = new(Window, 0, 0, 100, 300)
+                Dropdown = new(Window, 0, 0, 100, 300, SelfOrParentWindow.Theme)
                 {
                     ComponentParent = this,
                     IsUserResizable = false,

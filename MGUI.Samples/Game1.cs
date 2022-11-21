@@ -280,7 +280,8 @@ namespace MGUI.Samples
             //  Parse the XAML markup into an MGWindow instance
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.ListViewSample.xaml";
             string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
-            MGWindow Window1 = XAMLParser.LoadRootWindow(Desktop, XAML, false);
+            MGTheme Theme = null; //new(MGTheme.BuiltInTheme.Dark_Green, Desktop.FontManager.DefaultFontFamily); // Testing Window-specific themes, which override MGDesktop.Theme
+            MGWindow Window1 = XAMLParser.LoadRootWindow(Desktop, XAML, false, true, Theme);
 
             //  Get the ListView
             MGListView<Person> ListView_Sample1 = Window1.GetElementByName<MGListView<Person>>("ListView_Sample1");

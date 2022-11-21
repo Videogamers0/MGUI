@@ -78,6 +78,19 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
+    //Scaling?
+    //      Maybe MGWindow has a float Scale property.
+    //      When drawing an MGWindow, if scale is not 1.0, render to a temporary RenderTarget2D, then render that RenderTarget to the back buffer with the scale transform
+    //      will also need to scale mouse positions
+    //      Suppose window is Left=200,Top=300,Width=340,Height=400, and Scale=1.5
+    //      so the window will be Width=340*1.5=510, Height=400*1.5=600
+    //      If scaling from the window's center, it will take up screen space:
+    //      ScaledLeft=Left-([Width*Scale-Width]/2)=200-((340*1.5-340)/2)=200-170/2=115
+    //      ScaledTop=200   ScaledWidth=510     ScaledHeight=600
+    //      So if the mouse position is at 115,200, and the window's bounds are stored as the untransformed values, 200,300,340,400
+    //      then before checking if the bounds contains the mouse position, the 115,200 needs to be transformed to 200,300
+    //      I guess its just the inverse matrix of Matrix.CreateTranslation(-Window.Center) * Matrix.CreateTranslation(Window.Scale) * Matrix.CreateTranslation(Window.Center) ?
+    //      So call Matrix.TransformPoint(transform, real mouse position) before checking if MGElement.IMouseViewport.IsInside
     //statusbar, menubar/menuitems
     //      messagebox
     //          has icon docked left
@@ -92,7 +105,14 @@ namespace MGUI.Core.UI
     //maybe a subclass of MGImage for showing animations? Automatically cycles through a set list of textures/sourcerects without invoking LayoutChanged each time
     //		under the assumption each frame of the animation is same size. MGAnimatedImage(bool IsUniform) (if !IsUniform, has to invoke LayoutChanged)
     //chatbox
-    //
+    //      DockPanel
+    //          DockPanel Dock=Bottom
+    //              TextBlock Dock=Left (Contains your username)
+    //              Button Dock=Right (Send message button)
+    //              TextBox
+    //          ScrollViewer - Alternatively, could use ListBox<string>
+    //              StackPanel Orientation=Vertical
+    //                  TextBlock, 1 per message
     //maybe MGElement should have a: List<MGElement> AttachedElements { get; }
     //		This would specifically be for elements where the parent doesn't normally have a reference to the child, such as MGResizeGrip when using MGResizeGrip.Host to attach to
     //		The Visual Tree traversal logic should have an additional parameter, IncludeAttached
@@ -103,7 +123,8 @@ namespace MGUI.Core.UI
         public string UniqueId { get; }
 
 		public MGDesktop GetDesktop() => SelfOrParentWindow.Desktop;
-        public MGTheme GetTheme() => GetDesktop().Theme;
+        /// <summary>Prioritizes <see cref="MGWindow.Theme"/>. If null, falls back to <see cref="MGDesktop.Theme"/></summary>
+        public MGTheme GetTheme() => SelfOrParentWindow.Theme ?? GetDesktop().Theme;
 
 		/// <summary>The <see cref="MGWindow"/> that this <see cref="MGElement"/> belongs to. This value is only null if this <see cref="MGElement"/> is an <see cref="MGWindow"/> with no parent.</summary>
 		public MGWindow ParentWindow { get; }
@@ -644,20 +665,21 @@ namespace MGUI.Core.UI
 
 		}
 
-        protected MGElement(MGDesktop Desktop, MGWindow ParentWindow, MGElementType ElementType)
+        protected MGElement(MGDesktop Desktop, MGWindow ParentWindow, MGElementType ElementType, MGTheme Theme = null)
 		{
 			this.InitializationManager = new(() => { LayoutChanged(this, true); });
 			using (BeginInitializing())
 			{
 				this.UniqueId = Guid.NewGuid().ToString();
+                this.ParentWindow = ParentWindow;
+                this.ElementType = ElementType;
+
+                MGTheme ActualTheme = Theme ?? ParentWindow?.Theme ?? Desktop.Theme;
 
                 this.MouseHandler = Desktop.InputTracker.Mouse.CreateHandler(this, null);
                 this.KeyboardHandler = Desktop.InputTracker.Keyboard.CreateHandler(this, null);
 
-                this.ParentWindow = ParentWindow;
-				this.ElementType = ElementType;
-
-				this.Margin = new(0);
+                this.Margin = new(0);
 				this.Padding = new(0);
 
 				this.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -665,7 +687,7 @@ namespace MGUI.Core.UI
 				this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
 				this.VerticalContentAlignment = VerticalAlignment.Stretch;
 
-                this.BackgroundBrush = Desktop.Theme.GetBackgroundBrush(ElementType);
+                this.BackgroundBrush = ActualTheme.GetBackgroundBrush(ElementType);
                 this.DefaultTextForeground = new VisualStateSetting<Color?>(null, null, null);
 
                 this.Visibility = Visibility.Visible;

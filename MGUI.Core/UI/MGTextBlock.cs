@@ -166,14 +166,78 @@ namespace MGUI.Core.UI
             }
         }
 
-        private MGTextRunConfig DefaultTextRunSettings => new(IsBold, IsItalic, IsUnderlined);
+        private MGTextRunConfig DefaultTextRunSettings => new(IsBold, IsItalic, IsUnderlined, 1, null, null, 
+            IsShadowed, ShadowColor ?? GetTheme().FontSettings.DefaultFontShadowColor, ShadowOffset?.ToVector2() ?? GetTheme().FontSettings.DefaultFontShadowOffset.ToVector2());
         #endregion Font Style
+
+        #region Shadow
+        private bool _IsShadowed;
+        public bool IsShadowed
+        {
+            get => _IsShadowed;
+            set
+            {
+                if (_IsShadowed != value)
+                {
+                    _IsShadowed = value;
+                    if (!string.IsNullOrEmpty(Text))
+                    {
+                        UpdateRuns();
+                        UpdateLines();
+                    }
+                }
+            }
+        }
+
+        private Point? _ShadowOffset;
+        /// <summary>Only relevant if <see cref="IsShadowed"/> is true.<br/>
+        /// Determines the offset applied to <see cref="Text"/> when drawing the shadow.<br/>
+        /// If null, uses <see cref="ThemeFontSettings.DefaultFontShadowOffset"/> from <see cref="MGTheme.FontSettings"/><para/>
+        /// Warning - shadowed text does not affect the layout bounds of this <see cref="MGTextBlock"/>.<br/>
+        /// Using a large <see cref="ShadowOffset"/> value may result in parts of the shadow being clipped to <see cref="MGElement.ActualLayoutBounds"/>.</summary>
+        public Point? ShadowOffset
+        {
+            get => _ShadowOffset;
+            set
+            {
+                if (_ShadowOffset != value)
+                {
+                    _ShadowOffset = value;
+                    if (!string.IsNullOrEmpty(Text))
+                    {
+                        UpdateRuns();
+                        UpdateLines();
+                    }
+                }
+            }
+        }
+
+        private Color? _ShadowColor;
+        /// <summary>Only relevant if <see cref="IsShadowed"/> is true.<br/>
+        /// If null, uses <see cref="ThemeFontSettings.DefaultFontShadowColor"/> from <see cref="MGTheme.FontSettings"/></summary>
+        public Color? ShadowColor
+        {
+            get => _ShadowColor;
+            set
+            {
+                if (_ShadowColor != value)
+                {
+                    _ShadowColor = value;
+                    if (!string.IsNullOrEmpty(Text))
+                    {
+                        UpdateRuns();
+                        UpdateLines();
+                    }
+                }
+            }
+        }
+        #endregion Shadow
 
         /// <summary>The foreground color to use when rendering the text.<br/>
         /// If the text is formatted with color codes (such as '[color=Red]Hello World[/color]'), the color specified in the <see cref="MGTextRun"/> will take precedence.<para/>
         /// If the value for the current <see cref="MGElement.VisualState"/> is null, will attempt to resolve the value from <see cref="MGElement.DerivedDefaultTextForeground"/>, or <see cref="MGTheme.TextBlockFallbackForeground"/> if no value is specified.<para/>
         /// See also:<br/><see cref="MGElement.DefaultTextForeground"/><br/><see cref="MGElement.DerivedDefaultTextForeground"/><br/><see cref="ActualForeground"/><br/>
-        /// <see cref="MGTheme.TextBlockFallbackForeground"/><br/><see cref="MGDesktop.Theme"/></summary>
+        /// <see cref="MGTheme.TextBlockFallbackForeground"/><br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/></summary>
         public VisualStateSetting<Color?> Foreground { get; set; }
 
         public Color ActualForeground => Foreground.GetValue(VisualState.Primary) ?? DerivedDefaultTextForeground ?? GetTheme().TextBlockFallbackForeground.GetValue(false).GetValue(VisualState.Primary);
@@ -273,7 +337,7 @@ namespace MGUI.Core.UI
         public HorizontalAlignment TextAlignment { get; set; }
 
         /// <param name="FontSize">If null, uses the font size specified by <see cref="ThemeFontSettings.DefaultFontSize"/>.<para/>
-        /// See also: <see cref="MGDesktop.Theme"/>, <see cref="MGTheme.FontSettings"/></param>
+        /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/><br/><see cref="MGTheme.FontSettings"/></param>
         public MGTextBlock(MGWindow Window, string Text, Color? Foreground = null, int? FontSize = null)
             : base(Window, MGElementType.TextBlock)
         {
@@ -282,7 +346,8 @@ namespace MGUI.Core.UI
                 this.WrapText = true;
 
                 MGDesktop Desktop = GetDesktop();
-                if (!TrySetFont(Desktop.Theme.FontSettings.DefaultFontFamily ?? Desktop.FontManager.DefaultFontFamily, FontSize ?? GetTheme().FontSettings.DefaultFontSize))
+                MGTheme Theme = GetTheme();
+                if (!TrySetFont(Theme.FontSettings.DefaultFontFamily ?? Desktop.FontManager.DefaultFontFamily, FontSize ?? GetTheme().FontSettings.DefaultFontSize))
                     throw new ArgumentException($"Default font not found.");
 
                 this.IsBold = false;

@@ -56,7 +56,7 @@ namespace MGUI.Core.UI
 
         /// <summary>The <see cref="Color"/> to use when stroking the check mark if <see cref="IsChecked"/> is true.<para/>
         /// Default value: <see cref="MGTheme.CheckMarkColor"/><para/>
-        /// See also: <see cref="MGDesktop.Theme"/></summary>
+        /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/></summary>
         public Color CheckMarkColor { get; set; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

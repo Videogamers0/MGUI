@@ -418,34 +418,40 @@ namespace MGUI.Core.UI
         /// Warning: You may need to set <see cref="IsTitleBarVisible"/> to true to utilize this feature.</summary>
         public bool IsDraggable { get; set; } = true;
 
+        /// <summary>If null, uses <see cref="MGDesktop.Theme"/> instead.<para/>
+        /// Default value: null<para/>
+        /// See also:<br/><see cref="MGElement.GetTheme()"/><br/><see cref="MGDesktop.Theme"/></summary>
+        public MGTheme Theme { get; set; }
+
         #region Constructors
         /// <summary>Initializes a root-level window.</summary>
-        public MGWindow(MGDesktop Desktop, int Left, int Top, int Width, int Height)
-            : this(Desktop, null, MGElementType.Window, Left, Top, Width, Height)
+        public MGWindow(MGDesktop Desktop, int Left, int Top, int Width, int Height, MGTheme Theme = null)
+            : this(Desktop, Theme, null, MGElementType.Window, Left, Top, Width, Height)
         {
 
         }
 
         /// <summary>Initializes a nested window (such as a popup). You should still call <see cref="AddNestedWindow(MGWindow)"/> (or set <see cref="ModalWindow"/>) afterwards.</summary>
-        public MGWindow(MGWindow Window, int Left, int Top, int Width, int Height)
-            : this(Window.Desktop, Window, MGElementType.Window, Left, Top, Width, Height)
+        public MGWindow(MGWindow Window, int Left, int Top, int Width, int Height, MGTheme Theme = null)
+            : this(Window.Desktop, Theme, Window, MGElementType.Window, Left, Top, Width, Height)
         {
             if (Window == null)
                 throw new ArgumentNullException(nameof(Window));
         }
 
         /// <exception cref="InvalidOperationException">Thrown if you attempt to change <see cref="MGElement.HorizontalAlignment"/> or <see cref="MGElement.VerticalAlignment"/> on this <see cref="MGWindow"/></exception>
-        protected MGWindow(MGDesktop Desktop, MGWindow ParentWindow, MGElementType ElementType, int Left, int Top, int Width, int Height)
-            : base(Desktop, ParentWindow, ElementType)
+        protected MGWindow(MGDesktop Desktop, MGTheme WindowTheme, MGWindow ParentWindow, MGElementType ElementType, int Left, int Top, int Width, int Height)
+            : base(Desktop, WindowTheme, ParentWindow, ElementType)
         {
-            if (ParentWindow == null && !MGElement.WindowElementTypes.Contains(ElementType))
+            if (ParentWindow == null && !WindowElementTypes.Contains(ElementType))
                 throw new InvalidOperationException($"All {nameof(MGElement)}s must either belong to an {nameof(MGWindow)} or be a root-level {nameof(MGWindow)} instance.");
 
             using (BeginInitializing())
             {
                 this.Desktop = Desktop ?? throw new ArgumentNullException(nameof(Desktop));
+                this.Theme = WindowTheme;
 
-                MGTheme Theme = GetTheme();
+                MGTheme ActualTheme = GetTheme();
 
                 this.WindowMouseHandler = InputTracker.Mouse.CreateHandler(this, null);
                 this.WindowKeyboardHandler = InputTracker.Keyboard.CreateHandler(this, null);
@@ -483,7 +489,7 @@ namespace MGUI.Core.UI
                 TitleBarElement.HorizontalContentAlignment = HorizontalAlignment.Stretch;
                 TitleBarElement.VerticalAlignment = VerticalAlignment.Stretch;
                 TitleBarElement.VerticalContentAlignment = VerticalAlignment.Stretch;
-                TitleBarElement.BackgroundBrush = Theme.TitleBackground.GetValue(true);
+                TitleBarElement.BackgroundBrush = ActualTheme.TitleBackground.GetValue(true);
 
                 this.TitleBarComponent = new(TitleBarElement, true, false, true, true, false, false, false,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Top, ComponentSize.Size));
@@ -512,7 +518,7 @@ namespace MGUI.Core.UI
                 CloseButtonElement.SetContent(new MGTextBlock(this, "[b][shadow=Black 1 1]x[/shadow][/b]", Color.White));
                 //CloseButtonElement.CanChangeContent = false;
 
-                this.TitleBarTextBlockElement = new(this, null, Color.White, Theme.FontSettings.SmallFontSize)
+                this.TitleBarTextBlockElement = new(this, null, Color.White, ActualTheme.FontSettings.SmallFontSize)
                 {
                     Margin = new(4,0),
                     Padding = new(0),

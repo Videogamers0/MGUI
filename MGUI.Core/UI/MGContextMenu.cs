@@ -388,15 +388,15 @@ namespace MGUI.Core.UI
         }
 
         /// <summary>Creates a root-level <see cref="MGContextMenu"/></summary>
-        public MGContextMenu(MGWindow Window, string TitleText = "[b]Choose Option[/b]")
-            : this(Window.Desktop, Window, TitleText) { }
+        public MGContextMenu(MGWindow Window, string TitleText = "[b]Choose Option[/b]", MGTheme Theme = null)
+            : this(Window.Desktop, Theme, Window, TitleText) { }
 
         /// <summary>Creates a root-level <see cref="MGContextMenu"/> that does not belong to any <see cref="MGWindow"/>s</summary>
-        public MGContextMenu(MGDesktop Desktop, string TitleText = "[b]Choose Option[/b]")
-            : this(Desktop, null, TitleText) { }
+        public MGContextMenu(MGDesktop Desktop, string TitleText = "[b]Choose Option[/b]", MGTheme Theme = null)
+            : this(Desktop, Theme, null, TitleText) { }
 
-        protected MGContextMenu(MGDesktop Desktop, MGWindow Window, string TitleText = "[b]Choose Option[/b]")
-            : base(Desktop, Window, MGElementType.ContextMenu, 0, 0, 1, 1)
+        protected MGContextMenu(MGDesktop Desktop, MGTheme WindowTheme, MGWindow Window, string TitleText = "[b]Choose Option[/b]")
+            : base(Desktop, WindowTheme, Window, MGElementType.ContextMenu, 0, 0, 1, 1)
         {
             using (BeginInitializing())
             {

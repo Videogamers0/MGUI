@@ -209,11 +209,11 @@ namespace MGUI.Core.UI
 
         /// <summary>The brush to use for the outer portion of the scrollbars.<br/>
         /// Default value: <see cref="MGTheme.ScrollBarOuterBrush"/><para/>
-        /// See also: <see cref="MGDesktop.Theme"/></summary>
+        /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/></summary>
         public VisualStateFillBrush ScrollBarOuterBrush { get; set; }
         /// <summary>The brush to use for the inner portion of the scrollbars.<br/>
         /// Default value: <see cref="MGTheme.ScrollBarInnerBrush"/><para/>
-        /// See also: <see cref="MGDesktop.Theme"/></summary>
+        /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/></summary>
         public VisualStateFillBrush ScrollBarInnerBrush { get; set; }
 
         protected override bool CanCacheSelfMeasurement => false; // The self measurement depends on the measurement of the children, so it must be re-calculated each time it's requested

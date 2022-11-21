@@ -111,8 +111,8 @@ namespace MGUI.Core.UI.Containers
         public event EventHandler<MGElement> OnDirectOrNestedContentRemoved;
 
         /// <summary>Only intended to be used by <see cref="MGWindow"/>'s constructor.</summary>
-        protected MGContentHost(MGDesktop UI, MGWindow Window, MGElementType ElementType)
-            : base(UI, Window, ElementType) { }
+        protected MGContentHost(MGDesktop UI, MGTheme Theme, MGWindow Window, MGElementType ElementType)
+            : base(UI, Window, ElementType, Theme) { }
 
         protected MGContentHost(MGWindow Window, MGElementType ElementType)
             : base(Window, ElementType)
@@ -220,8 +220,8 @@ namespace MGUI.Core.UI.Containers
             => SetContent<MGSingleContentHost>(new MGTextBlock(SelfOrParentWindow, Content));
 
         /// <summary>Only intended to be used by <see cref="MGWindow"/>'s constructor.</summary>
-        protected MGSingleContentHost(MGDesktop UI, MGWindow Window, MGElementType ElementType)
-            : base(UI, Window, ElementType) { }
+        protected MGSingleContentHost(MGDesktop UI, MGTheme Theme, MGWindow Window, MGElementType ElementType)
+            : base(UI, Theme, Window, ElementType) { }
 
         protected MGSingleContentHost(MGWindow Window, MGElementType ElementType)
             : base(Window, ElementType)

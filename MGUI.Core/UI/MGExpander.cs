@@ -56,7 +56,7 @@ namespace MGUI.Core.UI
 
         /// <summary>The color to use when rendering the dropdown arrow icon inside the button part of this <see cref="MGExpander"/>'s header.<para/>
         /// Default value: <see cref="MGTheme.DropdownArrowColor"/><para/>
-        /// See also: <see cref="MGDesktop.Theme"/></summary>
+        /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/></summary>
         public Color ExpanderDropdownArrowColor { get; set; }
 
         /// <summary>The width of the dropdown arrow icon inside the button part of this <see cref="MGExpander"/>'s header.<para/>

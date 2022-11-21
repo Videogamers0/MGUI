@@ -1040,6 +1040,10 @@ namespace MGUI.Core.UI.XAML
         public bool? IsItalic { get; set; }
         public bool? IsUnderlined { get; set; }
 
+        public bool? IsShadowed { get; set; }
+        public Size? ShadowOffset { get; set; }
+        public XAMLColor? ShadowColor { get; set; }
+
         public bool? AllowsInlineFormatting { get; set; }
 
         public XAMLColor? Foreground { get; set; }
@@ -1063,6 +1067,13 @@ namespace MGUI.Core.UI.XAML
                 TextBlock.IsItalic = IsItalic.Value;
             if (IsUnderlined.HasValue)
                 TextBlock.IsUnderlined = IsUnderlined.Value;
+
+            if (IsShadowed.HasValue)
+                TextBlock.IsShadowed = IsShadowed.Value;
+            if (ShadowOffset.HasValue)
+                TextBlock.ShadowOffset = new Point(ShadowOffset.Value.Width, ShadowOffset.Value.Height);
+            if (ShadowColor.HasValue)
+                TextBlock.ShadowColor = ShadowColor.Value.ToXNAColor();
 
             if (AllowsInlineFormatting.HasValue)
                 TextBlock.AllowsInlineFormatting = AllowsInlineFormatting.Value;
@@ -1375,17 +1386,17 @@ namespace MGUI.Core.UI.XAML
         {
             int WindowWidth = Math.Clamp(Width ?? 0, MinWidth ?? 0, MaxWidth ?? int.MaxValue);
             int WindowHeight = Math.Clamp(Height ?? 0, MinHeight ?? 0, MaxHeight ?? int.MaxValue);
-            MGWindow Instance = new(Window, Left ?? 0, Top ?? 0, WindowWidth, WindowHeight);
+            MGWindow Instance = new(Window, Left ?? 0, Top ?? 0, WindowWidth, WindowHeight, Window.Theme);
             foreach (Window Nested in NestedWindows)
                 Instance.AddNestedWindow(Nested.ToElement<MGWindow>(Window, Window));
             return Instance;
         }
 
-        public MGWindow ToElement(MGDesktop Desktop)
+        public MGWindow ToElement(MGDesktop Desktop, MGTheme Theme)
         {
             int WindowWidth = Math.Clamp(Width ?? 0, MinWidth ?? 0, MaxWidth ?? int.MaxValue);
             int WindowHeight = Math.Clamp(Height ?? 0, MinHeight ?? 0, MaxHeight ?? int.MaxValue);
-            MGWindow Window = new(Desktop, Left ?? 0, Top ?? 0, WindowWidth, WindowHeight);
+            MGWindow Window = new(Desktop, Left ?? 0, Top ?? 0, WindowWidth, WindowHeight, Theme);
             ApplySettings(null, Window);
             return Window;
         }
