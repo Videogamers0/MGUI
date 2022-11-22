@@ -423,6 +423,9 @@ namespace MGUI.Core.UI
         /// See also:<br/><see cref="MGElement.GetTheme()"/><br/><see cref="MGDesktop.Theme"/></summary>
         public MGTheme Theme { get; set; }
 
+        /// <summary>If true, this <see cref="MGWindow"/>'s layout will be recomputed at the start of the next update tick.</summary>
+        public bool QueueLayoutRefresh { get; set; }
+
         #region Constructors
         /// <summary>Initializes a root-level window.</summary>
         public MGWindow(MGDesktop Desktop, int Left, int Top, int Width, int Height, MGTheme Theme = null)
@@ -570,9 +573,9 @@ namespace MGUI.Core.UI
                 { 
                     ValidateWindowSizeAndPosition();
 
-                    if (!IsLayoutValid)
+                    if (!IsLayoutValid || QueueLayoutRefresh)
                     {
-                        InvalidateLayout();
+                        QueueLayoutRefresh = false;
                         UpdateLayout(new(this.Left, this.Top, this.WindowWidth, this.WindowHeight));
                     }
                 };

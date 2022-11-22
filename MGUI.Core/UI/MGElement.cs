@@ -581,7 +581,23 @@ namespace MGUI.Core.UI
         public bool DerivedIsHitTestVisible => IsHitTestVisible && (Parent?.IsHitTestVisible ?? IsHitTestVisible);
         #endregion Input
 
-        public VisualState VisualState { get; private set; } = new(PrimaryVisualState.Normal, SecondaryVisualState.None);
+        private VisualState _VisualState = new(PrimaryVisualState.Normal, SecondaryVisualState.None);
+        public VisualState VisualState
+        {
+            get => _VisualState;
+            private set
+            {
+                if (_VisualState != value)
+                {
+                    VisualState Previous = VisualState;
+                    _VisualState = value;
+                    VisualStateChanged?.Invoke(this, new(Previous, VisualState));
+                }
+            }
+        }
+
+        /// <summary>Invoked when <see cref="VisualState"/> changes.</summary>
+        public event EventHandler<EventArgs<VisualState>> VisualStateChanged;
 
         /// <summary>This property does not account for the parent's <see cref="IsSelected"/>. Consider using <see cref="DerivedIsSelected"/> instead.</summary>
         public bool IsSelected { get; set; } = false;
@@ -971,10 +987,12 @@ namespace MGUI.Core.UI
 			if (InitializationManager.IsDeferringEvents)
 				return;
 
-			InvalidateLayout();
+            if (IsUpdatingLayout)
+                SelfOrParentWindow.QueueLayoutRefresh = true;
 
+            InvalidateLayout();
             if (NotifyParent)
-				Parent?.LayoutChanged(Source, NotifyParent);
+                Parent?.LayoutChanged(Source, NotifyParent);
         }
 
         /// <summary>If true, indicates that the layout will be re-calculated during the next update tick. This also invalidates any cached measurements.</summary>

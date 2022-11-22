@@ -249,8 +249,6 @@ namespace MGUI.Core.UI
         /// enumerate <see cref="GridSelection"/>, and for each <see cref="GridCell"/>, call <see cref="GridSelection.Grid"/>'s <see cref="MGGrid.GetCellContent(GridCell)"/></summary>
         public GridSelection? SelectedData => DataGrid.CurrentSelection;
 
-        private bool IsWindowLayoutRefreshPending = false;
-
         public MGListView(MGWindow Window)
             : this(Window, 8, 3) { }
 
@@ -292,29 +290,8 @@ namespace MGUI.Core.UI
                 this.ScrollViewer = new(Window, ScrollBarVisibility.Auto, ScrollBarVisibility.Disabled);
                 ScrollViewer.SetContent(DataGrid);
                 ScrollViewer.CanChangeContent = false;
-                ScrollViewer.VerticalScrollBarBoundsChanged += (sender, e) =>
-                {
-                    int DesiredWidth = e?.Width ?? 0;
-                    if (TopRightCornerPlaceholder.PreferredWidth != DesiredWidth)
-                    {
-                        TopRightCornerPlaceholder.PreferredWidth = DesiredWidth;
-
-                        //  Setting PreferredWidth of the top right corner element will set Window.IsLayoutValid=false
-                        //  But if the Window is already in the process of updating its layout, it will overwrite this with Window.IsLayoutValid=true at the end
-                        //  So we must queue up a call to InvalidateLayout on the next update tick
-                        if (Window.IsUpdatingLayout)
-                            IsWindowLayoutRefreshPending = true;
-                    }
-                };
-
-                Window.OnBeginUpdate += (sender, e) =>
-                {
-                    try
-                    {
-                        if (IsWindowLayoutRefreshPending)
-                            Window.InvalidateLayout();
-                    }
-                    finally { IsWindowLayoutRefreshPending = false; }
+                ScrollViewer.VerticalScrollBarBoundsChanged += (sender, e) => {
+                    TopRightCornerPlaceholder.PreferredWidth = e?.Width ?? 0;
                 };
 
                 MGDockPanel HeaderGridWrapper = new(Window);
