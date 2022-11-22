@@ -18,81 +18,132 @@ namespace MGUI.Core.UI.XAML
 
         public string Name { get; set; }
 
+        [Category("Layout")]
         public Thickness? Margin { get; set; }
+        [Category("Layout")]
         public Thickness? Padding { get; set; }
 
-        public HorizontalAlignment? HorizontalAlignment { get; set; }
-        public VerticalAlignment? VerticalAlignment { get; set; }
-        public HorizontalAlignment? HorizontalContentAlignment { get; set; }
-        public VerticalAlignment? VerticalContentAlignment { get; set; }
+        [Category("Layout")]public HorizontalAlignment? HorizontalAlignment { get; set; }
+        [Category("Layout")]public VerticalAlignment? VerticalAlignment { get; set; }
+        [Category("Layout")]public HorizontalAlignment? HorizontalContentAlignment { get; set; }
+        [Category("Layout")]public VerticalAlignment? VerticalContentAlignment { get; set; }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public HorizontalAlignment? HA { get => HorizontalAlignment; set => HorizontalAlignment = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public VerticalAlignment? VA { get => VerticalAlignment; set => VerticalAlignment = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public HorizontalAlignment? HCA { get => HorizontalContentAlignment; set => HorizontalContentAlignment = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public VerticalAlignment? VCA { get => VerticalContentAlignment; set => VerticalContentAlignment = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public HorizontalAlignment? HA { get => HorizontalAlignment; set => HorizontalAlignment = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public VerticalAlignment? VA { get => VerticalAlignment; set => VerticalAlignment = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public HorizontalAlignment? HCA { get => HorizontalContentAlignment; set => HorizontalContentAlignment = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public VerticalAlignment? VCA { get => VerticalContentAlignment; set => VerticalContentAlignment = value; }
 
+        [Category("Layout")]
         public int? MinWidth { get; set; }
+        [Category("Layout")]
         public int? MinHeight { get; set; }
+        [Category("Layout")]
         public int? MaxWidth { get; set; }
+        [Category("Layout")]
         public int? MaxHeight { get; set; }
 
+        [Browsable(false)]
         public int? PreferredWidth { get; set; }
+        [Browsable(false)]
         public int? PreferredHeight { get; set; }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int? Width { get => PreferredWidth; set => PreferredWidth = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int? Height { get => PreferredHeight; set => PreferredHeight = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Category("Layout")]
+        public int? Width { get => PreferredWidth; set => PreferredWidth = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Category("Layout")]
+        public int? Height { get => PreferredHeight; set => PreferredHeight = value; }
 
         public ToolTip ToolTip { get; set; }
         public ContextMenu ContextMenu { get; set; }
 
+        [Category("Behavior")]
         public bool? CanHandleInputsWhileHidden { get; set; }
+        [Category("Behavior")]
         public bool? IsHitTestVisible { get; set; }
 
+        [Category("Behavior")]
         public bool? IsSelected { get; set; }
+        [Category("Behavior")]
         public bool? IsEnabled { get; set; }
 
         //public VisualStateBrush Background
+        [Category("Appearance")]
         public FillBrush Background { get; set; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public FillBrush BG { get => Background; set => Background = value; }
+        [Category("Appearance")]
         public XAMLColor? TextForeground { get; set; }
 
+        [Category("Appearance")]
         public Visibility? Visibility { get; set; }
 
+        [Category("Layout")]
         public bool? ClipToBounds { get; set; }
 
+        [Category("Appearance")]
         public float? Opacity { get; set; }
 
         /// <summary>Used by <see cref="DockPanel"/>'s children</summary>
+        [Category("Attached")]
         public Dock Dock { get; set; } = Dock.Top;
+
         /// <summary>Used by <see cref="Grid"/>'s children</summary>
+        [Browsable(false)]
         public int GridRow { get; set; } = 0;
         /// <summary>Used by <see cref="Grid"/>'s children</summary>
+        [Browsable(false)]
         public int GridColumn { get; set; } = 0;
         /// <summary>Used by <see cref="Grid"/>'s children</summary>
+        [Browsable(false)]
         public int GridRowSpan { get; set; } = 1;
         /// <summary>Used by <see cref="Grid"/>'s children</summary>
+        [Browsable(false)]
         public int GridColumnSpan { get; set; } = 1;
         /// <summary>Used by <see cref="Grid"/>'s children</summary>
+        [Category("Attached")]
         public bool GridAffectsMeasure { get; set; } = true;
+
         /// <summary>Used by <see cref="OverlayPanel"/>'s children</summary>
+        [Category("Attached")]
         public Thickness Offset { get; set; } = new();
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int Row { get => GridRow; set => GridRow = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int Column { get => GridColumn; set => GridColumn = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int RowSpan { get => GridRowSpan; set => GridRowSpan = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public int ColumnSpan { get => GridColumnSpan; set => GridColumnSpan = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Category("Attached")]
+        public int Row { get => GridRow; set => GridRow = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Category("Attached")]
+        public int Column { get => GridColumn; set => GridColumn = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Category("Attached")]
+        public int RowSpan { get => GridRowSpan; set => GridRowSpan = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Category("Attached")]
+        public int ColumnSpan { get => GridColumnSpan; set => GridColumnSpan = value; }
 
         /// <summary>If true, this object can have <see cref="Setter"/>s applied to its properties.<para/>
         /// Default value: true</summary>
+        [Category("Appearance")]
         public bool IsStyleable { get; set; } = true;
+        [Category("Appearance")]
         public List<Style> Styles { get; set; } = new();
         /// <summary>The names of the named <see cref="Style"/>s that should be applied to this <see cref="Element"/>.<br/>
         /// Use a comma to delimit multiple names, such as: "Style1,Style2<br/>
         /// to apply <see cref="Style"/> with <see cref="Style.Name"/>="Style1" and <see cref="Style"/> with <see cref="Style.Name"/>="Style2" to this <see cref="Element"/><para/>
         /// See also: <see cref="Style.Name"/></summary>
+        [Category("Appearance")]
         public string StyleNames { get; set; }
 
+        [Category("Attached")]
         public Dictionary<string, object> AttachedProperties { get; set; } = new();
 
         public T ToElement<T>(MGWindow Window, MGElement Parent) 

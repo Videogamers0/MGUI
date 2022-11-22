@@ -22,6 +22,7 @@ namespace MGUI.Core.UI.XAML
 #endif
     public abstract class MultiContentHost : Element
     {
+        [Browsable(false)]
         public List<Element> Children { get; set; } = new();
 
         protected internal override IEnumerable<Element> GetChildren() => Children;
@@ -32,6 +33,7 @@ namespace MGUI.Core.UI.XAML
 #endif
     public abstract class SingleContentHost : Element
     {
+        [Category("Data")]
         public Element Content { get; set; }
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
@@ -52,16 +54,22 @@ namespace MGUI.Core.UI.XAML
 
     public struct ColumnDefinition
     {
+        [Category("Layout")]
         public GridLength Length { get; set; }
+        [Category("Layout")]
         public int? MinWidth { get; set; }
+        [Category("Layout")]
         public int? MaxWidth { get; set; }
         public override string ToString() => $"{nameof(ColumnDefinition)}: {Length}";
     }
 
     public struct RowDefinition
     {
+        [Category("Layout")]
         public GridLength Length { get; set; }
+        [Category("Layout")]
         public int? MinHeight { get; set; }
+        [Category("Layout")]
         public int? MaxHeight { get; set; }
         public override string ToString() => $"{nameof(RowDefinition)}: {Length}";
     }
@@ -70,8 +78,11 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.GridSplitter;
 
+        [Category("Layout")]
         public int? Size { get; set; }
+        [Category("Layout")]
         public Size? TickSize { get; set; }
+        [Category("Appearance")]
         public FillBrush Foreground { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGGridSplitter(Window);
@@ -95,23 +106,38 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.Grid;
 
+        [Category("Layout")]
         public string RowLengths { get; set; }
+        [Category("Layout")]
         public string ColumnLengths { get; set; }
+        [Category("Layout")]
         public List<RowDefinition> RowDefinitions { get; set; } = new();
+        [Category("Layout")]
         public List<ColumnDefinition> ColumnDefinitions { get; set; } = new();
 
+        [Category("Behavior")]
         public GridSelectionMode? SelectionMode { get; set; }
+        [Category("Behavior")]
         public bool? CanDeselectByClickingSelectedCell { get; set; }
+        [Category("Appearance")]
         public FillBrush SelectionBackground { get; set; }
+        [Category("Appearance")]
         public FillBrush SelectionOverlay { get; set; }
 
+        [Category("Appearance")]
         public GridLineIntersection? GridLineIntersectionHandling { get; set; }
+        [Category("Appearance")]
         public GridLinesVisibility? GridLinesVisibility { get; set; }
+        [Category("Layout")]
         public int? GridLineMargin { get; set; }
+        [Category("Appearance")]
         public FillBrush HorizontalGridLineBrush { get; set; }
+        [Category("Appearance")]
         public FillBrush VerticalGridLineBrush { get; set; }
 
+        [Category("Layout")]
         public int? RowSpacing { get; set; }
+        [Category("Layout")]
         public int? ColumnSpacing { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGGrid(Window);
@@ -179,26 +205,43 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.UniformGrid;
 
+        [Category("Layout")]
         public int? Rows { get; set; }
+        [Category("Layout")]
         public int? Columns { get; set; }
+        [Category("Layout")]
         public Size? CellSize { get; set; }
+        [Category("Layout")]
         public int? HeaderRowHeight { get; set; }
+        [Category("Layout")]
         public int? HeaderColumnWidth { get; set; }
 
+        [Category("Behavior")]
         public GridSelectionMode? SelectionMode { get; set; }
+        [Category("Behavior")]
         public bool? CanDeselectByClickingSelectedCell { get; set; }
+        [Category("Appearance")]
         public FillBrush SelectionBackground { get; set; }
+        [Category("Appearance")]
         public FillBrush SelectionOverlay { get; set; }
 
+        [Category("Appearance")]
         public GridLineIntersection? GridLineIntersectionHandling { get; set; }
+        [Category("Appearance")]
         public GridLinesVisibility? GridLinesVisibility { get; set; }
+        [Category("Layout")]
         public int? GridLineMargin { get; set; }
+        [Category("Appearance")]
         public FillBrush HorizontalGridLineBrush { get; set; }
+        [Category("Appearance")]
         public FillBrush VerticalGridLineBrush { get; set; }
 
+        [Category("Layout")]
         public int? RowSpacing { get; set; }
+        [Category("Layout")]
         public int? ColumnSpacing { get; set; }
 
+        [Category("Appearance")]
         public FillBrush CellBackground { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGUniformGrid(Window, Rows ?? 0, Columns ?? 0, CellSize?.ToSize() ?? MonoGame.Extended.Size.Empty);
@@ -276,7 +319,9 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.StackPanel;
 
+        [Category("Layout")]
         public Orientation? Orientation { get; set; }
+        [Category("Layout")]
         public int? Spacing { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGStackPanel(Window, Orientation ?? UI.Orientation.Vertical);

@@ -29,37 +29,68 @@ namespace MGUI.Core.UI.XAML
         /// Example:
         /// <code>&lt;ListBox xmlns:System="clr-namespace:System;assembly=mscorlib" ItemType="{x:Type System:Double}" /&gt;</code><para/>
         /// Default value: <code>typeof(object)</code></summary>
+        [Category("Data")]
         public Type ItemType { get; set; } = typeof(object);
 
         #region Borders
+        [Category("Border")]
         public Border OuterBorder { get; set; } = new();
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public BorderBrush OuterBorderBrush { get => OuterBorder.BorderBrush; set => OuterBorder.BorderBrush = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public BorderBrush OuterBB { get => OuterBorderBrush; set => OuterBorderBrush = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public Thickness? OuterBorderThickness { get => OuterBorder.BorderThickness; set => OuterBorder.BorderThickness = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public Thickness? OuterBT { get => OuterBorderThickness; set => OuterBorderThickness = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Category("Border")]
+        public BorderBrush OuterBorderBrush { get => OuterBorder.BorderBrush; set => OuterBorder.BorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public BorderBrush OuterBB { get => OuterBorderBrush; set => OuterBorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Category("Border")]
+        public Thickness? OuterBorderThickness { get => OuterBorder.BorderThickness; set => OuterBorder.BorderThickness = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public Thickness? OuterBT { get => OuterBorderThickness; set => OuterBorderThickness = value; }
 
+        [Category("Border")]
         public Border InnerBorder { get; set; } = new();
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public BorderBrush InnerBorderBrush { get => InnerBorder.BorderBrush; set => InnerBorder.BorderBrush = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public BorderBrush InnerBB { get => InnerBorderBrush; set => InnerBorderBrush = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public Thickness? InnerBorderThickness { get => InnerBorder.BorderThickness; set => InnerBorder.BorderThickness = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public Thickness? InnerBT { get => InnerBorderThickness; set => InnerBorderThickness = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Category("Border")]
+        public BorderBrush InnerBorderBrush { get => InnerBorder.BorderBrush; set => InnerBorder.BorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public BorderBrush InnerBB { get => InnerBorderBrush; set => InnerBorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Category("Border")]
+        public Thickness? InnerBorderThickness { get => InnerBorder.BorderThickness; set => InnerBorder.BorderThickness = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public Thickness? InnerBT { get => InnerBorderThickness; set => InnerBorderThickness = value; }
 
+        [Category("Border")]
         public Border TitleBorder { get; set; } = new();
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public BorderBrush TitleBorderBrush { get => TitleBorder.BorderBrush; set => TitleBorder.BorderBrush = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public BorderBrush TitleBB { get => TitleBorderBrush; set => TitleBorderBrush = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public Thickness? TitleBorderThickness { get => TitleBorder.BorderThickness; set => TitleBorder.BorderThickness = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)] public Thickness? TitleBT { get => TitleBorderThickness; set => TitleBorderThickness = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Category("Border")]
+        public BorderBrush TitleBorderBrush { get => TitleBorder.BorderBrush; set => TitleBorder.BorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public BorderBrush TitleBB { get => TitleBorderBrush; set => TitleBorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Category("Border")]
+        public Thickness? TitleBorderThickness { get => TitleBorder.BorderThickness; set => TitleBorder.BorderThickness = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public Thickness? TitleBT { get => TitleBorderThickness; set => TitleBorderThickness = value; }
         #endregion Borders
 
+        [Category("Title")]
         public ContentPresenter TitlePresenter { get; set; } = new();
-
+        [Category("Title")]
         public bool? IsTitleVisible { get; set; }
 
         public ScrollViewer ScrollViewer { get; set; } = new();
         public StackPanel ItemsPanel { get; set; } = new();
 
+        [Category("Title")]
         public Element Header { get; set; }
 
+        [Category("Data")]
         public List<object> Items { get; set; } = new();
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -106,15 +137,19 @@ namespace MGUI.Core.UI.XAML
         /// Example:
         /// <code>&lt;ListView xmlns:System="clr-namespace:System;assembly=mscorlib" ItemType="{x:Type System:Double}" /&gt;</code><para/>
         /// Default value: <code>typeof(object)</code></summary>
+        [Category("Data")]
         public Type ItemType { get; set; } = typeof(object);
 
+        [Category("Layout")]
         public List<ListViewColumn> Columns { get; set; } = new();
+        [Category("Layout")]
         public int? RowHeight { get; set; }
 
         public Grid HeaderGrid { get; set; } = new();
         public ScrollViewer ScrollViewer { get; set; } = new();
         public Grid DataGrid { get; set; } = new();
 
+        [Category("Behavior")]
         public GridSelectionMode? SelectionMode { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -154,7 +189,9 @@ namespace MGUI.Core.UI.XAML
     [TypeConverter(typeof(ListViewColumnWidthStringConverter))]
     public class ListViewColumnWidth
     {
+        [Category("Layout")]
         public int? WidthPixels { get; set; }
+        [Category("Layout")]
         public double? WidthWeight { get; set; }
 
         public UI.ListViewColumnWidth ToWidth()

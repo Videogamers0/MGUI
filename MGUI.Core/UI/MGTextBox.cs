@@ -286,7 +286,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _LimitedCharacterCountFormatString;
-        /// <summary>Only relevant if <see cref="ShowCharacterCount"/>==true and <see cref="CharacterLimit"/> is not null.<para/>
+        /// <summary>Only relevant if <see cref="ShowCharacterCount"/> is true and <see cref="CharacterLimit"/> is not null.<para/>
         /// A format string to use when computing the character-count text displayed in the bottom-right corner of this <see cref="MGTextBox"/>.<br/>
         /// "{{CharacterCount}}" and "{{CharacterLimit}}" will be replaced with their actual underlying values when formatting the string.<para/>
         /// Default value:<code>"[b]{{CharacterCount}}[/b] / [b]{{CharacterLimit}}[/b]"</code><para/>
@@ -308,7 +308,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _LimitlessCharacterCountFormatString;
-        /// <summary>Only relevant if <see cref="ShowCharacterCount"/>==true and <see cref="CharacterLimit"/>==null.<para/>
+        /// <summary>Only relevant if <see cref="ShowCharacterCount"/> is true and <see cref="CharacterLimit"/> is null.<para/>
         /// A format string to use when computing the character-count text displayed in the bottom-right corner of this <see cref="MGTextBox"/>.<br/>
         /// "{{CharacterCount}}" will be replaced with its actual underlying value when formatting the string.<para/>
         /// Default value:<code>"[b]{{CharacterCount}}[/b] character(s)"</code><para/>

@@ -32,7 +32,9 @@ namespace MGUI.Core.UI.XAML
 
         public Element Header { get; set; }
 
+        [Category("Layout")]
         public Dock? HeaderPosition { get; set; }
+        [Category("Layout")]
         public int? Spacing { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGHeaderedContentPresenter(Window, null, null);
@@ -64,12 +66,16 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.Border;
 
+        [Category("Border")]
         public BorderBrush BorderBrush { get; set; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
 
+        [Category("Border")]
         public Thickness? BorderThickness { get; set; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGBorder(Window);
@@ -91,16 +97,21 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.Button;
 
+        [Category("Border")]
         public Border Border { get; set; } = new();
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Thickness? BorderThickness { get => Border.BorderThickness; set => Border.BorderThickness = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGButton(Window);
@@ -120,10 +131,16 @@ namespace MGUI.Core.UI.XAML
 
         public Button Button { get; set; } = new();
 
+        [Category("Layout")]
         public int? CheckBoxComponentSize { get; set; }
+        [Category("Layout")]
         public int? SpacingWidth { get; set; }
+        [Category("Appearance")]
         public XAMLColor? CheckMarkColor { get; set; }
+
+        [Category("Behavior")]
         public bool? IsThreeState { get; set; }
+        [Category("Behavior")]
         public bool? IsChecked { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGCheckBox(Window);
@@ -168,23 +185,32 @@ namespace MGUI.Core.UI.XAML
         /// Example:
         /// <code>&lt;ComboBox xmlns:System="clr-namespace:System;assembly=mscorlib" ItemType="{x:Type System:Double}" /&gt;</code><para/>
         /// Default value: <code>typeof(object)</code></summary>
+        [Category("Data")]
         public Type ItemType { get; set; } = typeof(object);
 
+        [Category("Border")]
         public Border Border { get; set; } = new();
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Thickness? BorderThickness { get => Border.BorderThickness; set => Border.BorderThickness = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
+        [Category("Appearance")]
         public ContentPresenter DropdownArrow { get; set; } = new();
+        [Category("Appearance")]
         public XAMLColor? DropdownArrowColor { get; set; }
 
+        [Category("Data")]
         public List<object> Items { get; set; } = new();
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -217,18 +243,28 @@ namespace MGUI.Core.UI.XAML
 
         public ToggleButton ExpanderToggleButton { get; set; } = new();
 
+        [Category("Layout")]
         public int? ExpanderButtonSize { get; set; }
+        [Category("Border")]
         public BorderBrush ExpanderButtonBorderBrush { get; set; }
+        [Category("Border")]
         public Thickness? ExpanderButtonBorderThickness { get; set; }
+        [Category("Appearance")]
         public FillBrush ExpanderButtonBackgroundBrush { get; set; }
+        [Category("Appearance")]
         public XAMLColor? ExpanderDropdownArrowColor { get; set; }
+        [Category("Layout")]
         public int? ExpanderDropdownArrowSize { get; set; }
 
+        [Category("Layout")]
         public int? HeaderSpacingWidth { get; set; }
         public Element Header { get; set; }
 
+        [Category("Behavior")]
         public bool? IsExpanded { get; set; }
+        [Category("Behavior")]
         public Visibility? ExpandedVisibility { get; set; }
+        [Category("Behavior")]
         public Visibility? CollapsedVisibility { get; set; }
 
         public StackPanel HeadersPanel { get; set; } = new();
@@ -287,19 +323,25 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.GroupBox;
 
+        [Category("Border")]
         public UniformBorderBrush BorderBrush { get; set; }
+        [Category("Border")]
         public Thickness? BorderThickness { get; set; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
         public Expander Expander { get; set; } = new();
         public ContentPresenter HeaderPresenter { get; set; } = new();
 
+        [Category("Behavior")]
         public bool? IsExpandable { get; set; }
 
         public Element Header { get; set; }
 
+        [Category("Layout")]
         public int? HeaderHorizontalMargin { get; set; }
+        [Category("Layout")]
         public int? HeaderHorizontalPadding { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGGroupBox(Window);
@@ -347,8 +389,10 @@ namespace MGUI.Core.UI.XAML
         public string TextureName { get; set; }
         public string RegionName { get; set; }
 
+        [Category("Appearance")]
         public XAMLColor? TextureColor { get; set; }
         public XAMLRectangle? SourceRect { get; set; }
+        [Category("Layout")]
         public Stretch? Stretch { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -384,6 +428,7 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.PasswordBox;
 
+        [Category("Appearance")]
         public char? PasswordCharacter { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGPasswordBox(Window);
@@ -403,33 +448,50 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.ProgressBar;
 
+        [Category("Border")]
         public Border Border { get; set; } = new();
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Thickness? BorderThickness { get => Border.BorderThickness; set => Border.BorderThickness = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
+        [Category("Value")]
         public TextBlock ValueTextBlock { get; set; } = new();
+        [Category("Value")]
         public bool? ShowValue { get; set; }
+        [Category("Value")]
         public string ValueDisplayFormat { get; set; }
+        [Category("Value")]
         public string NumberFormat { get; set; }
 
+        [Category("Value")]
         public float? Minimum { get; set; }
+        [Category("Value")]
         public float? Maximum { get; set; }
+        [Category("Value")]
         public float? Value { get; set; }
 
+        [Category("Layout")]
         public int? Size { get; set; }
 
+        [Category("Appearance")]
         public FillBrush CompletedBrush { get; set; }
+        [Category("Appearance")]
         public FillBrush IncompleteBrush { get; set; }
 
+        [Category("Layout")]
         public Orientation? Orientation { get; set; }
+        [Category("Layout")]
         public bool? IsReversed { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGProgressBar(Window);
@@ -481,19 +543,29 @@ namespace MGUI.Core.UI.XAML
 
         public Button Button { get; set; } = new();
 
+        [Category("Behavior")]
         public string GroupName { get; set; }
 
+        [Category("Layout")]
         public int? BubbleComponentSize { get; set; }
+        [Category("Border")]
         public XAMLColor? BubbleComponentBorderColor { get; set; }
+        [Category("Border")]
         public float? BubbleComponentBorderThickness { get; set; }
+        [Category("Appearance")]
         public XAMLColor? BubbleComponentBackground { get; set; }
+        [Category("Appearance")]
         public XAMLColor? BubbleCheckedColor { get; set; }
 
+        [Category("Layout")]
         public int? SpacingWidth { get; set; }
 
+        [Category("Appearance")]
         public XAMLColor? HoveredHighlightColor { get; set; }
+        [Category("Appearance")]
         public float? PressedDarkenIntensity { get; set; }
 
+        [Category("Behavior")]
         public bool? IsChecked { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGRadioButton(Window, GroupName ?? "");
@@ -534,29 +606,47 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.RatingControl;
 
+        [Category("Appearance")]
         public RatingItemShape? ItemShape { get; set; }
+        [Category("Layout")]
         public int? ItemSize { get; set; }
+        [Category("Layout")]
         public int? Spacing { get; set; }
 
+        [Category("Value")]
         public float? Minimum { get; set; }
+        [Category("Value")]
         public float? Maximum { get; set; }
+        [Category("Value")]
         public float? Value { get; set; }
 
+        [Category("Value")]
         public bool? UseDiscreteValues { get; set; }
+        [Category("Value")]
         public float? DiscreteValueInterval { get; set; }
 
+        [Category("Appearance")]
         public int? UnfilledShapeStrokeThickness { get; set; }
+        [Category("Appearance")]
         public XAMLColor? UnfilledShapeStrokeColor { get; set; }
+        [Category("Appearance")]
         public XAMLColor? UnfilledShapeFillColor { get; set; }
 
+        [Category("Appearance")]
         public int? FilledShapeStrokeThickness { get; set; }
+        [Category("Appearance")]
         public XAMLColor? FilledShapeStrokeColor { get; set; }
+        [Category("Appearance")]
         public XAMLColor? FilledShapeFillColor { get; set; }
 
+        [Category("Appearance")]
         public int? PreviewShapeStrokeThickness { get; set; }
+        [Category("Appearance")]
         public XAMLColor? PreviewShapeStrokeColor { get; set; }
+        [Category("Appearance")]
         public XAMLColor? PreviewShapeFillColor { get; set; }
 
+        [Category("Behavior")]
         public bool? IsReadonly { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGRatingControl(Window);
@@ -612,8 +702,11 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.Rectangle;
 
+        [Category("Border")]
         public XAMLColor? Stroke { get; set; }
+        [Category("Border")]
         public int? StrokeThickness { get; set; }
+        [Category("Appearance")]
         public FillBrush Fill { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -638,8 +731,11 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.ResizeGrip;
 
+        [Category("Appearance")]
         public XAMLColor? Foreground { get; set; }
+        [Category("Appearance")]
         public int? MaxDots { get; set; }
+        [Category("Layout")]
         public int? Spacing { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -664,20 +760,30 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.ScrollViewer;
 
+        [Category("Appearance")]
         public ScrollBarVisibility? VerticalScrollBarVisibility { get; set; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public ScrollBarVisibility? VSBVisibility { get => VerticalScrollBarVisibility; set => VerticalScrollBarVisibility = value; }
 
+        [Category("Appearance")]
         public ScrollBarVisibility? HorizontalScrollBarVisibility { get; set; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public ScrollBarVisibility? HSBVisibility { get => HorizontalScrollBarVisibility; set => HorizontalScrollBarVisibility = value; }
 
+        [Category("Layout")]
         public float? VerticalOffset { get; set; }
+        [Category("Layout")]
         public float? HorizontalOffset { get; set; }
 
+        [Category("Appearance")]
         public FillBrush ScrollBarUnfocusedOuterBrush { get; set; }
+        [Category("Appearance")]
         public FillBrush ScrollBarFocusedOuterBrush { get; set; }
+        [Category("Appearance")]
         public FillBrush ScrollBarUnfocusedInnerBrush { get; set; }
+        [Category("Appearance")]
         public FillBrush ScrollBarFocusedInnerBrush { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGScrollViewer(Window);
@@ -713,7 +819,9 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.Separator;
 
+        [Category("Layout")]
         public Orientation? Orientation { get; set; }
+        [Category("Layout")]
         public int? Size { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -736,36 +844,60 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.Slider;
 
+        [Category("Value")]
         public float? Minimum { get; set; }
+        [Category("Value")]
         public float? Maximum { get; set; }
+        [Category("Value")]
         public float? Value { get; set; }
 
+        [Category("Value")]
         public bool? UseDiscreteValues { get; set; }
+        [Category("Value")]
         public float? DiscreteValueInterval { get; set; }
 
+        [Category("Layout")]
         public int? NumberLineSize { get; set; }
+        [Category("Border")]
         public Thickness? NumberLineBorderThickness { get; set; }
+        [Category("Border")]
         public BorderBrush NumberLineBorderBrush { get; set; }
+        [Category("Appearance")]
         public FillBrush NumberLineFillBrush { get; set; }
 
+        [Category("Appearance")]
         public float? TickFrequency { get; set; }
+        [Category("Appearance")]
         public bool? DrawTicks { get; set; }
+        [Category("Layout")]
         public int? TickWidth { get; set; }
+        [Category("Layout")]
         public int? TickHeight { get; set; }
+        [Category("Border")]
         public Thickness? TickBorderThickness { get; set; }
+        [Category("Border")]
         public BorderBrush TickBorderBrush { get; set; }
+        [Category("Appearance")]
         public FillBrush TickFillBrush { get; set; }
 
+        [Category("Layout")]
         public int? ThumbWidth { get; set; }
+        [Category("Layout")]
         public int? ThumbHeight { get; set; }
+        [Category("Border")]
         public Thickness? ThumbBorderThickness { get; set; }
+        [Category("Border")]
         public BorderBrush ThumbBorderBrush { get; set; }
+        [Category("Appearance")]
         public FillBrush ThumbFillBrush { get; set; }
 
+        [Category("Layout")]
         public Orientation? Orientation { get; set; }
 
+        [Category("Appearance")]
         public FillBrush Foreground { get; set; }
 
+        [Category("Behavior")]
         public bool? AcceptsMouseScrollWheel { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -847,16 +979,22 @@ namespace MGUI.Core.UI.XAML
 
         public Button Button { get; set; } = new();
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public BorderBrush UnspoiledBorderBrush { get => Button.BorderBrush; set => Button.BorderBrush = value; }
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Thickness? UnspoiledBorderThickness { get => Button.BorderThickness; set => Button.BorderThickness = value; }
+        [Category("Appearance")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public FillBrush UnspoiledBackgroundBrush { get => Button.Background; set => Button.Background = value; }
 
+        [Category("Data")]
         public string UnspoiledText { get; set; }
+        [Category("Layout")]
         public HorizontalAlignment? UnspoiledTextAlignment { get; set; }
 
+        [Category("Behavior")]
         public bool? IsRevealed { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGSpoiler(Window);
@@ -891,21 +1029,30 @@ namespace MGUI.Core.UI.XAML
 
         public Border Border { get; set; } = new();
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Thickness? BorderThickness { get => Border.BorderThickness; set => Border.BorderThickness = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
+        [Category("Value")]
         public TextBlock Value { get; set; } = new();
-
+        [Category("Value")]
         public string ValueDisplayFormat { get; set; }
+        [Category("Value")]
         public TimeSpan? Elapsed { get; set; }
+
+        [Category("Behavior")]
         public double? TimeScale { get; set; }
+        [Category("Behavior")]
         public bool? IsRunning { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGStopwatch(Window);
@@ -947,17 +1094,22 @@ namespace MGUI.Core.UI.XAML
 
         public Border Border { get; set; } = new();
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Thickness? BorderThickness { get => Border.BorderThickness; set => Border.BorderThickness = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
         public StackPanel HeadersPanel { get; set; } = new();
+        [Category("Appearance")]
         public FillBrush HeaderAreaBackground { get; set; }
 
         public List<TabItem> Tabs { get; set; } = new();
@@ -995,6 +1147,7 @@ namespace MGUI.Core.UI.XAML
 
         public Element Header { get; set; }
 
+        [Category("Behavior")]
         public bool? IsTabSelected { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -1033,23 +1186,36 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.TextBlock;
 
+        [Category("Appearance")]
         public string FontFamily { get; set; }
+        [Category("Appearance")]
         public int? FontSize { get; set; }
 
+        [Category("Appearance")]
         public bool? IsBold { get; set; }
+        [Category("Appearance")]
         public bool? IsItalic { get; set; }
+        [Category("Appearance")]
         public bool? IsUnderlined { get; set; }
 
+        [Category("Appearance")]
         public bool? IsShadowed { get; set; }
+        [Category("Appearance")]
         public Size? ShadowOffset { get; set; }
+        [Category("Appearance")]
         public XAMLColor? ShadowColor { get; set; }
 
+        [Category("Behavior")]
         public bool? AllowsInlineFormatting { get; set; }
 
+        [Category("Appearance")]
         public XAMLColor? Foreground { get; set; }
         public string Text { get; set; }
+        [Category("Layout")]
         public bool? WrapText { get; set; }
+        [Category("Layout")]
         public float? LinePadding { get; set; }
+        [Category("Layout")]
         public HorizontalAlignment? TextAlignment { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTextBlock(Window, Text, Foreground?.ToXNAColor());
@@ -1099,51 +1265,73 @@ namespace MGUI.Core.UI.XAML
 
         public Border Border { get; set; } = new();
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Thickness? BorderThickness { get => Border.BorderThickness; set => Border.BorderThickness = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
         public TextBlock TextBlock { get; set; } = new();
 
         public string Text { get; set; }
+        [Category("Layout")]
         public bool? WrapText { get; set; }
 
         public TextBlock Placeholder { get; set; } = new();
         public string PlaceholderText { get; set; }
 
         public TextBlock CharacterCounter { get; set; } = new();
+        [Category("Behavior")]
         public int? CharacterLimit { get; set; }
+        [Category("Appearance")]
         public bool? ShowCharacterCount { get; set; }
+        [Category("Appearance")]
         public string LimitedCharacterCountFormatString { get; set; }
+        [Category("Appearance")]
         public string LimitlessCharacterCountFormatString { get; set; }
 
+        [Category("Appearance")]
         public XAMLColor? FocusedSelectionForegroundColor { get; set; }
+        [Category("Appearance")]
         public XAMLColor? FocusedSelectionBackgroundColor { get; set; }
+        [Category("Appearance")]
         public XAMLColor? UnfocusedSelectionForegroundColor { get; set; }
+        [Category("Appearance")]
         public XAMLColor? UnfocusedSelectionBackgroundColor { get; set; }
 
+        [Category("Behavior")]
         public int? UndoRedoHistorySize { get; set; }
 
+        [Category("Behavior")]
         public bool? IsReadonly { get; set; }
 
+        [Category("Behavior")]
         public bool? AcceptsReturn { get; set; }
+        [Category("Behavior")]
         public bool? AcceptsTab { get; set; }
 
+        [Category("Behavior")]
         public bool? IsHeldKeyRepeated { get; set; }
+        [Category("Behavior")]
         public TimeSpan? InitialKeyRepeatDelay { get; set; }
+        [Category("Behavior")]
         public TimeSpan? KeyRepeatInterval { get; set; }
+        [Category("Behavior")]
         public TextEntryMode? TextEntryMode { get; set; }
 
         public ResizeGrip ResizeGrip { get; set; } = new();
+        [Category("Layout")]
         public bool? IsUserResizable { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTextBox(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTextBox(Window, null);
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
@@ -1220,24 +1408,34 @@ namespace MGUI.Core.UI.XAML
 
         public Border Border { get; set; } = new();
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Thickness? BorderThickness { get => Border.BorderThickness; set => Border.BorderThickness = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
+        [Category("Value")]
         public TextBlock Value { get; set; } = new();
+        [Category("Value")]
         public string ValueDisplayFormat { get; set; }
+        [Category("Value")]
         public TimeSpan? RemainingDuration { get; set; }
 
+        [Category("Behavior")]
         public bool? AllowsNegativeDuration { get; set; }
 
+        [Category("Behavior")]
         public double? TimeScale { get; set; }
 
+        [Category("Behavior")]
         public bool? IsPaused { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -1281,18 +1479,25 @@ namespace MGUI.Core.UI.XAML
 
         public Border Border { get; set; } = new();
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Thickness? BorderThickness { get => Border.BorderThickness; set => Border.BorderThickness = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
+        [Category("Appearance")]
         public FillBrush CheckedBackgroundBrush { get; set; }
+        [Category("Appearance")]
         public XAMLColor? CheckedTextForeground { get; set; }
+        [Category("Behavior")]
         public bool? IsChecked { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGToggleButton(Window);
@@ -1325,6 +1530,7 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.ToolTip;
 
+        [Category("Behavior")]
         public bool? ShowOnDisabled { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -1345,41 +1551,59 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.Window;
 
+        [Category("Layout")]
         public int? Left { get; set; }
+        [Category("Layout")]
         public int? Top { get; set; }
 
+        [Category("Layout")]
         public SizeToContent? SizeToContent { get; set; }
 
         public ResizeGrip ResizeGrip { get; set; } = new();
+        [Category("Layout")]
         public bool? IsUserResizable { get; set; }
 
         public Border Border { get; set; } = new();
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
 
+        [Category("Border")]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public Thickness? BorderThickness { get => Border.BorderThickness; set => Border.BorderThickness = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
         public Window ModalWindow { get; set; }
         public List<Window> NestedWindows { get; set; } = new();
 
+        [Category("Title")]
         public DockPanel TitleBar { get; set; } = new();
 
+        [Category("Title")]
         public TextBlock TitleBarTextBlock { get; set; } = new();
+        [Category("Title")]
         public string TitleText { get; set; }
+        [Category("Title")]
         public bool? IsTitleBarVisible { get; set; }
 
+        [Category("Title")]
         public Button CloseButton { get; set; } = new();
+        [Category("Title")]
         public bool? IsCloseButtonVisible { get; set; }
+
+        [Category("Behavior")]
         public bool? CanCloseWindow { get; set; }
 
+        [Category("Behavior")]
         public bool? AllowsClickThrough { get; set; }
 
+        [Category("Behavior")]
         public bool? IsDraggable { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
