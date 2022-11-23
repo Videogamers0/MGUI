@@ -339,8 +339,10 @@ namespace MGUI.Core.UI
                 }
             }
 
-            int ActualMinHeight = Math.Clamp(MinDropdownHeight, 0, GetDesktop().ValidScreenBounds.Bottom - Dropdown.Top);
-            int ActualMaxHeight = Math.Clamp(MaxDropdownHeight, 0, GetDesktop().ValidScreenBounds.Bottom - Dropdown.Top);
+            int AvailableHeightScreenSpace = GetDesktop().ValidScreenBounds.Bottom - Dropdown.Top;
+            int ActualAvailableHeight = (int)(AvailableHeightScreenSpace / Dropdown.Scale);
+            int ActualMinHeight = Math.Clamp(MinDropdownHeight, 0, ActualAvailableHeight);
+            int ActualMaxHeight = Math.Clamp(MaxDropdownHeight, 0, ActualAvailableHeight);
             Dropdown.ApplySizeToContent(SizeToContent.WidthAndHeight, Math.Max(this.ActualWidth, MinDropdownWidth), ActualMinHeight, MaxDropdownWidth, ActualMaxHeight);
         }
 
@@ -362,8 +364,9 @@ namespace MGUI.Core.UI
 
                     if (IsDropdownOpen)
                     {
-                        Dropdown.Left = LayoutBounds.Left - Origin.X;
-                        Dropdown.Top = LayoutBounds.Bottom - Origin.Y;
+                        Point TopLeft = ConvertCoordinateSpace(CoordinateSpace.Layout, CoordinateSpace.Screen, LayoutBounds.BottomLeft());
+                        Dropdown.Left = TopLeft.X;
+                        Dropdown.Top = TopLeft.Y;
                         UpdateDropdownContent();
                         ParentWindow.AddNestedWindow(Dropdown);
                     }
@@ -435,11 +438,17 @@ namespace MGUI.Core.UI
 
                 this.CanChangeContent = false;
 
+                SelfOrParentWindow.ScaleChanged += (sender, e) =>
+                {
+                    Dropdown.Scale = e.NewValue;
+                };
+
                 Dropdown = new(Window, 0, 0, 100, 300, SelfOrParentWindow.Theme)
                 {
                     ComponentParent = this,
                     IsUserResizable = false,
-                    IsTitleBarVisible = false
+                    IsTitleBarVisible = false,
+                    Scale = SelfOrParentWindow.Scale
                 };
                 Dropdown.WindowMouseHandler.LMBReleasedInside += (sender, e) =>
                 {
@@ -512,8 +521,9 @@ namespace MGUI.Core.UI
                 //  Should we auto-hide (or close) the dropdown?
                 //Dropdown.Visibility = RecentDrawWasClipped ? Visibility.Collapsed : Visibility.Visible;
 
-                Dropdown.Left = LayoutBounds.Left - Origin.X;
-                Dropdown.Top = LayoutBounds.Bottom - Origin.Y;
+                Point TopLeft = ConvertCoordinateSpace(CoordinateSpace.Layout, CoordinateSpace.Screen, LayoutBounds.BottomLeft());
+                Dropdown.Left = TopLeft.X;
+                Dropdown.Top = TopLeft.Y;
                 Dropdown.ValidateWindowSizeAndPosition();
             }
         }

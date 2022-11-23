@@ -97,6 +97,11 @@ namespace MGUI.Samples
 
             //Window.MakeInvisible();
 
+            if (Window.TryGetElementByName("Btn_1", out MGButton Btn1))
+            {
+                Btn1.RenderScale = new(1.1f, 1.1f);
+            }
+
             if (Window.TryGetElementByName("SP_1", out MGStackPanel SP))
             {
                 //SP.BackgroundBrush.NormalValue = new MGTextureFillBrush(Desktop, "SkullAndCrossbones");

@@ -205,14 +205,19 @@ namespace MGUI.Core.UI
             {
                 if (_Scale != value)
                 {
+                    float Previous = Scale;
                     _Scale = value;
                     UpdateScaleTransforms();
 #if NEVER
                     UpdateRenderTarget();
 #endif
+                    ScaleChanged?.Invoke(this, new(Previous, Scale));
                 }
             }
         }
+
+        /// <summary>Invoked when <see cref="Scale"/> changes.</summary>
+        public event EventHandler<EventArgs<float>> ScaleChanged;
 
         public bool IsWindowScaled => !Scale.IsAlmostEqual(1.0f);
 
@@ -725,29 +730,6 @@ namespace MGUI.Core.UI
                     WindowKeyboardHandler.ManualUpdate();
                 };
 
-                OnEndDraw += (sender, e) =>
-                {
-                    //  Draw a transparent black overlay if there is a Modal window overtop of this window
-                    if (ModalWindow != null)
-                        e.DA.DT.FillRectangle(e.DA.Offset.ToVector2(), this.LayoutBounds, Color.Black * 0.5f);
-
-                    foreach (MGWindow Nested in _NestedWindows)
-                        Nested.Draw(e.DA);
-                    ModalWindow?.Draw(e.DA);
-
-                    if (!IsDrawingDraggedWindowPreview && IsDraggingWindowPosition && DragWindowPositionOffset.HasValue && DragWindowPositionOffset.Value != Point.Zero)
-                    {
-                        try
-                        {
-                            IsDrawingDraggedWindowPreview = true;
-                            float TempOpacity = e.DA.Opacity * 0.25f;
-                            Point TempOffset = e.DA.Offset + DragWindowPositionOffset.Value;
-                            Draw(e.DA.SetOpacity(TempOpacity) with { Offset = TempOffset });
-                        }
-                        finally { IsDrawingDraggedWindowPreview = false; }
-                    }
-                };
-
                 MakeDraggable();
             }
         }
@@ -972,6 +954,9 @@ namespace MGUI.Core.UI
 
         public void Draw(DrawBaseArgs BA) => Draw(new ElementDrawArgs(BA, this.VisualState, Point.Zero));
 
+        public event EventHandler<ElementDrawArgs> OnBeginDrawNestedWindows;
+        public event EventHandler<ElementDrawArgs> OnEndDrawNestedWindows;
+
         public override void Draw(ElementDrawArgs DA)
         {
             if (!IsWindowScaled)
@@ -994,6 +979,30 @@ namespace MGUI.Core.UI
                 Rectangle Destination = ConvertCoordinateSpace(CoordinateSpace.Layout, CoordinateSpace.Screen, LayoutSpaceBounds);
                 DA.DT.DrawTextureTo(RenderTarget, null, Destination);
 #endif
+
+                OnBeginDrawNestedWindows?.Invoke(this, DA);
+
+                //  Draw a transparent black overlay if there is a Modal window overtop of this window
+                if (ModalWindow != null)
+                    DA.DT.FillRectangle(DA.Offset.ToVector2(), this.LayoutBounds, Color.Black * 0.5f);
+
+                foreach (MGWindow Nested in _NestedWindows)
+                    Nested.Draw(DA);
+                ModalWindow?.Draw(DA);
+
+                if (!IsDrawingDraggedWindowPreview && IsDraggingWindowPosition && DragWindowPositionOffset.HasValue && DragWindowPositionOffset.Value != Point.Zero)
+                {
+                    try
+                    {
+                        IsDrawingDraggedWindowPreview = true;
+                        float TempOpacity = DA.Opacity * 0.25f;
+                        Point TempOffset = DA.Offset + DragWindowPositionOffset.Value;
+                        Draw(DA.SetOpacity(TempOpacity) with { Offset = TempOffset });
+                    }
+                    finally { IsDrawingDraggedWindowPreview = false; }
+                }
+
+                OnEndDrawNestedWindows?.Invoke(this, DA);
             }
         }
     }

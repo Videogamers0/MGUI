@@ -78,14 +78,12 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
-    //Finish MGWindow.Scale implementation:
+    //Test MGWindow.Scale implementation:
     //      Test a context menu with a scrollbar and a nested submenu
     //      Test changes to MGContextMenu.IsHoveringSubmenu
     //      Test the auto-close threshold when scrollbar is visible
     //      Test MGRatingControl's preview value rendering
     //      Test MGGrid/MGUniformGrid selection rendering
-    //      Fix ComboBox dropdown and other nested windows like tooltips
-    //          maybe they inherit the scale from their window? If Window.Scale=2f and ComboBox's Dropdown.Scale=1.5f, then the dropdown rendered with scale=2*1.5=3?
     //Improve Grid/UniformGrid's default selection graphics
     //Bugfix MGTextBox's Caret positioning after moving to new line such as when inserting a linebreak
     //      only seems incorrect if the textbox's height changes? (I.E. it doesnt have a PreferredHeight and its not inside a ScrollViewer)
@@ -988,7 +986,7 @@ namespace MGUI.Core.UI
                     Matrix.CreateTranslation(new Vector3(-TargetBounds.Center.ToVector2(), 0)) *
                     Matrix.CreateScale(Scale) *
                     Matrix.CreateTranslation(new Vector3(TargetBounds.Center.ToVector2(), 0));
-                TempTransform = DA.DT.SetTransformTemporary(Transform);
+                TempTransform = DA.DT.SetTransformTemporary(DA.DT.CurrentSettings.Transform * Transform);
                 TargetBounds = TargetBounds.CreateTransformedF(Transform).RoundUp();
                 if (DA.DT.CurrentSettings.RasterizerState.ScissorTestEnable)
                 {
