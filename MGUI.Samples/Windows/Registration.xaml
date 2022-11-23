@@ -48,7 +48,7 @@
                         <TextBox Name="TextBox_Email" PlaceholderText="[i][opacity=0.5]Email[/opacity][/i]" CharacterLimit="40" ShowCharacterCount="false" AcceptsReturn="false" AcceptsTab="false" />
                     </HeaderedContentPresenter>
                     <Spacer Height="8" />
-                    
+
                     <!-- Username -->
                     <HeaderedContentPresenter>
                         <HeaderedContentPresenter.Header>

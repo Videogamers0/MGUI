@@ -25,5 +25,7 @@ namespace MGUI.Shared.Helpers
             => (@this.X - Other.X) * (@this.X - Other.X) + (@this.Y - Other.Y) * (@this.Y - Other.Y);
 
         public static Size AsSize(this Point @this) => new(@this.X, @this.Y);
+
+        public static Point Negate(this Point @this) => new(-@this.X, -@this.Y);
     }
 }

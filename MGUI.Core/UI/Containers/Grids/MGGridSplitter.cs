@@ -222,7 +222,9 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     if (e.IsLMB && IsDragging)
                     {
-                        ApplyResizing(e.PositionDelta);
+                        float Scalar = 1.0f / SelfOrParentWindow.Scale;
+                        Point Delta = new((int)(e.PositionDelta.X * Scalar), (int)(e.PositionDelta.Y * Scalar));
+                        ApplyResizing(Delta);
                     }
                 };
             }

@@ -47,13 +47,23 @@ namespace MGUI.Core.UI
     public class ThemeFontSettings
     {
         /// <summary>The default fontsize for content inside an <see cref="MGContextMenu"/>, such as <see cref="MGContextMenuButton"/> and <see cref="MGContextMenuToggle"/></summary>
-        public int ContextMenu { get; set; } = 10;
+        public int ContextMenuFontSize { get; set; } = 10;
 
         public int SmallFontSize { get; set; } = 10;
         public int MediumFontSize { get; set; } = 12;
         public int LargeFontSize { get; set; } = 14;
 
         public int DefaultFontSize { get; set; } = 11;
+
+        /// <summary>Changes all font sizes by the given <paramref name="Offset"/></summary>
+        public void AdjustAllFontSizes(int Offset)
+        {
+            ContextMenuFontSize += Offset;
+            SmallFontSize += Offset;
+            MediumFontSize += Offset;
+            LargeFontSize += Offset;
+            DefaultFontSize += Offset;
+        }
 
         /// <summary>If true, <see cref="MGTextBlock"/> will attempt to draw text with a scale that most closely results in the desired font size.<br/>
         /// If false, <see cref="MGTextBlock"/> may choose a slightly different font size that approximates the exact size, but results in better scaling results.<para/>

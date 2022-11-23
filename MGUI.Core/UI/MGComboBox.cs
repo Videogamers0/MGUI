@@ -362,8 +362,8 @@ namespace MGUI.Core.UI
 
                     if (IsDropdownOpen)
                     {
-                        Dropdown.Left = LayoutBounds.Left - BoundsOffset.X;
-                        Dropdown.Top = LayoutBounds.Bottom - BoundsOffset.Y;
+                        Dropdown.Left = LayoutBounds.Left - Origin.X;
+                        Dropdown.Top = LayoutBounds.Bottom - Origin.Y;
                         UpdateDropdownContent();
                         ParentWindow.AddNestedWindow(Dropdown);
                     }
@@ -452,10 +452,14 @@ namespace MGUI.Core.UI
                 };
                 Dropdown.WindowMouseHandler.ReleasedOutside += (sender, e) =>
                 {
-                    if (IsDropdownOpen && !Dropdown.RenderBounds.ContainsInclusive(e.AdjustedPosition(this)))
+                    if (IsDropdownOpen)
                     {
-                        IsDropdownOpen = false;
-                        e.SetHandled(Dropdown, false);
+                        Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
+                        if (!Dropdown.RenderBounds.ContainsInclusive(LayoutSpacePosition))
+                        {
+                            IsDropdownOpen = false;
+                            e.SetHandled(Dropdown, false);
+                        }
                     }
                 };
                 Dropdown.WindowMouseHandler.MovedInside += (sender, e) => { UpdateHoveredDropdownItem(); };
@@ -508,8 +512,8 @@ namespace MGUI.Core.UI
                 //  Should we auto-hide (or close) the dropdown?
                 //Dropdown.Visibility = RecentDrawWasClipped ? Visibility.Collapsed : Visibility.Visible;
 
-                Dropdown.Left = LayoutBounds.Left - BoundsOffset.X;
-                Dropdown.Top = LayoutBounds.Bottom - BoundsOffset.Y;
+                Dropdown.Left = LayoutBounds.Left - Origin.X;
+                Dropdown.Top = LayoutBounds.Bottom - Origin.Y;
                 Dropdown.ValidateWindowSizeAndPosition();
             }
         }

@@ -877,14 +877,15 @@ namespace MGUI.Core.UI
                 {
                     try
                     {
-                        AddMousePressHistory(e.AdjustedPosition(this), out bool IsDoublePress, out bool IsTriplePress, out bool IsQuadruplePress);
+                        Point Position = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
+                        AddMousePressHistory(Position.ToVector2(), out bool IsDoublePress, out bool IsTriplePress, out bool IsQuadruplePress);
 
                         GetDesktop().QueuedFocusedKeyboardHandler = this;
 
-                        Caret.MoveToApproximateScreenPosition(e.AdjustedPosition(this));
+                        Caret.MoveToApproximateScreenPosition(Position.ToVector2());
 
                         CurrentSelection = null;
-                        if (TextRenderInfo.TryGetCharAtScreenPosition(e.AdjustedPosition(this), out CharRenderInfo CharInfo))
+                        if (TextRenderInfo.TryGetCharAtScreenPosition(Position.ToVector2(), out CharRenderInfo CharInfo))
                         {
                             if (IsQuadruplePress)
                                 SelectAll();
@@ -929,13 +930,17 @@ namespace MGUI.Core.UI
 
                 MouseHandler.DragStart += (sender, e) =>
                 {
-                    if (e.IsLMB && TextRenderInfo.TryGetCharAtScreenPosition(e.AdjustedPosition(this), out CharRenderInfo CharInfo))
+                    if (e.IsLMB)
                     {
-                        IsDraggingSelection = true;
-                        bool IsLeftEdge = e.AdjustedPosition(this).X <= CharInfo.CenterX;
-                        int SelectionIndex = IsLeftEdge ? CharInfo.IndexInOriginalText : CharInfo.IndexInOriginalText + 1;
-                        CurrentSelection = new(SelectionIndex, SelectionIndex);
-                        e.SetHandled(this, false);
+                        Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
+                        if (TextRenderInfo.TryGetCharAtScreenPosition(LayoutSpacePosition.ToVector2(), out CharRenderInfo CharInfo))
+                        {
+                            IsDraggingSelection = true;
+                            bool IsLeftEdge = LayoutSpacePosition.X <= CharInfo.CenterX;
+                            int SelectionIndex = IsLeftEdge ? CharInfo.IndexInOriginalText : CharInfo.IndexInOriginalText + 1;
+                            CurrentSelection = new(SelectionIndex, SelectionIndex);
+                            e.SetHandled(this, false);
+                        }
                     }
                 };
 
@@ -949,22 +954,22 @@ namespace MGUI.Core.UI
                 {
                     if (e.IsLMB && IsDraggingSelection && (Text?.Length ?? 0) > 0 && CurrentSelection.HasValue)
                     {
-                        Vector2 AdjustedPosition = e.AdjustedPosition(this);
+                        Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
 
                         int LayoutBoundsVerticalPadding = 5;
-                        if (AdjustedPosition.Y < LayoutBounds.Top - LayoutBoundsVerticalPadding)
+                        if (LayoutSpacePosition.Y < LayoutBounds.Top - LayoutBoundsVerticalPadding)
                         {
                             int SelectionIndex = TextRenderInfo.GetFirstChar().IndexInOriginalText;
                             CurrentSelection = new(CurrentSelection.Value.Index1, SelectionIndex);
                         }
-                        else if (AdjustedPosition.Y > LayoutBounds.Bottom + LayoutBoundsVerticalPadding)
+                        else if (LayoutSpacePosition.Y > LayoutBounds.Bottom + LayoutBoundsVerticalPadding)
                         {
                             int SelectionIndex = TextRenderInfo.GetLastChar().IndexInOriginalText + 1;
                             CurrentSelection = new(CurrentSelection.Value.Index1, SelectionIndex);
                         }
-                        else if (TextRenderInfo.TryGetCharAtScreenPosition(AdjustedPosition, out CharRenderInfo CharInfo))
+                        else if (TextRenderInfo.TryGetCharAtScreenPosition(LayoutSpacePosition.ToVector2(), out CharRenderInfo CharInfo))
                         {
-                            bool IsLeftEdge = e.AdjustedPosition(this).X <= CharInfo.CenterX;
+                            bool IsLeftEdge = LayoutSpacePosition.X <= CharInfo.CenterX;
                             int SelectionIndex = IsLeftEdge ? CharInfo.IndexInOriginalText : CharInfo.IndexInOriginalText + 1;
                             //Debug.WriteLine($"Dragged from {CurrentSelection.Value.StartIndex} to {SelectionIndex}");
                             CurrentSelection = new(CurrentSelection.Value.Index1, SelectionIndex);
@@ -1008,6 +1013,7 @@ namespace MGUI.Core.UI
 
         private void HandleKeyPress(BaseKeyPressedEventArgs e)
         {
+            Debug.WriteLine($"{e.PrintableValue} {e.IsHandled}");
             if (!e.IsPrintableKey)
             {
                 //  Handle non-printable keys such as arrow keys

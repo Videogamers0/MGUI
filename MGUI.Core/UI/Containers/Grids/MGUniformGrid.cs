@@ -155,7 +155,8 @@ namespace MGUI.Core.UI.Containers.Grids
         }
 
         private Dictionary<GridCellIndex, Rectangle> _CellBounds = new();
-        /// <summary>Warning - the <see cref="Rectangle"/>s in this dictionary do not account for <see cref="MGElement.BoundsOffset"/></summary>
+        /// <summary>Warning - the <see cref="Rectangle"/>s in this dictionary do not account for <see cref="MGElement.Origin"/><para/>
+        /// See also: <see cref="MGElement.ConvertCoordinateSpace(CoordinateSpace, CoordinateSpace, Point)"/></summary>
         public IReadOnlyDictionary<GridCellIndex, Rectangle> CellBounds => _CellBounds;
 
         private Dictionary<GridCellIndex, Rectangle> GetCellBounds(Rectangle LayoutBounds, bool IncludeGridLineMargin)
@@ -381,8 +382,8 @@ namespace MGUI.Core.UI.Containers.Grids
             if (TryFindParentOfType(out MGScrollViewer SV, false))
             {
                 //TODO test this logic for ScrollViewers that are nested inside of another ScrollViewer
-                //  It might be: this.BoundsOffset + SV.BoundsOffset; Idk
-                Viewport = SV.ContentViewport.GetTranslated(BoundsOffset - SV.BoundsOffset);
+                //  It might be: this.Origin + SV.Origin; Idk
+                Viewport = SV.ContentViewport.GetTranslated(Origin - SV.Origin);
             }
 
             GridCellIndex? Cell = null;
@@ -547,7 +548,7 @@ namespace MGUI.Core.UI.Containers.Grids
                     if (!ParentWindow.HasModalWindow)
                     {
                         PreviousSelection = CurrentSelection;
-                        Point Position = e.AdjustedPosition(this).ToPoint();
+                        Point Position = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
                         UpdateSelection(Position, false);
                     }
                 };
@@ -555,7 +556,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     if (!ParentWindow.HasModalWindow)
                     {
-                        Point Position = e.AdjustedPosition(this).ToPoint();
+                        Point Position = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
                         UpdateSelection(Position, true);
                     }
                 };

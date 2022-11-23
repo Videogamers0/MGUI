@@ -690,7 +690,8 @@ namespace MGUI.Shared.Rendering
         /// <param name="ClearColor">Optional. If not null, the new render target will be immediately cleared with this color. Only used if the render target actually changed.</param>
         public void SetRenderTarget(RenderTarget2D New, Color? ClearColor)
         {
-            RenderTarget2D CurrentTarget = GD.GetRenderTargets().First().RenderTarget as RenderTarget2D;
+            RenderTargetBinding[] RTBs = GD.GetRenderTargets();
+            RenderTarget2D CurrentTarget = RTBs.Length == 0 ? null : RTBs[0].RenderTarget as RenderTarget2D;
             if (New != CurrentTarget)
             {
                 EndDraw(CurrentContext);
@@ -717,7 +718,10 @@ namespace MGUI.Shared.Rendering
         /// <param name="ClearColor">Optional. If not null, the new render target will be immediately cleared with this color. Only used if the render target actually changed.</param>
         public IDisposable SetRenderTargetTemporary(RenderTarget2D New, Color? ClearColor)
         {
-            return new TemporaryChange<RenderTarget2D, Color?>(GD.GetRenderTargets().First().RenderTarget as RenderTarget2D, New, null, ClearColor, SetRenderTarget);
+            RenderTargetBinding[] RTBs = GD.GetRenderTargets();
+            RenderTarget2D CurrentTarget = RTBs.Length == 0 ? null : RTBs[0].RenderTarget as RenderTarget2D;
+
+            return new TemporaryChange<RenderTarget2D, Color?>(CurrentTarget, New, null, ClearColor, SetRenderTarget);
         }
 
         /// <param name="New">To change current settings, consider using '<see cref="CurrentSettings"/> with { ... }' record syntax.</param>

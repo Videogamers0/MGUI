@@ -1,6 +1,7 @@
 ﻿using MGUI.Core.UI;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
+using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Containers.Grids;
 using MGUI.Core.UI.Text;
 using MGUI.Core.UI.XAML;
@@ -53,7 +54,8 @@ namespace MGUI.Samples
             Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
             MGWindow XAMLDesigner = LoadDesignerWindow(CurrentAssembly, Desktop);
             Desktop.Windows.Add(XAMLDesigner);
-            Desktop.Windows.Add(LoadDebugWindow(CurrentAssembly, Desktop));
+            MGWindow DebugWindow = LoadDebugWindow(CurrentAssembly, Desktop);
+            Desktop.Windows.Add(DebugWindow);
             Desktop.Windows.Add(LoadRegistrationWindow(CurrentAssembly, Desktop));
             Desktop.Windows.Add(LoadCharacterStatsWindow(CurrentAssembly, Desktop));
             Desktop.Windows.Add(LoadInventoryWindow(CurrentAssembly, Desktop));
@@ -61,6 +63,7 @@ namespace MGUI.Samples
             Desktop.Windows.Add(LoadListViewSampleWindow(CurrentAssembly, Desktop));
 
             Desktop.BringToFront(XAMLDesigner);
+            Desktop.BringToFront(DebugWindow);
 
             base.Initialize();
         }
@@ -87,9 +90,17 @@ namespace MGUI.Samples
             //  Parse the XAML markup into an MGWindow instance
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Debug.xaml";
             string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
-            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, false);
+            MGTheme WindowTheme = new(MGTheme.BuiltInTheme.Dark_Blue, Desktop.Theme.FontSettings.DefaultFontFamily);
+            WindowTheme.FontSettings.AdjustAllFontSizes(-2);
+            MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, false, true, WindowTheme);
+            Window.Scale = 2f;
 
             //Window.MakeInvisible();
+
+            if (Window.TryGetElementByName("SP_1", out MGStackPanel SP))
+            {
+                //SP.BackgroundBrush.NormalValue = new MGTextureFillBrush(Desktop, "SkullAndCrossbones");
+            }
 
             if (Window.TryGetElementByName("LV1", out MGListView<double> LV))
             {

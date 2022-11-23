@@ -21,6 +21,11 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
         //TODO Option to make it tesselate if Stretch is not Fill/UniformToFill? (LinearWrap SamplerState?)
         //      So if Stretch is None or UniformToFill, the empty space would instead be filled up with LinearWrap texture
 
+        /// <param name="RegionName">The name of the <see cref="NamedTextureRegion"/> used to reference the texture settings by. This name must exist in <see cref="MGDesktop.NamedRegions"/><para/>
+        /// See also: <see cref="MGDesktop.NamedTextures"/>, <see cref="MGDesktop.NamedRegions"/></param>
+        public MGTextureFillBrush(MGDesktop Desktop, string RegionName, Stretch Stretch = Stretch.Fill, float Opacity = 1.0f)
+            : this(Desktop.NamedTextures[Desktop.NamedRegions[RegionName].TextureName], Desktop.NamedRegions[RegionName].SourceRect, Stretch, Opacity) { }
+
         public MGTextureFillBrush(Texture2D Texture, Rectangle? SourceRect, Stretch Stretch = Stretch.Fill, float Opacity = 1.0f)
         {
             this.Texture = Texture;

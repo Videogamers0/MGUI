@@ -230,8 +230,17 @@ namespace MGUI.Core.UI
 
             if (!ParentWindow.HasModalWindow)
             {
-                bool IsBubblePartPressed = MouseHandler.Tracker.IsPressedInside(MouseButton.Left, BubblePartBounds, AsIViewport().GetOffset());
-                bool IsBubblePartHovered = BubblePartBounds.ContainsInclusive(MouseHandler.Tracker.CurrentPosition.ToVector2() + AsIViewport().GetOffset());
+                Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, MouseHandler.Tracker.CurrentPosition);
+                bool IsBubblePartPressed;
+                if (MouseHandler.Tracker.RecentButtonPressedEvents[MouseButton.Left] != null)
+                {
+                    Point PressPositionScreenSpace = MouseHandler.Tracker.RecentButtonPressedEvents[MouseButton.Left].Position;
+                    Point PressPositionLayoutSpace = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, PressPositionScreenSpace);
+                    IsBubblePartPressed = BubblePartBounds.ContainsInclusive(PressPositionLayoutSpace);
+                }
+                else
+                    IsBubblePartPressed = false;
+                bool IsBubblePartHovered = BubblePartBounds.ContainsInclusive(LayoutSpacePosition);
 
                 Color? Overlay = BubbleComponentBackground.GetColorOverlay(IsBubblePartPressed ? SecondaryVisualState.Pressed : IsBubblePartHovered ? SecondaryVisualState.Hovered : SecondaryVisualState.None);
                 if (Overlay.HasValue)

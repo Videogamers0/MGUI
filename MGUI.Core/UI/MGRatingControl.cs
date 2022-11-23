@@ -278,7 +278,7 @@ namespace MGUI.Core.UI
                     if (ParentWindow.HasModalWindow)
                         PreviewValue = null;
                     else
-                        UpdatePreviewValue(e.AdjustedCurrentPosition(this).ToPoint());
+                        UpdatePreviewValue(ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.CurrentPosition));
                 };
 
                 MouseHandler.MovedOutside += (sender, e) => { PreviewValue = null; };
@@ -305,7 +305,8 @@ namespace MGUI.Core.UI
                 {
                     if (e.IsLMB && !IsReadonly)
                     {
-                        UpdatePreviewValue(e.AdjustedPosition(this).ToPoint());
+                        Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
+                        UpdatePreviewValue(LayoutSpacePosition);
                         SetValue(PreviewValue.Value);
                         PreviewValue = null;
                         e.SetHandled(this, false);

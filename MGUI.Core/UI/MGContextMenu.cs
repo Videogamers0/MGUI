@@ -153,7 +153,7 @@ namespace MGUI.Core.UI
 
         /// <param name="Action">The action to invoke if the <see cref="MGContextMenuButton"/> is left-clicked.</param>
         public MGContextMenuButton AddButton(string Text, Action<MGContextMenuButton> Action)
-            => AddButton(new MGTextBlock(this, Text, null, GetTheme().FontSettings.ContextMenu), Action);
+            => AddButton(new MGTextBlock(this, Text, null, GetTheme().FontSettings.ContextMenuFontSize), Action);
 
         /// <param name="Action">The action to invoke if the <see cref="MGContextMenuButton"/> is left-clicked.</param>
         public MGContextMenuButton AddButton(MGElement Content, Action<MGContextMenuButton> Action)
@@ -164,7 +164,7 @@ namespace MGUI.Core.UI
         }
 
         public MGContextMenuToggle AddCheckBox(string Text, bool IsChecked)
-            => AddToggle(new MGTextBlock(this, Text, null, GetTheme().FontSettings.ContextMenu), IsChecked);
+            => AddToggle(new MGTextBlock(this, Text, null, GetTheme().FontSettings.ContextMenuFontSize), IsChecked);
 
         public MGContextMenuToggle AddToggle(MGElement Content, bool IsChecked)
         {
@@ -288,9 +288,9 @@ namespace MGUI.Core.UI
             Point CurrentMousePosition = this.MouseHandler.Tracker.CurrentState.Position;
             foreach (MGContextMenu Submenu in Submenus)
             {
-                Point AdjustedMousePosition = Submenu.AdjustMousePosition(CurrentMousePosition).ToPoint();
+                Point LayoutSpacePosition = Submenu.ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, CurrentMousePosition);
                 Rectangle SubmenuBounds = Submenu.LayoutBounds.GetExpanded(Padding);
-                if (SubmenuBounds.ContainsInclusive(AdjustedMousePosition))
+                if (SubmenuBounds.ContainsInclusive(LayoutSpacePosition))
                     return true;
             }
 
@@ -337,7 +337,7 @@ namespace MGUI.Core.UI
 
             if (Items != null)
             {
-                int FontSize = Menu.GetTheme().FontSettings.ContextMenu;
+                int FontSize = Menu.GetTheme().FontSettings.ContextMenuFontSize;
                 foreach (MGSimpleContextMenuItem Item in Items)
                 {
                     MGContextMenuItem GeneratedItem;
@@ -504,10 +504,11 @@ namespace MGUI.Core.UI
 
                 MouseHandler.MovedOutside += (sender, e) =>
                 {
-                    if (IsContextMenuOpen && !IsSubmenu && !IsHoveringSubmenu(5) && AutoCloseThreshold.HasValue && 
-                        ((RectangleF)this.LayoutBounds).SquaredDistanceTo(AdjustMousePosition(e.CurrentPosition)) >= AutoCloseThreshold.Value * AutoCloseThreshold.Value)
+                    if (IsContextMenuOpen && !IsSubmenu && !IsHoveringSubmenu(5) && AutoCloseThreshold.HasValue)
                     {
-                        TryCloseContextMenu();
+                        Point LayoutSpacePosition = this.ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.CurrentPosition);
+                        if (((RectangleF)this.LayoutBounds).SquaredDistanceTo(LayoutSpacePosition) >= AutoCloseThreshold.Value * AutoCloseThreshold.Value)
+                            TryCloseContextMenu();
                     }
                 };
 

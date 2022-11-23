@@ -295,8 +295,9 @@ namespace MGUI.Core.UI
 
                 MouseHandler.MovedInside += (sender, e) =>
                 {
-                    IsHoveringVSB = !ParentWindow.HasModalWindow && VSBBounds.HasValue && VSBBounds.Value.ContainsInclusive(e.AdjustedCurrentPosition(this));
-                    IsHoveringHSB = !ParentWindow.HasModalWindow && HSBBounds.HasValue && HSBBounds.Value.ContainsInclusive(e.AdjustedCurrentPosition(this));
+                    Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.CurrentPosition);
+                    IsHoveringVSB = !ParentWindow.HasModalWindow && VSBBounds.HasValue && VSBBounds.Value.ContainsInclusive(LayoutSpacePosition);
+                    IsHoveringHSB = !ParentWindow.HasModalWindow && HSBBounds.HasValue && HSBBounds.Value.ContainsInclusive(LayoutSpacePosition);
                 };
 
                 MouseHandler.MovedOutside += (sender, e) =>
@@ -310,13 +311,15 @@ namespace MGUI.Core.UI
                     if (IsHoveringVSB)
                     {
                         e.SetHandled(this, false);
-                        HandleScrollBarInput(Orientation.Vertical, e.Button, (int)e.AdjustedPosition(this).Y);
+                        Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
+                        HandleScrollBarInput(Orientation.Vertical, e.Button, LayoutSpacePosition.Y);
                     }
 
                     if (IsHoveringHSB)
                     {
                         e.SetHandled(this, false);
-                        HandleScrollBarInput(Orientation.Horizontal, e.Button, (int)e.AdjustedPosition(this).X);
+                        Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
+                        HandleScrollBarInput(Orientation.Horizontal, e.Button, LayoutSpacePosition.X);
                     }
                 };
 
@@ -348,13 +351,15 @@ namespace MGUI.Core.UI
                     if (IsDraggingVSB)
                     {
                         e.SetHandled(this, false);
-                        HandleScrollBarInput(Orientation.Vertical, e.Button, (int)e.AdjustedPosition(this).Y);
+                        Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
+                        HandleScrollBarInput(Orientation.Vertical, e.Button, LayoutSpacePosition.Y);
                     }
 
                     if (IsDraggingHSB)
                     {
                         e.SetHandled(this, false);
-                        HandleScrollBarInput(Orientation.Horizontal, e.Button, (int)e.AdjustedPosition(this).X);
+                        Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
+                        HandleScrollBarInput(Orientation.Horizontal, e.Button, LayoutSpacePosition.X);
                     }
                 };
 
@@ -616,7 +621,8 @@ namespace MGUI.Core.UI
 
         protected override void DrawContents(ElementDrawArgs DA)
         {
-            using (DA.DT.SetClipTargetTemporary(ContentViewport.GetTranslated(DA.Offset), true))
+            Rectangle ScreenBounds = ConvertCoordinateSpace(CoordinateSpace.UnscaledScreen, CoordinateSpace.Screen, ContentViewport.GetTranslated(DA.Offset));
+            using (DA.DT.SetClipTargetTemporary(ScreenBounds, true))
             {
                 Point NewOffset = DA.Offset - new Point((int)HorizontalOffset, (int)VerticalOffset);
                 base.DrawContents(DA with { Offset = NewOffset });

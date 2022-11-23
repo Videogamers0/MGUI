@@ -123,9 +123,9 @@ namespace MGUI.Shared.Input.Mouse
         public bool IsPressedInside(MouseButton Button, RectangleF Viewport)
             => IsPressedInside(Button, Viewport, Vector2.Zero);
         public bool IsPressedInside(MouseButton Button, RectangleF Viewport, Vector2 Offset)
-            => RecentButtonPressedEvents[Button] != null && Viewport.ContainsInclusive(RecentButtonPressedEvents[Button].Position.ToVector2() + Offset);
+            => _RecentButtonPressedEvents[Button] != null && Viewport.ContainsInclusive(_RecentButtonPressedEvents[Button].Position.ToVector2() + Offset);
         public bool IsPressedInside(MouseButton Button, IMouseHandlerHost Owner)
-            => RecentButtonPressedEvents[Button] != null && Owner.IsInside(RecentButtonPressedEvents[Button].Position.ToVector2() + Owner.GetOffset());
+            => _RecentButtonPressedEvents[Button] != null && Owner.IsInside(_RecentButtonPressedEvents[Button].Position.ToVector2() + Owner.GetOffset());
 
         #region Events
         /// <summary>The mouse scroll event that occurred on the current Update tick, or null if the mouse wheel didn't change between the previous Update tick and the current Update tick.</summary>
@@ -135,12 +135,14 @@ namespace MGUI.Shared.Input.Mouse
         public BaseMouseMovedEventArgs CurrentMoveEvent { get; private set; } = null;
 
         /// <summary>The most recent MouseButton Press events that have occurred, even if they occurred on a prior Update tick. These values are set back to null when the button is released.</summary>
-        private readonly Dictionary<MouseButton, BaseMousePressedEventArgs> RecentButtonPressedEvents = new()
+        private readonly Dictionary<MouseButton, BaseMousePressedEventArgs> _RecentButtonPressedEvents = new()
         {
             { MouseButton.Left, null },
             { MouseButton.Middle, null },
             { MouseButton.Right, null }
         };
+        /// <summary>The most recent MouseButton Press events that have occurred, even if they occurred on a prior Update tick. These values are set back to null when the button is released.</summary>
+        public IReadOnlyDictionary<MouseButton, BaseMousePressedEventArgs> RecentButtonPressedEvents => _RecentButtonPressedEvents;
 
         private readonly Dictionary<MouseButton, BaseMousePressedEventArgs> _CurrentButtonPressedEvents = new()
         {
@@ -304,7 +306,7 @@ namespace MGUI.Shared.Input.Mouse
                 {
                     //Debug.WriteLine($"Pressed: {Button} - {CurrentPosition}");
                     BaseMousePressedEventArgs Args = new(this, Button, CurrentPosition);
-                    RecentButtonPressedEvents[Button] = Args;
+                    _RecentButtonPressedEvents[Button] = Args;
                     _CurrentButtonPressedEvents[Button] = Args;
 
                     //  Detect DragStart events when Condition=MousePressed
@@ -319,7 +321,7 @@ namespace MGUI.Shared.Input.Mouse
 
                 //  Detect buttons that were just released
                 if (GetButtonState(PreviousState, Button) == ButtonState.Pressed && GetButtonState(CurrentState, Button) == ButtonState.Released &&
-                    RecentButtonPressedEvents.TryGetValue(Button, out BaseMousePressedEventArgs PressedArgs) && PressedArgs != null)
+                    _RecentButtonPressedEvents.TryGetValue(Button, out BaseMousePressedEventArgs PressedArgs) && PressedArgs != null)
                 {
                     //Debug.WriteLine($"Released: {Button} - {CurrentPosition}");
                     BaseMouseReleasedEventArgs ReleasedArgs = new(this, PressedArgs, Button, CurrentPosition);
@@ -333,7 +335,7 @@ namespace MGUI.Shared.Input.Mouse
                         _CurrentButtonClickedEvents[Button] = ClickedArgs;
                     }
 
-                    RecentButtonPressedEvents[Button] = null;
+                    _RecentButtonPressedEvents[Button] = null;
                 }
             }
 
@@ -351,12 +353,12 @@ namespace MGUI.Shared.Input.Mouse
                     _CurrentDragEndEvents[Condition][Button] = null;
 
                     bool IsDragging = RecentDragStartEvents[Condition][Button] != null;
-                    bool IsButtonPressed = RecentButtonPressedEvents[Button] != null;
+                    bool IsButtonPressed = _RecentButtonPressedEvents[Button] != null;
 
                     //  Check if a drag just began
                     if (CurrentMoveEvent != null && !IsDragging && IsButtonPressed)
                     {
-                        BaseMousePressedEventArgs PressedArgs = RecentButtonPressedEvents[Button];
+                        BaseMousePressedEventArgs PressedArgs = _RecentButtonPressedEvents[Button];
                         if (Condition == DragStartCondition.MouseMovedAfterPress &&
                             (Math.Abs(CurrentPosition.X - PressedArgs.Position.X) >= DragThreshold || Math.Abs(CurrentPosition.Y - PressedArgs.Position.Y) >= DragThreshold))
                         {

@@ -372,7 +372,7 @@ namespace MGUI.Core.UI
                     if (IsHoveringNumberLine)
                     {
                         e.SetHandled(this, false);
-                        HandleSliderInput(e.AdjustedPosition(this));
+                        HandleSliderInput(ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position).ToVector2());
                     }
                 };
 
@@ -400,7 +400,7 @@ namespace MGUI.Core.UI
                 MouseHandler.Dragged += (sender, e) =>
                 {
                     if (e.IsLMB && IsDraggingThumb)
-                        HandleSliderInput(e.AdjustedPosition(this));
+                        HandleSliderInput(ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position).ToVector2());
                 };
 
                 MouseHandler.Scrolled += (sender, e) =>
@@ -427,9 +427,9 @@ namespace MGUI.Core.UI
             base.UpdateSelf(UA);
             if (IsHitTestVisible && !RecentDrawWasClipped)
             {
-                Point AdjustedMousePosition = AdjustMousePosition(MouseHandler.Tracker.CurrentPosition).ToPoint();
-                IsHoveringNumberLine = RecentStretchedNumberLineBounds.ContainsInclusive(AdjustedMousePosition);
-                IsHoveringThumb = RecentThumbBounds.GetExpanded(5).ContainsInclusive(AdjustedMousePosition);
+                Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, MouseHandler.Tracker.CurrentPosition);
+                IsHoveringNumberLine = RecentStretchedNumberLineBounds.ContainsInclusive(LayoutSpacePosition);
+                IsHoveringThumb = RecentThumbBounds.GetExpanded(5).ContainsInclusive(LayoutSpacePosition);
             }
         }
 

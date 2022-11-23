@@ -16,6 +16,7 @@ using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Shared.Input.Mouse;
 using MGUI.Shared.Input.Keyboard;
 using MGUI.Shared.Rendering;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MGUI.Core.UI
 {
@@ -65,6 +66,7 @@ namespace MGUI.Core.UI
                 {
                     _WindowWidth = ActualValue;
                     LayoutChanged(this, true);
+                    UpdateScaleTransforms();
                 }
             }
         }
@@ -81,6 +83,7 @@ namespace MGUI.Core.UI
                 {
                     _WindowHeight = ActualValue;
                     LayoutChanged(this, true);
+                    UpdateScaleTransforms();
                 }
             }
         }
@@ -107,6 +110,7 @@ namespace MGUI.Core.UI
             {
                 try
                 {
+                    UpdateScaleTransforms();
                     OnWindowPositionChanged?.Invoke(this, new((PreviousLeft, PreviousTop), (Left, Top)));
                 }
                 finally
@@ -120,6 +124,10 @@ namespace MGUI.Core.UI
             {
                 try
                 {
+                    UpdateScaleTransforms();
+#if NEVER
+                    UpdateRenderTarget();
+#endif
                     OnWindowSizeChanged?.Invoke(this, new((PreviousWidth, PreviousHeight), (WindowWidth, WindowHeight)));
                 }
                 finally
@@ -185,6 +193,83 @@ namespace MGUI.Core.UI
 
             return ActualAvailableSize;
         }
+
+        #region Scale
+        private float _Scale = 1.0f;
+        /// <summary>Scales this <see cref="MGWindow"/> from the window's center point.<para/>
+        /// Default value: 1.0f</summary>
+        public float Scale
+        {
+            get => _Scale;
+            set
+            {
+                if (_Scale != value)
+                {
+                    _Scale = value;
+                    UpdateScaleTransforms();
+#if NEVER
+                    UpdateRenderTarget();
+#endif
+                }
+            }
+        }
+
+        public bool IsWindowScaled => !Scale.IsAlmostEqual(1.0f);
+
+        private Matrix _UnscaledScreenSpaceToScaledScreenSpace;
+        /// <summary>A <see cref="Matrix"/> that converts coordinates that haven't accounted for <see cref="Scale"/> to coordinates that have.<para/>
+        /// If <see cref="Scale"/> is 1.0f, this value is <see cref="Matrix.Identity"/><para/>
+        /// See also: <see cref="ScaledScreenSpaceToUnscaledScreenSpace"/></summary>
+        protected internal Matrix UnscaledScreenSpaceToScaledScreenSpace { get => _UnscaledScreenSpaceToScaledScreenSpace; }
+
+        private Matrix _ScaledScreenSpaceToUnscaledScreenSpace;
+        /// <summary>A <see cref="Matrix"/> that converts coordinates in screen space to coordinates that haven't accounted for <see cref="Scale"/>.<para/>
+        /// If <see cref="Scale"/> is 1.0f, this value is <see cref="Matrix.Identity"/><para/>
+        /// See also: <see cref="UnscaledScreenSpaceToScaledScreenSpace"/></summary>
+        protected internal Matrix ScaledScreenSpaceToUnscaledScreenSpace { get => _ScaledScreenSpaceToUnscaledScreenSpace; }
+
+        private void UpdateScaleTransforms()
+        {
+            if (IsWindowScaled)
+            {
+                Vector2 ScaleOrigin = TopLeft.ToVector2(); //TopLeft.ToVector2() + new Vector2(WindowWidth / 2, WindowHeight / 2); // Center of window
+                _UnscaledScreenSpaceToScaledScreenSpace =
+                    Matrix.CreateTranslation(new Vector3(-ScaleOrigin, 0)) *
+                    Matrix.CreateScale(Scale) *
+                    Matrix.CreateTranslation(new Vector3(ScaleOrigin, 0));
+                _ScaledScreenSpaceToUnscaledScreenSpace = Matrix.Invert(UnscaledScreenSpaceToScaledScreenSpace);
+            }
+            else
+            {
+                _UnscaledScreenSpaceToScaledScreenSpace = Matrix.Identity;
+                _ScaledScreenSpaceToUnscaledScreenSpace = Matrix.Identity;
+            }
+        }
+
+#if NEVER
+        private void UpdateRenderTarget()
+        {
+            if (IsWindowScaled)
+                RenderTarget = RenderUtils.CreateRenderTarget(GetDesktop().Renderer.GraphicsDevice, WindowWidth, WindowHeight, true);
+            else
+                RenderTarget = null;
+        }
+
+        private RenderTarget2D _RenderTarget;
+        private RenderTarget2D RenderTarget
+        {
+            get => _RenderTarget;
+            set
+            {
+                if (_RenderTarget != value)
+                {
+                    _RenderTarget?.Dispose();
+                    _RenderTarget = value;
+                }
+            }
+        }
+#endif
+        #endregion Scale
 
         #region Resizing
         /// <summary>Provides direct access to the resizer grip that appears in the bottom-right corner of this textbox when <see cref="IsUserResizable"/> is true.</summary>
@@ -623,7 +708,7 @@ namespace MGUI.Core.UI
 
                 OnBeginUpdateContents += (sender, e) =>
                 {
-                    ElementUpdateArgs UpdateArgs = e.UA with { Offset = this.BoundsOffset };
+                    ElementUpdateArgs UpdateArgs = e.UA with { Offset = this.Origin };
 
                     //TODO does this order make sense?
                     //What if this window has both a ModalWindow and a NestedWindow, and the NestedWindow has a ModalWindow.
@@ -683,8 +768,8 @@ namespace MGUI.Core.UI
             {
                 if (e.IsLMB && IsDraggable && e.Condition == DragStartCondition.MouseMovedAfterPress && IsTitleBarVisible)
                 {
-                    Point MousePosition = e.AdjustedPosition(this).ToPoint();
-                    if (TitleBarElement.LayoutBounds.ContainsInclusive(MousePosition) && !CloseButtonElement.LayoutBounds.ContainsInclusive(MousePosition))
+                    Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
+                    if (TitleBarElement.LayoutBounds.ContainsInclusive(LayoutSpacePosition) && !CloseButtonElement.LayoutBounds.ContainsInclusive(LayoutSpacePosition))
                     {
                         IsDraggingWindowPosition = true;
                         DragWindowPositionOffset = Point.Zero;
@@ -698,7 +783,9 @@ namespace MGUI.Core.UI
             {
                 if (e.IsLMB && IsDraggingWindowPosition)
                 {
-                    DragWindowPositionOffset = e.PositionDelta;
+                    float Scalar = 1.0f / Scale;
+                    Point Delta = new((int)(e.PositionDelta.X * Scalar), (int)(e.PositionDelta.Y * Scalar));
+                    DragWindowPositionOffset = Delta;
                 }
             };
 
@@ -708,19 +795,21 @@ namespace MGUI.Core.UI
                 {
                     if (e.IsLMB && IsDraggingWindowPosition && DragWindowPositionOffset.HasValue)
                     {
-                        this.Left += DragWindowPositionOffset.Value.X;
-                        this.Top += DragWindowPositionOffset.Value.Y;
+                        Point Delta = new((int)(DragWindowPositionOffset.Value.X * Scale), (int)(DragWindowPositionOffset.Value.Y * Scale));
+
+                        this.Left += Delta.X;
+                        this.Top += Delta.Y;
 
                         foreach (MGWindow Nested in this._NestedWindows)
                         {
-                            Nested.Left += DragWindowPositionOffset.Value.X;
-                            Nested.Top += DragWindowPositionOffset.Value.Y;
+                            Nested.Left += Delta.X;
+                            Nested.Top += Delta.Y;
                         }
 
                         if (ModalWindow != null)
                         {
-                            ModalWindow.Left += DragWindowPositionOffset.Value.X;
-                            ModalWindow.Top += DragWindowPositionOffset.Value.Y;
+                            ModalWindow.Left += Delta.X;
+                            ModalWindow.Top += Delta.Y;
                         }
 
                         MouseHandler.Tracker.CurrentButtonReleasedEvents[MouseButton.Left]?.SetHandled(this, false);
@@ -882,5 +971,30 @@ namespace MGUI.Core.UI
         }
 
         public void Draw(DrawBaseArgs BA) => Draw(new ElementDrawArgs(BA, this.VisualState, Point.Zero));
+
+        public override void Draw(ElementDrawArgs DA)
+        {
+            if (!IsWindowScaled)
+                base.Draw(DA);
+            else
+            {
+#if true
+                using (DA.DT.SetTransformTemporary(UnscaledScreenSpaceToScaledScreenSpace))
+                {
+                    base.Draw(DA);
+                }
+#else
+                using (DA.DT.SetRenderTargetTemporary(RenderTarget, Color.Transparent))
+                {
+                    ElementDrawArgs Translated = DA with { Offset = DA.Offset - TopLeft };
+                    base.Draw(Translated);
+                }
+
+                Rectangle LayoutSpaceBounds = new(Left, Top, WindowWidth, WindowHeight);
+                Rectangle Destination = ConvertCoordinateSpace(CoordinateSpace.Layout, CoordinateSpace.Screen, LayoutSpaceBounds);
+                DA.DT.DrawTextureTo(RenderTarget, null, Destination);
+#endif
+            }
+        }
     }
 }

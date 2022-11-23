@@ -29,7 +29,7 @@ namespace MGUI.Shared.Input
             this.HandledBy = default;
         }
 
-        public void SetHandled<T>(T HandledBy, bool OverwriteIfAlreadyHandled)
+        public void SetHandled<T>(T HandledBy, bool OverwriteIfAlreadyHandled = false)
             where T : THandlerType
         {
             if (!this.IsHandled || OverwriteIfAlreadyHandled)

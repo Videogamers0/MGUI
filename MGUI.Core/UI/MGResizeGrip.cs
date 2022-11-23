@@ -161,15 +161,17 @@ namespace MGUI.Core.UI
                 {
                     if (e.IsLMB && e.DragStartArgs.HandledBy == this && Parent != null)
                     {
+                        float Scalar = 1.0f / Parent.SelfOrParentWindow.Scale;
+                        Point Delta = new((int)(e.PositionDelta.X * Scalar), (int)(e.PositionDelta.Y * Scalar));
                         if (Parent is MGWindow TargetWindow)
                         {
-                            TargetWindow.WindowWidth = Math.Max(0, InitialWidth + e.PositionDelta.X);
-                            TargetWindow.WindowHeight = Math.Max(0, InitialHeight + e.PositionDelta.Y);
+                            TargetWindow.WindowWidth = Math.Max(0, InitialWidth + Delta.X);
+                            TargetWindow.WindowHeight = Math.Max(0, InitialHeight + Delta.Y);
                         }
                         else
                         {
-                            Parent.PreferredWidth = Math.Max(0, InitialWidth + e.PositionDelta.X);
-                            Parent.PreferredHeight = Math.Max(0, InitialHeight + e.PositionDelta.Y);
+                            Parent.PreferredWidth = Math.Max(0, InitialWidth + Delta.X);
+                            Parent.PreferredHeight = Math.Max(0, InitialHeight + Delta.Y);
                         }
                     }
                 };
