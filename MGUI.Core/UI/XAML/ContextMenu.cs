@@ -38,7 +38,7 @@ namespace MGUI.Core.UI.XAML
             else if (Parent is MGContextMenuItem CMI)
                 return new MGContextMenu(CMI.Menu);
             else
-                return new MGContextMenu(Window);
+                return new MGContextMenu(Window, Theme: Window?.Theme);
         }
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)

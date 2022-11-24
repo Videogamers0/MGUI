@@ -52,7 +52,7 @@ namespace MGUI.Samples
 
             //  Note: If reading XAML markup from .xaml files, make sure they're set to BuildAction=EmbeddedResource
             Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
-#if NEVER
+#if true
             MGWindow XAMLDesigner = LoadDesignerWindow(CurrentAssembly, Desktop);
             Desktop.Windows.Add(XAMLDesigner);
             MGWindow DebugWindow = LoadDebugWindow(CurrentAssembly, Desktop);
@@ -64,7 +64,7 @@ namespace MGUI.Samples
             Desktop.Windows.Add(LoadListViewSampleWindow(CurrentAssembly, Desktop));
 
             Desktop.BringToFront(XAMLDesigner);
-            Desktop.BringToFront(DebugWindow);
+            //Desktop.BringToFront(DebugWindow);
 #else
             MGWindow DebugWindow = LoadDebugWindow(CurrentAssembly, Desktop);
             Desktop.Windows.Add(DebugWindow);

@@ -56,7 +56,7 @@
                             <ComboBox Name="CB" />
                             <ProgressBar Name="TestProgressBar" ShowValue="true">
                                 <ProgressBar.ContextMenu>
-                                    <ContextMenu Name="CM1" Scale="1.5">
+                                    <ContextMenu Name="CM1" Scale="2">
                                         <ContextMenuButton Name="CMB1" Content="ABC" />
                                         <ContextMenuButton>
                                             <ContextMenuButton.Submenu>

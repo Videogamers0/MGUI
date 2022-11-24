@@ -332,7 +332,7 @@ namespace MGUI.Core.UI
         /// <summary>Consider subscribing to <see cref="ItemSelected"/> and <see cref="ItemToggled"/> to handle user actions.</summary>
         public static MGContextMenu CreateSimpleMenu(MGWindow Window, string Title, Color? TextForeground, params MGSimpleContextMenuItem[] Items)
         {
-            MGContextMenu Menu = new(Window, Title);
+            MGContextMenu Menu = new(Window, Title, Window.Theme);
             AddItemsToMenu(Menu, TextForeground, Items?.ToList());
             return Menu;
         }
@@ -384,7 +384,7 @@ namespace MGUI.Core.UI
 
         /// <summary>Creates a nested <see cref="MGContextMenu"/></summary>
         public MGContextMenu(MGContextMenu ParentContextMenu)
-            : this(ParentContextMenu, ParentContextMenu.TitleText)
+            : this(ParentContextMenu, ParentContextMenu.TitleText, ParentContextMenu.Theme)
         {
             this.Host = ParentContextMenu;
             this.HeaderSize = ParentContextMenu.HeaderSize;
