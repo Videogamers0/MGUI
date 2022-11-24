@@ -185,7 +185,7 @@ namespace MGUI.Core.UI
 
                 this.ExpanderToggleButton = new(Window, IsExpanded);
                 ExpanderToggleButton.VerticalAlignment = VerticalAlignment.Center;
-                ExpanderToggleButton.ComponentParent = this;
+                ExpanderToggleButton.ManagedParent = this;
 
                 this.ExpanderButtonSize = DefaultExpanderButtonSize;
 

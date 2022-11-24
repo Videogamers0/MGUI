@@ -513,6 +513,8 @@ namespace MGUI.Core.UI
         /// See also:<br/><see cref="MGElement.GetTheme()"/><br/><see cref="MGDesktop.Theme"/></summary>
         public MGTheme Theme { get; set; }
 
+        protected internal MGElement HoveredElement { get; set; }
+
         /// <summary>If true, this <see cref="MGWindow"/>'s layout will be recomputed at the start of the next update tick.</summary>
         public bool QueueLayoutRefresh { get; set; }
 
@@ -660,7 +662,8 @@ namespace MGUI.Core.UI
                 OnDirectOrNestedContentRemoved += Element_Removed;
 
                 OnBeginUpdate += (sender, e) =>
-                { 
+                {
+                    HoveredElement = null;
                     ValidateWindowSizeAndPosition();
 
                     if (!IsLayoutValid || QueueLayoutRefresh)
@@ -957,9 +960,22 @@ namespace MGUI.Core.UI
         public event EventHandler<ElementDrawArgs> OnBeginDrawNestedWindows;
         public event EventHandler<ElementDrawArgs> OnEndDrawNestedWindows;
 
+        private IEnumerable<MGWindow> ParentWindows
+        {
+            get
+            {
+                MGWindow Current = ParentWindow;
+                while (Current != null)
+                {
+                    yield return Current;
+                    Current = Current.ParentWindow;
+                }
+            }
+        }
+
         public override void Draw(ElementDrawArgs DA)
         {
-            if (!IsWindowScaled)
+            if (!IsWindowScaled && !ParentWindows.Any(x => x.IsWindowScaled))
                 base.Draw(DA);
             else
             {

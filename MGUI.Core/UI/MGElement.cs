@@ -14,6 +14,7 @@ using MGUI.Shared.Input.Mouse;
 using MGUI.Shared.Input.Keyboard;
 using MGUI.Shared.Input;
 using MGUI.Core.UI.Containers;
+using MGUI.Core.UI.Containers.Grids;
 
 namespace MGUI.Core.UI
 {
@@ -79,9 +80,6 @@ namespace MGUI.Core.UI
 
     //TODO:
     //Test MGWindow.Scale implementation:
-    //      Test a context menu with a scrollbar and a nested submenu
-    //      Test changes to MGContextMenu.IsHoveringSubmenu
-    //      Test the auto-close threshold when scrollbar is visible
     //      Test MGRatingControl's preview value rendering
     //      Test MGGrid/MGUniformGrid selection rendering
     //Improve Grid/UniformGrid's default selection graphics
@@ -149,11 +147,16 @@ namespace MGUI.Core.UI
 
 		public event EventHandler<EventArgs<MGElement>> OnParentChanged;
 
-        /// <summary>The parent <see cref="MGElement"/> that this <see cref="MGComponent{TElementType}"/> belongs to, or null if this <see cref="MGElement"/> is not a <see cref="MGComponent{TElementType}"/>.<para/>
-        /// In very rare cases, an element may represent hard-coded content nested inside another element without actually being an <see cref="MGComponent{TElementType}"/>, and still be treated as a component.<br/>
-        /// Such as <see cref="MGGroupBox.OuterHeaderPresenter"/>, which wraps the <see cref="MGGroupBox.Expander"/> and <see cref="MGGroupBox.HeaderPresenter"/></summary>
-        public MGElement ComponentParent { get; protected internal set; }
+        /// <summary>The parent <see cref="MGElement"/> that micromanages this <see cref="MGElement"/>, or null if this <see cref="MGElement"/> is not tightly coupled with its creator.<para/>
+        /// For example, an <see cref="MGListView{TItemType}"/> always contains an <see cref="MGGrid"/> to display the column headers, and another <see cref="MGGrid"/> to display the rows<br/>
+        /// Those 2 <see cref="MGGrid"/>s are specially-created elements whose <see cref="ManagedParent"/> is the <see cref="MGListView{TItemType}"/></summary>
+        public MGElement ManagedParent { get; protected internal set; }
+        /// <summary>True if this <see cref="MGElement"/> is automatically created and managed by its parent,<br/>
+        /// such as a ComboBox's <see cref="MGComboBox{TItemType}.Dropdown"/> or a ContextMenu's <see cref="MGContextMenu.ItemsPanel"/></summary>
+        public bool IsManagedElement => ManagedParent != null;
 
+        /// <summary>The parent <see cref="MGElement"/> that this <see cref="MGComponent{TElementType}"/> belongs to, or null if this <see cref="MGElement"/> is not a <see cref="MGComponent{TElementType}"/>.</summary>
+        public MGElement ComponentParent { get; private set; }
         /// <summary>True if this <see cref="MGElement"/> is a <see cref="MGComponent{TElementType}"/> of its parent,
         /// such as the <see cref="MGCheckBox.ButtonComponent"/> of an <see cref="MGCheckBox"/>, or the <see cref="MGButton.BorderComponent"/> of an <see cref="MGButton"/></summary>
         public bool IsComponent => ComponentParent != null;
@@ -545,7 +548,9 @@ namespace MGUI.Core.UI
 
         protected IMouseViewport AsIViewport() => this;
         protected IMouseHandlerHost AsIMouseHandlerHost() => this;
-        bool IMouseViewport.IsInside(Vector2 Position) => ActualLayoutBounds.ContainsInclusive(ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.UnscaledScreen, Position));
+        bool IMouseViewport.IsInside(Vector2 Position) => 
+            ActualLayoutBounds.ContainsInclusive(ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.UnscaledScreen, Position)) &&
+            GetDesktop().ValidScreenBounds.ContainsInclusive(Position);
 
         Vector2 IMouseViewport.GetOffset() => Vector2.Zero;
 
@@ -875,12 +880,20 @@ namespace MGUI.Core.UI
 
             this.Origin = UA.Offset;
 
-            Rectangle ParentLayoutBounds = IsWindow ? GetDesktop().ValidScreenBounds : UA.ActualLayoutBounds;
-            this.ActualLayoutBounds = Rectangle.Intersect(ParentLayoutBounds, ConvertCoordinateSpace(CoordinateSpace.Layout, CoordinateSpace.UnscaledScreen, LayoutBounds));
+            Rectangle UnscaledScreenBounds = ConvertCoordinateSpace(CoordinateSpace.Layout, CoordinateSpace.UnscaledScreen, LayoutBounds);
             //TODO there's a bug with ActualLayoutBounds that I'm too lazy to fix:
             //Rectangle.Intersect(Parent.ActualLayoutBounds, this.LayoutBounds.GetTranslated(-UA.Offset)) does NOT properly account for the parent's Padding.
             //We can't simply compress the ActualLayoutBounds by the parent's Padding because not all element's pad all of their children.
             //For example, an MGTabControl's padding isn't applied to the HeadersPanel that hosts the TabControl's Tab headers.
+#if true
+            if (IsWindow)
+                this.ActualLayoutBounds = UnscaledScreenBounds;
+            else
+                this.ActualLayoutBounds = Rectangle.Intersect(UA.ActualLayoutBounds, UnscaledScreenBounds);
+#else
+            Rectangle ParentLayoutBounds = IsWindow ? GetDesktop().ValidScreenBounds : UA.ActualLayoutBounds;
+            this.ActualLayoutBounds = Rectangle.Intersect(ParentLayoutBounds, UnscaledScreenBounds);
+#endif
 
             UA = UA with {
                 IsEnabled = ComputedIsEnabled, 
@@ -915,6 +928,9 @@ namespace MGUI.Core.UI
 				&& (!RecentDrawWasClipped || (Visibility == Visibility.Hidden && CanHandleInputsWhileHidden));
             this._CanReceiveMouseInput = BaseCanReceiveInput && (Parent?._CanReceiveMouseInput ?? true);
 			this._CanReceiveKeyboardInput = BaseCanReceiveInput && (Parent?._CanReceiveKeyboardInput ?? true);
+
+            if (_CanReceiveMouseInput && SecondaryVisualState == SecondaryVisualState.Hovered && (ElementType != MGElementType.Border || !IsComponent) && this is not MGMultiContentHost)
+                SelfOrParentWindow.HoveredElement = this;
 
             OnBeginUpdateContents?.Invoke(this, UpdateEventArgs);
 			foreach (MGElement Component in Components.Where(x => x.UpdateBeforeContents).Select(x => x.BaseElement))

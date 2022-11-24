@@ -56,12 +56,22 @@
                             <ComboBox Name="CB" />
                             <ProgressBar Name="TestProgressBar" ShowValue="true">
                                 <ProgressBar.ContextMenu>
-                                    <ContextMenu Name="CM1">
+                                    <ContextMenu Name="CM1" Scale="1.5">
                                         <ContextMenuButton Name="CMB1" Content="ABC" />
                                         <ContextMenuButton>
                                             <ContextMenuButton.Submenu>
                                                 <ContextMenu>
                                                     <ContextMenuToggle Content="Toggle Me" />
+                                                    <ContextMenuButton Content="1" />
+                                                    <ContextMenuButton Content="2" />
+                                                    <ContextMenuButton Content="3" />
+                                                    <ContextMenuButton Content="4" />
+                                                    <ContextMenuButton Content="5" />
+                                                    <ContextMenuButton Content="6" />
+                                                    <ContextMenuButton Content="7" />
+                                                    <ContextMenuButton Content="8" />
+                                                    <ContextMenuButton Content="9" />
+                                                    <ContextMenuButton Content="10" />
                                                 </ContextMenu>
                                             </ContextMenuButton.Submenu>
                                             <Rectangle Width="16" VA="Stretch" Fill="Blue" />

@@ -1559,6 +1559,9 @@ namespace MGUI.Core.UI.XAML
         [Category("Layout")]
         public SizeToContent? SizeToContent { get; set; }
 
+        [Category("Layout")]
+        public float? Scale { get; set; }
+
         public ResizeGrip ResizeGrip { get; set; } = new();
         [Category("Layout")]
         public bool? IsUserResizable { get; set; }
@@ -1672,6 +1675,9 @@ namespace MGUI.Core.UI.XAML
 
             if (SizeToContent != null)
                 Window.ApplySizeToContent(SizeToContent.Value, 50, 50, null, null, false);
+
+            if (Scale != null)
+                Window.Scale = Scale.Value;
         }
 
         protected internal override IEnumerable<Element> GetChildren()

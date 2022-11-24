@@ -93,6 +93,9 @@ namespace MGUI.Core.UI.XAML
         [Category("Appearance")]
         public float? Opacity { get; set; }
 
+        [Category("Appearance")]
+        public float? RenderScale { get; set; }
+
         /// <summary>Used by <see cref="DockPanel"/>'s children</summary>
         [Category("Attached")]
         public Dock Dock { get; set; } = Dock.Top;
@@ -225,6 +228,9 @@ namespace MGUI.Core.UI.XAML
 
                 if (Opacity.HasValue)
                     Element.Opacity = Opacity.Value;
+
+                if (RenderScale.HasValue)
+                    Element.RenderScale = new(RenderScale.Value, RenderScale.Value);
             }
         }
 

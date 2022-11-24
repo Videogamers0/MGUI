@@ -149,7 +149,7 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGElement _MenuItemContent;
         /// <summary>The content to display inside this <see cref="MGContextMenuItem"/>.<para/>
-        /// This content is automatically wrapped inside of an <see cref="MGSingleContentHost"/> that is created via <see cref="MGContextMenu.ButtonWrapperTemplate"/>.<para/>
+        /// This content is automatically wrapped inside of an <see cref="MGButton"/> that is created via <see cref="MGContextMenu.ButtonWrapperTemplate"/>.<para/>
         /// See also: <see cref="ContentWrapper"/></summary>
         public MGElement MenuItemContent
         {
@@ -228,7 +228,7 @@ namespace MGUI.Core.UI
         {
             Container = new(Menu, Orientation.Horizontal);
             Container.Spacing = 5;
-            Container.ComponentParent = this;
+            Container.ManagedParent = this;
             Container.CanChangeContent = false;
 
             HeaderPresenter = new(Menu);
@@ -238,7 +238,7 @@ namespace MGUI.Core.UI
             HeaderPresenter.PreferredHeight = Menu.HeaderSize.Height;
             HeaderPresenter.Margin = new(0);
             HeaderPresenter.BackgroundBrush = new(null);
-            HeaderPresenter.ComponentParent = this;
+            HeaderPresenter.ManagedParent = this;
             InvokeContentAdded(HeaderPresenter);
 
             Menu.HeaderSizeChanged += (sender, e) =>
@@ -278,7 +278,8 @@ namespace MGUI.Core.UI
             {
                 if (Submenu?.IsContextMenuOpen == false)
                 {
-                    Submenu.TryOpenContextMenu(LayoutBounds.TranslatedCopy(AsIMouseHandlerHost().GetOffset().ToPoint()).GetExpanded(new Thickness(2, 0, 2, 0)));
+                    Rectangle ScreenBounds = ConvertCoordinateSpace(CoordinateSpace.Layout, CoordinateSpace.Screen, LayoutBounds.GetExpanded(new Thickness(2, 0, 2, 0)));
+                    Submenu.TryOpenContextMenu(ScreenBounds);
                 }
             }
 
@@ -332,11 +333,11 @@ namespace MGUI.Core.UI
         public Action<MGContextMenuButton> Action { get; set; }
 
         internal MGContextMenuButton(MGContextMenu Menu, MGElement Content, Action<MGContextMenuButton> Action = null)
-            : base(Menu, ContextMenuItemType.Button, Menu.ButtonWrapperTemplate(), Content)
+            : base(Menu, ContextMenuItemType.Button, Menu.ButtonWrapperTemplate(Menu), Content)
         {
             Menu.ButtonWrapperTemplateChanged += (sender, e) =>
             {
-                this.ContentWrapper = Menu.ButtonWrapperTemplate();
+                this.ContentWrapper = Menu.ButtonWrapperTemplate(Menu);
             };
 
             OnSelected += (sender, e) => 
@@ -376,11 +377,11 @@ namespace MGUI.Core.UI
         }
 
         internal MGContextMenuToggle(MGContextMenu Menu, MGElement Header, bool IsChecked)
-            : base(Menu, ContextMenuItemType.Toggle, Menu.ButtonWrapperTemplate(), Header)
+            : base(Menu, ContextMenuItemType.Toggle, Menu.ButtonWrapperTemplate(Menu), Header)
         {
             Menu.ButtonWrapperTemplateChanged += (sender, e) =>
             {
-                this.ContentWrapper = Menu.ButtonWrapperTemplate();
+                this.ContentWrapper = Menu.ButtonWrapperTemplate(Menu);
             };
 
             HeaderPresenter.OnEndDraw += (sender, e) =>

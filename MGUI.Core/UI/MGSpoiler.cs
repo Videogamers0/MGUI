@@ -125,7 +125,7 @@ namespace MGUI.Core.UI
             {
                 this.ButtonElement = new(Window, new(1), MGUniformBorderBrush.Black, x => IsRevealed = true);
                 this.TextElement = new(Window, DefaultUnspoiledText, Color.White);
-                TextElement.ComponentParent = this;
+                TextElement.ManagedParent = this;
                 this.ButtonElement.SetContent(TextElement);
                 this.ButtonComponent = new(ButtonElement, ComponentUpdatePriority.BeforeContents, ComponentDrawPriority.AfterContents,
                     true, true, true, true, false, false, false,

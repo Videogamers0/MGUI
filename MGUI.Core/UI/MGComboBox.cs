@@ -445,7 +445,7 @@ namespace MGUI.Core.UI
 
                 Dropdown = new(Window, 0, 0, 100, 300, SelfOrParentWindow.Theme)
                 {
-                    ComponentParent = this,
+                    ManagedParent = this,
                     IsUserResizable = false,
                     IsTitleBarVisible = false,
                     Scale = SelfOrParentWindow.Scale
@@ -482,12 +482,12 @@ namespace MGUI.Core.UI
                 DropdownSP = new(Dropdown, Orientation.Vertical);
                 DropdownSP.Spacing = 0;
                 DropdownSP.CanChangeContent = false;
-                DropdownSP.ComponentParent = Dropdown;
+                DropdownSP.ManagedParent = Dropdown;
                 DropdownSV = new(Dropdown, ScrollBarVisibility.Auto, ScrollBarVisibility.Disabled);
                 DropdownSV.Padding = new(0);
                 DropdownSV.SetContent(DropdownSP);
                 DropdownSV.CanChangeContent = false;
-                DropdownSV.ComponentParent = Dropdown;
+                DropdownSV.ManagedParent = Dropdown;
                 Dropdown.SetContent(DropdownSV);
                 Dropdown.CanChangeContent = false;
 

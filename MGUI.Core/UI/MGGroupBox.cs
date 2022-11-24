@@ -125,7 +125,7 @@ namespace MGUI.Core.UI
 
                 this.BorderElement = new(Window, new Thickness(2), MGUniformBorderBrush.Black);
                 BorderElement.SetParent(this);
-                BorderElement.ComponentParent = this;
+                BorderElement.ManagedParent = this;
 
                 this.Expander = new(Window);
                 Expander.Margin = new(0, 0, 5, 0);
@@ -136,7 +136,7 @@ namespace MGUI.Core.UI
                 this.OuterHeaderPresenter = new(Window, Expander, HeaderPresenter);
                 OuterHeaderPresenter.Spacing = 0;
                 OuterHeaderPresenter.CanChangeContent = false;
-                OuterHeaderPresenter.ComponentParent = this;
+                OuterHeaderPresenter.ManagedParent = this;
                 OuterHeaderPresenter.SetParent(this);
 
                 this.Padding = new(8,4,8,8);

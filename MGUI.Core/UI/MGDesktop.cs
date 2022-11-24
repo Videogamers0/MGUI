@@ -148,9 +148,11 @@ namespace MGUI.Core.UI
             if (Menu == null || !Menu.CanContextMenuOpen)
                 return false;
 
+            Rectangle ValidBounds = ValidScreenBounds;
             if (Menu.IsContextMenuOpen)
             {
-                Point NewPosition = MGContextMenu.FitMenuToViewport(Anchor, Menu.RenderBounds.Size, ValidScreenBounds).TopLeft();
+                Size MenuSizeScreenSpace = new((int)(Menu.RenderBounds.Width * Menu.Scale), (int)(Menu.RenderBounds.Height * Menu.Scale));
+                Point NewPosition = MGContextMenu.FitMenuToViewport(Anchor, MenuSizeScreenSpace, ValidBounds).TopLeft();
                 Menu.Left = NewPosition.X;
                 Menu.Top = NewPosition.Y;
                 Menu.ValidateWindowSizeAndPosition();
@@ -175,7 +177,10 @@ namespace MGUI.Core.UI
                 int MaxWidth = 1000;
                 int MaxHeight = 800;
 
-                Point Position = MGContextMenu.FitMenuToViewport(Anchor, Menu.ComputeContentSize(MinWidth, MinHeight, MaxWidth, MaxHeight), ValidScreenBounds).TopLeft();
+                Size MenuSizeUnscaledScreenSpace = Menu.ComputeContentSize(MinWidth, MinHeight, MaxWidth, MaxHeight);
+                Size MenuSizeScreenSpace = new((int)(MenuSizeUnscaledScreenSpace.Width * Menu.Scale), (int)(MenuSizeUnscaledScreenSpace.Height * Menu.Scale));
+
+                Point Position = MGContextMenu.FitMenuToViewport(Anchor, MenuSizeScreenSpace, ValidBounds).TopLeft();
                 Menu.TopLeft = Position;
                 _ = Menu.ApplySizeToContent(SizeToContent.WidthAndHeight, MinWidth, MinHeight, MaxWidth, MaxHeight, true);
 

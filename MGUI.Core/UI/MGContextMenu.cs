@@ -110,9 +110,9 @@ namespace MGUI.Core.UI
         public float? AutoCloseThreshold { get; set; }
         #endregion Close Conditions
 
-        public MGButton CreateDefaultDropdownButton()
+        public MGButton CreateDefaultDropdownButton(MGWindow Window)
         {
-            MGButton Button = new(this, new(0), MGUniformBorderBrush.Gray);
+            MGButton Button = new(Window ?? this, new(0), MGUniformBorderBrush.Gray);
 
             Button.Padding = new(5, 3, 20, 3);
             Button.Margin = new(0);
@@ -128,10 +128,10 @@ namespace MGUI.Core.UI
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Func<MGButton> _ButtonWrapperTemplate;
+        private Func<MGWindow, MGButton> _ButtonWrapperTemplate;
         /// <summary>Every <see cref="MGContextMenuButton"/> and <see cref="MGContextMenuToggle"/> within <see cref="Items"/> will be automatically wrapped in an <see cref="MGButton"/> created by this function.<para/>
         /// Default value: <see cref="CreateDefaultDropdownButton"/></summary>
-        public Func<MGButton> ButtonWrapperTemplate
+        public Func<MGWindow, MGButton> ButtonWrapperTemplate
         {
             get => _ButtonWrapperTemplate;
             set
@@ -241,9 +241,11 @@ namespace MGUI.Core.UI
             if (Menu == null || !Menu.CanContextMenuOpen)
                 return false;
 
+            Rectangle ValidBounds = GetDesktop().ValidScreenBounds;
             if (Menu.IsContextMenuOpen)
             {
-                Point NewPosition = MGContextMenu.FitMenuToViewport(Anchor, Menu.RenderBounds.Size, GetDesktop().ValidScreenBounds).TopLeft();
+                Size MenuSizeScreenSpace = new((int)(Menu.RenderBounds.Width * Menu.Scale), (int)(Menu.RenderBounds.Height * Menu.Scale));
+                Point NewPosition = FitMenuToViewport(Anchor, MenuSizeScreenSpace, ValidBounds).TopLeft();
                 Menu.Left = NewPosition.X;
                 Menu.Top = NewPosition.Y;
                 Menu.ValidateWindowSizeAndPosition();
@@ -254,12 +256,17 @@ namespace MGUI.Core.UI
                 Menu.InvokeContextMenuOpening();
                 _ActiveContextMenu = Menu;
 
+                Menu.Scale = this.Scale;
+
                 int MinWidth = 100;
                 int MinHeight = 40;
                 int MaxWidth = 1000;
                 int MaxHeight = 800;
 
-                Point Position = MGContextMenu.FitMenuToViewport(Anchor, Menu.ComputeContentSize(MinWidth, MinHeight, MaxWidth, MaxHeight), GetDesktop().ValidScreenBounds).TopLeft();
+                Size MenuSizeUnscaledScreenSpace = Menu.ComputeContentSize(MinWidth, MinHeight, MaxWidth, MaxHeight);
+                Size MenuSizeScreenSpace = new((int)(MenuSizeUnscaledScreenSpace.Width * Menu.Scale), (int)(MenuSizeUnscaledScreenSpace.Height * Menu.Scale));
+
+                Point Position = FitMenuToViewport(Anchor, MenuSizeScreenSpace, ValidBounds).TopLeft();
                 Menu.TopLeft = Position;
                 _ = Menu.ApplySizeToContent(SizeToContent.WidthAndHeight, MinWidth, MinHeight, MaxWidth, MaxHeight, true);
 
@@ -408,12 +415,12 @@ namespace MGUI.Core.UI
 
                 this.ItemsPanel = new(this, Orientation.Vertical);
                 ItemsPanel.Spacing = 2;
-                ItemsPanel.ComponentParent = this;
+                ItemsPanel.ManagedParent = this;
                 MGScrollViewer SV = new(this, ScrollBarVisibility.Auto, ScrollBarVisibility.Disabled);
                 this.ScrollViewerElement = SV;
                 SV.Padding = new(0);
                 SV.SetContent(ItemsPanel);
-                SV.ComponentParent = this;
+                SV.ManagedParent = this;
                 this.SetContent(SV);
 
                 SV.CanChangeContent = false;
@@ -498,6 +505,9 @@ namespace MGUI.Core.UI
                 //  Can also be 'fixed' by removing MGElement.TryGetRecentSelfMeasurement(...)
                 //  Seems to be related to how MGScrollViewer handles ScrollBarVisibility.Auto
                 ContextMenuOpening += (sender, e) => { SV.InvalidateLayout(); };
+                //  TODO: This may have been due to an issue that was fixed in this commit?
+                //  https://github.com/Videogamers0/MGUI/commit/dd4c1d6cefffe5d4474f8e6017687ff14b6c63c1
+                //  Should try re-testing the issue now and see if it's still reproducible
                 #endregion Bug Workaround
 
                 this.ButtonWrapperTemplate = CreateDefaultDropdownButton;

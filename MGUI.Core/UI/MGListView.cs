@@ -307,10 +307,10 @@ namespace MGUI.Core.UI
                 SetContent(DockPanelElement);
                 this.CanChangeContent = false;
 
-                HeaderGrid.ComponentParent = this;
-                DataGrid.ComponentParent = this;
-                ScrollViewer.ComponentParent = this;
-                DockPanelElement.ComponentParent = this;
+                HeaderGrid.ManagedParent = this;
+                DataGrid.ManagedParent = this;
+                ScrollViewer.ManagedParent = this;
+                DockPanelElement.ManagedParent = this;
 
                 this.VerticalAlignment = VerticalAlignment.Top;
 
