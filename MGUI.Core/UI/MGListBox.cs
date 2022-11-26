@@ -487,7 +487,7 @@ namespace MGUI.Core.UI
                 ItemsPanel.VerticalAlignment = VerticalAlignment.Top;
                 ItemsPanel.CanChangeContent = false;
                 this.ScrollViewer = new(ParentWindow);
-                ScrollViewer.Padding = new(0, 3);
+                ScrollViewer.Padding = new(0, 0);
                 ScrollViewer.SetContent(ItemsPanel);
                 ScrollViewer.CanChangeContent = false;
                 InnerBorder.SetContent(ScrollViewer);
@@ -626,6 +626,14 @@ namespace MGUI.Core.UI
                     SetItemsSource(TempItems);
                 }
             }
+
+            if (Settings.CanDeselectByClickingSelectedItem.HasValue)
+                CanDeselectByClickingSelectedItem = Settings.CanDeselectByClickingSelectedItem.Value;
+            if (Settings.SelectionMode.HasValue)
+                SelectionMode = Settings.SelectionMode.Value;
+
+            if (Settings.AlternatingRowBackgrounds != null && Settings.AlternatingRowBackgrounds.Any())
+                AlternatingRowBackgrounds = Settings.AlternatingRowBackgrounds.Select(x => x.ToFillBrush()).ToList().AsReadOnly();
         }
     }
 

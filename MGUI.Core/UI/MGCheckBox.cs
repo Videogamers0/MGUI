@@ -127,7 +127,7 @@ namespace MGUI.Core.UI
                     }
                 });
 
-                ButtonElement.OnEndDraw += (sender, e) =>
+                ButtonElement.OnEndingDraw += (sender, e) =>
                 {
                     if (!this.IsChecked.HasValue)
                         e.DA.DT.FillRectangle(e.DA.Offset.ToVector2(), ButtonElement.LayoutBounds.GetScaledFromCenter(0.60f), CheckMarkColor * e.DA.Opacity);

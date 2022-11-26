@@ -384,7 +384,7 @@ namespace MGUI.Core.UI
                 this.ContentWrapper = Menu.ButtonWrapperTemplate(Menu);
             };
 
-            HeaderPresenter.OnEndDraw += (sender, e) =>
+            HeaderPresenter.OnEndingDraw += (sender, e) =>
             {
                 if (this.IsChecked)
                 {

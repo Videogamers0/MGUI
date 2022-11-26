@@ -93,6 +93,14 @@ namespace MGUI.Core.UI.XAML
         [Category("Data")]
         public List<object> Items { get; set; } = new();
 
+        [Category("Behavior")]
+        public bool? CanDeselectByClickingSelectedItem { get; set; }
+        [Category("Behavior")]
+        public ListBoxSelectionMode? SelectionMode { get; set; }
+
+        [Category("Appearance")]
+        public List<FillBrush> AlternatingRowBackgrounds { get; set; } = new();
+
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
             Type GenericType = typeof(MGListBox<>).MakeGenericType(new Type[] { ItemType });

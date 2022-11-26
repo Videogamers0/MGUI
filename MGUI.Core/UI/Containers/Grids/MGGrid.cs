@@ -808,7 +808,7 @@ namespace MGUI.Core.UI.Containers.Grids
                     }
                 };
 
-                OnEndDraw += (sender, e) =>
+                OnEndingDraw += (sender, e) =>
                 {
                     //  Draw the selection overlay
                     if (HasSelection && SelectionOverlay != null)
@@ -818,7 +818,8 @@ namespace MGUI.Core.UI.Containers.Grids
                         {
                             if (_CellBounds.TryGetValue(Cell, out Rectangle Bounds))
                             {
-                                if (ScissorBounds.HasValue && Bounds.GetTranslated(e.DA.Offset).Intersects(ScissorBounds.Value))
+                                Rectangle ScreenSpaceBounds = ConvertCoordinateSpace(CoordinateSpace.UnscaledScreen, CoordinateSpace.Screen, Bounds.GetTranslated(e.DA.Offset));
+                                if (ScissorBounds.HasValue && ScreenSpaceBounds.Intersects(ScissorBounds.Value))
                                     SelectionOverlay.Draw(e.DA, this, Bounds);
                             }
                         }

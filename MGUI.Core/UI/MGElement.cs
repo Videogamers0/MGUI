@@ -79,9 +79,6 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
-    //Test MGWindow.Scale implementation:
-    //      Test MGRatingControl's preview value rendering
-    //      Test MGGrid/MGUniformGrid selection rendering
     //Improve Grid/UniformGrid's default selection graphics
     //Bugfix MGTextBox's Caret positioning after moving to new line such as when inserting a linebreak
     //      only seems incorrect if the textbox's height changes? (I.E. it doesnt have a PreferredHeight and its not inside a ScrollViewer)
@@ -1032,6 +1029,8 @@ namespace MGUI.Core.UI
 
                     foreach (MGElement Component in Components.Where(x => x.DrawAfterContents).Select(x => x.BaseElement))
                         Component.Draw(DA);
+
+                    OnEndingDraw?.Invoke(this, DrawEventArgs);
                 }
             }
             else
@@ -1059,6 +1058,13 @@ namespace MGUI.Core.UI
 		}
 
 		public event EventHandler<MGElementDrawEventArgs> OnBeginDraw;
+        /// <summary>Invoked after drawing the background, self, and all components, 
+        /// but while the <see cref="GraphicsDevice.ScissorRectangle"/> is still set to the desired screen-space bounds of this element.<para/>
+        /// See also: <see cref="OnEndDraw"/></summary>
+        public event EventHandler<MGElementDrawEventArgs> OnEndingDraw;
+        /// <summary>Invoked at the very end of <see cref="MGElement.Draw(ElementDrawArgs)"/>.<br/>
+        /// Unlike <see cref="OnEndingDraw"/>, this event is invoked AFTER the <see cref="GraphicsDevice.ScissorRectangle"/> has been reverted to its prior value.<para/>
+        /// See also: <see cref="OnEndingDraw"/></summary>
 		public event EventHandler<MGElementDrawEventArgs> OnEndDraw;
 
         protected void DrawBackground(ElementDrawArgs DA) => DrawBackground(DA, this.LayoutBounds);

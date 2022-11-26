@@ -200,7 +200,7 @@ namespace MGUI.Core.UI
                     this.IsExpanded = ExpanderToggleButton.IsChecked;
                 };
 
-                ExpanderToggleButton.OnEndDraw += (sender, e) =>
+                ExpanderToggleButton.OnEndingDraw += (sender, e) =>
                 {
                     int DropdownArrowHeight = ExpanderDropdownArrowSize / 2;
                     if (DropdownArrowHeight % 2 != 0)

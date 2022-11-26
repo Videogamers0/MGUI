@@ -73,7 +73,7 @@ namespace MGUI.Core.UI
                 {
                     Host.OnLayoutUpdated -= Host_LayoutUpdated;
                     Host.OnBeginUpdateContents -= Host_BeginUpdateContents;
-                    Host.OnEndDraw -= Host_EndDraw;
+                    Host.OnEndingDraw -= Host_EndingDraw;
                 }
 
                 _Host = Value;
@@ -83,7 +83,7 @@ namespace MGUI.Core.UI
                 {
                     Host.OnLayoutUpdated += Host_LayoutUpdated;
                     Host.OnBeginUpdateContents += Host_BeginUpdateContents;
-                    Host.OnEndDraw += Host_EndDraw;
+                    Host.OnEndingDraw += Host_EndingDraw;
                 }
 
                 return true;
@@ -102,7 +102,7 @@ namespace MGUI.Core.UI
             Update(e.UA);
         }
 
-        private void Host_EndDraw(object sender, MGElementDrawEventArgs e)
+        private void Host_EndingDraw(object sender, MGElementDrawEventArgs e)
         {
             if (!Host.RecentDrawWasClipped)
                 DrawSelf(e.DA, this.LayoutBounds);

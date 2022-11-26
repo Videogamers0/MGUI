@@ -420,7 +420,7 @@ namespace MGUI.Core.UI
                 this.DropdownArrowElement.Margin = new(DefaultDropdownArrowLeftMargin, 0, DefaultDropdownArrowRightMargin, 0);
                 this.DropdownArrowColor = GetTheme().DropdownArrowColor;
 
-                DropdownArrowElement.OnEndDraw += (sender, e) =>
+                DropdownArrowElement.OnEndingDraw += (sender, e) =>
                 {
                     Rectangle ArrowElementFullBounds = DropdownArrowElement.LayoutBounds;
                     Rectangle ArrowPartBounds = ApplyAlignment(ArrowElementFullBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new Size(DropdownArrowWidth, DropdownArrowHeight));
