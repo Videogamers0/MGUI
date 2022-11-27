@@ -339,7 +339,7 @@ namespace MGUI.Core.UI
 
         /// <param name="FontSize">If null, uses the font size specified by <see cref="ThemeFontSettings.DefaultFontSize"/>.<para/>
         /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/><br/><see cref="MGTheme.FontSettings"/></param>
-        public MGTextBlock(MGWindow Window, string Text, Color? Foreground = null, int? FontSize = null)
+        public MGTextBlock(MGWindow Window, string Text, Color? Foreground = null, int? FontSize = null, bool AllowsInlineFormatting = true)
             : base(Window, MGElementType.TextBlock)
         {
             using (BeginInitializing())
@@ -351,6 +351,7 @@ namespace MGUI.Core.UI
                 if (!TrySetFont(Theme.FontSettings.DefaultFontFamily ?? Desktop.FontManager.DefaultFontFamily, FontSize ?? GetTheme().FontSettings.DefaultFontSize))
                     throw new ArgumentException($"Default font not found.");
 
+                this.AllowsInlineFormatting = AllowsInlineFormatting;
                 this.IsBold = false;
                 this.IsItalic = false;
                 this.IsUnderlined = false;
@@ -563,11 +564,13 @@ namespace MGUI.Core.UI
             DrawTransaction DT = DA.DT;
             float Opacity = DA.Opacity;
             Color DefaultForeground = this.ActualForeground;
-            Vector2 FontOrigin = this.FontOrigin / WindowScale;
+            Vector2 FontOrigin = this.FontOrigin;
 
             Matrix Transform = Matrix.CreateTranslation(new Vector3(DA.Offset.ToVector2(), 0));
             IDisposable TemporaryDrawTransform = null;
             bool UseScaledSpriteFont = false;
+            float ImageSizeScalar = 1.0f;
+#if NEVER // This logic *almost* works but not quite :(
             if (ParentWindow.IsWindowScaled)
             {
                 //  Experimental logic that attempts to handle MGWindow.Scale by using a larger SpriteFont rather than scaling the current, smaller SpriteFont.
@@ -580,8 +583,11 @@ namespace MGUI.Core.UI
                     Transform = GetTransform(CoordinateSpace.Layout, CoordinateSpace.Screen) *
                         Matrix.CreateTranslation(new Vector3((DA.Offset + Origin).ToVector2() * WindowScale, 0));
                     UseScaledSpriteFont = true;
+                    ImageSizeScalar = WindowScale;
+                    FontOrigin = this.FontOrigin / WindowScale;
                 }
             }
+#endif
 
             float CurrentY = LayoutBounds.Top + Padding.Top;
 
@@ -601,8 +607,8 @@ namespace MGUI.Core.UI
                         int ImgHeight = ImageRun.TargetHeight;
                         int YPosition = ApplyAlignment(LineBounds, HorizontalAlignment.Center, VerticalContentAlignment, new Size(ImgWidth, ImgHeight)).Top;
                         Point Position = new Vector2((int)CurrentX, YPosition).TransformBy(Transform).ToPoint();
-                        Desktop.TryDrawNamedRegion(DT, ImageRun.RegionName, Position, (int)(ImgWidth * WindowScale), (int)(ImgHeight * WindowScale));
-                        CurrentX += ImgWidth * WindowScale;
+                        Desktop.TryDrawNamedRegion(DT, ImageRun.RegionName, Position, (int)(ImgWidth * ImageSizeScalar), (int)(ImgHeight * ImageSizeScalar));
+                        CurrentX += ImgWidth;
                     }
                     else if (Run.RunType == TextRunType.Text && Run is MGTextRunText TextRun)
                     {
@@ -658,17 +664,17 @@ namespace MGUI.Core.UI
                         }
                         else
                         {
-                            DT.DrawSpriteFontText(SF, TextRun.Text, Position, Foreground, FontOrigin * WindowScale, FontScale, FontScale);
+                            DT.DrawSpriteFontText(SF, TextRun.Text, Position, Foreground, FontOrigin, FontScale, FontScale);
                         }
 
-                        CurrentX += TextSize.X * WindowScale;
+                        CurrentX += TextSize.X;
                         IsStartOfLine = false;
                     }
                     else
                         throw new NotImplementedException($"{nameof(MGTextBlock)}.{nameof(DrawSelf)} does not support rendering {nameof(MGTextRun)}s of type={nameof(TextRunType)}.{Run.RunType}");
                 }
 
-                CurrentY += (Line.LineTotalHeight + LinePadding) * WindowScale;
+                CurrentY += Line.LineTotalHeight + LinePadding;
             }
 
             TemporaryDrawTransform?.Dispose();

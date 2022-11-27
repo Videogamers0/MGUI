@@ -137,18 +137,41 @@ namespace MGUI.Core.UI
         private float _MaxVerticalOffset;
         /// <summary>The maximum value that <see cref="VerticalOffset"/> can be set to.<br/>
         /// Setting <see cref="VerticalOffset"/> to this value will scroll to the bottom of the scrollable content.</summary>
-        private float MaxVerticalOffset
+        public float MaxVerticalOffset
         {
             get => _MaxVerticalOffset;
-            set
+            private set
             {
                 if (_MaxVerticalOffset != value)
                 {
+                    float Previous = MaxVerticalOffset;
                     _MaxVerticalOffset = value;
                     VerticalOffset = Math.Clamp(VerticalOffset, 0, MaxVerticalOffset);
+                    MaxVerticalOffsetChanged?.Invoke(this, new(Previous, MaxVerticalOffset));
                 }
             }
         }
+
+        public event EventHandler<EventArgs<float>> MaxVerticalOffsetChanged;
+
+        /// <summary>Attempts to immediately invoke <see cref="ScrollToBottom"/> if <see cref="MGElement.IsLayoutValid"/> is true.<br/>
+        /// Else queues an action that will invoke <see cref="ScrollToBottom"/> the next time the <see cref="MaxVerticalOffset"/> value changes.</summary>
+        public void QueueScrollToBottom()
+        {
+            if (IsLayoutValid)
+                ScrollToBottom();
+            else
+                MaxVerticalOffsetChanged += MaxVerticalOffsetChanged_ScrollToBottom;
+        }
+
+        private void MaxVerticalOffsetChanged_ScrollToBottom(object sender, EventArgs<float> e)
+        {
+            ScrollToBottom();
+            MaxVerticalOffsetChanged -= MaxVerticalOffsetChanged_ScrollToBottom;
+        }
+
+        public void ScrollToTop() => VerticalOffset = 0;
+        public void ScrollToBottom() => VerticalOffset = MaxVerticalOffset;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _HorizontalOffset;
@@ -170,18 +193,22 @@ namespace MGUI.Core.UI
         private float _MaxHorizontalOffset;
         /// <summary>The maximum value that <see cref="HorizontalOffset"/> can be set to.<br/>
         /// Setting <see cref="HorizontalOffset"/> to this value will scroll to the right-most of the scrollable content.</summary>
-        private float MaxHorizontalOffset
+        public float MaxHorizontalOffset
         {
             get => _MaxHorizontalOffset;
-            set
+            private set
             {
                 if (_MaxHorizontalOffset != value)
                 {
+                    float Previous = MaxHorizontalOffset;
                     _MaxHorizontalOffset = value;
                     HorizontalOffset = Math.Clamp(HorizontalOffset, 0, MaxHorizontalOffset);
+                    MaxHorizontalOffsetChanged?.Invoke(this, new(Previous, MaxHorizontalOffset));
                 }
             }
         }
+
+        public event EventHandler<EventArgs<float>> MaxHorizontalOffsetChanged;
         #endregion Offset
 
         private bool IsHoveringVSB { get; set; }

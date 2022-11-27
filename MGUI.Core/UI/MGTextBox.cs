@@ -102,6 +102,12 @@ namespace MGUI.Core.UI
 
                 TextChanged?.Invoke(this, new(Previous, Text));
 
+                //if (Caret.HasPosition && Caret.Position.Value.IndexInOriginalText >= Text.Length)
+                //    Caret.MoveToStartOfLine(TextRenderInfo.Lines.FirstOrDefault());
+
+                if (Caret.HasPosition && string.IsNullOrEmpty(Text))
+                    Caret.MoveToStartOfLine(TextRenderInfo.Lines.FirstOrDefault());
+
                 return true;
             }
             else

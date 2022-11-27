@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MGUI.Shared.Helpers;
+using System.Collections.ObjectModel;
+using MGUI.Core.UI.Text;
+using MGUI.Core.UI.Brushes.Border_Brushes;
+using System.Collections.Specialized;
+using Microsoft.Xna.Framework.Input;
+using MGUI.Core.UI.Brushes.Fill_Brushes;
 
 namespace MGUI.Core.UI
 {
@@ -14,6 +20,25 @@ namespace MGUI.Core.UI
 
     public class MGChatBox : MGElement
     {
+        #region Border
+        /// <summary>Provides direct access to this element's border.</summary>
+        public MGComponent<MGBorder> BorderComponent { get; }
+        private MGBorder BorderElement { get; }
+        public override MGBorder GetBorder() => BorderElement;
+
+        public IBorderBrush BorderBrush
+        {
+            get => BorderElement.BorderBrush;
+            set => BorderElement.BorderBrush = value;
+        }
+
+        public Thickness BorderThickness
+        {
+            get => BorderElement.BorderThickness;
+            set => BorderElement.BorderThickness = value;
+        }
+        #endregion Border
+
         private MGComponent<MGDockPanel> MainContent { get; }
 
         private string _TimestampFormat;
@@ -41,35 +66,162 @@ namespace MGUI.Core.UI
         /// <summary>Invoked when <see cref="TimestampFormat"/> changes.</summary>
         public event EventHandler<EventArgs<string>> TimestampFormatChanged;
 
+        /// <summary>The <see cref="MGTextBlock"/> that displays the current user's name next to the <see cref="InputTextBox"/></summary>
+        public MGTextBlock CurrentUserTextBlock { get; }
         /// <summary>The <see cref="MGTextBox"/> that the user may type a new message into</summary>
         public MGTextBox InputTextBox { get; }
         /// <summary>The <see cref="MGButton"/> that commits the current message that is typed into the <see cref="InputTextBox"/></summary>
         public MGButton SendButton { get; }
 
-        public MGChatBox(MGWindow ParentWindow)
+        /// <summary>A separator between the messages list and the bottom portion of the chatbox that contains the <see cref="InputTextBox"/> and <see cref="SendButton"/></summary>
+        public MGSeparator Separator { get; }
+
+        public MGListBox<ChatBoxMessageData> MessagesContainer { get; }
+
+        public ObservableCollection<ChatBoxMessageData> Messages { get; }
+
+        private int _MaxMessages;
+        /// <summary>The maximum number of items that can be stored in <see cref="Messages"/>.<br/>
+        /// Once this limit is reached, the oldest item will be removed to make room for new items.</summary>
+        public int MaxMessages
+        {
+            get => _MaxMessages;
+            set
+            {
+                if (_MaxMessages != value)
+                {
+                    _MaxMessages = value;
+                    ValidateNumMessages();
+                }
+            }
+        }
+
+        /// <param name="MaxMessageLength">The maximum number of characters that can be sent in a single message</param>
+        public MGChatBox(MGWindow ParentWindow, int MaxMessageLength = 100, int MaxMessages = 25)
             : base(ParentWindow, MGElementType.ChatBox)
         {
             using (BeginInitializing())
             {
+                //this.Padding = new(3);
+
+                this.BorderElement = new(ParentWindow, new(1), MGUniformBorderBrush.Black);
+                this.BorderComponent = MGComponentBase.Create(BorderElement);
+                AddComponent(BorderComponent);
+
                 MGDockPanel DockPanel = new(ParentWindow);
                 this.MainContent = new(DockPanel, false, false, true, true, false, false, true,
-                    (AvailableBounds, ComponentSize) => AvailableBounds);
+                    (AvailableBounds, ComponentSize) => AvailableBounds.GetCompressed(Padding));
                 AddComponent(MainContent);
 
                 TimestampFormat = @"'\\['HH:mm:ss']'";
 
-                DockPanel.TryAddChild(new MGChatBoxMessage(ParentWindow, this, new("ABC", DateTime.Now, "Hello World")), Dock.Left);
+                this.CurrentUserTextBlock = new(ParentWindow, $"{Environment.UserName}:");
+                CurrentUserTextBlock.IsShadowed = true;
+                CurrentUserTextBlock.Margin = new(0, 0, 2, 0);
+                CurrentUserTextBlock.VerticalAlignment = VerticalAlignment.Center;
+                CurrentUserTextBlock.ManagedParent = this;
 
-                //chatbox
-                //      DockPanel
-                //          DockPanel Dock=Bottom
-                //              TextBlock Dock=Left (Contains your username)
-                //              Button Dock=Right (Send message button)
-                //              TextBox
-                //          ScrollViewer - Alternatively, could use ListBox<string>
-                //              StackPanel Orientation=Vertical
-                //                  TextBlock, 1 per message
+                this.InputTextBox = new(ParentWindow, MaxMessageLength);
+                InputTextBox.AcceptsReturn = false;
+                InputTextBox.ManagedParent = this;
+                InputTextBox.KeyboardHandler.Pressed += (sender, e) =>
+                {
+                    if (e.Key == Keys.Enter)
+                    {
+                        SendMessage();
+                        e.SetHandled(this);
+                    }
+                };
+
+                this.SendButton = new(ParentWindow, btn => { SendMessage(); });
+                SendButton.SetContent("Send");
+                SendButton.ManagedParent = this;
+
+                this.Separator = new(ParentWindow, Orientation.Horizontal, 1);
+                Separator.BackgroundBrush.SetAll(MGSolidFillBrush.Black);
+                Separator.Margin = new(0);
+                Separator.ManagedParent = this;
+
+                MGDockPanel Footer = new(ParentWindow);
+                Footer.Margin = new(4, 2, 2, 2);
+                Footer.TryAddChild(CurrentUserTextBlock, Dock.Left);
+                Footer.TryAddChild(SendButton, Dock.Right);
+                Footer.TryAddChild(InputTextBox, Dock.Left);
+                Footer.ManagedParent = this;
+                Footer.CanChangeContent = false;
+
+                this.Messages = new();
+                Messages.CollectionChanged += (sender, e) =>
+                {
+                    if (e.Action is NotifyCollectionChangedAction.Add)
+                        IsMessagesCountRefreshPending = true;
+                };
+                this.MessagesContainer = new(ParentWindow);
+                MessagesContainer.SetItemsSource(this.Messages);
+                MessagesContainer.IsTitleVisible = false;
+                MessagesContainer.SelectionMode = ListBoxSelectionMode.None;
+                MessagesContainer.OuterBorderThickness = new(0);
+                MessagesContainer.TitleBorderThickness = new(0);
+                MessagesContainer.InnerBorderThickness = new(0);
+                MessagesContainer.ItemsPanel.BorderThickness = new(0);
+                MessagesContainer.MinHeight = 0;
+                MessagesContainer.ItemContainerStyle = (contentPresenter) =>
+                {
+                    MessagesContainer.ApplyDefaultItemContainerStyle(contentPresenter);
+                    contentPresenter.BorderThickness = new(0);
+                };
+                MessagesContainer.ManagedParent = this;
+                MessagesContainer.ItemTemplate = item => new MGChatBoxMessage(ParentWindow, this, item);
+
+                DockPanel.TryAddChild(Footer, Dock.Bottom);
+                DockPanel.TryAddChild(Separator, Dock.Bottom);
+                DockPanel.TryAddChild(MessagesContainer, Dock.Top);
+                DockPanel.CanChangeContent = false;
+
+                this.MaxMessages = MaxMessages;
             }
+        }
+
+        private bool IsMessagesCountRefreshPending = false;
+
+        public override void UpdateSelf(ElementUpdateArgs UA)
+        {
+            try
+            {
+                if (IsMessagesCountRefreshPending)
+                    ValidateNumMessages();
+            }
+            finally { IsMessagesCountRefreshPending = false; }
+
+            base.UpdateSelf(UA);
+        }
+
+        private void ValidateNumMessages()
+        {
+            if (Messages != null)
+            {
+                while (Messages.Count > MaxMessages)
+                    Messages.RemoveAt(0);
+            }
+        }
+
+        private void SendMessage()
+        {
+            if (!string.IsNullOrEmpty(InputTextBox.Text))
+            {
+                SendMessage(InputTextBox.Text);
+                InputTextBox.SetText("");
+            }
+        }
+
+        public void SendMessage(string Message)
+        {
+            MGScrollViewer ScrollViewer = MessagesContainer.ScrollViewer;
+            bool WasScrolledToBottom = ScrollViewer.VerticalOffset.IsAlmostEqual(ScrollViewer.MaxVerticalOffset);
+            Messages.Add(new(Environment.UserName, DateTime.Now, Message));
+            if (WasScrolledToBottom)
+                ScrollViewer.QueueScrollToBottom();
+            InputTextBox.RequestFocus();
         }
     }
 
@@ -109,9 +261,12 @@ namespace MGUI.Core.UI
                 this.TimestampTextBlock = new(ParentWindow, Timestamp.ToString(ChatBox.TimestampFormat));
                 TimestampTextBlock.Opacity = 0.75f;
                 TimestampTextBlock.Margin = new(0, 0, Spacing, 0);
+                TimestampTextBlock.ManagedParent = this;
                 this.UsernameTextBlock = new(ParentWindow, $"{Username}:");
                 UsernameTextBlock.Margin = new(0, 0, Spacing, 0);
-                this.MessageTextBlock = new(ParentWindow, Message);
+                UsernameTextBlock.ManagedParent = this;
+                this.MessageTextBlock = new(ParentWindow, Message, AllowsInlineFormatting: false);
+                MessageTextBlock.ManagedParent = this;
 
                 DockPanel.TryAddChild(TimestampTextBlock, Dock.Left);
                 DockPanel.TryAddChild(UsernameTextBlock, Dock.Left);

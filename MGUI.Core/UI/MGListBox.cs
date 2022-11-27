@@ -407,9 +407,21 @@ namespace MGUI.Core.UI
 
         public event EventHandler<EventArgs> ItemTemplateChanged;
 
+        public readonly MGUniformBorderBrush DefaultItemBorderBrush = new MGSolidFillBrush(Color.Black * 0.35f).AsUniformBorderBrush();
+        public readonly Thickness DefaultItemBorderThickness = new(0, 1);
+
+        public void ApplyDefaultItemContainerStyle(MGBorder Item)
+        {
+            Item.BorderBrush = DefaultItemBorderBrush;
+            Item.BorderThickness = DefaultItemBorderThickness;
+            Item.Padding = new(6, 4);
+            Item.BackgroundBrush = GetTheme().ListBoxItemBackground.GetValue(true);
+        }
+
         private Action<MGBorder> _ItemContainerStyle;
         /// <summary>An action that will be invoked on every <see cref="MGBorder"/> that wraps each <see cref="MGListBoxItem{TItemType}"/>'s content.<para/>
-        /// See also: <see cref="MGListBoxItem{TItemType}.ContentPresenter"/></summary>
+        /// See also: <see cref="MGListBoxItem{TItemType}.ContentPresenter"/><para/>
+        /// Default value: <see cref="ApplyDefaultItemContainerStyle(MGBorder)"/></summary>
         public Action<MGBorder> ItemContainerStyle
         {
             get => _ItemContainerStyle;
@@ -499,19 +511,10 @@ namespace MGUI.Core.UI
 
                 AlternatingRowBackgrounds = GetTheme().ListBoxItemAlternatingRowBackgrounds.Select(x => x.GetValue(true)).ToList().AsReadOnly();
 
-                IBorderBrush ItemBorderBrush = new MGSolidFillBrush(Color.Black * 0.35f).AsUniformBorderBrush();
-                Thickness ItemBorderThickness = new(0, 1);
+                ItemsPanel.BorderThickness = DefaultItemBorderThickness;
+                ItemsPanel.BorderBrush = DefaultItemBorderBrush;
 
-                ItemsPanel.BorderThickness = ItemBorderThickness;
-                ItemsPanel.BorderBrush = ItemBorderBrush;
-
-                this.ItemContainerStyle = (contentPresenter) =>
-                {
-                    contentPresenter.BorderBrush = ItemBorderBrush;
-                    contentPresenter.BorderThickness = ItemBorderThickness;
-                    contentPresenter.Padding = new(6, 4);
-                    contentPresenter.BackgroundBrush = GetTheme().ListBoxItemBackground.GetValue(true);
-                };
+                this.ItemContainerStyle = ApplyDefaultItemContainerStyle;
                 this.ItemTemplate = (item) => new MGTextBlock(ParentWindow, item.ToString()) { Padding = new(1,0) };
 
                 this.SelectedItems = new List<MGListBoxItem<TItemType>>().AsReadOnly();

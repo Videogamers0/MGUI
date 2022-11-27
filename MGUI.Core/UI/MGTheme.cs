@@ -357,7 +357,7 @@ namespace MGUI.Core.UI
                     );
                 _Backgrounds[MGElementType.GridSplitter] = GridSplitterBG;
 
-                //  GroupBox/ListBox/ListView/ProgressBar/TabControl
+                //  GroupBox/ListBox/ListView/ProgressBar/TabControl/ChatBox
                 ThemeManagedVisualStateFillBrush BrightNeutralBG =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
@@ -369,6 +369,7 @@ namespace MGUI.Core.UI
                 _Backgrounds[MGElementType.ListView] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
                 _Backgrounds[MGElementType.ProgressBar] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
                 _Backgrounds[MGElementType.TabControl] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
+                _Backgrounds[MGElementType.ChatBox] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
 
                 //  PasswordBox/TextBox
                 ThemeManagedVisualStateFillBrush TextBoxBG =
@@ -588,6 +589,7 @@ namespace MGUI.Core.UI
                 _Backgrounds[MGElementType.ListView] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
                 _Backgrounds[MGElementType.ProgressBar] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
                 _Backgrounds[MGElementType.TabControl] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
+                _Backgrounds[MGElementType.ChatBox] = new ThemeManagedVisualStateFillBrush(BrightNeutralBG.GetValue(true));
 
                 //  PasswordBox/TextBox
                 ThemeManagedVisualStateFillBrush TextBoxBG =
