@@ -36,6 +36,13 @@ namespace MGUI.Shared.Helpers
             return new RectangleF(TopLeft.X, TopLeft.Y, BottomRight.X - TopLeft.X, BottomRight.Y - TopLeft.Y);
         }
 
+        public static RectangleF CreateTransformedF(this RectangleF @this, Matrix Transform)
+        {
+            Vector2 TopLeft = @this.TopLeft().TransformBy(Transform);
+            Vector2 BottomRight = @this.BottomRight().TransformBy(Transform);
+            return new RectangleF(TopLeft.X, TopLeft.Y, BottomRight.X - TopLeft.X, BottomRight.Y - TopLeft.Y);
+        }
+
         [DebuggerStepThrough]
         public static bool ContainsInclusive(this Rectangle @this, Point point)
             => ContainsInclusive(@this, point.ToVector2());
@@ -126,6 +133,15 @@ namespace MGUI.Shared.Helpers
         public static Point BottomLeft(this Rectangle @this) => new(@this.Left, @this.Bottom);
         [DebuggerStepThrough]
         public static Point BottomRight(this Rectangle @this) => new(@this.Right, @this.Bottom);
+
+        [DebuggerStepThrough]
+        public static Vector2 TopLeft(this RectangleF @this) => new(@this.Left, @this.Top);
+        [DebuggerStepThrough]
+        public static Vector2 TopRight(this RectangleF @this) => new(@this.Right, @this.Top);
+        [DebuggerStepThrough]
+        public static Vector2 BottomLeft(this RectangleF @this) => new(@this.Left, @this.Bottom);
+        [DebuggerStepThrough]
+        public static Vector2 BottomRight(this RectangleF @this) => new(@this.Right, @this.Bottom);
 
         public static RectangleF GetBounds(IEnumerable<Vector2> Vertices)
         {

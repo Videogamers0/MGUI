@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using MonoGame.Extended;
 using MGUI.Shared.Text;
 using MGUI.Shared.Rendering;
+using MGUI.Core.UI.Brushes.Fill_Brushes;
 
 namespace MGUI.Core.UI
 {
@@ -484,6 +485,7 @@ namespace MGUI.Core.UI
             return Measurement;
         }
 
+#if false //true
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
         {
             MGDesktop Desktop = GetDesktop();
@@ -552,5 +554,125 @@ namespace MGUI.Core.UI
                 CurrentY += Line.LineTotalHeight + LinePadding;
             }
         }
+#else
+        public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
+        {
+            float WindowScale = ParentWindow.Scale;
+            MGDesktop Desktop = GetDesktop();
+            FontManager FontManager = Desktop.FontManager;
+            DrawTransaction DT = DA.DT;
+            float Opacity = DA.Opacity;
+            Color DefaultForeground = this.ActualForeground;
+            Vector2 FontOrigin = this.FontOrigin / WindowScale;
+
+            Matrix Transform = Matrix.CreateTranslation(new Vector3(DA.Offset.ToVector2(), 0));
+            IDisposable TemporaryDrawTransform = null;
+            bool UseScaledSpriteFont = false;
+            if (ParentWindow.IsWindowScaled)
+            {
+                //  Experimental logic that attempts to handle MGWindow.Scale by using a larger SpriteFont rather than scaling the current, smaller SpriteFont.
+                //  This probably only works correctly if the FontSet for the current FontFamily contains a SpriteFont that exactly matches the scale
+                //      EX: If using 12pt font, and MGWindow.Scale=1.5f, we need an 18pt font. Using something like a 16pt font with 1.125 scale will likely yield poor results
+                float ExactScaledFontSize = this.FontSize * ParentWindow.Scale;
+                if (ExactScaledFontSize == (int)ExactScaledFontSize && FontManager.FontsByFamily[FontFamily].SupportedSizes.Contains((int)ExactScaledFontSize))
+                {
+                    TemporaryDrawTransform = DA.DT.SetTransformTemporary(Matrix.Identity); // Remove the current transform since we'll calculate the scaled positions ourself
+                    Transform = GetTransform(CoordinateSpace.Layout, CoordinateSpace.Screen) *
+                        Matrix.CreateTranslation(new Vector3((DA.Offset + Origin).ToVector2() * WindowScale, 0));
+                    UseScaledSpriteFont = true;
+                }
+            }
+
+            float CurrentY = LayoutBounds.Top + Padding.Top;
+
+            foreach (MGTextLine Line in this.Lines)
+            {
+                Rectangle LineBounds = new(LayoutBounds.Left + Padding.Left, (int)CurrentY, LayoutBounds.Width - PaddingSize.Width, (int)Line.LineTotalHeight);
+                float CurrentX = ApplyAlignment(LineBounds, TextAlignment, VerticalContentAlignment, new Size((int)Line.LineWidth, (int)Line.LineTotalHeight)).Left;
+                float TextYPosition = ApplyAlignment(LineBounds, TextAlignment, VerticalContentAlignment, new Size((int)Line.LineWidth, (int)Line.LineTextHeight)).Y;
+
+                bool IsStartOfLine = true;
+
+                foreach (MGTextRun Run in Line.Runs)
+                {
+                    if (Run.RunType == TextRunType.Image && Run is MGTextRunImage ImageRun)
+                    {
+                        int ImgWidth = ImageRun.TargetWidth;
+                        int ImgHeight = ImageRun.TargetHeight;
+                        int YPosition = ApplyAlignment(LineBounds, HorizontalAlignment.Center, VerticalContentAlignment, new Size(ImgWidth, ImgHeight)).Top;
+                        Point Position = new Vector2((int)CurrentX, YPosition).TransformBy(Transform).ToPoint();
+                        Desktop.TryDrawNamedRegion(DT, ImageRun.RegionName, Position, (int)(ImgWidth * WindowScale), (int)(ImgHeight * WindowScale));
+                        CurrentX += ImgWidth * WindowScale;
+                    }
+                    else if (Run.RunType == TextRunType.Text && Run is MGTextRunText TextRun)
+                    {
+                        bool IsBold = TextRun.Settings.IsBold;
+                        bool IsItalic = TextRun.Settings.IsItalic;
+                        SpriteFont SF = GetFont(IsBold, IsItalic, out _);
+
+                        float FontScale = this.FontScale;
+                        if (UseScaledSpriteFont)
+                        {
+                            CustomFontStyles FontStyle = 
+                                IsBold && IsItalic ? CustomFontStyles.Bold | CustomFontStyles.Italic : 
+                                IsBold ? CustomFontStyles.Bold : 
+                                IsItalic ? CustomFontStyles.Italic : 
+                                CustomFontStyles.Normal;
+                            SF = Desktop.FontManager.GetFont(FontFamily, FontStyle,(int)(FontSize * FontScale * WindowScale), true, out _, out float ExactScale, out float SuggestedScale, out _);
+                            FontScale = ExactScale;
+                        }
+
+                        float ActualOpacity = Opacity * TextRun.Settings.Opacity;
+                        Color Foreground = (TextRun.Settings.Foreground ?? DefaultForeground) * ActualOpacity;
+
+                        Vector2 TextSize = MeasureText(TextRun.Text, IsBold, IsItalic, IsStartOfLine);
+
+                        if (TextRun.Settings.Background != null)
+                        {
+                            if (UseScaledSpriteFont)
+                            {
+                                Rectangle BackgroundDestination = new Rectangle((int)CurrentX, (int)TextYPosition, (int)TextSize.X, (int)Line.LineTextHeight).CreateTransformed(Transform);
+                                TextRun.Settings.Background.Draw(DA.SetOpacity(ActualOpacity).AsZeroOffset(), this, BackgroundDestination);
+                            }
+                            else
+                            {
+                                Rectangle BackgroundDestination = new((int)CurrentX, (int)TextYPosition, (int)TextSize.X, (int)Line.LineTextHeight);
+                                TextRun.Settings.Background.Draw(DA.SetOpacity(ActualOpacity), this, BackgroundDestination);
+                            }
+                        }
+
+                        if (TextRun.Settings.IsUnderlined)
+                        {
+                            RectangleF Destination = new RectangleF(CurrentX, TextYPosition + Line.LineTextHeight - 2, TextSize.X, 1).CreateTransformedF(Transform);
+                            DT.FillRectangle(Vector2.Zero, Destination, Foreground);
+                        }
+
+                        Vector2 Position = new Vector2(CurrentX, TextYPosition).TransformBy(Transform);
+                        if (TextRun.Settings.IsShadowed)
+                        {
+                            Color ShadowColor = (TextRun.Settings.ShadowColor ?? DefaultForeground) * ActualOpacity;
+                            Vector2 ShadowOffset = TextRun.Settings.ShadowOffset ?? new(1, 1);
+
+                            DT.DrawSpriteFontText(SF, TextRun.Text, Position + ShadowOffset, ShadowColor, FontOrigin, FontScale, FontScale);
+                            DT.DrawSpriteFontText(SF, TextRun.Text, Position, Foreground, FontOrigin, FontScale, FontScale);
+                        }
+                        else
+                        {
+                            DT.DrawSpriteFontText(SF, TextRun.Text, Position, Foreground, FontOrigin * WindowScale, FontScale, FontScale);
+                        }
+
+                        CurrentX += TextSize.X * WindowScale;
+                        IsStartOfLine = false;
+                    }
+                    else
+                        throw new NotImplementedException($"{nameof(MGTextBlock)}.{nameof(DrawSelf)} does not support rendering {nameof(MGTextRun)}s of type={nameof(TextRunType)}.{Run.RunType}");
+                }
+
+                CurrentY += (Line.LineTotalHeight + LinePadding) * WindowScale;
+            }
+
+            TemporaryDrawTransform?.Dispose();
+        }
+#endif
     }
 }

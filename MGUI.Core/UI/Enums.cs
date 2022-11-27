@@ -67,6 +67,8 @@ namespace MGUI.Core.UI
         //  Input
         TextBox,
         PasswordBox,
+        ChatBox,
+        ChatBoxMessage,
 
         //  Media
         Image,

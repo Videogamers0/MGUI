@@ -64,7 +64,7 @@ namespace MGUI.Samples
             Desktop.Windows.Add(LoadListViewSampleWindow(CurrentAssembly, Desktop));
 
             Desktop.BringToFront(XAMLDesigner);
-            //Desktop.BringToFront(DebugWindow);
+            Desktop.BringToFront(DebugWindow);
 #else
             MGWindow DebugWindow = LoadDebugWindow(CurrentAssembly, Desktop);
             Desktop.Windows.Add(DebugWindow);
@@ -102,6 +102,11 @@ namespace MGUI.Samples
             Window.Scale = 2f;
 
             //Window.MakeInvisible();
+
+            if (Window.TryGetElementByName("Test_Presenter1", out MGContentPresenter ContentPresenter))
+            {
+                ContentPresenter.SetContent(new MGChatBox(Window));
+            }
 
             if (Window.TryGetElementByName("Btn_1", out MGButton Btn1))
             {

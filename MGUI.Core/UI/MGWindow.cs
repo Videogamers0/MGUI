@@ -995,31 +995,31 @@ namespace MGUI.Core.UI
                 Rectangle Destination = ConvertCoordinateSpace(CoordinateSpace.Layout, CoordinateSpace.Screen, LayoutSpaceBounds);
                 DA.DT.DrawTextureTo(RenderTarget, null, Destination);
 #endif
-
-                OnBeginDrawNestedWindows?.Invoke(this, DA);
-
-                //  Draw a transparent black overlay if there is a Modal window overtop of this window
-                if (ModalWindow != null)
-                    DA.DT.FillRectangle(DA.Offset.ToVector2(), this.LayoutBounds, Color.Black * 0.5f);
-
-                foreach (MGWindow Nested in _NestedWindows)
-                    Nested.Draw(DA);
-                ModalWindow?.Draw(DA);
-
-                if (!IsDrawingDraggedWindowPreview && IsDraggingWindowPosition && DragWindowPositionOffset.HasValue && DragWindowPositionOffset.Value != Point.Zero)
-                {
-                    try
-                    {
-                        IsDrawingDraggedWindowPreview = true;
-                        float TempOpacity = DA.Opacity * 0.25f;
-                        Point TempOffset = DA.Offset + DragWindowPositionOffset.Value;
-                        Draw(DA.SetOpacity(TempOpacity) with { Offset = TempOffset });
-                    }
-                    finally { IsDrawingDraggedWindowPreview = false; }
-                }
-
-                OnEndDrawNestedWindows?.Invoke(this, DA);
             }
+
+            OnBeginDrawNestedWindows?.Invoke(this, DA);
+
+            //  Draw a transparent black overlay if there is a Modal window overtop of this window
+            if (ModalWindow != null)
+                DA.DT.FillRectangle(DA.Offset.ToVector2(), this.LayoutBounds, Color.Black * 0.5f);
+
+            foreach (MGWindow Nested in _NestedWindows)
+                Nested.Draw(DA);
+            ModalWindow?.Draw(DA);
+
+            if (!IsDrawingDraggedWindowPreview && IsDraggingWindowPosition && DragWindowPositionOffset.HasValue && DragWindowPositionOffset.Value != Point.Zero)
+            {
+                try
+                {
+                    IsDrawingDraggedWindowPreview = true;
+                    float TempOpacity = DA.Opacity * 0.25f;
+                    Point TempOffset = DA.Offset + DragWindowPositionOffset.Value;
+                    Draw(DA.SetOpacity(TempOpacity) with { Offset = TempOffset });
+                }
+                finally { IsDrawingDraggedWindowPreview = false; }
+            }
+
+            OnEndDrawNestedWindows?.Invoke(this, DA);
         }
     }
 }

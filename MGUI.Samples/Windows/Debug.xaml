@@ -49,6 +49,7 @@
                                 <TextBlock Text="Rate Me!" Dock="Left" />
                                 <RatingControl ItemShape="Star" DiscreteValueInterval="0.5" UseDiscreteValues="True" Minimum="1" Maximum="10" Value="7" />
                             </DockPanel>
+                            <ContentPresenter Name="Test_Presenter1" />
                         </StackPanel>
                     </DockPanel>
                 </TabItem>

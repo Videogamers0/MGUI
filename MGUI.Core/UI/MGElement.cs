@@ -37,6 +37,7 @@ namespace MGUI.Core.UI
         public bool IsSelected => VisualState.IsSelected;
 
         public ElementDrawArgs SetOpacity(float Value) => this with { BA = BA.SetOpacity(Value) };
+        public ElementDrawArgs SetOffset(Point Value) => this with { Offset = Value };
 
         public ElementDrawArgs AsZeroOffset() => this with { Offset = Point.Zero };
     }
@@ -96,15 +97,6 @@ namespace MGUI.Core.UI
     //      rest is a textblock for the character's dialogue
     //maybe a subclass of MGImage for showing animations? Automatically cycles through a set list of textures/sourcerects without invoking LayoutChanged each time
     //		under the assumption each frame of the animation is same size. MGAnimatedImage(bool IsUniform) (if !IsUniform, has to invoke LayoutChanged)
-    //chatbox
-    //      DockPanel
-    //          DockPanel Dock=Bottom
-    //              TextBlock Dock=Left (Contains your username)
-    //              Button Dock=Right (Send message button)
-    //              TextBox
-    //          ScrollViewer - Alternatively, could use ListBox<string>
-    //              StackPanel Orientation=Vertical
-    //                  TextBlock, 1 per message
     //maybe MGElement should have a: List<MGElement> AttachedElements { get; }
     //		This would specifically be for elements where the parent doesn't normally have a reference to the child, such as MGResizeGrip when using MGResizeGrip.Host to attach to
     //		The Visual Tree traversal logic should have an additional parameter, IncludeAttached
@@ -900,7 +892,7 @@ namespace MGUI.Core.UI
             };
 
             PrimaryVisualState PrimaryVisualState = !ComputedIsEnabled ? PrimaryVisualState.Disabled : ComputedIsSelected ? PrimaryVisualState.Selected : PrimaryVisualState.Normal;
-            SecondaryVisualState SecondaryVisualState = SelfOrParentWindow.HasModalWindow ? SecondaryVisualState.None : IsLMBPressed ? SecondaryVisualState.Pressed : IsHovered ? SecondaryVisualState.Hovered : SecondaryVisualState.None;
+            SecondaryVisualState SecondaryVisualState = !ComputedIsHitTestVisible || SelfOrParentWindow.HasModalWindow ? SecondaryVisualState.None : IsLMBPressed ? SecondaryVisualState.Pressed : IsHovered ? SecondaryVisualState.Hovered : SecondaryVisualState.None;
             this.VisualState = new(PrimaryVisualState, SecondaryVisualState);
 
             ElementUpdateEventArgs UpdateEventArgs = new(this, UA);
