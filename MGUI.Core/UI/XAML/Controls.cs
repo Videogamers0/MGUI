@@ -125,6 +125,64 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
+    public class ChatBox : Element
+    {
+        public override MGElementType ElementType => MGElementType.ChatBox;
+
+        [Category("Border")]
+        public Border Border { get; set; } = new();
+
+        [Category("Border")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
+
+        [Category("Behavior")]
+        public int? MaxMessageLength { get; set; }
+        [Category("Behavior")]
+        public int? MaxMessages { get; set; }
+
+        [Category("Appearance")]
+        public string TimestampFormat { get; set; }
+
+        public TextBlock CurrentUserTextBlock { get; set; } = new();
+        public TextBox InputTextBox { get; set; } = new();
+        public Button SendButton { get; set; } = new();
+        public Separator Separator { get; set; } = new();
+        public ListBox MessagesContainer { get; set; } = new();
+
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGChatBox(Window);
+
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        {
+            MGChatBox ChatBox = Element as MGChatBox;
+            Border.ApplySettings(ChatBox, ChatBox.BorderComponent.Element);
+            CurrentUserTextBlock.ApplySettings(ChatBox, ChatBox.CurrentUserTextBlock);
+            InputTextBox.ApplySettings(ChatBox, ChatBox.InputTextBox);
+            SendButton.ApplySettings(ChatBox, ChatBox.SendButton);
+            Separator.ApplySettings(ChatBox, ChatBox.Separator);
+
+            MessagesContainer.ItemType = ChatBox.MessagesContainer.GetType().GenericTypeArguments[0];
+            MessagesContainer.ApplySettings(ChatBox, ChatBox.MessagesContainer);
+
+            if (MaxMessageLength.HasValue)
+                ChatBox.MaxMessageLength = MaxMessageLength.Value;
+            if (MaxMessages.HasValue)
+                ChatBox.MaxMessages = MaxMessages.Value;
+        }
+
+        protected internal override IEnumerable<Element> GetChildren()
+        {
+            yield return CurrentUserTextBlock;
+            yield return InputTextBox;
+            yield return SendButton;
+            yield return Separator;
+            yield return MessagesContainer;
+        }
+    }
+
     public class CheckBox : SingleContentHost
     {
         public override MGElementType ElementType => MGElementType.CheckBox;
@@ -422,6 +480,38 @@ namespace MGUI.Core.UI.XAML
         }
 
         protected internal override IEnumerable<Element> GetChildren() => Enumerable.Empty<Element>();
+    }
+
+    public class InputConsumer : SingleContentHost
+    {
+        public override MGElementType ElementType => MGElementType.InputConsumer;
+
+        [Category("Behavior")]
+        public bool? HandlesMousePresses { get; set; }
+        [Category("Behavior")]
+        public bool? HandlesMouseReleases { get; set; }
+        [Category("Behavior")]
+        public bool? HandlesMouseDrags { get; set; }
+        [Category("Behavior")]
+        public bool? HandlesMouseScroll { get; set; }
+
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGInputConsumer(Window);
+
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        {
+            MGInputConsumer InputConsumer = Element as MGInputConsumer;
+
+            if (HandlesMousePresses.HasValue)
+                InputConsumer.HandlesMousePresses = HandlesMousePresses.Value;
+            if (HandlesMouseReleases.HasValue)
+                InputConsumer.HandlesMouseReleases = HandlesMouseReleases.Value;
+            if (HandlesMouseDrags.HasValue)
+                InputConsumer.HandlesMouseDrags = HandlesMouseDrags.Value;
+            if (HandlesMouseScroll.HasValue)
+                InputConsumer.HandlesMouseScroll = HandlesMouseScroll.Value;
+
+            base.ApplyDerivedSettings(Parent, Element);
+        }
     }
 
     public class PasswordBox : TextBox

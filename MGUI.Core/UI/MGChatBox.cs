@@ -80,6 +80,12 @@ namespace MGUI.Core.UI
 
         public ObservableCollection<ChatBoxMessageData> Messages { get; }
 
+        public int? MaxMessageLength
+        {
+            get => InputTextBox.CharacterLimit;
+            set => InputTextBox.CharacterLimit = value;
+        }
+
         private int _MaxMessages;
         /// <summary>The maximum number of items that can be stored in <see cref="Messages"/>.<br/>
         /// Once this limit is reached, the oldest item will be removed to make room for new items.</summary>

@@ -49,7 +49,17 @@
                                 <TextBlock Text="Rate Me!" Dock="Left" />
                                 <RatingControl ItemShape="Star" DiscreteValueInterval="0.5" UseDiscreteValues="True" Minimum="1" Maximum="10" Value="7" />
                             </DockPanel>
-                            <ContentPresenter Name="Test_Presenter1" />
+                            <!--<ContentPresenter Name="Test_Presenter1" />-->
+                            <ChatBox>
+                                <!--<ChatBox.MessagesContainer>
+                                    <ListBox>
+                                        <ListBox.AlternatingRowBackgrounds>
+                                            <SolidFillBrush Color="Red * 0.1" />
+                                            <SolidFillBrush Color="Orange * 0.1" />
+                                        </ListBox.AlternatingRowBackgrounds>
+                                    </ListBox>
+                                </ChatBox.MessagesContainer>-->
+                            </ChatBox>
                         </StackPanel>
                     </DockPanel>
                 </TabItem>

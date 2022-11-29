@@ -431,37 +431,42 @@ namespace MGUI.Core.UI
             this.FocusedKeyboardHandler = QueuedFocusedKeyboardHandler;
         }
 
+        public void Draw(DrawTransaction DT, float Opacity = 1.0f)
+        {
+            DrawBaseArgs BA = new(Renderer.UpdateArgs.TotalElapsed, DT, Opacity);
+            ElementDrawArgs DA = new(BA, new VisualState(PrimaryVisualState.Normal, SecondaryVisualState.None), Point.Zero);
+
+            Rectangle ScreenBounds = ValidScreenBounds;
+            if (!BA.DT.CurrentSettings.RasterizerState.ScissorTestEnable || ScreenBounds.Intersects(BA.DT.GD.ScissorRectangle))
+            {
+                using (BA.DT.SetClipTargetTemporary(ScreenBounds, true))
+                {
+                    foreach (MGWindow Window in Windows)
+                    {
+                        Window.Draw(DA);
+                    }
+
+                    //  The ToolTip only takes priority if it is a ToolTip belonging to the current ContextMenu
+                    if (ActiveToolTip != null && ActiveContextMenu != null && ActiveToolTip.ParentWindow == ActiveContextMenu)
+                    {
+                        ActiveContextMenu?.Draw(DA);
+                        ActiveToolTip?.DrawAtMousePosition(DA);
+                    }
+                    else
+                    {
+                        ActiveToolTip?.DrawAtMousePosition(DA);
+                        ActiveContextMenu?.Draw(DA);
+                    }
+                }
+            }
+        }
+
         /// <param name="InitialDrawSettings">If null, uses <see cref="DrawSettings.Default"/></param>
         public void Draw(float Opacity = 1.0f, DrawSettings InitialDrawSettings = null)
         {
             using (DrawTransaction DT = new(Renderer, InitialDrawSettings ?? DrawSettings.Default, false))
             {
-                DrawBaseArgs BA = new(Renderer.UpdateArgs.TotalElapsed, DT, Opacity);
-                ElementDrawArgs DA = new(BA, new VisualState(PrimaryVisualState.Normal, SecondaryVisualState.None), Point.Zero);
-
-                Rectangle ScreenBounds = ValidScreenBounds;
-                if (!BA.DT.CurrentSettings.RasterizerState.ScissorTestEnable || ScreenBounds.Intersects(BA.DT.GD.ScissorRectangle))
-                {
-                    using (BA.DT.SetClipTargetTemporary(ScreenBounds, true))
-                    {
-                        foreach (MGWindow Window in Windows)
-                        {
-                            Window.Draw(DA);
-                        }
-
-                        //  The ToolTip only takes priority if it is a ToolTip belonging to the current ContextMenu
-                        if (ActiveToolTip != null && ActiveContextMenu != null && ActiveToolTip.ParentWindow == ActiveContextMenu)
-                        {
-                            ActiveContextMenu?.Draw(DA);
-                            ActiveToolTip?.DrawAtMousePosition(DA);
-                        }
-                        else
-                        {
-                            ActiveToolTip?.DrawAtMousePosition(DA);
-                            ActiveContextMenu?.Draw(DA);
-                        }
-                    }
-                }
+                Draw(DT, Opacity);
             }
         }
     }

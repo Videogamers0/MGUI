@@ -570,7 +570,14 @@ namespace MGUI.Core.UI
             IDisposable TemporaryDrawTransform = null;
             bool UseScaledSpriteFont = false;
             float ImageSizeScalar = 1.0f;
-#if NEVER // This logic *almost* works but not quite :(
+#if NEVER 
+            //  This logic *almost* works but not quite :( Seems like there's minor issues with the measured text width, so the X-positioning is slightly inaccurate
+            //  Maybe issues due to truncating floating point positions to an int?
+            //  Maybe issues related to Kerning? 
+            //      EX: SpriteFont1 has FontSize=24
+            //          SpriteFont2 has FontSize=12
+            //          Are the bearings in SpriteFont1's Kerning always exactly twice that of SpriteFont2? Check SpriteFont.Glyphs[char].LeftSideBearing and RightSideBearing/Width
+            //  If you re-enable this logic, try typing "iiiiiiiiiiiiiiiiiiiiiiiiiii" inside a TextBox and you'll notice the Caret positioning becomes less and less corect with each successive character
             if (ParentWindow.IsWindowScaled)
             {
                 //  Experimental logic that attempts to handle MGWindow.Scale by using a larger SpriteFont rather than scaling the current, smaller SpriteFont.

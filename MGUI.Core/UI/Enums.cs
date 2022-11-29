@@ -69,6 +69,7 @@ namespace MGUI.Core.UI
         PasswordBox,
         ChatBox,
         ChatBoxMessage,
+        InputConsumer,
 
         //  Media
         Image,

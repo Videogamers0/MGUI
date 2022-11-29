@@ -154,7 +154,7 @@ namespace MGUI.Shared.Rendering
         /// <summary>Invoked at the end of the <see cref="Update(UpdateBaseArgs)"/> method.</summary>
         public event EventHandler<UpdateBaseEventArgs> OnEndUpdate;
 
-        internal void Update(UpdateBaseArgs BA)
+        public void Update(UpdateBaseArgs BA)
         {
             OnBeginUpdate?.Invoke(this, new(BA));
             foreach (View Child in Children)
@@ -165,7 +165,7 @@ namespace MGUI.Shared.Rendering
 
         protected abstract void UpdateSelf(UpdateBaseArgs BA);
 
-        internal void Draw(DrawBaseArgs BA)
+        public void Draw(DrawBaseArgs BA)
         {
             if (IsVisible)
             {

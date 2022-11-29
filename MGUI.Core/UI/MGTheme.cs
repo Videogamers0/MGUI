@@ -688,7 +688,7 @@ namespace MGUI.Core.UI
                             Color.White * 0.01f, PressedModifierType.Darken, 0f)
                     );
 
-                this.CheckMarkColor = new(0, 128, 255);
+                this.CheckMarkColor = new(0, 128, 0);
                 this.RadioButtonBubbleBackground =
                     new ThemeManagedVisualStateColorBrush(
                         new VisualStateColorBrush(

@@ -1196,13 +1196,42 @@ namespace MGUI.Core.UI.Containers.Grids
                 DrawVerticalGridLines(DA, LayoutBounds);
         }
 
+        /// <summary>Attempts to retrieve the bottom-right <see cref="GridCell"/> whose layout has already been computed at least once.<para/>
+        /// Usually this is just (_Rows[^1], _Columns[^1]) but might not be in cases where a new row/column was just added and the layout for it is yet to be calculated.</summary>
+        private GridCell GetLastCellWithKnownBounds()
+        {
+            ColumnDefinition LastKnownColumn = _Columns.FirstOrDefault();
+            for (int i = _Columns.Count - 1; i >= 0; i--)
+            {
+                ColumnDefinition CD = _Columns[i];
+                if (CD.Left != default || CD.Width != default)
+                {
+                    LastKnownColumn = CD;
+                    break;
+                }
+            }
+
+            RowDefinition LastKnownRow = _Rows.FirstOrDefault();
+            for (int i = _Rows.Count - 1; i >= 0; i--)
+            {
+                RowDefinition RD = _Rows[i];
+                if (RD.Top != default || RD.Height != default)
+                {
+                    LastKnownRow = RD;
+                    break;
+                }
+            }
+
+            return new(LastKnownRow, LastKnownColumn);
+        }
+
         private void DrawHorizontalGridLines(ElementDrawArgs DA, Rectangle LayoutBounds)
         {
             if (DA.Opacity <= 0 || DA.Opacity.IsAlmostZero() || HorizontalGridLineBrush == null || Rows.Count == 0 || Columns.Count == 0)
                 return;
 
-            Rectangle TopLeftCellBounds = _CellBounds[new GridCell(_Rows[0], _Columns[0])];
-            Rectangle BottomRightCellBounds = _CellBounds[new GridCell(_Rows[^1], _Columns[^1])];
+            _CellBounds.TryGetValue(new GridCell(_Rows[0], _Columns[0]), out Rectangle TopLeftCellBounds);
+            _CellBounds.TryGetValue(GetLastCellWithKnownBounds(), out Rectangle BottomRightCellBounds);
 
             int Left = TopLeftCellBounds.Left - Math.Max(0, ColumnSpacing - GridLineMargin);
             int Right = BottomRightCellBounds.Right + Math.Max(0, ColumnSpacing - GridLineMargin);
@@ -1243,8 +1272,8 @@ namespace MGUI.Core.UI.Containers.Grids
             if (DA.Opacity <= 0 || DA.Opacity.IsAlmostZero() || VerticalGridLineBrush == null || Columns.Count == 0 || Columns.Count == 0)
                 return;
 
-            Rectangle TopLeftCellBounds = _CellBounds[new GridCell(_Rows[0], _Columns[0])];
-            Rectangle BottomRightCellBounds = _CellBounds[new GridCell(_Rows[^1], _Columns[^1])];
+            _CellBounds.TryGetValue(new GridCell(_Rows[0], _Columns[0]), out Rectangle TopLeftCellBounds);
+            _CellBounds.TryGetValue(GetLastCellWithKnownBounds(), out Rectangle BottomRightCellBounds);
 
             int Left = TopLeftCellBounds.Left - Math.Max(0, ColumnSpacing - GridLineMargin);
             int Right = BottomRightCellBounds.Right + Math.Max(0, ColumnSpacing - GridLineMargin);

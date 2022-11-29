@@ -138,7 +138,7 @@ namespace MGUI.Core.UI
                 int CurrentIndex = e.NewStartingIndex;
                 foreach (TItemType Item in e.NewItems)
                 {
-                    Containers.Grids.RowDefinition NewRow = DataGrid.InsertRow(CurrentIndex, RowLength);
+                    RowDefinition NewRow = DataGrid.InsertRow(CurrentIndex, RowLength);
                     MGListViewItem<TItemType> NewRowItem = new(this, Item, NewRow);
                     InternalRowItems.Insert(CurrentIndex, NewRowItem);
                     CurrentIndex++;
