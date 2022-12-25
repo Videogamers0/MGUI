@@ -104,6 +104,14 @@ namespace MGUI.Samples
 
             //Window.MakeInvisible();
 
+            MGToolTip Test1 = new(Window, Window, 100, 100);
+            Test1.SetContent("Testing inlined tooltip");
+            Window.AddNamedToolTip("Test1", Test1);
+            MGToolTip Test2 = new(Window, Window, 200, 100);
+            Test2.BackgroundBrush.NormalValue = MGSolidFillBrush.SemiBlack;
+            Test2.SetContent("Testing inlined tooltip on an inlined image");
+            Window.AddNamedToolTip("Test2", Test2);
+
             if (Window.TryGetElementByName("Test_Presenter1", out MGContentPresenter ContentPresenter))
             {
                 ContentPresenter.SetContent(new MGChatBox(Window));

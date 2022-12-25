@@ -80,6 +80,9 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
+    //textblock inline formatting:
+    //      add support for [action id={name}] - a delegate (Action<MGTextBlock>) to invoke when clicking a specific MGTextRun within the textblock
+    //      inlined images should have option for render size AND layout size, so you could, for example, have a zero-width image underneath specific text in the textblock
     //Improve Grid/UniformGrid's default selection graphics
     //Bugfix MGTextBox's Caret positioning after moving to new line such as when inserting a linebreak
     //      only seems incorrect if the textbox's height changes? (I.E. it doesnt have a PreferredHeight and its not inside a ScrollViewer)
@@ -904,12 +907,16 @@ namespace MGUI.Core.UI
 			else
 				HoverStartTime = null;
 
-			if (ToolTip != null && !RecentDrawWasClipped && (ComputedIsEnabled || ToolTip.ShowOnDisabled) && HoverStartTime.HasValue && !SelfOrParentWindow.HasModalWindow)
+			if (!RecentDrawWasClipped && HoverStartTime.HasValue && !SelfOrParentWindow.HasModalWindow)
 			{
 				TimeSpan HoveredTime = DateTime.Now.Subtract(HoverStartTime.Value);
                 if (HoveredTime >= GetDesktop().ToolTipShowDelay)
 				{
-                    GetDesktop().QueuedToolTip = ToolTip;
+                    if (!TryGetToolTip(out MGToolTip ToolTip))
+                        ToolTip = this.ToolTip;
+
+                    if (ToolTip != null && (ComputedIsEnabled || ToolTip.ShowOnDisabled))
+                        GetDesktop().QueuedToolTip = ToolTip;
                 }
 			}
 
@@ -937,6 +944,12 @@ namespace MGUI.Core.UI
             UpdateSelf(UA);
 
             OnEndUpdate?.Invoke(this, UpdateEventArgs);
+        }
+
+        protected virtual bool TryGetToolTip(out MGToolTip ToolTip)
+        {
+            ToolTip = null;
+            return false;
         }
 
 		protected virtual void UpdateContents(ElementUpdateArgs UA)

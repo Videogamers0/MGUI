@@ -155,7 +155,7 @@ namespace MGUI.Core.UI.Text
                 if (!IsText)
                     throw new InvalidOperationException();
                 else
-                    return new MGTextRunText(Text, ((MGTextRunText)OriginalRun).Settings);
+                    return new MGTextRunText(Text, ((MGTextRunText)OriginalRun).Settings, OriginalRun.ToolTipId, OriginalRun.ActionId);
             }
 
             public string GetAllRemainingText() => string.Join("", RemainingWords.Select(x => x.Text));
@@ -317,7 +317,7 @@ namespace MGUI.Core.UI.Text
                 if (Run.IsLineBreak && Run.OriginalRun is MGTextRunLineBreak LineBreakRun)
                 {
                     if (!CurrentLine.Any())
-                        CurrentLine.Add(new MGTextRunText("", new MGTextRunConfig(false)));
+                        CurrentLine.Add(new MGTextRunText("", new MGTextRunConfig(false), null, null));
                     if (FlushLine(out Line, true, LineBreakRun.LineBreakCharacterCount))
                         yield return Line;
                 }
@@ -493,7 +493,7 @@ namespace MGUI.Core.UI.Text
             }
 
             if (!CurrentLine.Any())
-                CurrentLine.Add(new MGTextRunText("", new MGTextRunConfig(false)));
+                CurrentLine.Add(new MGTextRunText("", new MGTextRunConfig(false), null, null));
             if (FlushLine(out Line, false))
                 yield return Line;
         }

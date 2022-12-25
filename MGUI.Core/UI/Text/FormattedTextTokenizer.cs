@@ -8,7 +8,8 @@ using System.Text.RegularExpressions;
 
 namespace MGUI.Core.UI.Text
 {
-    /// <summary>A token parsed from a piece of formatted text that contains markdown. These tokens are used as a first-pass, prior to more detailed parsing performed via <see cref="FTParser"/>.</summary>
+    /// <summary>A token parsed from a piece of formatted text that contains markdown.<br/>
+    /// These tokens are used as a first-pass, prior to more detailed parsing performed via <see cref="FTParser"/>.</summary>
     public enum FTTokenType
     {
         OpenTag,
@@ -41,6 +42,10 @@ namespace MGUI.Core.UI.Text
 
         ImageOpenTagType,
         ImageValue,
+
+        ToolTipOpenTagType,
+        ToolTipCloseTagType,
+        ToolTipValue,
 
         InvalidToken,
 
@@ -117,7 +122,8 @@ namespace MGUI.Core.UI.Text
                 FTTokenType.ForegroundOpenTagType,
                 FTTokenType.BackgroundOpenTagType,
                 FTTokenType.ShadowOpenTagType,
-                FTTokenType.ImageOpenTagType
+                FTTokenType.ImageOpenTagType,
+                FTTokenType.ToolTipOpenTagType
             };
 
             List<FTTokenType> CloseTagTypes = new() {
@@ -127,7 +133,8 @@ namespace MGUI.Core.UI.Text
                 FTTokenType.OpacityCloseTagType,
                 FTTokenType.ForegroundCloseTagType,
                 FTTokenType.BackgroundCloseTagType,
-                FTTokenType.ShadowCloseTagType
+                FTTokenType.ShadowCloseTagType,
+                FTTokenType.ToolTipCloseTagType
             };
 
             List<FTTokenType> TagValues = new() {
@@ -135,7 +142,8 @@ namespace MGUI.Core.UI.Text
                 FTTokenType.ForegroundValue,
                 FTTokenType.BackgroundValue,
                 FTTokenType.ShadowValue,
-                FTTokenType.ImageValue
+                FTTokenType.ImageValue,
+                FTTokenType.ToolTipValue
             };
 
             string EscapedOpenTag = Regex.Escape(OpenTagChar.ToString());
@@ -230,6 +238,16 @@ namespace MGUI.Core.UI.Text
                 Enumerable.Empty<FTTokenType?>())
             );
 
+            string ToolTipTypePattern = $@"(?i)(tooltip|tt)(?-i)";
+            Definitions.Add(new(FTTokenType.ToolTipOpenTagType, $@"^{ToolTipTypePattern}",
+                AsEnumerable<FTTokenType?>(FTTokenType.OpenTag),
+                Enumerable.Empty<FTTokenType?>())
+            );
+            Definitions.Add(new(FTTokenType.ToolTipCloseTagType, $@"^(\\|\/){ToolTipTypePattern}",
+                AsEnumerable<FTTokenType?>(FTTokenType.OpenTag),
+                Enumerable.Empty<FTTokenType?>())
+            );
+
             //  Tag Values
             string OpacityPattern = $@"0?\.\d\d?";
             Definitions.Add(new(FTTokenType.OpacityValue, $@"^={OpacityPattern}",
@@ -257,6 +275,11 @@ namespace MGUI.Core.UI.Text
 
             Definitions.Add(new(FTTokenType.ImageValue, $@"^={ImageValuePattern}",
                 AsEnumerable<FTTokenType?>(FTTokenType.ImageOpenTagType),
+                Enumerable.Empty<FTTokenType?>())
+            );
+
+            Definitions.Add(new(FTTokenType.ToolTipValue, $@"^={ToolTipValuePattern}",
+                AsEnumerable<FTTokenType?>(FTTokenType.ToolTipOpenTagType),
                 Enumerable.Empty<FTTokenType?>())
             );
 
@@ -291,6 +314,10 @@ namespace MGUI.Core.UI.Text
 
             return (RegionName, Width, Height);
         }
+
+        //  The name to reference the ToolTip by
+        private static readonly string ToolTipValuePattern = $@"(?<ToolTipName>.+?)(?=({Regex.Escape(CloseTagChar.ToString())}|$))";
+        public static readonly Regex ToolTipValueParser = new(ToolTipValuePattern);
 
         /// <summary>Removes all formatted text markdown from the given <paramref name="Text"/> by prefixing all instances of <see cref="OpenTagChar"/> with <see cref="EscapeOpenTagChar"/>.<para/>
         /// (This method does not modify <see cref="FTTokenType.LineBreak"/>s)</summary>

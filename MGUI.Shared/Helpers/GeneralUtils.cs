@@ -210,5 +210,17 @@ namespace MGUI.Shared.Helpers
                 @this.RemoveAt(@this.Count - 1);
             }
         }
+
+        public static T RemoveLast<T>(IList<T> Items, T DefaultValue)
+        {
+            if (!Items.Any())
+                return DefaultValue;
+            else
+            {
+                T Value = Items[Items.Count - 1];
+                Items.RemoveAt(Items.Count - 1);
+                return Value;
+            }
+        }
     }
 }

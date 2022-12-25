@@ -17,18 +17,6 @@ namespace MGUI.Core.UI.Text
     public record struct MGTextRunConfig(bool IsBold, bool IsItalic = false, bool IsUnderlined = false, float Opacity = 1.0f,
         Color? Foreground = null, IFillBrush Background = null, bool IsShadowed = false, Color? ShadowColor = null, Vector2? ShadowOffset = null)
     {
-        private static T RemoveLast<T>(IList<T> Items, T DefaultValue)
-        {
-            if (!Items.Any())
-                return DefaultValue;
-            else
-            {
-                T Value = Items[Items.Count - 1];
-                Items.RemoveAt(Items.Count - 1);
-                return Value;
-            }
-        }
-
         public MGTextRunConfig ApplyAction(FTAction Action,
             IList<float> PreviousOpacities, IList<Color?> PreviousForegrounds, IList<IFillBrush> PreviousBackgrounds, 
             IList<bool> PreviousShadowStates, IList<Color?> PreviousShadowColors, IList<Vector2?> PreviousShadowOffsets)
@@ -61,7 +49,7 @@ namespace MGUI.Core.UI.Text
                         return this with { Opacity = Value };
                     }
                 case FTActionType.RevertOpacity:
-                    return this with { Opacity = RemoveLast(PreviousOpacities, 1.0f) };
+                    return this with { Opacity = GeneralUtils.RemoveLast(PreviousOpacities, 1.0f) };
 
                 //  Foreground
                 case FTActionType.SetForeground:
@@ -71,7 +59,7 @@ namespace MGUI.Core.UI.Text
                         return this with { Foreground = Value };
                     }
                 case FTActionType.RevertForeground:
-                    return this with { Foreground = RemoveLast(PreviousForegrounds, null) };
+                    return this with { Foreground = GeneralUtils.RemoveLast(PreviousForegrounds, null) };
 
                 //  Background
                 case FTActionType.SetBackground:
@@ -81,7 +69,7 @@ namespace MGUI.Core.UI.Text
                         return this with { Background = new MGSolidFillBrush(Value) };
                     }
                 case FTActionType.RevertBackground:
-                    return this with { Background = RemoveLast(PreviousBackgrounds, null) };
+                    return this with { Background = GeneralUtils.RemoveLast(PreviousBackgrounds, null) };
 
                 //  Shadowing
                 case FTActionType.SetShadowing:
@@ -97,13 +85,19 @@ namespace MGUI.Core.UI.Text
                 case FTActionType.RevertShadowing:
                     return this with
                     { 
-                        IsShadowed = RemoveLast(PreviousShadowStates, false), 
-                        ShadowColor = RemoveLast(PreviousShadowColors, null), 
-                        ShadowOffset = RemoveLast(PreviousShadowOffsets, null)
+                        IsShadowed = GeneralUtils.RemoveLast(PreviousShadowStates, false), 
+                        ShadowColor = GeneralUtils.RemoveLast(PreviousShadowColors, null), 
+                        ShadowOffset = GeneralUtils.RemoveLast(PreviousShadowOffsets, null)
                     };
 
                 //  Image
                 case FTActionType.Image:
+                    return this;
+
+                //  ToolTip
+                case FTActionType.SetToolTip:
+                    return this;
+                case FTActionType.RevertToolTip:
                     return this;
 
                 //  String value
@@ -134,9 +128,17 @@ namespace MGUI.Core.UI.Text
 
         public readonly TextRunType RunType;
 
-        protected MGTextRun(TextRunType RunType)
+        public readonly string ToolTipId;
+        public bool HasToolTip => !string.IsNullOrEmpty(ToolTipId);
+
+        public readonly string ActionId;
+        public bool HasAction => !string.IsNullOrEmpty(ActionId);
+
+        protected MGTextRun(TextRunType RunType, string ToolTipId, string ActionId)
         {
             this.RunType = RunType;
+            this.ToolTipId = ToolTipId;
+            this.ActionId = ActionId;
         }
 
         public static IEnumerable<MGTextRun> ParseRuns(string FormattedText, MGTextRunConfig DefaultSettings)
@@ -165,6 +167,12 @@ namespace MGUI.Core.UI.Text
             List<Color?> PreviousShadowColors = new();
             List<Vector2?> PreviousShadowOffsets = new();
 
+            string CurrentToolTipId = null;
+            List<string> PreviousToolTipIds = new();
+
+            string CurrentActionId = null;
+            List<string> PreviousActionIds = new();
+
             List<FTAction> Actions = Parser.ParseTokens(Tokens).ToList();
             for (int i = 0; i < Actions.Count; i++)
             {
@@ -190,14 +198,26 @@ namespace MGUI.Core.UI.Text
                     }
                     i--;
 
-                    yield return new MGTextRunText(LiteralValue.ToString(), CurrentState);
+                    yield return new MGTextRunText(LiteralValue.ToString(), CurrentState, CurrentToolTipId, CurrentActionId);
                 }
                 else if (CurrentAction.ActionType == FTActionType.LineBreak)
                     yield return new MGTextRunLineBreak(CurrentAction.Parameter?.Length ?? 1);
                 else if (CurrentAction.ActionType == FTActionType.Image)
                 {
                     var (RegionName, TargetWidth, TargetHeight) = FTTokenizer.ParseImageValue(CurrentAction.Parameter.Substring(1));
-                    yield return new MGTextRunImage(RegionName, TargetWidth, TargetHeight);
+                    yield return new MGTextRunImage(RegionName, TargetWidth, TargetHeight, CurrentToolTipId, CurrentActionId);
+                }
+                else if (CurrentAction.ActionType == FTActionType.SetToolTip)
+                {
+                    if (!string.IsNullOrEmpty(CurrentToolTipId))
+                        PreviousToolTipIds.Add(CurrentToolTipId);
+
+                    string NewToolTipValue = CurrentAction.Parameter.Substring(1);
+                    CurrentToolTipId = FTTokenizer.ToolTipValueParser.Match(NewToolTipValue).Groups["ToolTipName"].Value;
+                }
+                else if (CurrentAction.ActionType == FTActionType.RevertToolTip)
+                {
+                    CurrentToolTipId = GeneralUtils.RemoveLast(PreviousToolTipIds, null);
                 }
             }
         }
@@ -209,8 +229,8 @@ namespace MGUI.Core.UI.Text
         public readonly string Text;
         public readonly MGTextRunConfig Settings;
 
-        public MGTextRunText(string Text, MGTextRunConfig Settings)
-            : base(TextRunType.Text)
+        public MGTextRunText(string Text, MGTextRunConfig Settings, string ToolTipId, string ActionId)
+            : base(TextRunType.Text, ToolTipId, ActionId)
         {
             this.Text = Text;
             this.Settings = Settings;
@@ -256,7 +276,7 @@ namespace MGUI.Core.UI.Text
         /// <param name="LineBreakCharactersCount">The number of characters used to specify the linebreak.<para/>
         /// Windows typically uses "\r\n" (2 characters) while Mac and Linux typically uses '\r' and '\n' (1 character)</param>
         public MGTextRunLineBreak(int LineBreakCharactersCount)
-            : base(TextRunType.LineBreak)
+            : base(TextRunType.LineBreak, null, null)
         {
             this.LineBreakCharacterCount = LineBreakCharactersCount;
         }
@@ -273,8 +293,8 @@ namespace MGUI.Core.UI.Text
         public readonly int TargetWidth;
         public readonly int TargetHeight;
 
-        public MGTextRunImage(string RegionName, int TargetWidth, int TargetHeight)
-            : base(TextRunType.Image)
+        public MGTextRunImage(string RegionName, int TargetWidth, int TargetHeight, string ToolTipId, string ActionId)
+            : base(TextRunType.Image, ToolTipId, ActionId)
         {
             this.RegionName = RegionName;
             this.TargetWidth = TargetWidth;

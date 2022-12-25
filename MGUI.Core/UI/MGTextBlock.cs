@@ -486,6 +486,40 @@ namespace MGUI.Core.UI
             return Measurement;
         }
 
+        /// <summary>
+        /// Key = the name of a ToolTip to reference,<br/>
+        /// Value = the bounds of the text content that the tooltip is applied to. Usually a list of 1 rectangle, but might be multiple if the text spans multiple lines.
+        /// </summary>
+        private readonly Dictionary<string, List<Rectangle>> ToolTipBounds = new();
+
+        protected override bool TryGetToolTip(out MGToolTip ToolTip)
+        {
+            if (ToolTipBounds.Any())
+            {
+                try
+                {
+                    Point MousePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, MouseHandler.Tracker.CurrentPosition);
+
+                    foreach (var KVP in ToolTipBounds)
+                    {
+                        string ToolTipName = KVP.Key;
+                        if (ParentWindow.NamedToolTips.TryGetValue(ToolTipName, out ToolTip))
+                        {
+                            foreach (Rectangle Bounds in KVP.Value)
+                            {
+                                if (Bounds.Contains(MousePosition))
+                                    return true;
+                            }
+                        }
+                    }
+                }
+                finally { ToolTipBounds.Clear(); }
+            }
+
+            ToolTip = null;
+            return false;
+        }
+
 #if false //true
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
         {
@@ -596,6 +630,8 @@ namespace MGUI.Core.UI
             }
 #endif
 
+            ToolTipBounds.Clear();
+
             float CurrentY = LayoutBounds.Top + Padding.Top;
 
             foreach (MGTextLine Line in this.Lines)
@@ -608,6 +644,8 @@ namespace MGUI.Core.UI
 
                 foreach (MGTextRun Run in Line.Runs)
                 {
+                    RectangleF RunBounds; // The bounds of the MGTextRun, in CoordinateSpace.Layout space
+
                     if (Run.RunType == TextRunType.Image && Run is MGTextRunImage ImageRun)
                     {
                         int ImgWidth = ImageRun.TargetWidth;
@@ -615,6 +653,7 @@ namespace MGUI.Core.UI
                         int YPosition = ApplyAlignment(LineBounds, HorizontalAlignment.Center, VerticalContentAlignment, new Size(ImgWidth, ImgHeight)).Top;
                         Point Position = new Vector2((int)CurrentX, YPosition).TransformBy(Transform).ToPoint();
                         Desktop.TryDrawNamedRegion(DT, ImageRun.RegionName, Position, (int)(ImgWidth * ImageSizeScalar), (int)(ImgHeight * ImageSizeScalar));
+                        RunBounds = new(CurrentX, YPosition, ImgWidth, ImgHeight);
                         CurrentX += ImgWidth;
                     }
                     else if (Run.RunType == TextRunType.Text && Run is MGTextRunText TextRun)
@@ -674,11 +713,24 @@ namespace MGUI.Core.UI
                             DT.DrawSpriteFontText(SF, TextRun.Text, Position, Foreground, FontOrigin, FontScale, FontScale);
                         }
 
+                        RunBounds = new(CurrentX, TextYPosition, TextSize.X, TextSize.Y);
                         CurrentX += TextSize.X;
                         IsStartOfLine = false;
                     }
                     else
                         throw new NotImplementedException($"{nameof(MGTextBlock)}.{nameof(DrawSelf)} does not support rendering {nameof(MGTextRun)}s of type={nameof(TextRunType)}.{Run.RunType}");
+                
+                    if (Run.HasToolTip)
+                    {
+                        string ToolTipName = Run.ToolTipId;
+                        if (!ToolTipBounds.TryGetValue(ToolTipName, out List<Rectangle> Bounds))
+                        {
+                            Bounds = new();
+                            ToolTipBounds.Add(ToolTipName, Bounds);
+                        }
+
+                        Bounds.Add(RunBounds.RoundUp());
+                    }
                 }
 
                 CurrentY += Line.LineTotalHeight + LinePadding;

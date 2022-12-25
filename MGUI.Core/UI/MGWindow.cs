@@ -518,6 +518,18 @@ namespace MGUI.Core.UI
         /// <summary>If true, this <see cref="MGWindow"/>'s layout will be recomputed at the start of the next update tick.</summary>
         public bool QueueLayoutRefresh { get; set; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Dictionary<string, MGToolTip> _NamedToolTips { get; }
+        /// <summary>This dictionary is commonly used by <see cref="MGTextBlock"/> to reference <see cref="MGToolTip"/>s by a string key value.<para/>
+        /// See also:<br/><see cref="AddNamedToolTip(string, MGToolTip)"/><br/><see cref="RemoveNamedToolTip(string)"/><para/>
+        /// EX: If you create an <see cref="MGTextBlock"/> and set its text to:
+        /// <code>[ToolTip=ABC]This text has a ToolTip[/ToolTip] but this text doesn't</code>
+        /// then the ToolTip with the name "ABC" will be shown when hovering over the substring "This text has a ToolTip"</summary>
+        public IReadOnlyDictionary<string, MGToolTip> NamedToolTips => _NamedToolTips;
+
+        public void AddNamedToolTip(string Name, MGToolTip ToolTip) => _NamedToolTips.Add(Name, ToolTip);
+        public void RemoveNamedToolTip(string Name) => _NamedToolTips.Remove(Name);
+
         #region Constructors
         /// <summary>Initializes a root-level window.</summary>
         public MGWindow(MGDesktop Desktop, int Left, int Top, int Width, int Height, MGTheme Theme = null)
@@ -554,6 +566,7 @@ namespace MGUI.Core.UI
 
                 this.RadioButtonGroups = new();
                 this._NestedWindows = new();
+                this._NamedToolTips = new();
                 this.ModalWindow = null;
 
                 this.Left = Left;

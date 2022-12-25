@@ -35,6 +35,9 @@ namespace MGUI.Core.UI.Text
 
         Image,
 
+        SetToolTip,
+        RevertToolTip,
+
         StringLiteral,
 
         LineBreak
@@ -138,6 +141,12 @@ namespace MGUI.Core.UI.Text
             //  Image
             Definitions.Add(new(FTActionType.Image, FTTokenType.ImageValue,
                 FTTokenType.OpenTag, FTTokenType.ImageOpenTagType, FTTokenType.ImageValue, FTTokenType.CloseTag));
+
+            //  ToolTip
+            Definitions.Add(new(FTActionType.SetToolTip, FTTokenType.ToolTipValue,
+                FTTokenType.OpenTag, FTTokenType.ToolTipOpenTagType, FTTokenType.ToolTipValue, FTTokenType.CloseTag));
+            Definitions.Add(new(FTActionType.RevertToolTip, FTTokenType.ToolTipCloseTagType,
+                FTTokenType.OpenTag, FTTokenType.ToolTipCloseTagType, FTTokenType.CloseTag));
 
             //  String value
             Definitions.Add(new(FTActionType.StringLiteral, FTTokenType.StringValue,
