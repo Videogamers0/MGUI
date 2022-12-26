@@ -199,7 +199,7 @@ namespace MGUI.Core.UI.Text
                 Enumerable.Empty<FTTokenType?>())
             );
 
-            string OpacityTypePattern = $@"(?i)(opacity|o(?=\=))(?-i)";
+            string OpacityTypePattern = $@"(?i)(opacity|o(?=(\=|{EscapedCloseTag})))(?-i)";
             Definitions.Add(new(FTTokenType.OpacityOpenTagType, $@"^{OpacityTypePattern}",
                 AsEnumerable<FTTokenType?>(FTTokenType.OpenTag),
                 Enumerable.Empty<FTTokenType?>())
@@ -209,7 +209,7 @@ namespace MGUI.Core.UI.Text
                 Enumerable.Empty<FTTokenType?>())
             );
 
-            string ForegroundTypePattern = $@"(?i)(fg|foreground|color|c(?=\=))(?-i)";
+            string ForegroundTypePattern = $@"(?i)(fg|foreground|color|c(?=(\=|{EscapedCloseTag})))(?-i)";
             Definitions.Add(new(FTTokenType.ForegroundOpenTagType, $@"^{ForegroundTypePattern}",
                 AsEnumerable<FTTokenType?>(FTTokenType.OpenTag),
                 Enumerable.Empty<FTTokenType?>())
@@ -229,7 +229,7 @@ namespace MGUI.Core.UI.Text
                 Enumerable.Empty<FTTokenType?>())
             );
 
-            string ShadowTypePattern = $@"(?i)(shadow|s(?=\=))(?-i)";
+            string ShadowTypePattern = $@"(?i)(shadow|s(?=(\=|{EscapedCloseTag})))(?-i)";
             Definitions.Add(new(FTTokenType.ShadowOpenTagType, $@"^{ShadowTypePattern}",
                 AsEnumerable<FTTokenType?>(FTTokenType.OpenTag),
                 Enumerable.Empty<FTTokenType?>())
