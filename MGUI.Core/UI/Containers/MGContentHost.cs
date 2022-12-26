@@ -212,12 +212,12 @@ namespace MGUI.Core.UI.Containers
         public MGSingleContentHost SetContent(MGElement Content)
             => SetContent<MGSingleContentHost>(Content);
 
-        public THostType SetContent<THostType>(string Content)
+        public THostType SetContent<THostType>(string Content, Color? Foreground = null, int? FontSize = null)
             where THostType : MGSingleContentHost
-            => SetContent<THostType>(new MGTextBlock(SelfOrParentWindow, Content));
+            => SetContent<THostType>(new MGTextBlock(SelfOrParentWindow, Content, Foreground, FontSize));
 
-        public MGSingleContentHost SetContent(string Content)
-            => SetContent<MGSingleContentHost>(new MGTextBlock(SelfOrParentWindow, Content));
+        public MGSingleContentHost SetContent(string Content, Color? Foreground = null, int? FontSize = null)
+            => SetContent<MGSingleContentHost>(new MGTextBlock(SelfOrParentWindow, Content, Foreground, FontSize));
 
         /// <summary>Only intended to be used by <see cref="MGWindow"/>'s constructor.</summary>
         protected MGSingleContentHost(MGDesktop UI, MGTheme Theme, MGWindow Window, MGElementType ElementType)

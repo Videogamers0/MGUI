@@ -38,6 +38,9 @@ namespace MGUI.Core.UI.Text
         SetToolTip,
         RevertToolTip,
 
+        SetAction,
+        RevertAction,
+
         StringLiteral,
 
         LineBreak
@@ -147,6 +150,12 @@ namespace MGUI.Core.UI.Text
                 FTTokenType.OpenTag, FTTokenType.ToolTipOpenTagType, FTTokenType.ToolTipValue, FTTokenType.CloseTag));
             Definitions.Add(new(FTActionType.RevertToolTip, FTTokenType.ToolTipCloseTagType,
                 FTTokenType.OpenTag, FTTokenType.ToolTipCloseTagType, FTTokenType.CloseTag));
+
+            //  Action
+            Definitions.Add(new(FTActionType.SetAction, FTTokenType.ActionValue,
+                FTTokenType.OpenTag, FTTokenType.ActionOpenTagType, FTTokenType.ActionValue, FTTokenType.CloseTag));
+            Definitions.Add(new(FTActionType.RevertAction, FTTokenType.ActionCloseTagType,
+                FTTokenType.OpenTag, FTTokenType.ActionCloseTagType, FTTokenType.CloseTag));
 
             //  String value
             Definitions.Add(new(FTActionType.StringLiteral, FTTokenType.StringValue,

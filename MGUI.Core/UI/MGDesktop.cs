@@ -325,7 +325,7 @@ namespace MGUI.Core.UI
         }
         public void RemoveNamedRegion(string RegionName) => _NamedRegions.Remove(RegionName);
 
-        public bool TryDrawNamedRegion(DrawTransaction DT, string RegionName, Point Position, int? Width, int? Height)
+        public bool TryDrawNamedRegion(DrawTransaction DT, string RegionName, Point Position, int? Width, int? Height, float Opacity = 1.0f)
         {
             if (_NamedRegions.TryGetValue(RegionName, out NamedTextureRegion Region) && _NamedTextures.TryGetValue(Region.TextureName, out Texture2D Texture))
             {
@@ -333,7 +333,7 @@ namespace MGUI.Core.UI
                 int ActualHeight = Height ?? Texture.Height;
                 Rectangle Destination = new(Position.X, Position.Y, ActualWidth, ActualHeight);
 
-                DT.DrawTextureTo(Texture, Region.SourceRect, Destination, Region.Color ?? Color.White);
+                DT.DrawTextureTo(Texture, Region.SourceRect, Destination, (Region.Color ?? Color.White) * Opacity);
 
                 return true;
             }

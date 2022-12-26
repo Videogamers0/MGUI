@@ -100,6 +100,12 @@ namespace MGUI.Core.UI.Text
                 case FTActionType.RevertToolTip:
                     return this;
 
+                //  Action
+                case FTActionType.SetAction:
+                    return this;
+                case FTActionType.RevertAction:
+                    return this;
+
                 //  String value
                 case FTActionType.StringLiteral:
                     return this;
@@ -218,6 +224,18 @@ namespace MGUI.Core.UI.Text
                 else if (CurrentAction.ActionType == FTActionType.RevertToolTip)
                 {
                     CurrentToolTipId = GeneralUtils.RemoveLast(PreviousToolTipIds, null);
+                }
+                else if (CurrentAction.ActionType == FTActionType.SetAction)
+                {
+                    if (!string.IsNullOrEmpty(CurrentActionId))
+                        PreviousActionIds.Add(CurrentActionId);
+
+                    string NewActionValue = CurrentAction.Parameter.Substring(1);
+                    CurrentActionId = FTTokenizer.ActionValueParser.Match(NewActionValue).Groups["ActionName"].Value;
+                }
+                else if (CurrentAction.ActionType == FTActionType.RevertAction)
+                {
+                    CurrentActionId = GeneralUtils.RemoveLast(PreviousActionIds, null);
                 }
             }
         }

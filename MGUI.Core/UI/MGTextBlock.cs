@@ -362,6 +362,34 @@ namespace MGUI.Core.UI
                 this.Padding = new(1,2,1,1);
                 this.VerticalContentAlignment = VerticalAlignment.Center;
 
+                //  Handle the '[Action]' inlined formatting code
+                //  EX: Text="[Action=Action1]Click here[/Action] but not here"
+                //  Then clicking the substring "Click here" should invoke the action named "Action1" (in MGWindow.NamedActions)
+                MouseHandler.ReleasedInside += (sender, e) =>
+                {
+                    if (ActionBounds.Any())
+                    {
+                        Point MousePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, MouseHandler.Tracker.CurrentPosition);
+
+                        foreach (var KVP in ActionBounds)
+                        {
+                            string ActionName = KVP.Key;
+                            if (ParentWindow.NamedActions.TryGetValue(ActionName, out var Delegate))
+                            {
+                                foreach (Rectangle Bounds in KVP.Value)
+                                {
+                                    if (Bounds.Contains(MousePosition))
+                                    {
+                                        Delegate(this);
+                                        e.SetHandled(this, false);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+
                 OnLayoutUpdated += (sender, e) => { UpdateLines(); };
             }
         }
@@ -487,6 +515,12 @@ namespace MGUI.Core.UI
         }
 
         /// <summary>
+        /// Key = the name of a named delegate to invoke when clicking within any of the given bounds.<br/>
+        /// Value = the bounds of the text content that the named action corresponds to. Usually a list of 1 rectangle, but might be multiple if the bound text spans multiple lines.
+        /// </summary>
+        private readonly Dictionary<string, List<Rectangle>> ActionBounds = new();
+
+        /// <summary>
         /// Key = the name of a ToolTip to reference,<br/>
         /// Value = the bounds of the text content that the tooltip is applied to. Usually a list of 1 rectangle, but might be multiple if the text spans multiple lines.
         /// </summary>
@@ -518,6 +552,13 @@ namespace MGUI.Core.UI
 
             ToolTip = null;
             return false;
+        }
+
+        public override void UpdateSelf(ElementUpdateArgs UA)
+        {
+            base.UpdateSelf(UA);
+            if (ActionBounds.Any())
+                ActionBounds.Clear();
         }
 
 #if false //true
@@ -630,6 +671,7 @@ namespace MGUI.Core.UI
             }
 #endif
 
+            ActionBounds.Clear();
             ToolTipBounds.Clear();
 
             float CurrentY = LayoutBounds.Top + Padding.Top;
@@ -652,7 +694,7 @@ namespace MGUI.Core.UI
                         int ImgHeight = ImageRun.TargetHeight;
                         int YPosition = ApplyAlignment(LineBounds, HorizontalAlignment.Center, VerticalContentAlignment, new Size(ImgWidth, ImgHeight)).Top;
                         Point Position = new Vector2((int)CurrentX, YPosition).TransformBy(Transform).ToPoint();
-                        Desktop.TryDrawNamedRegion(DT, ImageRun.RegionName, Position, (int)(ImgWidth * ImageSizeScalar), (int)(ImgHeight * ImageSizeScalar));
+                        Desktop.TryDrawNamedRegion(DT, ImageRun.RegionName, Position, (int)(ImgWidth * ImageSizeScalar), (int)(ImgHeight * ImageSizeScalar), DA.Opacity);
                         RunBounds = new(CurrentX, YPosition, ImgWidth, ImgHeight);
                         CurrentX += ImgWidth;
                     }
@@ -719,17 +761,35 @@ namespace MGUI.Core.UI
                     }
                     else
                         throw new NotImplementedException($"{nameof(MGTextBlock)}.{nameof(DrawSelf)} does not support rendering {nameof(MGTextRun)}s of type={nameof(TextRunType)}.{Run.RunType}");
-                
-                    if (Run.HasToolTip)
+
+                    //  Keep track of which parts of the textblock content have their own tooltip or delegate to invoke when clicking in the bounds
+                    if (Run.HasToolTip || Run.HasAction)
                     {
-                        string ToolTipName = Run.ToolTipId;
-                        if (!ToolTipBounds.TryGetValue(ToolTipName, out List<Rectangle> Bounds))
+                        Rectangle RoundedRunBounds = RunBounds.RoundUp();
+
+                        if (Run.HasToolTip)
                         {
-                            Bounds = new();
-                            ToolTipBounds.Add(ToolTipName, Bounds);
+                            string ToolTipName = Run.ToolTipId;
+                            if (!ToolTipBounds.TryGetValue(ToolTipName, out List<Rectangle> Bounds))
+                            {
+                                Bounds = new();
+                                ToolTipBounds.Add(ToolTipName, Bounds);
+                            }
+
+                            Bounds.Add(RoundedRunBounds);
                         }
 
-                        Bounds.Add(RunBounds.RoundUp());
+                        if (Run.HasAction)
+                        {
+                            string ActionName = Run.ActionId;
+                            if (!ActionBounds.TryGetValue(ActionName, out List<Rectangle> Bounds))
+                            {
+                                Bounds = new();
+                                ActionBounds.Add(ActionName, Bounds);
+                            }
+
+                            Bounds.Add(RoundedRunBounds);
+                        }
                     }
                 }
 

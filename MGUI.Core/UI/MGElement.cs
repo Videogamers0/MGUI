@@ -81,7 +81,6 @@ namespace MGUI.Core.UI
 
     //TODO:
     //textblock inline formatting:
-    //      add support for [action id={name}] - a delegate (Action<MGTextBlock>) to invoke when clicking a specific MGTextRun within the textblock
     //      inlined images should have option for render size AND layout size, so you could, for example, have a zero-width image underneath specific text in the textblock
     //Improve Grid/UniformGrid's default selection graphics
     //Bugfix MGTextBox's Caret positioning after moving to new line such as when inserting a linebreak

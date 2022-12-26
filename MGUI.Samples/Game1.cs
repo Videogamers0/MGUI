@@ -109,8 +109,16 @@ namespace MGUI.Samples
             Window.AddNamedToolTip("Test1", Test1);
             MGToolTip Test2 = new(Window, Window, 200, 100);
             Test2.BackgroundBrush.NormalValue = MGSolidFillBrush.SemiBlack;
-            Test2.SetContent("Testing inlined tooltip on an inlined image");
+            Test2.SetContent("Testing inlined tooltip on an inlined image.\n\nAlso click here to reduce window opacity by 0.05", null, 14);
+            Test2.ApplySizeToContent(SizeToContent.Height);
             Window.AddNamedToolTip("Test2", Test2);
+
+            Action<MGElement> TestAction = element =>
+            {
+                Window.Opacity -= 0.05f;
+                //Window.BackgroundBrush.NormalValue = MGSolidFillBrush.SemiBlack;
+            };
+            Window.AddNamedAction("TestAction", TestAction);
 
             if (Window.TryGetElementByName("Test_Presenter1", out MGContentPresenter ContentPresenter))
             {

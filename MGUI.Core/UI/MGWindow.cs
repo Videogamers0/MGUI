@@ -491,6 +491,34 @@ namespace MGUI.Core.UI
         }
         #endregion RadioButton Groups
 
+        #region Named Actions
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Dictionary<string, Action<MGElement>> _NamedActions { get; }
+        /// <summary>This dictionary is commonly used by <see cref="MGTextBlock"/> to reference delegates by a string key value.<para/>
+        /// See also:<br/><see cref="AddNamedAction(string, Action{MGElement})"/><br/><see cref="RemoveNamedAction(string)"/><para/>
+        /// EX: If you create an <see cref="MGTextBlock"/> and set its text to:
+        /// <code>[Action=ABC]This text invokes a delegate when clicked[/Action] but this text doesn't</code>
+        /// then the <see cref="Action{MGElement}"/> with the name "ABC" will be invoked when clicking the substring "This text invokes a delegate when clicked"</summary>
+        public IReadOnlyDictionary<string, Action<MGElement>> NamedActions => _NamedActions;
+
+        public void AddNamedAction(string Name, Action<MGElement> Action) => _NamedActions.Add(Name, Action);
+        public void RemoveNamedAction(string Name) => _NamedActions.Remove(Name);
+        #endregion Named Actions
+
+        #region Named ToolTips
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Dictionary<string, MGToolTip> _NamedToolTips { get; }
+        /// <summary>This dictionary is commonly used by <see cref="MGTextBlock"/> to reference <see cref="MGToolTip"/>s by a string key value.<para/>
+        /// See also:<br/><see cref="AddNamedToolTip(string, MGToolTip)"/><br/><see cref="RemoveNamedToolTip(string)"/><para/>
+        /// EX: If you create an <see cref="MGTextBlock"/> and set its text to:
+        /// <code>[ToolTip=ABC]This text has a ToolTip[/ToolTip] but this text doesn't</code>
+        /// then the ToolTip with the name "ABC" will be shown when hovering over the substring "This text has a ToolTip"</summary>
+        public IReadOnlyDictionary<string, MGToolTip> NamedToolTips => _NamedToolTips;
+
+        public void AddNamedToolTip(string Name, MGToolTip ToolTip) => _NamedToolTips.Add(Name, ToolTip);
+        public void RemoveNamedToolTip(string Name) => _NamedToolTips.Remove(Name);
+        #endregion Named ToolTips
+
         /// <summary>A <see cref="MouseHandler"/> that is updated just before <see cref="MGElement.MouseHandler"/> is updated.<para/>
         /// This allows subscribing to mouse events that can get handled just before the <see cref="MGWindow"/>'s input handling can occur.</summary>
         public MouseHandler WindowMouseHandler { get; }
@@ -517,18 +545,6 @@ namespace MGUI.Core.UI
 
         /// <summary>If true, this <see cref="MGWindow"/>'s layout will be recomputed at the start of the next update tick.</summary>
         public bool QueueLayoutRefresh { get; set; }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Dictionary<string, MGToolTip> _NamedToolTips { get; }
-        /// <summary>This dictionary is commonly used by <see cref="MGTextBlock"/> to reference <see cref="MGToolTip"/>s by a string key value.<para/>
-        /// See also:<br/><see cref="AddNamedToolTip(string, MGToolTip)"/><br/><see cref="RemoveNamedToolTip(string)"/><para/>
-        /// EX: If you create an <see cref="MGTextBlock"/> and set its text to:
-        /// <code>[ToolTip=ABC]This text has a ToolTip[/ToolTip] but this text doesn't</code>
-        /// then the ToolTip with the name "ABC" will be shown when hovering over the substring "This text has a ToolTip"</summary>
-        public IReadOnlyDictionary<string, MGToolTip> NamedToolTips => _NamedToolTips;
-
-        public void AddNamedToolTip(string Name, MGToolTip ToolTip) => _NamedToolTips.Add(Name, ToolTip);
-        public void RemoveNamedToolTip(string Name) => _NamedToolTips.Remove(Name);
 
         #region Constructors
         /// <summary>Initializes a root-level window.</summary>
@@ -566,6 +582,7 @@ namespace MGUI.Core.UI
 
                 this.RadioButtonGroups = new();
                 this._NestedWindows = new();
+                this._NamedActions = new();
                 this._NamedToolTips = new();
                 this.ModalWindow = null;
 
