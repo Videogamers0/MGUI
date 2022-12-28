@@ -216,4 +216,10 @@ namespace MGUI.Core.UI
         /// before checking if the position intersects the <see cref="MGElement"/> bounds (such as <see cref="MGElement.LayoutBounds"/>)</summary>
         Screen
     }
+
+    public enum WindowStyle
+    {
+        Default,
+        None
+    }
 }

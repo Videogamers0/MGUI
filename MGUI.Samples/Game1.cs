@@ -72,6 +72,9 @@ namespace MGUI.Samples
             Desktop.BringToFront(DebugWindow);
 #endif
 
+            //MGWindow Tmp = XAMLParser.LoadRootWindow(Desktop, ReadEmbeddedResourceAsString(CurrentAssembly, $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Temp.xaml"));
+            //Desktop.Windows.Add(Tmp);
+
             base.Initialize();
         }
 
@@ -303,7 +306,7 @@ namespace MGUI.Samples
             IBorderBrush CellBorderBrush = new MGDockedBorderBrush(Border2, Border1, Border1, Border2);
             UniformGrid_Inventory.CellBackground.NormalValue = new MGBorderedFillBrush(new(3), CellBorderBrush, new Color(255, 195, 118).AsFillBrush(), true);
 
-            Window.MakeInvisible();
+            Window.WindowStyle = WindowStyle.None;
             Window.ApplySizeToContent(SizeToContent.WidthAndHeight, 100, 100, null, null, false);
 
             return Window;

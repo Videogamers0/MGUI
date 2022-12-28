@@ -1699,6 +1699,9 @@ namespace MGUI.Core.UI.XAML
         [Category("Behavior")]
         public bool? IsDraggable { get; set; }
 
+        [Category("Appearance")]
+        public WindowStyle? WindowStyle { get; set; }
+
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
             int WindowWidth = Math.Clamp(Width ?? 0, MinWidth ?? 0, MaxWidth ?? int.MaxValue);
@@ -1763,8 +1766,11 @@ namespace MGUI.Core.UI.XAML
 
             base.ApplyDerivedSettings(Parent, Element);
 
+            if (WindowStyle != null)
+                Window.WindowStyle = WindowStyle.Value;
+
             if (SizeToContent != null)
-                Window.ApplySizeToContent(SizeToContent.Value, 50, 50, null, null, false);
+                Window.ApplySizeToContent(SizeToContent.Value, 10, 10, null, null, false);
 
             if (Scale != null)
                 Window.Scale = Scale.Value;

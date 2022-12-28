@@ -149,7 +149,7 @@ namespace MGUI.Core.UI
 
         /// <summary>Resizes this <see cref="MGWindow"/> to satisfy the given constraints. Note: The layout of child content isn't refreshed until the next update tick.</summary>
         /// <returns>The computed size that this <see cref="MGWindow"/> will be changed to.</returns>
-        public Size ApplySizeToContent(SizeToContent Value, int MinWidth = 100, int MinHeight = 100, int? MaxWidth = 1920, int? MaxHeight = 1080, bool UpdateLayoutImmediately = true)
+        public Size ApplySizeToContent(SizeToContent Value, int MinWidth = 50, int MinHeight = 50, int? MaxWidth = 1920, int? MaxHeight = 1080, bool UpdateLayoutImmediately = true)
         {
             Size MinSize = new(MinWidth, MinHeight);
             Size MaxSize = new(Math.Min(GetDesktop().ValidScreenBounds.Width, MaxWidth ?? int.MaxValue), Math.Min(GetDesktop().ValidScreenBounds.Height, MaxHeight ?? int.MaxValue));
@@ -546,6 +546,9 @@ namespace MGUI.Core.UI
         /// <summary>If true, this <see cref="MGWindow"/>'s layout will be recomputed at the start of the next update tick.</summary>
         public bool QueueLayoutRefresh { get; set; }
 
+        private static readonly Thickness DefaultWindowPadding = new(5);
+        private static readonly Thickness DefaultWindowBorderThickness = new(2);
+
         #region Constructors
         /// <summary>Initializes a root-level window.</summary>
         public MGWindow(MGDesktop Desktop, int Left, int Top, int Width, int Height, MGTheme Theme = null)
@@ -596,14 +599,14 @@ namespace MGUI.Core.UI
                 this.WindowHeight = Height;
                 this.PreviousHeight = Height;
 
-                this.MinWidth = 100;
-                this.MinHeight = 100;
+                this.MinWidth = 50;
+                this.MinHeight = 50;
                 this.MaxWidth = 4000;
                 this.MaxHeight = 2000;
 
-                this.Padding = new(5);
+                this.Padding = DefaultWindowPadding;
 
-                this.BorderElement = new(this, new Thickness(2), MGUniformBorderBrush.Black);
+                this.BorderElement = new(this, DefaultWindowBorderThickness, MGUniformBorderBrush.Black);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
 
@@ -966,23 +969,48 @@ namespace MGUI.Core.UI
         }
         #endregion Indexed Elements
 
-        /// <summary>Removes all graphics from this window except its content.<br/>
-        /// Such as hiding the title bar, resize grip, close button, removing padding, setting the border and background to transparent</summary>
-        public void MakeInvisible()
+        private VisualStateFillBrush PreviousBackgroundBrush = null;
+
+        private WindowStyle _WindowStyle = WindowStyle.Default;
+        public WindowStyle WindowStyle
         {
-            this.IsTitleBarVisible = false;
-            this.IsCloseButtonVisible = false;
-            this.IsUserResizable = false;
-            this.Padding = new(0);
-            this.BorderThickness = new(0);
-            this.BackgroundBrush.SetAll(MGSolidFillBrush.Transparent); // Set this to MGSolidFillBrush.White * 0.2f while testing the AllowsClickThrough issue below
-            //this.AllowsClickThrough = true;   //TODO we probably want AllowsClickThrough=false, but to then handle any unhandled events that occurred overtop of this window's content.
-                                                //That way, an invisible window with margin around the content (such as horizontally-centered content) won't auto-handle clicks within the
-                                                //window that are outside the content.
-                                                //For Example, make an invisible window at topleft=0,0, size=500,500
-                                                //Add content with size=200,200, centered in the window
-                                                //clicking at position=100,100 overlaps the window, but doesn't overlap the content of the window
-                                                //so the click should fall-through to whatever's under the window
+            get => _WindowStyle;
+            set
+            {
+                if (WindowStyle != value)
+                {
+                    _WindowStyle = value;
+
+                    switch (_WindowStyle)
+                    {
+                        case WindowStyle.Default:
+                            this.IsTitleBarVisible = true;
+                            this.IsCloseButtonVisible = true;
+                            this.IsUserResizable = true;
+                            this.Padding = DefaultWindowPadding;
+                            this.BorderThickness = DefaultWindowBorderThickness;
+                            this.BackgroundBrush = PreviousBackgroundBrush ?? BackgroundBrush;
+                            break;
+                        case WindowStyle.None:
+                            this.IsTitleBarVisible = false;
+                            this.IsCloseButtonVisible = false;
+                            this.IsUserResizable = false;
+                            this.Padding = new(0);
+                            this.BorderThickness = new(0);
+                            this.PreviousBackgroundBrush = BackgroundBrush.Copy();
+                            this.BackgroundBrush.SetAll(MGSolidFillBrush.Transparent); // Set this to MGSolidFillBrush.White * 0.2f while testing the AllowsClickThrough issue below
+                                                                                       //this.AllowsClickThrough = true;   //TODO we probably want AllowsClickThrough=false, but to then handle any unhandled events that occurred overtop of this window's content.
+                                                                                       //That way, an invisible window with margin around the content (such as horizontally-centered content) won't auto-handle clicks within the
+                                                                                       //window that are outside the content.
+                                                                                       //For Example, make an invisible window at topleft=0,0, size=500,500
+                                                                                       //Add content with size=200,200, centered in the window
+                                                                                       //clicking at position=100,100 overlaps the window, but doesn't overlap the content of the window
+                                                                                       //so the click should fall-through to whatever's under the window
+                            break;
+                        default: throw new NotImplementedException($"Unrecognized {nameof(WindowStyle)}: {value}");
+                    }
+                }
+            }
         }
 
         public void Draw(DrawBaseArgs BA) => Draw(new ElementDrawArgs(BA, this.VisualState, Point.Zero));
