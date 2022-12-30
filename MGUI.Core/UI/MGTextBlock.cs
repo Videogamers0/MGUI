@@ -87,9 +87,9 @@ namespace MGUI.Core.UI
                 this.FontHeight = FS.Heights[Size];
                 this.SpaceWidth = (SF_Regular.MeasureString(" ") * FontScale).X;
 
-                SF_Bold = GetFontStyleOrDefault(FS, CustomFontStyles.Bold, Size, null);
-                SF_Italic = GetFontStyleOrDefault(FS, CustomFontStyles.Italic, Size, null);
-                SF_BoldItalic = GetFontStyleOrDefault(FS, CustomFontStyles.Bold | CustomFontStyles.Italic, Size, null);
+                SF_Bold = GetFontStyleOrDefault(FS, CustomFontStyles.Bold, Size, SF_Regular);
+                SF_Italic = GetFontStyleOrDefault(FS, CustomFontStyles.Italic, Size, SF_Regular);
+                SF_BoldItalic = GetFontStyleOrDefault(FS, CustomFontStyles.Bold | CustomFontStyles.Italic, Size, SF_Bold ?? SF_Italic ?? SF_Regular);
 
                 SF_Regular_Glyphs = SF_Regular?.GetGlyphs();
                 SF_Bold_Glyphs = SF_Bold?.GetGlyphs();
@@ -288,7 +288,30 @@ namespace MGUI.Core.UI
         private void UpdateRuns()
         {
             if (AllowsInlineFormatting)
-                Runs = MGTextRun.ParseRuns(Text, DefaultTextRunSettings).ToList().AsReadOnly();
+            {
+                MGDesktop Desktop = GetDesktop();
+
+                IEnumerable<MGTextRun> ParsedRuns = MGTextRun.ParseRuns(Text, DefaultTextRunSettings);
+                List<MGTextRun> Temp = new();
+
+                //  Sanitize the runs
+                foreach (MGTextRun Run in ParsedRuns)
+                {
+                    MGTextRun CurrentRun = Run;
+
+                    //  If a TextRunImage didn't specify destination dimensions, use the default size of the image
+                    if (Run.RunType == TextRunType.Image && Run is MGTextRunImage ImageRun && 
+                        ImageRun.TargetWidth <= 0 && ImageRun.TargetHeight <= 0)
+                    {
+                        (int? DefaultWidth, int? DefaultHeight) = Desktop.GetNamedRegionDimensions(ImageRun.RegionName);
+                        CurrentRun = new MGTextRunImage(ImageRun.RegionName, DefaultWidth ?? 0, DefaultHeight ?? 0, ImageRun.ToolTipId, ImageRun.ActionId);
+                    }
+
+                    Temp.Add(CurrentRun);
+                }
+
+                Runs = Temp.AsReadOnly();
+            }
             else
             {
                 List<FTTokenMatch> Tokens = FTTokenizer.TokenizeLineBreaks(Text, true).ToList();

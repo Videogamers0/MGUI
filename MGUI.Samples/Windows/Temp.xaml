@@ -1,11 +1,7 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Background="White" Left="200" Top="200" MinHeight="0" SizeToContent="WidthAndHeight" WindowStyle="None">
-    <StackPanel Orientation="Vertical" Background="Red * 0.2">
-        <CheckBox IsChecked="False">
-            <TextBlock FontSize="9" Foreground="Black" Text="This CheckBox is unchecked" />
-        </CheckBox>
-        <CheckBox IsChecked="True">
-            <TextBlock FontSize="9" Foreground="Black" Text="This CheckBox is checked" />
-        </CheckBox>
-    </StackPanel>
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Left="200" Top="200" Width="300" Height="400" BorderThickness="2" WindowStyle="None">
+    <Border HorizontalAlignment="Stretch" Background="White" Padding="30" VerticalContentAlignment="Top">
+
+    </Border>
 </Window>

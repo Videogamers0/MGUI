@@ -325,6 +325,18 @@ namespace MGUI.Core.UI
         }
         public void RemoveNamedRegion(string RegionName) => _NamedRegions.Remove(RegionName);
 
+        internal (int? Width, int? Height) GetNamedRegionDimensions(string RegionName)
+        {
+            if (_NamedRegions.TryGetValue(RegionName, out NamedTextureRegion Region) && _NamedTextures.TryGetValue(Region.TextureName, out Texture2D Texture))
+            {
+                int Width = Region.SourceRect?.Width ?? Texture.Width;
+                int Height = Region.SourceRect?.Height ?? Texture.Height;
+                return (Width, Height);
+            }
+            else
+                return (null, null);
+        }
+
         public bool TryDrawNamedRegion(DrawTransaction DT, string RegionName, Point Position, int? Width, int? Height, float Opacity = 1.0f)
         {
             if (_NamedRegions.TryGetValue(RegionName, out NamedTextureRegion Region) && _NamedTextures.TryGetValue(Region.TextureName, out Texture2D Texture))

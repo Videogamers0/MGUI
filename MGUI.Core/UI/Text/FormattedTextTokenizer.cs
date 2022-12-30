@@ -331,16 +331,16 @@ namespace MGUI.Core.UI.Text
 
         //  The name to reference the texture by, followed by an optional target size X Y
         //  EX: "[img=Gold.png 32x16]" would reference a texture by name="Gold.png", and draw it with Width=32, Height=16
-        private static readonly string ImageValuePattern = $@"(?<RegionName>.+?) (?<Width>\d{{1,4}})( |,|x|X)(?<Height>\d{{1,4}})(?=({Regex.Escape(CloseTagChar.ToString())}|$))";
+        private static readonly string ImageValuePattern = $@"(?<RegionName>.+?)( (?<Width>\d{{1,4}})( |,|x|X)(?<Height>\d{{1,4}}))?(?=({Regex.Escape(CloseTagChar.ToString())}|$))";
         private static readonly Regex ImageValueParser = new(ImageValuePattern);
 
-        internal static (string RegionName, int TargetWidth, int TargetHeight) ParseImageValue(string Value)
+        internal static (string RegionName, int? TargetWidth, int? TargetHeight) ParseImageValue(string Value)
         {
             Match Match = ImageValueParser.Match(Value);
 
             string RegionName = Match.Groups["RegionName"].Value;
-            int Width = int.Parse(Match.Groups["Width"].Value);
-            int Height = int.Parse(Match.Groups["Height"].Value);
+            int? Width = Match.Groups["Width"].Success ? int.Parse(Match.Groups["Width"].Value) : null;
+            int? Height = Match.Groups["Height"].Success ? int.Parse(Match.Groups["Height"].Value) : null;
 
             return (RegionName, Width, Height);
         }

@@ -211,7 +211,7 @@ namespace MGUI.Core.UI.Text
                 else if (CurrentAction.ActionType == FTActionType.Image)
                 {
                     var (RegionName, TargetWidth, TargetHeight) = FTTokenizer.ParseImageValue(CurrentAction.Parameter.Substring(1));
-                    yield return new MGTextRunImage(RegionName, TargetWidth, TargetHeight, CurrentToolTipId, CurrentActionId);
+                    yield return new MGTextRunImage(RegionName, TargetWidth ?? 0, TargetHeight ?? 0, CurrentToolTipId, CurrentActionId);
                 }
                 else if (CurrentAction.ActionType == FTActionType.SetToolTip)
                 {

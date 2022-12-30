@@ -72,8 +72,11 @@ namespace MGUI.Samples
             Desktop.BringToFront(DebugWindow);
 #endif
 
-            //MGWindow Tmp = XAMLParser.LoadRootWindow(Desktop, ReadEmbeddedResourceAsString(CurrentAssembly, $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Temp.xaml"));
-            //Desktop.Windows.Add(Tmp);
+#if NEVER
+            Desktop.Windows.Clear();
+            MGWindow Tmp = XAMLParser.LoadRootWindow(Desktop, ReadEmbeddedResourceAsString(CurrentAssembly, $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Temp.xaml"));
+            Desktop.Windows.Add(Tmp);
+#endif
 
             base.Initialize();
         }
