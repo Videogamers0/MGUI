@@ -1,10 +1,14 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using MGUI.Core.UI.Brushes.Fill_Brushes;
+using MGUI.Core.UI.XAML;
+using MonoGame.Extended;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Thickness = MonoGame.Extended.Thickness;
 
 namespace MGUI.Core.UI.Text
 {
@@ -279,7 +283,7 @@ namespace MGUI.Core.UI.Text
                 AsEnumerable<FTTokenType?>(FTTokenType.ForegroundOpenTagType),
                 Enumerable.Empty<FTTokenType?>())
             );
-            Definitions.Add(new(FTTokenType.BackgroundValue, $@"^={ColorPattern}",
+            Definitions.Add(new(FTTokenType.BackgroundValue, $@"^={BackgroundValuePattern}",
                 AsEnumerable<FTTokenType?>(FTTokenType.BackgroundOpenTagType),
                 Enumerable.Empty<FTTokenType?>())
             );
@@ -321,8 +325,27 @@ namespace MGUI.Core.UI.Text
 #endif
         }
 
+        //  Regex pattern that checks if the next character is either a close tag ']' or end of string, but does not consume that character (lookahead)
+        private static readonly string CloseTagOrEndOfStringLookahead = $@"(?=({Regex.Escape(CloseTagChar.ToString())}|$))";
+
+        //  The background fill brush (usually a single color) followed by an optional Padding Thickness
+        //  EX: "[Background=Red 2,4,2,8]" uses a solid red brush, with Padding="2,4,2,8"
+        private static readonly string BackgroundValuePattern = $@"(?<Brush>.+?)( (?<Padding>\d+(,\d+){{0,3}}))?{CloseTagOrEndOfStringLookahead}";
+        public static readonly Regex BackgroundValueParser = new(BackgroundValuePattern);
+
+        public static (IFillBrush Brush, Thickness Padding) ParseBackgroundValue(string Value)
+        {
+            Match Match = BackgroundValueParser.Match(Value);
+
+            string BrushString = Match.Groups["Brush"].Value;
+            IFillBrush Brush = FillBrushStringConverter.ParseFillBrush(BrushString).ToFillBrush();
+            Thickness Padding = Match.Groups["Padding"].Success ? Thickness.Parse(Match.Groups["Padding"].Value) : default;
+
+            return (Brush, Padding);
+        }
+
         //  The name to reference the ToolTip by
-        private static readonly string ToolTipValuePattern = $@"(?<ToolTipName>.+?)(?=({Regex.Escape(CloseTagChar.ToString())}|$))";
+        private static readonly string ToolTipValuePattern = $@"(?<ToolTipName>.+?){CloseTagOrEndOfStringLookahead}";
         public static readonly Regex ToolTipValueParser = new(ToolTipValuePattern);
 
         //  The name to reference the Action delegate by
@@ -331,7 +354,7 @@ namespace MGUI.Core.UI.Text
 
         //  The name to reference the texture by, followed by an optional target size X Y
         //  EX: "[img=Gold.png 32x16]" would reference a texture by name="Gold.png", and draw it with Width=32, Height=16
-        private static readonly string ImageValuePattern = $@"(?<RegionName>.+?)( (?<Width>\d{{1,4}})( |,|x|X)(?<Height>\d{{1,4}}))?(?=({Regex.Escape(CloseTagChar.ToString())}|$))";
+        private static readonly string ImageValuePattern = $@"(?<RegionName>.+?)( (?<Width>\d{{1,4}})( |,|x|X)(?<Height>\d{{1,4}}))?{CloseTagOrEndOfStringLookahead}";
         private static readonly Regex ImageValueParser = new(ImageValuePattern);
 
         internal static (string RegionName, int? TargetWidth, int? TargetHeight) ParseImageValue(string Value)

@@ -82,6 +82,9 @@ namespace MGUI.Core.UI
     //TODO:
     //textblock inline formatting:
     //      inlined images should have option for render size AND layout size, so you could, for example, have a zero-width image underneath specific text in the textblock
+    //      underline should allow specifying a color and stroke thickness, maybe also an offset
+    //          [Underline={Color} {Height} {YOffset}]
+    //          [Underline=Red 2 3] means to draw a Red underline that's 2px tall, and is moved down by 3px from the default Y position
     //Improve Grid/UniformGrid's default selection graphics
     //Bugfix MGTextBox's Caret positioning after moving to new line such as when inserting a linebreak
     //      only seems incorrect if the textbox's height changes? (I.E. it doesnt have a PreferredHeight and its not inside a ScrollViewer)

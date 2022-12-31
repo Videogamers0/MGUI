@@ -11,15 +11,32 @@ using System.Threading.Tasks;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using Microsoft.Xna.Framework.Graphics;
 using MGUI.Shared.Rendering;
+using MonoGame.Extended;
+using MGUI.Core.UI.XAML;
+using Thickness = MonoGame.Extended.Thickness;
 
 namespace MGUI.Core.UI.Text
 {
-    public record struct MGTextRunConfig(bool IsBold, bool IsItalic = false, bool IsUnderlined = false, float Opacity = 1.0f,
-        Color? Foreground = null, IFillBrush Background = null, bool IsShadowed = false, Color? ShadowColor = null, Vector2? ShadowOffset = null)
+    public record struct MGTextRunBackgroundConfig(IFillBrush Brush = null, Thickness Padding = default)
     {
-        public MGTextRunConfig ApplyAction(FTAction Action,
-            IList<float> PreviousOpacities, IList<Color?> PreviousForegrounds, IList<IFillBrush> PreviousBackgrounds, 
-            IList<bool> PreviousShadowStates, IList<Color?> PreviousShadowColors, IList<Vector2?> PreviousShadowOffsets)
+        public static readonly MGTextRunBackgroundConfig Empty = new(null, default);
+        public bool HasBackground => Brush != null;
+    }
+
+    public record struct MGTextRunShadowConfig(Color? ShadowColor = null, Vector2? ShadowOffset = null)
+    {
+        public static readonly MGTextRunShadowConfig Empty = new(null, null);
+        public bool IsShadowed => ShadowColor.HasValue;
+    }
+
+    public record struct MGTextRunConfig(bool IsBold, bool IsItalic = false, bool IsUnderlined = false, float Opacity = 1.0f,
+        Color? Foreground = null, MGTextRunBackgroundConfig Background = new(), MGTextRunShadowConfig Shadow = new())
+    {
+        public bool HasBackground => Background.HasBackground;
+        public bool IsShadowed => Shadow.IsShadowed;
+
+        public MGTextRunConfig ApplyAction(FTAction Action, IList<float> PreviousOpacities, IList<Color?> PreviousForegrounds,
+            IList<MGTextRunBackgroundConfig> PreviousBackgrounds, IList<MGTextRunShadowConfig> PreviousShadows)
         {
             switch (Action.ActionType)
             {
@@ -65,30 +82,23 @@ namespace MGUI.Core.UI.Text
                 case FTActionType.SetBackground:
                     {
                         PreviousBackgrounds.Add(Background);
-                        Color Value = ColorTranslator.FromHtml(Action.Parameter.Substring(1)).AsXNAColor();
-                        return this with { Background = new MGSolidFillBrush(Value) };
+                        (IFillBrush Brush, Thickness Padding) = FTTokenizer.ParseBackgroundValue(Action.Parameter.Substring(1));
+                        return this with { Background = new MGTextRunBackgroundConfig(Brush, Padding) };
                     }
                 case FTActionType.RevertBackground:
-                    return this with { Background = GeneralUtils.RemoveLast(PreviousBackgrounds, null) };
+                    return this with { Background = GeneralUtils.RemoveLast(PreviousBackgrounds, default) };
 
                 //  Shadowing
                 case FTActionType.SetShadowing:
                     {
-                        PreviousShadowStates.Add(IsShadowed);
-                        PreviousShadowColors.Add(ShadowColor);
-                        PreviousShadowOffsets.Add(ShadowOffset);
+                        PreviousShadows.Add(Shadow);
                         string[] Words = Action.Parameter.Substring(1).Split(' ');
                         Color ParsedShadowColor = ColorTranslator.FromHtml(Words[0]).AsXNAColor();
                         Vector2 ParsedShadowOffset = Words.Length == 3 ? new(int.Parse(Words[1]), int.Parse(Words[2])) : new(1, 1);
-                        return this with { IsShadowed = true, ShadowColor = ParsedShadowColor, ShadowOffset = ParsedShadowOffset };
+                        return this with { Shadow = new MGTextRunShadowConfig(ParsedShadowColor, ParsedShadowOffset) };
                     }
                 case FTActionType.RevertShadowing:
-                    return this with
-                    { 
-                        IsShadowed = GeneralUtils.RemoveLast(PreviousShadowStates, false), 
-                        ShadowColor = GeneralUtils.RemoveLast(PreviousShadowColors, null), 
-                        ShadowOffset = GeneralUtils.RemoveLast(PreviousShadowOffsets, null)
-                    };
+                    return this with { Shadow = GeneralUtils.RemoveLast(PreviousShadows, default) };
 
                 //  Image
                 case FTActionType.Image:
@@ -168,10 +178,8 @@ namespace MGUI.Core.UI.Text
 
             List<float> PreviousOpacities = new();
             List<Color?> PreviousForegrounds = new();
-            List<IFillBrush> PreviousBackgrounds = new();
-            List<bool> PreviousShadowStates = new();
-            List<Color?> PreviousShadowColors = new();
-            List<Vector2?> PreviousShadowOffsets = new();
+            List<MGTextRunBackgroundConfig> PreviousBackgrounds = new();
+            List<MGTextRunShadowConfig> PreviousShadows = new();
 
             string CurrentToolTipId = null;
             List<string> PreviousToolTipIds = new();
@@ -183,7 +191,7 @@ namespace MGUI.Core.UI.Text
             for (int i = 0; i < Actions.Count; i++)
             {
                 FTAction CurrentAction = Actions[i];
-                CurrentState = CurrentState.ApplyAction(CurrentAction, PreviousOpacities, PreviousForegrounds, PreviousBackgrounds, PreviousShadowStates, PreviousShadowColors, PreviousShadowOffsets);
+                CurrentState = CurrentState.ApplyAction(CurrentAction, PreviousOpacities, PreviousForegrounds, PreviousBackgrounds, PreviousShadows);
 
                 if (CurrentAction.ActionType == FTActionType.StringLiteral)
                 {

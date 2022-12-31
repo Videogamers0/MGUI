@@ -167,8 +167,10 @@ namespace MGUI.Core.UI
             }
         }
 
-        private MGTextRunConfig DefaultTextRunSettings => new(IsBold, IsItalic, IsUnderlined, 1, null, null, 
-            IsShadowed, ShadowColor ?? GetTheme().FontSettings.DefaultFontShadowColor, ShadowOffset?.ToVector2() ?? GetTheme().FontSettings.DefaultFontShadowOffset.ToVector2());
+        private MGTextRunShadowConfig DefaultShadowSettings => 
+            IsShadowed ? new MGTextRunShadowConfig(ShadowColor ?? GetTheme().FontSettings.DefaultFontShadowColor, ShadowOffset?.ToVector2() ?? GetTheme().FontSettings.DefaultFontShadowOffset.ToVector2()) : default;
+
+        private MGTextRunConfig DefaultTextRunSettings => new(IsBold, IsItalic, IsUnderlined, 1, null, default, DefaultShadowSettings);
         #endregion Font Style
 
         #region Shadow
@@ -744,17 +746,23 @@ namespace MGUI.Core.UI
 
                         Vector2 TextSize = MeasureText(TextRun.Text, IsBold, IsItalic, IsStartOfLine);
 
-                        if (TextRun.Settings.Background != null)
+                        if (TextRun.Settings.HasBackground)
                         {
+                            IFillBrush BackgroundBrush = TextRun.Settings.Background.Brush;
+                            Thickness BackgroundPadding = TextRun.Settings.Background.Padding;
+
                             if (UseScaledSpriteFont)
                             {
-                                Rectangle BackgroundDestination = new Rectangle((int)CurrentX, (int)TextYPosition, (int)TextSize.X, (int)Line.LineTextHeight).CreateTransformed(Transform);
-                                TextRun.Settings.Background.Draw(DA.SetOpacity(ActualOpacity).AsZeroOffset(), this, BackgroundDestination);
+                                Rectangle BackgroundDestination = new Rectangle((int)CurrentX, (int)TextYPosition, (int)TextSize.X, (int)Line.LineTextHeight)
+                                    .GetExpanded(BackgroundPadding)
+                                    .CreateTransformed(Transform);
+                                BackgroundBrush.Draw(DA.SetOpacity(ActualOpacity).AsZeroOffset(), this, BackgroundDestination);
                             }
                             else
                             {
-                                Rectangle BackgroundDestination = new((int)CurrentX, (int)TextYPosition, (int)TextSize.X, (int)Line.LineTextHeight);
-                                TextRun.Settings.Background.Draw(DA.SetOpacity(ActualOpacity), this, BackgroundDestination);
+                                Rectangle BackgroundDestination = new Rectangle((int)CurrentX, (int)TextYPosition, (int)TextSize.X, (int)Line.LineTextHeight)
+                                    .GetExpanded(BackgroundPadding);
+                                BackgroundBrush.Draw(DA.SetOpacity(ActualOpacity), this, BackgroundDestination);
                             }
                         }
 
@@ -767,8 +775,8 @@ namespace MGUI.Core.UI
                         Vector2 Position = new Vector2(CurrentX, TextYPosition).TransformBy(Transform);
                         if (TextRun.Settings.IsShadowed)
                         {
-                            Color ShadowColor = (TextRun.Settings.ShadowColor ?? DefaultForeground) * ActualOpacity;
-                            Vector2 ShadowOffset = TextRun.Settings.ShadowOffset ?? new(1, 1);
+                            Color ShadowColor = (TextRun.Settings.Shadow.ShadowColor ?? DefaultForeground) * ActualOpacity;
+                            Vector2 ShadowOffset = TextRun.Settings.Shadow.ShadowOffset ?? new(1, 1);
 
                             DT.DrawSpriteFontText(SF, TextRun.Text, Position + ShadowOffset, ShadowColor, FontOrigin, FontScale, FontScale);
                             DT.DrawSpriteFontText(SF, TextRun.Text, Position, Foreground, FontOrigin, FontScale, FontScale);

@@ -58,42 +58,45 @@ namespace MGUI.Core.UI.XAML
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value is string stringValue)
+                return ParseColor(stringValue);
+            else
+                return base.ConvertFrom(context, culture, value);
+        }
+
+        public static XAMLColor ParseColor(string Value)
+        {
+            static DrawingColor ParseDrawingColor(string colorName)
             {
-                DrawingColor ParseColor(string colorName)
+                Match RGBMatch = RGBColorRegex.Match(colorName);
+                if (RGBMatch.Success)
                 {
-                    Match RGBMatch = RGBColorRegex.Match(colorName);
-                    if (RGBMatch.Success)
-                    {
-                        int r = int.Parse(RGBMatch.Groups["RedComponent"].Value);
-                        int g = int.Parse(RGBMatch.Groups["GreenComponent"].Value);
-                        int b = int.Parse(RGBMatch.Groups["BlueComponent"].Value);
-                        int a = RGBMatch.Groups["AlphaComponent"].Success ? int.Parse(RGBMatch.Groups["AlphaComponent"].Value) : byte.MaxValue;
-                        return DrawingColor.FromArgb(a, r, g, b);
-                    }
-                    else
-                    {
-                        return ColorTranslator.FromHtml(colorName);
-                    }
-                }
-
-                int asteriskIndex = stringValue.IndexOf('*');
-                if (asteriskIndex > 0)
-                {
-                    string colorName = stringValue.Substring(0, asteriskIndex).Trim();
-                    DrawingColor color = ParseColor(colorName);
-                    string opacityScalarString = stringValue.Substring(asteriskIndex + 1).Trim();
-                    float opacityScalar = float.Parse(opacityScalarString);
-
-                    return new XAMLColor(color.R, color.G, color.B, color.A) * opacityScalar;
+                    int r = int.Parse(RGBMatch.Groups["RedComponent"].Value);
+                    int g = int.Parse(RGBMatch.Groups["GreenComponent"].Value);
+                    int b = int.Parse(RGBMatch.Groups["BlueComponent"].Value);
+                    int a = RGBMatch.Groups["AlphaComponent"].Success ? int.Parse(RGBMatch.Groups["AlphaComponent"].Value) : byte.MaxValue;
+                    return DrawingColor.FromArgb(a, r, g, b);
                 }
                 else
                 {
-                    DrawingColor color = ParseColor(stringValue);
-                    return new XAMLColor(color.R, color.G, color.B, color.A);
+                    return ColorTranslator.FromHtml(colorName);
                 }
             }
 
-            return base.ConvertFrom(context, culture, value);
+            int asteriskIndex = Value.IndexOf('*');
+            if (asteriskIndex > 0)
+            {
+                string colorName = Value.Substring(0, asteriskIndex).Trim();
+                DrawingColor color = ParseDrawingColor(colorName);
+                string opacityScalarString = Value.Substring(asteriskIndex + 1).Trim();
+                float opacityScalar = float.Parse(opacityScalarString);
+
+                return new XAMLColor(color.R, color.G, color.B, color.A) * opacityScalar;
+            }
+            else
+            {
+                DrawingColor color = ParseDrawingColor(Value);
+                return new XAMLColor(color.R, color.G, color.B, color.A);
+            }
         }
     }
     #endregion Color
@@ -113,29 +116,34 @@ namespace MGUI.Core.UI.XAML
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             if (value is string stringValue)
-            {
-                string[] colorStrings = stringValue.Split('|');
-                if (colorStrings.Length == 1)
-                {
-                    XAMLColor Color = (XAMLColor)ColorStringConverter.ConvertFrom(context, culture, colorStrings[0]);
-                    return new SolidFillBrush(Color);
-                }
-                else if (colorStrings.Length == 2)
-                {
-                    XAMLColor Color1 = (XAMLColor)ColorStringConverter.ConvertFrom(context, culture, colorStrings[0]);
-                    XAMLColor Color2 = (XAMLColor)ColorStringConverter.ConvertFrom(context, culture, colorStrings[1]);
-                    Color Lerped = Color.Lerp(Color1.ToXNAColor(), Color2.ToXNAColor(), 0.5f);
-                    XAMLColor Diagonals = new XAMLColor(Lerped.R, Lerped.G, Lerped.B, Lerped.A);
-                    return new GradientFillBrush(Color1, Diagonals, Color2, Diagonals);
-                }
-                else if (colorStrings.Length == 4)
-                {
-                    XAMLColor[] Colors = colorStrings.Select(x => (XAMLColor)ColorStringConverter.ConvertFrom(context, culture, x)).ToArray();
-                    return new GradientFillBrush(Colors[0], Colors[1], Colors[2], Colors[3]);
-                }
-            }
+                return ParseFillBrush(stringValue);
+            else
+                return base.ConvertFrom(context, culture, value);
+        }
 
-            return base.ConvertFrom(context, culture, value);
+        public static FillBrush ParseFillBrush(string Value)
+        {
+            string[] colorStrings = Value.Split('|');
+            if (colorStrings.Length == 1)
+            {
+                XAMLColor Color = ColorStringConverter.ParseColor(colorStrings[0]);
+                return new SolidFillBrush(Color);
+            }
+            else if (colorStrings.Length == 2)
+            {
+                XAMLColor Color1 = ColorStringConverter.ParseColor(colorStrings[0]);
+                XAMLColor Color2 = ColorStringConverter.ParseColor(colorStrings[1]);
+                Color Lerped = Color.Lerp(Color1.ToXNAColor(), Color2.ToXNAColor(), 0.5f);
+                XAMLColor Diagonals = new XAMLColor(Lerped.R, Lerped.G, Lerped.B, Lerped.A);
+                return new GradientFillBrush(Color1, Diagonals, Color2, Diagonals);
+            }
+            else if (colorStrings.Length == 4)
+            {
+                XAMLColor[] Colors = colorStrings.Select(x => ColorStringConverter.ParseColor(x)).ToArray();
+                return new GradientFillBrush(Colors[0], Colors[1], Colors[2], Colors[3]);
+            }
+            else
+                throw new InvalidOperationException($"{Value} is not a valid format for a {nameof(FillBrush)}.");
         }
     }
 
