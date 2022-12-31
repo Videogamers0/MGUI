@@ -329,8 +329,8 @@ namespace MGUI.Core.UI.Text
         private static readonly string CloseTagOrEndOfStringLookahead = $@"(?=({Regex.Escape(CloseTagChar.ToString())}|$))";
 
         //  The background fill brush (usually a single color) followed by an optional Padding Thickness
-        //  EX: "[Background=Red 2,4,2,8]" uses a solid red brush, with Padding="2,4,2,8"
-        private static readonly string BackgroundValuePattern = $@"(?<Brush>.+?)( (?<Padding>\d+(,\d+){{0,3}}))?{CloseTagOrEndOfStringLookahead}";
+        //  EX: "[Background=Red 2,-4,2,8]" uses a solid red brush, with Padding="2,-4,2,8"
+        private static readonly string BackgroundValuePattern = $@"(?<Brush>.+?)( (?<Padding>-?\d+(,-?\d+){{0,3}}))?{CloseTagOrEndOfStringLookahead}";
         public static readonly Regex BackgroundValueParser = new(BackgroundValuePattern);
 
         public static (IFillBrush Brush, Thickness Padding) ParseBackgroundValue(string Value)
