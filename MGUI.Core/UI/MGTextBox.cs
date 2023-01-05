@@ -1129,7 +1129,7 @@ namespace MGUI.Core.UI
                                         AddUndoState(UndoState);
                                         CurrentSelection = null;
                                         TextBlockElement.UpdateLines();
-                                        _ = Caret.MoveToOriginalCharacterIndexOrEnd(SelectionStart, true);
+                                        _ = Caret.MoveToOriginalCharacterIndexOrRight(SelectionStart - 1, false);
                                         Clipboard.Text = SelectedText;
                                     }
                                 }
@@ -1162,8 +1162,13 @@ namespace MGUI.Core.UI
                                             CurrentSelection = null;
                                             TextBlockElement.UpdateLines();
                                             int NumCharactersInserted = ClipboardText.Length;
-                                            _ = Caret.MoveToOriginalCharacterIndexOrEnd(SelectionStart + NumCharactersInserted, true);
+                                            _ = Caret.MoveToOriginalCharacterIndexOrRight(SelectionStart + NumCharactersInserted - 1, false);
                                         }
+                                        //  We should still clear the selection even if pasting didn't change the text value.
+                                        //  EX: Text="Foo", Clipboard="oo", Select the text "oo" and paste.
+                                        //  Text attempts to change from "Foo" to "Foo", SetText returns false since nothing changed, so previous if-statement didn't execute
+                                        else if (GetTextBackingField() == NewValue)
+                                            CurrentSelection = null;
                                     }
                                     else if (Caret.HasPosition)
                                     {
@@ -1176,7 +1181,7 @@ namespace MGUI.Core.UI
                                             CurrentSelection = null;
                                             TextBlockElement.UpdateLines();
                                             int NumCharactersInserted = ClipboardText.Length;
-                                            _ = Caret.MoveToOriginalCharacterIndexOrEnd(CaretIndex + NumCharactersInserted, true);
+                                            _ = Caret.MoveToOriginalCharacterIndexOrRight(CaretIndex + NumCharactersInserted - 1, false);
                                         }
                                     }
                                 }
@@ -1207,14 +1212,14 @@ namespace MGUI.Core.UI
                                     int LineStart = CharInfo.Line.FirstCharacter.IndexInOriginalText;
                                     int LineEnd = CharInfo.Line.LastCharacter.IndexInOriginalText + 1;
                                     string LineText = CurrentText.Substring(LineStart, LineEnd - LineStart);
-                                    string NewValue = CurrentText.Substring(0, LineStart) + LineText + LineText + CurrentText.Substring(LineEnd);
+                                    string NewValue = CurrentText.Substring(0, LineStart) + LineText + '\n' + LineText + CurrentText.Substring(LineEnd);
                                     if (SetText(NewValue))
                                     {
                                         AddUndoState(UndoState);
                                         CurrentSelection = null;
                                         TextBlockElement.UpdateLines();
-                                        int NumCharactersInserted = LineText.Length;
-                                        //_ = Caret.MoveToOriginalCharacterIndexOrEnd(CharInfo.IndexInOriginalText + NumCharactersInserted, true);
+                                        int NumCharactersInserted = LineText.Length + 1; // +1 because of the linebreak character appended to the end of the line
+                                        //_ = Caret.MoveToOriginalCharacterIndexOrRight(CharInfo.IndexInOriginalText + NumCharactersInserted - 1, false);
                                     }
                                 }
                                 Handled = true;

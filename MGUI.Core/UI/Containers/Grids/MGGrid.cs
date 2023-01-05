@@ -596,7 +596,7 @@ namespace MGUI.Core.UI.Containers.Grids
         {
             AllowDeselect = AllowDeselect && CanDeselectByClickingSelectedCell;
 
-            Rectangle Viewport = LayoutBounds; // Does this also need to be translated by this.BoundsOffset?
+            Rectangle Viewport = LayoutBounds; // Does this also need to be translated by this.Origin?
             if (TryFindParentOfType(out MGScrollViewer SV, false))
             {
                 //TODO test this logic for ScrollViewers that are nested inside of another ScrollViewer

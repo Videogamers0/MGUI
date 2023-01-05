@@ -80,6 +80,19 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
+	//tabcontrol - a separate default tabheader style that has like 'floating' tab headers. Just Underlined ContentPresenters instead of a full border. not touching the tabitem content's top border etc
+	//		should be easily achieved by just restyling the buttons to only have a bottom border, and have a bottom padding. but we probably also want the selected background to be null, and instead
+	//		have a brighter font color when hovered?
+	//mgoverlaypanel allow zindex, default=null. when drawing/updating, group by zindex.hasvalue, thenby zindex.value before iterating
+	//mgdockpanel - lastchildfill property, default=true. if false, then the actualdockedchildren shouldn't  be different than dockedchildren. when changed, calls layoutchanged
+	//something for mouse cursors?
+	//		maybe an enum MouseCursorType
+	//		and MGElement would have MouseCursorType Cursor property
+	//		then MGDesktop defines some textures (and drawing offsets) associated with each MouseCursorType, and bool UseHardwareCursor
+	//		If usehardwarecursor=false, then after drawing the desktop, get the hovered element, and draw the texture associated with its MGElement.Cursor
+	//something really basic for Gamepads? Maybe just a simple way to 'spoof' a mousestate that's hovering a particular MGElement
+	//		like MGElement.NavigateTo, Dictionary<Direction, MGElement> Neighbors. So if you press GamePad Left, it would basically just 
+	//		get the hovered element, and call hovered.Neighbors[Left]?.NavigateTo() which returns a new MouseState to use for next update tick? idk
     //textblock inline formatting:
     //      inlined images should have option for render size AND layout size, so you could, for example, have a zero-width image underneath specific text in the textblock
     //      underline should allow specifying a color and stroke thickness, maybe also an offset

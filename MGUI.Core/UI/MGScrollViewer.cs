@@ -409,15 +409,33 @@ namespace MGUI.Core.UI
 
                 MouseHandler.Scrolled += (sender, e) =>
                 {
-                    if (e.ScrollWheelDelta > 0 && VerticalOffset > 0)
+                    //  Attempt to scroll vertically
+                    if (VSBBounds.HasValue)
                     {
-                        e.SetHandled(this, false);
-                        VerticalOffset -= VerticalScrollInterval;
+                        if (e.ScrollWheelDelta > 0 && VerticalOffset > 0)
+                        {
+                            e.SetHandled(this, false);
+                            VerticalOffset -= VerticalScrollInterval;
+                        }
+                        else if (e.ScrollWheelDelta < 0 && VerticalOffset < MaxVerticalOffset)
+                        {
+                            e.SetHandled(this, false);
+                            VerticalOffset += VerticalScrollInterval;
+                        }
                     }
-                    else if (e.ScrollWheelDelta < 0 && VerticalOffset < MaxVerticalOffset)
+                    //  Scroll horizontally if there is only a horizontal scrollbar but no vertical scrollbar
+                    else if (HSBBounds.HasValue)
                     {
-                        e.SetHandled(this, false);
-                        VerticalOffset += VerticalScrollInterval;
+                        if (e.ScrollWheelDelta > 0 && HorizontalOffset > 0)
+                        {
+                            e.SetHandled(this, false);
+                            HorizontalOffset -= VerticalScrollInterval;
+                        }
+                        else if (e.ScrollWheelDelta < 0 && HorizontalOffset < MaxHorizontalOffset)
+                        {
+                            e.SetHandled(this, false);
+                            HorizontalOffset += VerticalScrollInterval;
+                        }
                     }
                 };
             }

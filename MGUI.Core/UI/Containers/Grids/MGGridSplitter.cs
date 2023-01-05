@@ -102,16 +102,16 @@ namespace MGUI.Core.UI.Containers.Grids
             /// <summary>Contains copies of the <see cref="OwnerGrid"/>'s <see cref="MGGrid.Rows"/>, representing the state of the rows when this object was created.</summary>
             public readonly IReadOnlyList<RowDefinition> OriginalRows;
 
-            /// <summary>Key = Actual column. Value = Original row</summary>
+            /// <summary>Key = Actual row. Value = Original row</summary>
             [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             private readonly Dictionary<RowDefinition, RowDefinition> _ActualToOriginalRow;
-            /// <summary>Key = Actual column. Value = Original row</summary>
+            /// <summary>Key = Actual row. Value = Original row</summary>
             public IReadOnlyDictionary<RowDefinition, RowDefinition> ActualToOriginalRow => _ActualToOriginalRow;
 
-            /// <summary>Key = Original column. Value = Actual row</summary>
+            /// <summary>Key = Original row. Value = Actual row</summary>
             [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             private readonly Dictionary<RowDefinition, RowDefinition> _OriginalToActualRow;
-            /// <summary>Key = Original column. Value = Actual row</summary>
+            /// <summary>Key = Original row. Value = Actual row</summary>
             public IReadOnlyDictionary<RowDefinition, RowDefinition> OriginalToActualRow => _OriginalToActualRow;
 
             public bool IsValid => GridSplitter != null && GridSplitterCell.Column != null && GridSplitterCell.Row != null && 

@@ -69,7 +69,7 @@ namespace MGUI.Core.UI.Text
         #region Navigation
         /// <summary>Moves the caret position to the given side of the given <paramref name="CharIndex"/>.<br/>
         /// If no character was found at the index, continually navigates left until finding one.</summary>
-        /// <paramref name="CharIndex"/>The index in the original text, before it was parsed into <see cref="MGTextLine"/>s.<paramref/>
+        /// <param name="CharIndex">The index in the original text, before it was parsed into <see cref="MGTextLine"/>s.</param>
         public bool MoveToOriginalCharacterIndexOrLeft(int CharIndex, bool LeftSide)
         {
             Debug.WriteLine($"{nameof(MGTextCaret)}: Move to original index or left: {CharIndex} (Left={LeftSide})");
@@ -91,7 +91,7 @@ namespace MGUI.Core.UI.Text
 
         /// <summary>Moves the caret position to the given side of the given <paramref name="CharIndex"/>.<br/>
         /// If no character was found at the index, continually navigates right until finding one.</summary>
-        /// <paramref name="CharIndex"/>The index in the original text, before it was parsed into <see cref="MGTextLine"/>s.<paramref/>
+        /// <param name="CharIndex">The index in the original text, before it was parsed into <see cref="MGTextLine"/>s.</param>
         public bool MoveToOriginalCharacterIndexOrRight(int CharIndex, bool LeftSide)
         {
             Debug.WriteLine($"{nameof(MGTextCaret)}: Move to original index or right: {CharIndex} (Left={LeftSide})");
@@ -112,8 +112,8 @@ namespace MGUI.Core.UI.Text
         }
 
         /// <summary>Moves the caret position to the given side of the given <paramref name="CharIndex"/>.<br/>
-        /// If no character was found at the index, navigates to the end of the text.
-        /// <paramref name="CharIndex"/>The index in the original text, before it was parsed into <see cref="MGTextLine"/>s.</summary>
+        /// If no character was found at the index, navigates to the end of the text.</summary>
+        /// <param name="CharIndex">The index in the original text, before it was parsed into <see cref="MGTextLine"/>s.</param>
         public bool MoveToOriginalCharacterIndexOrEnd(int CharIndex, bool LeftSide)
         {
             Debug.WriteLine($"{nameof(MGTextCaret)}: Move to original index or end: {CharIndex} (Left={LeftSide})");
@@ -233,10 +233,10 @@ namespace MGUI.Core.UI.Text
             if (!HasPosition)
                 return false;
 
-            int DesiredIndex = Position.Value.IndexInParsedText + Amount;
+            int DesiredIndex = Position.Value.IndexInParsedText + Amount - 1;
             if (TextRenderInfo.TryGetCharAtParsedIndex(DesiredIndex, out CharRenderInfo CharInfo))
             {
-                return MoveToCharacter(CharInfo, true);
+                return MoveToCharacter(CharInfo, false);
             }
             else
             {

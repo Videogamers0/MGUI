@@ -2,6 +2,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Left="200" Top="200" Width="300" Height="400" BorderThickness="2" WindowStyle="None">
     <Border HorizontalAlignment="Stretch" Background="White" Padding="30" VerticalContentAlignment="Top">
-        
+        <TextBlock IsShadowed="True" Text="ABC[/shadow]DE[BG=Orange 0,0,0,-3]F[/BG]GHI" Foreground="Red" />
     </Border>
 </Window>
