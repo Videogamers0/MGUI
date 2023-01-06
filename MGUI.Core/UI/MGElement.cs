@@ -83,7 +83,6 @@ namespace MGUI.Core.UI
 	//tabcontrol - a separate default tabheader style that has like 'floating' tab headers. Just Underlined ContentPresenters instead of a full border. not touching the tabitem content's top border etc
 	//		should be easily achieved by just restyling the buttons to only have a bottom border, and have a bottom padding. but we probably also want the selected background to be null, and instead
 	//		have a brighter font color when hovered?
-	//mgoverlaypanel allow zindex, default=null. when drawing/updating, group by zindex.hasvalue, thenby zindex.value before iterating
 	//mgdockpanel - lastchildfill property, default=true. if false, then the actualdockedchildren shouldn't  be different than dockedchildren. when changed, calls layoutchanged
 	//something for mouse cursors?
 	//		maybe an enum MouseCursorType
@@ -969,7 +968,7 @@ namespace MGUI.Core.UI
 
 		protected virtual void UpdateContents(ElementUpdateArgs UA)
         {
-            foreach (MGElement Child in GetVisualTreeChildren().ToList())
+            foreach (MGElement Child in GetVisualTreeChildren().Reverse().ToList())
                 Child.Update(UA);
         }
 

@@ -119,6 +119,9 @@ namespace MGUI.Core.UI.XAML
         /// <summary>Used by <see cref="OverlayPanel"/>'s children</summary>
         [Category("Attached")]
         public Thickness Offset { get; set; } = new();
+        /// <summary>Used by <see cref="OverlayPanel"/>'s children</summary>
+        [Category("ZIndex")]
+        public double? ZIndex { get; set; } = null;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [Category("Attached")]

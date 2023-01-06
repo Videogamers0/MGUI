@@ -76,6 +76,10 @@ namespace MGUI.Samples
             Desktop.Windows.Clear();
             MGWindow Tmp = XAMLParser.LoadRootWindow(Desktop, ReadEmbeddedResourceAsString(CurrentAssembly, $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Temp.xaml"));
             Desktop.Windows.Add(Tmp);
+
+            //Tmp.GetElementByName<MGButton>("B1").AddCommandHandler((btn, e) => { Debug.WriteLine("Clicked B1"); });
+            //Tmp.GetElementByName<MGButton>("B2").AddCommandHandler((btn, e) => { Debug.WriteLine("Clicked B2"); });
+            //Tmp.GetElementByName<MGButton>("B3").AddCommandHandler((btn, e) => { Debug.WriteLine("Clicked B3"); });
 #endif
 
             base.Initialize();
@@ -108,7 +112,7 @@ namespace MGUI.Samples
             MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, false, true, WindowTheme);
             Window.Scale = 2f;
 
-            //Window.MakeInvisible();
+            //Window.WindowStyle = WindowStyle.None;
 
             MGToolTip Test1 = new(Window, Window, 100, 100);
             Test1.SetContent("Testing inlined tooltip");
@@ -219,6 +223,18 @@ namespace MGUI.Samples
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Registration.xaml";
             string XAML = ReadEmbeddedResourceAsString(CurrentAssembly, ResourceName);
             MGWindow Window = XAMLParser.LoadRootWindow(Desktop, XAML, false);
+
+            //  Create an action that is executed when clicking the "Terms of Service" link
+            //  (XAML: '<TextBlock Text="I agree to the [Action=OpenTOS][color=#3483eb][i][u]Terms of service[/u][/i][/color][/Action]" />')
+            Window.AddNamedAction("OpenTOS", x =>
+            {
+                string SampleTOSWebpage = @"https://www.google.com";
+                Process.Start(new ProcessStartInfo()
+                {
+                    FileName = SampleTOSWebpage,
+                    UseShellExecute = true
+                });
+            });
 
             //  Retrieve named elements from the window
             MGTextBox TextBox_Email = Window.GetElementByName<MGTextBox>("TextBox_Email");

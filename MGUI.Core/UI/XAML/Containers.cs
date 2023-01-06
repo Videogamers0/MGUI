@@ -356,7 +356,7 @@ namespace MGUI.Core.UI.XAML
             foreach (Element Child in Children)
             {
                 MGElement ChildElement = Child.ToElement<MGElement>(OverlayPanel.ParentWindow, OverlayPanel);
-                OverlayPanel.TryAddChild(ChildElement, Child.Offset.ToThickness());
+                OverlayPanel.TryAddChild(ChildElement, Child.Offset.ToThickness(), Child.ZIndex);
             }
         }
     }

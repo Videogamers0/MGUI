@@ -75,7 +75,7 @@
                     
                     <!-- Terms of service -->
                     <CheckBox Name="CheckBox_TOS" IsChecked="true">
-                        <TextBlock Text="I agree to the [color=#3483eb][i][u]Terms of service[/u][/i][/color]" />
+                        <TextBlock Text="I agree to the [Action=OpenTOS][color=#3483eb][i][u]Terms of service[/u][/i][/color][/Action]" />
                     </CheckBox>
                 </StackPanel>
             </ScrollViewer>
