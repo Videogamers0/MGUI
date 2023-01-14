@@ -933,7 +933,8 @@ namespace MGUI.Core.UI.Containers.Grids
             IEnumerable<ColumnDefinition> RemainingColumns = Columns
                 .Where(x => !ColumnWidths.ContainsKey(x))
                 .OrderBy(x => x.Length.IsAutoLength || IsPseudoInfiniteWidth ? 0 : 1)
-                .ThenBy(x => x.MaxWidth ?? int.MaxValue); // Try to handle columns with a MaxWidth first because if the column's width gets truncated, it might free up more width for the next weighted column to use
+                .ThenBy(x => x.MaxWidth ?? int.MaxValue) // Try to handle columns with a MaxWidth first because if the column's width gets truncated, it might free up more width for the next weighted column to use
+                .ThenByDescending(x => x.MinWidth.HasValue); // Try to handle columns with a MinWidth first because if the column's width gets increased upwards to the MinWidth, it consumes more space than usual, leaving less space for the next weighted column to use
             foreach (ColumnDefinition Column in RemainingColumns)
             {
                 int ColumnWidth;
@@ -998,7 +999,8 @@ namespace MGUI.Core.UI.Containers.Grids
             IEnumerable<RowDefinition> RemainingRows = Rows
                 .Where(x => !RowHeights.ContainsKey(x))
                 .OrderBy(x => x.Length.IsAutoLength || IsPseduoInfiniteHeight ? 0 : 1)
-                .ThenBy(x => x.MaxHeight ?? int.MaxValue); // Try to handle rows with a MaxHeight first because if the row's height gets truncated, it might free up more height for the next weighted row to use
+                .ThenBy(x => x.MaxHeight ?? int.MaxValue) // Try to handle rows with a MaxHeight first because if the row's height gets truncated, it might free up more height for the next weighted row to use
+                .ThenByDescending(x => x.MinHeight.HasValue); // Try to handle rows with a MinHeight first because if the row's height gets increased upwards to the MinHeight, it consumes more space than usual, leaving less space for the next weighted row to use
             foreach (RowDefinition Row in RemainingRows)
             {
                 int RowHeight;

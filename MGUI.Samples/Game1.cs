@@ -76,10 +76,6 @@ namespace MGUI.Samples
             Desktop.Windows.Clear();
             MGWindow Tmp = XAMLParser.LoadRootWindow(Desktop, ReadEmbeddedResourceAsString(CurrentAssembly, $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Temp.xaml"));
             Desktop.Windows.Add(Tmp);
-
-            //Tmp.GetElementByName<MGButton>("B1").AddCommandHandler((btn, e) => { Debug.WriteLine("Clicked B1"); });
-            //Tmp.GetElementByName<MGButton>("B2").AddCommandHandler((btn, e) => { Debug.WriteLine("Clicked B2"); });
-            //Tmp.GetElementByName<MGButton>("B3").AddCommandHandler((btn, e) => { Debug.WriteLine("Clicked B3"); });
 #endif
 
             base.Initialize();
