@@ -556,6 +556,22 @@ namespace MGUI.Core.UI
                     SetItemsSource(TempItems);
                 }
             }
+
+            if (Settings.DropdownItemTemplate != null)
+            {
+                this.DropdownItemTemplate = (Item) =>
+                {
+                    MGButton Button = CreateDefaultDropdownButton();
+                    MGElement Content = Settings.DropdownItemTemplate.GetContent(SelfOrParentWindow, this, Item);
+                    Button.SetContent(Content);
+                    return Button;
+                };
+            }
+
+            if (Settings.SelectedItemTemplate != null)
+            {
+                this.SelectedItemTemplate = (Item) => Settings.SelectedItemTemplate.GetContent(SelfOrParentWindow, this, Item);
+            }
         }
     }
 }

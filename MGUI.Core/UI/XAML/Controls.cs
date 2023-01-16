@@ -271,6 +271,11 @@ namespace MGUI.Core.UI.XAML
         [Category("Data")]
         public List<object> Items { get; set; } = new();
 
+        [Category("Data")]
+        public ContentTemplate DropdownItemTemplate { get; set; }
+        [Category("Data")]
+        public ContentTemplate SelectedItemTemplate { get; set; }
+
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
             Type GenericType = typeof(MGComboBox<>).MakeGenericType(new Type[] { ItemType });
@@ -292,6 +297,11 @@ namespace MGUI.Core.UI.XAML
 
             yield return Border;
             yield return DropdownArrow;
+
+            if (DropdownItemTemplate?.Content != null)
+                yield return DropdownItemTemplate.Content;
+            if (SelectedItemTemplate?.Content != null)
+                yield return SelectedItemTemplate.Content;
         }
     }
 
@@ -444,8 +454,12 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.Image;
 
+        [Category("Data")]
         public string TextureName { get; set; }
+        [Category("Data")]
         public string RegionName { get; set; }
+        [Category("Data")]
+        public Texture2D Texture { get; set; }
 
         [Category("Appearance")]
         public XAMLColor? TextureColor { get; set; }
@@ -463,7 +477,7 @@ namespace MGUI.Core.UI.XAML
                 if (!string.IsNullOrEmpty(TextureName))
                     return new MGImage(Window, Desktop.NamedTextures[TextureName], SourceRect?.ToRectangle());
                 else
-                    return new MGImage(Window, null as Texture2D);
+                    return new MGImage(Window, Texture, SourceRect?.ToRectangle(), TextureColor?.ToXNAColor(), Stretch ?? UI.Stretch.Uniform);
             }
         }
 
@@ -1308,7 +1322,7 @@ namespace MGUI.Core.UI.XAML
         [Category("Layout")]
         public HorizontalAlignment? TextAlignment { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTextBlock(Window, Text, Foreground?.ToXNAColor());
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTextBlock(Window, Text, Foreground?.ToXNAColor(), FontSize ?? null, AllowsInlineFormatting ?? true);
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {

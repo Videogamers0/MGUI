@@ -12,6 +12,10 @@ using DrawingColor = System.Drawing.Color;
 using ColorTranslator = System.Drawing.ColorTranslator;
 using System.Text.RegularExpressions;
 
+#if UseWPF
+using System.Windows.Markup;
+#endif
+
 namespace MGUI.Core.UI.XAML
 {
     #region Color
@@ -251,10 +255,35 @@ namespace MGUI.Core.UI.XAML
             this.Bottom = Bottom;
         }
 
-
         public override string ToString() => $"{nameof(DockedBorderBrush)}: {Left}, {Top}, {Right}, {Bottom}";
 
         public override IBorderBrush ToBorderBrush() => new MGDockedBorderBrush(Left.ToFillBrush(), Top.ToFillBrush(), Right.ToFillBrush(), Bottom.ToFillBrush());
+    }
+
+#if UseWPF
+    [ContentProperty(nameof(Bands))]
+#endif
+    public class BandedBorderBrush : BorderBrush
+    {
+        public List<BorderBand> Bands { get; set; } = new();
+
+        public BandedBorderBrush() : this(new List<BorderBand>()) { }
+        public BandedBorderBrush(IList<BorderBand> Bands)
+        {
+            this.Bands = Bands.ToList();
+        }
+
+        public override string ToString() => $"{nameof(BandedBorderBrush)}: {Bands.Count} band(s)";
+
+        public override IBorderBrush ToBorderBrush() => new MGBandedBorderBrush(Bands.Select(x => x.ToBorderBand()).ToArray());
+    }
+
+    public class BorderBand
+    {
+        public BorderBrush Brush { get; set; } = new UniformBorderBrush(new SolidFillBrush(new XAMLColor(255, 255, 255, 0)));
+        public double ThicknessWeight { get; set; } = 1.0;
+
+        public MGBorderBand ToBorderBand() => new(Brush.ToBorderBrush(), ThicknessWeight);
     }
     #endregion Border Brush
 }

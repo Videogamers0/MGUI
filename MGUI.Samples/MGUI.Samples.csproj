@@ -27,6 +27,9 @@
     <None Remove="Windows\Temp.xaml" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="FF7 Samples\InventoryUI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\CharacterStats.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>

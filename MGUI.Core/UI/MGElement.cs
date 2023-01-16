@@ -15,6 +15,7 @@ using MGUI.Shared.Input.Keyboard;
 using MGUI.Shared.Input;
 using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Containers.Grids;
+using PropertyBinding = MGUI.Core.UI.XAML.PropertyBinding;
 
 namespace MGUI.Core.UI
 {
@@ -670,6 +671,10 @@ namespace MGUI.Core.UI
 
         /// <summary>General-purpose dictionary to attach your own data to this <see cref="MGElement"/></summary>
         public Dictionary<string, object> Metadata { get; } = new();
+        /// <summary>General-purpose object to attach your own data to this <see cref="MGElement"/></summary>
+        public object Tag { get; set; }
+
+        internal List<PropertyBinding> OneWayBindings { get; } = new();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private DeferEventsManager InitializationManager { get; }

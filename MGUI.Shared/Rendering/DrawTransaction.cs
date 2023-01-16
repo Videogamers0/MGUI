@@ -293,7 +293,7 @@ namespace MGUI.Shared.Rendering
 
         public void FillRectangle(Vector2 Origin, RectangleF Destination, Color Color, DrawContext? PreferredContext = null)
         {
-            if (Destination.Width.IsAlmostZero() || Destination.Height.IsAlmostZero())
+            if (Destination.Width.IsAlmostZero() || Destination.Height.IsAlmostZero() || Color.A == 0)
                 return;
 
             DrawContext Ctx = GetFirstValidDrawContext(PreferredContext, CurrentContext, DrawContext.Sprites);

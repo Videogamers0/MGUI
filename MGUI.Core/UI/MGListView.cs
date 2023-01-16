@@ -249,6 +249,8 @@ namespace MGUI.Core.UI
         /// enumerate <see cref="GridSelection"/>, and for each <see cref="GridCell"/>, call <see cref="GridSelection.Grid"/>'s <see cref="MGGrid.GetCellContent(GridCell)"/></summary>
         public GridSelection? SelectedData => DataGrid.CurrentSelection;
 
+        public event EventHandler<GridSelection?> SelectionChanged;
+
         public MGListView(MGWindow Window)
             : this(Window, 8, 3) { }
 
@@ -280,6 +282,8 @@ namespace MGUI.Core.UI
                 DataGrid.HorizontalGridLineBrush = GridLineBrush;
                 DataGrid.VerticalGridLineBrush = GridLineBrush;
                 DataGrid.CanChangeContent = false;
+
+                DataGrid.SelectionChanged += (sender, e) => { SelectionChanged?.Invoke(this, e); };
 
                 //  Create a content-less element that will be placed to the right of the HeaderGrid, whose width will always match the width of the vertical scrollbar.
                 //  If the DataGrid needs to reserve width on the right edge for a vertical scrollbar, this width will also be reserved in the HeaderGrid

@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MonoGame.Extended;
+using System.Diagnostics;
 
 #if UseWPF
 using System.Windows.Markup;
@@ -319,6 +320,23 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.StackPanel;
 
+        [Category("Border")]
+        public Border Border { get; set; } = new();
+
+        [Category("Border")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
+
+        [Category("Border")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public Thickness? BorderThickness { get => Border.BorderThickness; set => Border.BorderThickness = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
+
         [Category("Layout")]
         public Orientation? Orientation { get; set; }
         [Category("Layout")]
@@ -329,6 +347,7 @@ namespace MGUI.Core.UI.XAML
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGStackPanel StackPanel = Element as MGStackPanel;
+            Border.ApplySettings(Parent, StackPanel.BorderComponent.Element);
 
             if (Orientation.HasValue)
                 StackPanel.Orientation = Orientation.Value;

@@ -5,9 +5,11 @@ using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Containers.Grids;
 using MGUI.Core.UI.Text;
 using MGUI.Core.UI.XAML;
+using MGUI.Samples.FF7_Samples;
 using MGUI.Shared.Helpers;
 using MGUI.Shared.Rendering;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -66,6 +68,8 @@ namespace MGUI.Samples
 
             Desktop.BringToFront(XAMLDesigner);
             Desktop.BringToFront(DebugWindow);
+
+            InitializeFF7InventorySampleWindow(Desktop);
 #else
             MGWindow DebugWindow = LoadDebugWindow(CurrentAssembly, Desktop);
             Desktop.Windows.Add(DebugWindow);
@@ -86,6 +90,63 @@ namespace MGUI.Samples
             using (Stream ResourceStream = CurrentAssembly.GetManifestResourceStream(ResourceName))
             using (StreamReader Reader = new StreamReader(ResourceStream))
             return Reader.ReadToEnd();
+        }
+
+        private void InitializeFF7InventorySampleWindow(MGDesktop Desktop)
+        {
+            //  Create a sample Party
+            Party FF7Party = new();
+            PartyMember Barret = FF7Party.AddMember("Barret", Content.Load<Texture2D>(Path.Combine("Portraits", "Barret")), 65077, 1601, 199);
+            Barret.CurrentHP = (int)(Barret.CurrentHP * 0.92);
+            Barret.CurrentMP = (int)(Barret.CurrentMP * 0.90);
+            PartyMember Cloud = FF7Party.AddMember("Cloud", Content.Load<Texture2D>(Path.Combine("Portraits", "Cloud")), 70140, 1455, 232);
+            Cloud.CurrentHP = (int)(Cloud.CurrentHP * 0.77);
+            Cloud.CurrentMP = (int)(Cloud.CurrentMP * 0.48);
+            PartyMember RedXIII = FF7Party.AddMember("Red XIII", Content.Load<Texture2D>(Path.Combine("Portraits", "Red XIII")), 55126, 1477, 204);
+            RedXIII.CurrentHP = (int)(RedXIII.CurrentHP * 0.65);
+            RedXIII.CurrentMP = (int)(RedXIII.CurrentMP * 0.80);
+
+            //  Create some items
+            Item Potion = new("Potion", "Restores HP by 100", 100, 0, 0, 0);
+            Item HiPotion = new("Hi-Potion", "Restores HP by 500", 500, 0, 0, 0);
+            Item XPotion = new("X-Potion", "Fully Restores HP", 0, 1.0, 0, 0);
+            Item MiniEther = new("Mini-Ether", "Restores MP by 10", 0, 0, 10, 0);
+            Item Ether = new("Ether", "Restores MP by 100", 0, 0, 100, 0);
+            Item TurboEther = new("Turbo Ether", "Fully Restores MP", 0, 0, 0, 1.0);
+            Item Elixir = new("Elixir", "Fully Restores HP/MP", 0, 1.0, 0, 1.0);
+            Item PhoenixDown = new("Phoenix Down", "Restores life", 0, 0.25, 0, 0, StatusAilments.Downed);
+            Item PoisonousBrew = new("Poisonous Brew", "Damages HP by 100 for testing purposes", -100, 0.0, 0, 0.0);
+            Item Antidote = new("Antidote", "Cures [Poison]", 0, 0, 0, 0, StatusAilments.Poison);
+            Item EyeDrop = new("Eye Drop", "Cures [Darkness]", 0, 0, 0, 0, StatusAilments.Darkness);
+            Item Soft = new("Soft", "Cures [Petrify]", 0, 0, 0, 0, StatusAilments.Petrify);
+            Item MaidensKiss = new("Maiden's Kiss", "Cures [Frog]", 0, 0, 0, 0, StatusAilments.Frog);
+            Item EchoScreen = new("Echo Screen", "Cures [Silence]", 0, 0, 0, 0, StatusAilments.Silence);
+            Item Remedy = new("Remedy", "Cures abnormal status", 0, 0, 0, 0, StatusAilments.All & ~StatusAilments.Downed);
+            Item Megalixir = new("Megalixir", "Fully restores all members HP/MP", 0, 1.0, 0, 1.0);
+
+            //  Create a sample inventory and add some items to it
+            Inventory FF7Inventory = new(Content, Desktop, FF7Party, x =>
+            {
+                x.AddItem(Potion, 43);
+                x.AddItem(HiPotion, 16);
+                x.AddItem(XPotion, 1);
+                x.AddItem(MiniEther, 7);
+                x.AddItem(Ether, 2);
+                x.AddItem(TurboEther, 7);
+                x.AddItem(Elixir, 1);
+                x.AddItem(PhoenixDown, 6);
+                x.AddItem(PoisonousBrew, 25);
+                x.AddItem(Antidote, 22);
+                x.AddItem(EyeDrop, 12);
+                x.AddItem(Soft, 15);
+                x.AddItem(MaidensKiss, 4);
+                x.AddItem(EchoScreen, 10);
+                x.AddItem(Remedy, 5);
+                x.AddItem(Megalixir, 2);
+            });
+
+            //  Show the UI
+            FF7Inventory.Show();
         }
 
         private static MGWindow LoadDesignerWindow(Assembly CurrentAssembly, MGDesktop Desktop)

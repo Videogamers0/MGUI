@@ -587,7 +587,22 @@ namespace MGUI.Core.UI.Containers.Grids
         public bool CanDeselectByClickingSelectedCell { get; set; } = true;
 
         private GridSelection? PreviousSelection = null;
-        public GridSelection? CurrentSelection = null;
+
+        private GridSelection? _CurrentSelection;
+        public GridSelection? CurrentSelection
+        {
+            get => _CurrentSelection;
+            set
+            {
+                if (_CurrentSelection != value)
+                {
+                    _CurrentSelection = value;
+                    SelectionChanged?.Invoke(this, CurrentSelection);
+                }
+            }
+        }
+
+        public event EventHandler<GridSelection?> SelectionChanged;
         public bool HasSelection => CurrentSelection.HasValue;
 
         /// <param name="MousePosition">The current mouse position in <see cref="CoordinateSpace.Layout"/><para/>

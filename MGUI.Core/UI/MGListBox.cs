@@ -347,6 +347,27 @@ namespace MGUI.Core.UI
 
                     foreach (MGListBoxItem<TItemType> Item in SelectedItems)
                         Item.ContentPresenter.IsSelected = true;
+
+                    SelectionChanged?.Invoke(this, SelectedItems);
+                }
+            }
+        }
+
+        public event EventHandler<ReadOnlyCollection<MGListBoxItem<TItemType>>> SelectionChanged;
+
+        public void SelectItem(TItemType Item)
+        {
+            if (SelectedItems?.Count == 1 && SelectedItems.First().Data.Equals(Item))
+                return;
+
+            //  Find ListBoxItem that wraps the Item data
+            foreach (MGListBoxItem<TItemType> LBI in ListBoxItems)
+            {
+                if (LBI.Data.Equals(Item))
+                {
+                    //  Select it
+                    this.SelectedItems = new List<MGListBoxItem<TItemType>>() { LBI }.AsReadOnly();
+                    return;
                 }
             }
         }
@@ -354,7 +375,8 @@ namespace MGUI.Core.UI
         public void ClearSelection()
         {
             SelectionSourceItem = null;
-            SelectedItems = new List<MGListBoxItem<TItemType>>().AsReadOnly();
+            if (SelectedItems?.Count != 0)
+                SelectedItems = new List<MGListBoxItem<TItemType>>().AsReadOnly();
         }
         #endregion Selection
 
@@ -609,7 +631,14 @@ namespace MGUI.Core.UI
                 Header = Settings.Header.ToElement<MGElement>(SelfOrParentWindow, this);
 
             if (Settings.IsTitleVisible.HasValue)
+            {
                 IsTitleVisible = Settings.IsTitleVisible.Value;
+                if (!IsTitleVisible)
+                {
+                    TitleBorderThickness = new(0);
+                    InnerBorderThickness = new(0);
+                }
+            }
 
             if (Settings.Items?.Any() == true)
             {
@@ -637,6 +666,18 @@ namespace MGUI.Core.UI
 
             if (Settings.AlternatingRowBackgrounds != null && Settings.AlternatingRowBackgrounds.Any())
                 AlternatingRowBackgrounds = Settings.AlternatingRowBackgrounds.Select(x => x.ToFillBrush()).ToList().AsReadOnly();
+            else
+                AlternatingRowBackgrounds = new List<IFillBrush>().AsReadOnly();
+
+            if (Settings.ItemContainerStyle != null)
+            {
+                this.ItemContainerStyle = (Border) => { Settings.ItemContainerStyle.ApplySettings(this, Border); };
+            }
+
+            if (Settings.ItemTemplate != null)
+            {
+                this.ItemTemplate = (Item) => Settings.ItemTemplate.GetContent(SelfOrParentWindow, this, Item);
+            }
         }
     }
 

@@ -77,6 +77,19 @@ namespace MGUI.Core.UI.XAML
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [Browsable(false)]
         public Thickness? TitleBT { get => TitleBorderThickness; set => TitleBorderThickness = value; }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Category("Border")]
+        public BorderBrush ItemsPanelBorderBrush { get => ItemsPanel.BorderBrush; set => ItemsPanel.BorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public BorderBrush ItemsPanelBB { get => ItemsPanelBorderBrush; set => ItemsPanelBorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Category("Border")]
+        public Thickness? ItemsPanelBorderThickness { get => ItemsPanel.BorderThickness; set => ItemsPanel.BorderThickness = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public Thickness? ItemsPanelBT { get => ItemsPanelBorderThickness; set => ItemsPanelBorderThickness = value; }
         #endregion Borders
 
         [Category("Title")]
@@ -100,6 +113,12 @@ namespace MGUI.Core.UI.XAML
 
         [Category("Appearance")]
         public List<FillBrush> AlternatingRowBackgrounds { get; set; } = new();
+
+        [Category("Data")]
+        public ContentTemplate ItemTemplate { get; set; }
+
+        [Category("Appearance")]
+        public Border ItemContainerStyle { get; set; } = null;
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
@@ -129,6 +148,10 @@ namespace MGUI.Core.UI.XAML
 
             if (Header != null)
                 yield return Header;
+            if (ItemTemplate?.Content != null)
+                yield return ItemTemplate.Content;
+            if (ItemContainerStyle != null)
+                yield return ItemContainerStyle;
         }
     }
 

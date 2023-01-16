@@ -120,7 +120,7 @@ namespace MGUI.Core.UI.XAML
         [Category("Attached")]
         public Thickness Offset { get; set; } = new();
         /// <summary>Used by <see cref="OverlayPanel"/>'s children</summary>
-        [Category("ZIndex")]
+        [Category("Attached")]
         public double? ZIndex { get; set; } = null;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -151,6 +151,11 @@ namespace MGUI.Core.UI.XAML
 
         [Category("Attached")]
         public Dictionary<string, object> AttachedProperties { get; set; } = new();
+
+        [Category("Attached")]
+        public object Tag { get; set; }
+
+        protected internal List<PropertyBinding> Bindings { get; } = new();
 
         public T ToElement<T>(MGWindow Window, MGElement Parent) 
             where T : MGElement
@@ -234,6 +239,11 @@ namespace MGUI.Core.UI.XAML
 
                 if (RenderScale.HasValue)
                     Element.RenderScale = new(RenderScale.Value, RenderScale.Value);
+
+                Element.Tag = this.Tag;
+
+                foreach (PropertyBinding Binding in this.Bindings.Where(x => x.Mode == BindingMode.OneWay))
+                    Element.OneWayBindings.Add(Binding);
             }
         }
 
