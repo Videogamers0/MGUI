@@ -205,7 +205,7 @@ namespace MGUI.Samples
             if (Window.TryGetElementByName("LV1", out MGListView<double> LV))
             {
                 LV.SetItemsSource(new List<double>() { 5, 25.5, 101.11, 0.0, -52.6, -18, 12345, -99.3, 0 });
-                LV.Columns[1].ItemTemplate = (double val) =>
+                LV.Columns[1].CellTemplate = (double val) =>
                 {
                     if (val > 0)
                         return new MGTextBlock(Window, "Positive", Color.Green);
@@ -409,10 +409,10 @@ namespace MGUI.Samples
             //  Get the ListView
             MGListView<Person> ListView_Sample1 = Window1.GetElementByName<MGListView<Person>>("ListView_Sample1");
 
-            //  Set the ItemTemplate of each column
-            ListView_Sample1.Columns[0].ItemTemplate = (person) => new MGTextBlock(Window1, person.Id.ToString(), Color.LightYellow) { HorizontalAlignment = HorizontalAlignment.Center };
-            ListView_Sample1.Columns[1].ItemTemplate = (person) => new MGTextBlock(Window1, person.FirstName, person.IsMale ? Color.CornflowerBlue : Color.HotPink);
-            ListView_Sample1.Columns[2].ItemTemplate = (person) => new MGTextBlock(Window1, person.LastName, person.IsMale ? Color.CornflowerBlue : Color.HotPink);
+            //  We already defined the CellTemplate of the first column in our XAML.
+            //  But the other 2 columns will use slightly more complex logic that depends on the IsMale property, so we'll define those CellTemplates with c# code
+            ListView_Sample1.Columns[1].CellTemplate = (person) => new MGTextBlock(Window1, person.FirstName, person.IsMale ? Color.CornflowerBlue : Color.HotPink);
+            ListView_Sample1.Columns[2].CellTemplate = (person) => new MGTextBlock(Window1, person.LastName, person.IsMale ? Color.CornflowerBlue : Color.HotPink);
 
             //  Set the row data of the ListView
             List<Person> People = new()

@@ -57,11 +57,6 @@ namespace MGUI.Core.UI.XAML
                     Type TargetType = Nullable.GetUnderlyingType(TargetProperty.PropertyType) ?? TargetProperty.PropertyType;
                     object TargetValue = Value == null ? null : Convert.ChangeType(Value, TargetType);
                     TargetProperty.SetValue(Element, TargetValue, null);
-
-                    //if (TargetProperty.PropertyType == typeof(string))
-                    //    TargetProperty.SetValue(Element, Value.ToString());
-                    //else if (Value != null && TargetProperty.PropertyType.IsAssignableFrom(Value.GetType()))
-                    //    TargetProperty.SetValue(Element, Value);
                 }
             }
 

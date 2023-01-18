@@ -213,8 +213,12 @@ namespace MGUI.Core.UI.XAML
 #endif
     public class ListViewColumn
     {
+        [Category("Layout")]
         public ListViewColumnWidth Width { get; set; }
+        [Category("Appearance")]
         public Element Header { get; set; }
+        [Category("Appearance")]
+        public ContentTemplate CellTemplate { get; set; }
     }
 
     [TypeConverter(typeof(ListViewColumnWidthStringConverter))]

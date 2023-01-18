@@ -7,6 +7,15 @@
             <ListViewColumn.Header>
                 <TextBlock IsBold="True" TextAlignment="Center" Text="Id" />
             </ListViewColumn.Header>
+            <ListViewColumn.CellTemplate>
+                <ContentTemplate>
+                    <!-- MGUI doesn't support data bindings like WPF, but it does have a very basic kind of binding with the {PropertyBinding} markup extension -->
+                    <!-- PropertyBindings currently only support OneWay or OneTime bindings, and don't support converters, triggers, nor nested property paths yet (such as "Path=Foo.Bar") -->
+                    <!-- If you need more advanced binding, you'll need to define the column's CellTemplate with c# code -->
+                    <TextBlock HorizontalAlignment="Center" Foreground="LightYellow" Background="Orange" 
+                               Text="{PropertyBinding Path=Id, Mode=OneTime, FallbackValue='&lt;Id&gt;'}" />
+                </ContentTemplate>
+            </ListViewColumn.CellTemplate>
         </ListViewColumn>
         <ListViewColumn Width="*">
             <ListViewColumn.Header>

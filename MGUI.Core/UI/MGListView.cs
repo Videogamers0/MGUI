@@ -345,7 +345,14 @@ namespace MGUI.Core.UI
             {
                 ListViewColumnWidth Width = ColumnDefinition.Width.ToWidth();
                 MGElement Header = ColumnDefinition.Header.ToElement<MGElement>(SelfOrParentWindow, this);
-                AddColumn(Width, Header, x => new MGTextBlock(SelfOrParentWindow, x.ToString()));
+
+                Func<TItemType, MGElement> CellTemplate;
+                if (ColumnDefinition.CellTemplate != null)
+                    CellTemplate = (Item) => ColumnDefinition.CellTemplate.GetContent(SelfOrParentWindow, this, Item);
+                else
+                    CellTemplate = (Item) => new MGTextBlock(SelfOrParentWindow, Item.ToString());
+
+                AddColumn(Width, Header, CellTemplate);
             }
 
             if (Settings.RowHeight.HasValue)
@@ -407,7 +414,7 @@ namespace MGUI.Core.UI
         public RowDefinition DataRow { get; }
 
         /// <summary>The data object used as a parameter to generate the content of each cell in the <see cref="DataRow"/>.<para/>
-        /// See also: <see cref="MGListViewColumn{TItemType}.ItemTemplate"/></summary>
+        /// See also: <see cref="MGListViewColumn{TItemType}.CellTemplate"/></summary>
         public TItemType Data { get; }
 
         public Dictionary<MGListViewColumn<TItemType>, MGElement> GetRowContents()
@@ -444,9 +451,9 @@ namespace MGUI.Core.UI
                 DataGrid.ClearRowContent(DataRow);
                 foreach (MGListViewColumn<TItemType> Column in ListView.Columns)
                 {
-                    if (Column.ItemTemplate != null)
+                    if (Column.CellTemplate != null)
                     {
-                        MGElement CellContent = Column.ItemTemplate(Data);
+                        MGElement CellContent = Column.CellTemplate(Data);
                         DataGrid.TryAddChild(DataRow, Column.DataColumn, CellContent);
                     }
                 }
@@ -492,7 +499,7 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<TItemType, MGElement> _ItemTemplate;
         /// <summary>This function is invoked to instantiate the content of each cell in this column</summary>
-        public Func<TItemType, MGElement> ItemTemplate
+        public Func<TItemType, MGElement> CellTemplate
         {
             get => _ItemTemplate;
             set
@@ -510,12 +517,12 @@ namespace MGUI.Core.UI
             using (DataGrid.AllowChangingContentTemporarily())
             {
                 DataGrid.ClearColumnContent(DataColumn);
-                if (ListView.RowItems != null && ItemTemplate != null)
+                if (ListView.RowItems != null && CellTemplate != null)
                 {
                     for (int i = 0; i < ListView.RowItems.Count; i++)
                     {
                         MGListViewItem<TItemType> RowItem = ListView.RowItems[i];
-                        MGElement CellContent = ItemTemplate(RowItem.Data);
+                        MGElement CellContent = CellTemplate(RowItem.Data);
                         DataGrid.TryAddChild(RowItem.DataRow, DataColumn, CellContent);
                     }
                 }
@@ -538,7 +545,7 @@ namespace MGUI.Core.UI
 
             this.Header = Header;
 
-            this.ItemTemplate = ItemTemplate;
+            this.CellTemplate = ItemTemplate;
         }
     }
 }
