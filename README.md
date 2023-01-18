@@ -42,6 +42,8 @@ All control names are prefixed with 'MG' and have similar names and properties t
   - MGTextBox
   - MGTimer
   
+[Wiki is under construction.](https://github.com/Videogamers0/MGUI/wiki) More documentation coming soon...
+  
 # Examples
   
 A simple registration window created with MGUI:
@@ -272,7 +274,156 @@ A simple registration window created with MGUI:
 ```
 </details>
 
-![Register.png](assets/samples/Sample_Debug_Window.png)
+![FF7Inventory.gif](assets/samples/Sample_FF7Inventory_Window.gif)
+<details>
+  <summary>XAML Markup</summary>
+  
+```xaml
+<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MGUI.Samples.FF7_Samples;assembly=MGUI.Samples"
+        WindowStyle="None" Width="600" Height="470">
+    <DockPanel>
+        <DockPanel.Styles>
+            <Style TargetType="TextBlock">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="Foreground" Value="rgb(236,236,236)" />
+                <Setter Property="IsShadowed" Value="True" />
+                <Setter Property="ShadowColor" Value="Black" />
+                <Setter Property="ShadowOffset" Value="1,2" />
+            </Style>
+            <Style TargetType="Border" Name="PanelBorder">
+                <Setter Property="BorderBrush">
+                    <Setter.Value>
+                    <!-- BandedBorderBrushes are similar to nesting several Borders within each other. -->
+                    <!-- It just draws each Border in sequence, from the outside edge moving inwards -->
+                        <BandedBorderBrush>
+                            <BorderBand Brush="rgb(128,128,128)" />
+                            <BorderBand Brush="rgb(168,168,168)" />
+                            <BorderBand Brush="rgb(198,198,198)" />
+                            <BorderBand Brush="rgb(210,210,210)" />
+                            <BorderBand Brush="rgb(148,148,148)" />
+                            <BorderBand Brush="rgb(85,85,104)" />
+                        </BandedBorderBrush>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="BorderThickness" Value="6" />
+                <!-- Specifying 2 colors, separated by '|', creates a diagonal gradient brush -->
+                <Setter Property="Background" Value="rgb(0,0,180)|rgb(0,0,50)" />
+                <Setter Property="Padding" Value="8,4" />
+            </Style>
+        </DockPanel.Styles>
+
+        <Border StyleNames="PanelBorder" Dock="Top">
+            <TextBlock HorizontalAlignment="Center" FontSize="14" Text="Items" />
+        </Border>
+        <Border StyleNames="PanelBorder" Dock="Top">
+            <TextBlock Name="ItemDescriptionLabel" HorizontalAlignment="Left" Text="Select an item" AllowsInlineFormatting="False" />
+        </Border>
+
+        <DockPanel>
+            <Border StyleNames="PanelBorder" Dock="Left">
+                <!-- List of each party member -->
+                <ListBox Name="PartyList" ItemType="{x:Type local:PartyMember}" IsTitleVisible="False" Background="Transparent" 
+                         Margin="5" AlternatingRowBackgrounds="{x:Null}" ItemsPanelBorderThickness="0" SelectionMode="None">
+                    <ListBox.ItemTemplate>
+                        <ContentTemplate>
+                            <DockPanel Margin="0,5">
+                                <DockPanel.Styles>
+                                    <Style TargetType="TextBlock" Name="HeaderLabel">
+                                        <Setter Property="IsBold" Value="True" />
+                                        <Setter Property="Foreground" Value="rgb(24,215,215)" />
+                                        <Setter Property="Margin" Value="0,0,1,0" />
+                                        <Setter Property="MinWidth" Value="32" />
+                                        <Setter Property="TextAlignment" Value="Left" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                    </Style>
+                                </DockPanel.Styles>
+                                
+                                <!-- Character Portrait -->
+                                <Border BorderBrush="Black" BorderThickness="2" Dock="Left" Margin="0,0,6,0" VerticalAlignment="Center">
+                                    <Image Stretch="None" Texture="{PropertyBinding Path=Portrait, Mode=OneTime}" />
+                                </Border>
+                                
+                                <StackPanel Margin="8,0,0,0" VerticalAlignment="Center" Orientation="Vertical">
+                                    <!-- Character Name -->
+                                    <TextBlock Text="{PropertyBinding Path=Name, Mode=OneTime, FallbackValue='&lt;Name&gt;'}" />
+                                    
+                                    <!-- Character Level -->
+                                    <DockPanel>
+                                        <TextBlock StyleNames="HeaderLabel" Dock="Left" Text="LV" />
+                                        <TextBlock Foreground="White" IsBold="True" Text="{PropertyBinding Path=Level, Mode=OneWay}" />
+                                    </DockPanel>
+                                    
+                                    <!-- Character HP -->
+                                    <DockPanel>
+                                        <TextBlock StyleNames="HeaderLabel" Dock="Left" Text="HP" />
+                                        <DockPanel VerticalAlignment="Center">
+                                            <!-- Tip: If you specify 4 colors, delimited by a '|', it will create an MGGradientBrush using those colors as the 4 corners of the gradient -->
+                                            <ProgressBar Dock="Bottom" Height="4" BorderThickness="0,0,0,1" BorderBrush="Black"
+                                                         Minimum="0" Maximum="{PropertyBinding Path=MaxHP, Mode=OneWay}" Value="{PropertyBinding Path=CurrentHP, Mode=OneWay}"
+                                                         CompletedBrush="rgb(56,114,217)|rgb(155,178,220)|rgb(155,178,220)|rgb(56,114,217)" 
+                                                         IncompleteBrush="rgb(60,0,0)" />
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{PropertyBinding Path=CurrentHP, Mode=OneWay}" />
+                                                <TextBlock Margin="3,0" Text="/" FontSize="12" />
+                                                <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{PropertyBinding Path=MaxHP, Mode=OneWay}" />
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </DockPanel>
+                                    
+                                    <!-- Character MP -->
+                                    <DockPanel>
+                                        <TextBlock StyleNames="HeaderLabel" Dock="Left" Text="MP" />
+                                        <DockPanel VerticalAlignment="Center">
+                                            <ProgressBar Dock="Bottom" Height="4" BorderThickness="0,0,0,1" BorderBrush="Black"
+                                                         Minimum="0" Maximum="{PropertyBinding Path=MaxMP, Mode=OneWay}" Value="{PropertyBinding Path=CurrentMP, Mode=OneWay}"
+                                                         CompletedBrush="rgb(65,217,152)|rgb(170,205,196)|rgb(170,205,196)|rgb(65,217,152)" 
+                                                         IncompleteBrush="rgb(60,0,0)" />
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{PropertyBinding Path=CurrentMP, Mode=OneWay}" />
+                                                <TextBlock Margin="3,0" Text="/" FontSize="12" />
+                                                <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{PropertyBinding Path=MaxMP, Mode=OneWay}" />
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </DockPanel>
+                                </StackPanel>
+                            </DockPanel>
+                        </ContentTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+
+            <Border StyleNames="PanelBorder">
+                <!-- List of each item in the inventory -->
+                <ListBox Name="ItemsList" ItemType="{x:Type local:InventoryItem}" IsTitleVisible="False" Background="Transparent" 
+                         Margin="10" AlternatingRowBackgrounds="{x:Null}" ItemsPanelBorderThickness="0">
+                    <ListBox.ItemTemplate>
+                        <ContentTemplate>
+                            <DockPanel>
+                                <!-- Name and icon -->
+                                <StackPanel Orientation="Horizontal" Dock="Left" Spacing="5">
+                                    <Image VerticalAlignment="Center" TextureName="FF7ItemIcon" Width="24" Height="22" />
+                                    <TextBlock VerticalAlignment="Center" Text="{PropertyBinding Path=Name, Mode=OneTime}" />
+                                </StackPanel>
+                                
+                                <!-- Quantity -->
+                                <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Right">
+                                    <TextBlock VerticalAlignment="Center" Text=":" IsBold="True" />
+                                    <TextBlock VerticalAlignment="Center" Text="{PropertyBinding Path=Quantity, Mode=OneWay}" 
+                                               MinWidth="24" TextAlignment="Right" IsBold="True" />
+                                </StackPanel>
+                            </DockPanel>
+                        </ContentTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+        </DockPanel>
+    </DockPanel>
+</Window>
+```
+</details>
+
   
 MGUI can also parse and render your XAML markup at runtime using the MGXAMLDesigner control:
 ![XAML Designer](assets/samples/Sample_XAML_Designer_Window.gif)
@@ -315,7 +466,6 @@ public class Game1 : Game, IObservableUpdate
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-        Window.AllowUserResizing = true;
     }
 
     protected override void Initialize()
@@ -333,16 +483,12 @@ public class Game1 : Game, IObservableUpdate
 
         this.Desktop.Windows.Add(Window1);
 
-        // TODO: Add your initialization logic here
-
         base.Initialize();
     }
 
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-        // TODO: use this.Content to load your game content here
     }
 
     protected override void Update(GameTime gameTime)
@@ -414,26 +560,19 @@ MGUI uses its own framework to detect and respond to inputs.
 
 - `InputTracker`
   - The base-class for input-related logic
-  - There is typically only 1 instance of InputTracker per program, automatically created when you create an instance of `MGUI.Shared.Rendering.MainRenderer`
+  - Uusually only 1 instance per program, automatically created when you create an instance of `MGUI.Shared.Rendering.MainRenderer`
   - Contains 2 child objects: `MouseTracker` and `KeyboardTracker`
 - `MouseTracker`
-  - Detects changes to the `MouseState` and stores information about those changes in EventArg objects. Most of the EventArgs have an `IsHandled` property.
-  - Contains 0 to many child `MouseHandler` objects
+  - Detects changes to the `MouseState` and stores information about those changes in EventArg objects, most of which have an `IsHandled` property.
+  - Manages 0 to many `MouseHandlers`
   - `MouseHandler`
-    - Each `MouseHandler` has an `IMouseHandlerHost` which defines things like the viewport that this handler detects events within.
     - Exposes several events that your code can subscribe to, to react to mouse events. Such as:
-      - Scrolled, MovedInside, MovedOutside, Entered, Exited, PressedInside, PressedOutside, ReleasedInside, ReleasedOutside, DragStart, Dragged, DragEnd
-    - Has logic that will prevent the same event from being invoked to several subscribers after one of the subscribers handles it (by setting `IsHandled` to `true`)
+      - `Scrolled`, `MovedInside`, `MovedOutside`, `Entered`, `Exited`, `PressedInside`, `PressedOutside`, `ReleasedInside`, `ReleasedOutside`, `DragStart`, `Dragged`, `DragEnd`
+    - Prevents the same event from being invoked to several subscribers after one of the subscribers handles it (by setting `IsHandled` to `true`)
 - `KeyboardTracker`
-  - Detects changes to the `KeyboardState` and stores information about those changes in EventArg objects. Most of the EventArgs have an `IsHandled` property.
-  - Contains 0 to many child `KeyboardHandler` objects
-    - `KeyboardHandler`
-      - Each `KeyboardHandler` has an `IKeyboardHandlerHost` which defines things like if the owner object currently has the keyboard focus.
-      - Exposes several events that your code can subscribe to, to react to keyboard events. Such as:
-        - Pressed, Clicked, Released
-        - The EventArgs contain useful information such as `PrintableValue` which would be 'A' if you pressed 'a' with CAPSLOCK on, or pressed 'a' with CAPSLOCK off but Left or Right shift is held etc.
+  - Just like `MouseTracker` except for managing Keyboard-related inputs.
         
-If you'd like to utilize this framework in your own code, get the `InputTracker` instance from your `MGUI.Shared.Rendering.MainRenderer` instance, then get the `MouseTracker` and/or `KeyboardTracker` instance from the `InputTracker`. Call `MouseTracker.CreateHandler(...)`/`KeyboardTracker.CreateHandler(...)`, and subscribe to the events in the handler instance.
+If you'd like to utilize this framework in your own code, get the `InputTracker` instance from your `MGUI.Shared.Rendering.MainRenderer` instance, then get the `MouseTracker` and/or `KeyboardTracker` instance from the `InputTracker`. Call `MouseTracker.CreateHandler(...)`/`KeyboardTracker.CreateHandler(...)`, and subscribe to the events in the returned handler instance.
 
 <details>
   <summary>Example code:</summary>
@@ -457,7 +596,6 @@ public class Game1 : Game, IObservableUpdate, IKeyboardHandlerHost
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-        Window.AllowUserResizing = true;
     }
 
     private KeyboardHandler PlayerMovementHandler;
@@ -495,7 +633,6 @@ public class Game1 : Game, IObservableUpdate, IKeyboardHandlerHost
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-        // TODO: use this.Content to load your game content here
     }
 
     protected override void Update(GameTime gameTime)
