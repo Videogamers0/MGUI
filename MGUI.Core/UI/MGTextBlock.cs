@@ -167,10 +167,11 @@ namespace MGUI.Core.UI
             }
         }
 
+        private MGTextRunUnderlineConfig DefaultUnderlineSettings => new MGTextRunUnderlineConfig(IsUnderlined);
         private MGTextRunShadowConfig DefaultShadowSettings => 
             IsShadowed ? new MGTextRunShadowConfig(ShadowColor ?? GetTheme().FontSettings.DefaultFontShadowColor, ShadowOffset?.ToVector2() ?? GetTheme().FontSettings.DefaultFontShadowOffset.ToVector2()) : default;
 
-        private MGTextRunConfig DefaultTextRunSettings => new(IsBold, IsItalic, IsUnderlined, 1, null, default, DefaultShadowSettings);
+        private MGTextRunConfig DefaultTextRunSettings => new(IsBold, IsItalic, 1, null, DefaultUnderlineSettings, default, DefaultShadowSettings);
         #endregion Font Style
 
         #region Shadow
@@ -746,6 +747,7 @@ namespace MGUI.Core.UI
 
                         Vector2 TextSize = MeasureText(TextRun.Text, IsBold, IsItalic, IsStartOfLine);
 
+                        //  Draw background
                         if (TextRun.Settings.HasBackground)
                         {
                             IFillBrush BackgroundBrush = TextRun.Settings.Background.Brush;
@@ -766,15 +768,23 @@ namespace MGUI.Core.UI
                             }
                         }
 
-                        if (TextRun.Settings.IsUnderlined)
+                        //  Draw underline
+                        MGTextRunUnderlineConfig UnderlineSettings = TextRun.Settings.Underline;
+                        if (TextRun.Settings.Underline.IsEnabled)
                         {
-                            RectangleF Destination = new RectangleF(CurrentX, TextYPosition + Line.LineTextHeight - 2, TextSize.X, 1).CreateTransformedF(Transform);
-                            DT.FillRectangle(Vector2.Zero, Destination, Foreground);
+                            int UnderlineHeight = UnderlineSettings.Height;
+                            int UnderlineYOffset = UnderlineSettings.VerticalOffset;
+                            IFillBrush UnderlineBrush = TextRun.Settings.Underline.Brush ?? Foreground.AsFillBrush();
+
+                            RectangleF Destination = new RectangleF(CurrentX, TextYPosition + Line.LineTextHeight - 2 + UnderlineYOffset, TextSize.X, UnderlineHeight).CreateTransformedF(Transform);
+                            UnderlineBrush.Draw(DA.SetOpacity(ActualOpacity), this, Destination.RoundUp());
+                            //DT.FillRectangle(Vector2.Zero, Destination, Foreground);
                         }
 
                         Vector2 Position = new Vector2(CurrentX, TextYPosition).TransformBy(Transform);
                         if (TextRun.Settings.IsShadowed)
                         {
+                            //  Draw text twice, once for the shadow, then again for itself
                             Color ShadowColor = (TextRun.Settings.Shadow.ShadowColor ?? DefaultForeground) * ActualOpacity;
                             Vector2 ShadowOffset = TextRun.Settings.Shadow.ShadowOffset ?? new(1, 1);
 

@@ -17,6 +17,8 @@ using Thickness = MonoGame.Extended.Thickness;
 
 namespace MGUI.Core.UI.Text
 {
+    public record struct MGTextRunUnderlineConfig(bool IsEnabled = false, int Height = 1, int VerticalOffset = 0, IFillBrush Brush = null);
+
     public record struct MGTextRunBackgroundConfig(IFillBrush Brush = null, Thickness Padding = default)
     {
         public static readonly MGTextRunBackgroundConfig Empty = new(null, default);
@@ -29,14 +31,14 @@ namespace MGUI.Core.UI.Text
         public bool IsShadowed => ShadowColor.HasValue;
     }
 
-    public record struct MGTextRunConfig(bool IsBold, bool IsItalic = false, bool IsUnderlined = false, float Opacity = 1.0f,
-        Color? Foreground = null, MGTextRunBackgroundConfig Background = new(), MGTextRunShadowConfig Shadow = new())
+    public record struct MGTextRunConfig(bool IsBold, bool IsItalic = false, float Opacity = 1.0f,
+        Color? Foreground = null, MGTextRunUnderlineConfig Underline = new(), MGTextRunBackgroundConfig Background = new(), MGTextRunShadowConfig Shadow = new())
     {
         public bool HasBackground => Background.HasBackground;
         public bool IsShadowed => Shadow.IsShadowed;
 
         public MGTextRunConfig ApplyAction(FTAction Action, IList<float> PreviousOpacities, IList<Color?> PreviousForegrounds,
-            IList<MGTextRunBackgroundConfig> PreviousBackgrounds, IList<MGTextRunShadowConfig> PreviousShadows)
+            IList<MGTextRunUnderlineConfig> PreviousUnderlines, IList<MGTextRunBackgroundConfig> PreviousBackgrounds, IList<MGTextRunShadowConfig> PreviousShadows)
         {
             switch (Action.ActionType)
             {
@@ -53,10 +55,19 @@ namespace MGUI.Core.UI.Text
                     return this with { IsItalic = false };
 
                 //  Underline
-                case FTActionType.EnableUnderline:
-                    return this with { IsUnderlined = true };
-                case FTActionType.DisableUnderline:
-                    return this with { IsUnderlined = false };
+                case FTActionType.SetUnderline:
+                    {
+                        PreviousUnderlines.Add(Underline);
+                        MGTextRunUnderlineConfig UnderlineConfig = new(true);
+                        if (!string.IsNullOrEmpty(Action.Parameter))
+                        {
+                            (int? Height, int? VerticalOffset, IFillBrush Brush) = FTTokenizer.ParseUnderlineValue(Action.Parameter.Substring(1));
+                            UnderlineConfig = new MGTextRunUnderlineConfig(true, Height ?? 1, VerticalOffset ?? 0, Brush);
+                        }
+                        return this with { Underline = UnderlineConfig };
+                    }
+                case FTActionType.RevertUnderline:
+                    return this with { Underline = GeneralUtils.RemoveLast(PreviousUnderlines, default) };
 
                 //  Opacity
                 case FTActionType.SetOpacity:
@@ -164,8 +175,29 @@ namespace MGUI.Core.UI.Text
 
             if (!Tokenizer.TryTokenize(FormattedText, true, out List<FTTokenMatch> Tokens))
             {
-                FTTokenMatch InvalidToken = Tokens.First(x => x.TokenType == FTTokenType.InvalidToken);
-                throw new InvalidDataException($"Formatted text does not match valid format: {FormattedText}\n\nError at token #{Tokens.IndexOf(InvalidToken) + 1} with value: {InvalidToken.Value}");
+                //FTTokenMatch InvalidToken = Tokens.First(x => x.TokenType == FTTokenType.InvalidToken);
+                //throw new InvalidDataException($"Formatted text does not match valid format: {FormattedText}\n\nError at token #{Tokens.IndexOf(InvalidToken) + 1} with value: {InvalidToken.Value}");
+
+                //  Parse as much as we can until hitting an InvalidToken.
+                //  Once we do, convert all remaining text into a StringLiteral token
+                List<FTTokenMatch> Temp = Tokens;
+                Tokens = new List<FTTokenMatch>();
+                for (int i = 0; i < Temp.Count; i++)
+                {
+                    FTTokenMatch CurrentToken = Temp[i];
+                    if (i + 1 < Temp.Count)
+                    {
+                        FTTokenMatch NextToken = Temp[i + 1];
+                        if (NextToken.TokenType == FTTokenType.InvalidToken)
+                        {
+                            string Value = CurrentToken.Value + CurrentToken.RemainingText;
+                            Tokens.Add(new FTTokenMatch(FTTokenType.StringLiteral, Value, ""));
+                            break;
+                        }
+                    }
+
+                    Tokens.Add(CurrentToken);
+                }
             }
 
             foreach (MGTextRun Run in ParseRuns(Tokens, DefaultSettings))
@@ -178,6 +210,7 @@ namespace MGUI.Core.UI.Text
 
             List<float> PreviousOpacities = new();
             List<Color?> PreviousForegrounds = new();
+            List<MGTextRunUnderlineConfig> PreviousUnderlines = new();
             List<MGTextRunBackgroundConfig> PreviousBackgrounds = new();
             List<MGTextRunShadowConfig> PreviousShadows = new();
 
@@ -191,7 +224,7 @@ namespace MGUI.Core.UI.Text
             for (int i = 0; i < Actions.Count; i++)
             {
                 FTAction CurrentAction = Actions[i];
-                CurrentState = CurrentState.ApplyAction(CurrentAction, PreviousOpacities, PreviousForegrounds, PreviousBackgrounds, PreviousShadows);
+                CurrentState = CurrentState.ApplyAction(CurrentAction, PreviousOpacities, PreviousForegrounds, PreviousUnderlines, PreviousBackgrounds, PreviousShadows);
 
                 if (CurrentAction.ActionType == FTActionType.StringLiteral)
                 {

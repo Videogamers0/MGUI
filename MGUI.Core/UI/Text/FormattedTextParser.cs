@@ -18,8 +18,8 @@ namespace MGUI.Core.UI.Text
         EnableItalic,
         DisableItalic,
 
-        EnableUnderline,
-        DisableUnderline,
+        SetUnderline,
+        RevertUnderline,
 
         SetOpacity,
         RevertOpacity,
@@ -111,12 +111,6 @@ namespace MGUI.Core.UI.Text
             Definitions.Add(new(FTActionType.DisableItalic, FTTokenType.ItalicCloseTagType,
                 FTTokenType.OpenTag, FTTokenType.ItalicCloseTagType, FTTokenType.CloseTag));
 
-            //  Underline
-            Definitions.Add(new(FTActionType.EnableUnderline, FTTokenType.UnderlineOpenTagType,
-                FTTokenType.OpenTag, FTTokenType.UnderlineOpenTagType, FTTokenType.CloseTag));
-            Definitions.Add(new(FTActionType.DisableUnderline, FTTokenType.UnderlineCloseTagType,
-                FTTokenType.OpenTag, FTTokenType.UnderlineCloseTagType, FTTokenType.CloseTag));
-
             //  Opacity
             Definitions.Add(new(FTActionType.SetOpacity, FTTokenType.OpacityValue,
                 FTTokenType.OpenTag, FTTokenType.OpacityOpenTagType, FTTokenType.OpacityValue, FTTokenType.CloseTag));
@@ -128,6 +122,12 @@ namespace MGUI.Core.UI.Text
                 FTTokenType.OpenTag, FTTokenType.ForegroundOpenTagType, FTTokenType.ForegroundValue, FTTokenType.CloseTag));
             Definitions.Add(new(FTActionType.RevertForeground, FTTokenType.ForegroundCloseTagType,
                 FTTokenType.OpenTag, FTTokenType.ForegroundCloseTagType, FTTokenType.CloseTag));
+
+            //  Underline
+            Definitions.Add(new(FTActionType.SetUnderline, FTTokenType.UnderlineValue,
+                FTTokenType.OpenTag, FTTokenType.UnderlineOpenTagType, FTTokenType.UnderlineValue, FTTokenType.CloseTag));
+            Definitions.Add(new(FTActionType.RevertUnderline, FTTokenType.UnderlineCloseTagType,
+                FTTokenType.OpenTag, FTTokenType.UnderlineCloseTagType, FTTokenType.CloseTag));
 
             //  Background
             Definitions.Add(new(FTActionType.SetBackground, FTTokenType.BackgroundValue,
@@ -158,8 +158,8 @@ namespace MGUI.Core.UI.Text
                 FTTokenType.OpenTag, FTTokenType.ActionCloseTagType, FTTokenType.CloseTag));
 
             //  String value
-            Definitions.Add(new(FTActionType.StringLiteral, FTTokenType.StringValue,
-                FTTokenType.StringValue));
+            Definitions.Add(new(FTActionType.StringLiteral, FTTokenType.StringLiteral,
+                FTTokenType.StringLiteral));
 
             //  LineBreak
             Definitions.Add(new(FTActionType.LineBreak, FTTokenType.LineBreak,

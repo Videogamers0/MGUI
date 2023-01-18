@@ -25,9 +25,6 @@ namespace MGUI.Core.UI.Text
         ItalicOpenTagType,
         ItalicCloseTagType,
 
-        UnderlineOpenTagType,
-        UnderlineCloseTagType,
-
         OpacityOpenTagType,
         OpacityCloseTagType,
         OpacityValue,
@@ -35,6 +32,10 @@ namespace MGUI.Core.UI.Text
         ForegroundOpenTagType,
         ForegroundCloseTagType,
         ForegroundValue,
+
+        UnderlineOpenTagType,
+        UnderlineCloseTagType,
+        UnderlineValue,
 
         BackgroundOpenTagType,
         BackgroundCloseTagType,
@@ -57,7 +58,7 @@ namespace MGUI.Core.UI.Text
 
         InvalidToken,
 
-        StringValue,
+        StringLiteral,
 
         LineBreak
     }
@@ -121,13 +122,13 @@ namespace MGUI.Core.UI.Text
 
             List<FTTokenType> OpenTagTypesWithoutValues = new() {
                 FTTokenType.BoldOpenTagType,
-                FTTokenType.ItalicOpenTagType,
-                FTTokenType.UnderlineOpenTagType
+                FTTokenType.ItalicOpenTagType
             };
 
             List<FTTokenType> OpenTagTypesWithValues = new() {
                 FTTokenType.OpacityOpenTagType,
                 FTTokenType.ForegroundOpenTagType,
+                FTTokenType.UnderlineOpenTagType,
                 FTTokenType.BackgroundOpenTagType,
                 FTTokenType.ShadowOpenTagType,
                 FTTokenType.ImageOpenTagType,
@@ -150,6 +151,7 @@ namespace MGUI.Core.UI.Text
             List<FTTokenType> TagValues = new() {
                 FTTokenType.OpacityValue,
                 FTTokenType.ForegroundValue,
+                FTTokenType.UnderlineValue,
                 FTTokenType.BackgroundValue,
                 FTTokenType.ShadowValue,
                 FTTokenType.ImageValue,
@@ -162,7 +164,7 @@ namespace MGUI.Core.UI.Text
 
             //  Open Tag
             Definitions.Add(new(FTTokenType.OpenTag, $@"^{EscapedOpenTag}",
-                AsEnumerable<FTTokenType?>(null, FTTokenType.CloseTag, FTTokenType.StringValue, FTTokenType.LineBreak), //PrecededBy
+                AsEnumerable<FTTokenType?>(null, FTTokenType.CloseTag, FTTokenType.StringLiteral, FTTokenType.LineBreak), //PrecededBy
                 AsEnumerable<FTTokenType?>(FTTokenType.InvalidToken)) //NotPrecededBy
             );
 
@@ -193,22 +195,22 @@ namespace MGUI.Core.UI.Text
                 Enumerable.Empty<FTTokenType?>())
             );
 
-            string UnderlineTypePattern = $@"(?i)(underline|u(?={EscapedCloseTag}))(?-i)";
-            Definitions.Add(new(FTTokenType.UnderlineOpenTagType, $@"^{UnderlineTypePattern}",
-                AsEnumerable<FTTokenType?>(FTTokenType.OpenTag),
-                Enumerable.Empty<FTTokenType?>())
-            );
-            Definitions.Add(new(FTTokenType.UnderlineCloseTagType, $@"^(\\|\/){UnderlineTypePattern}",
-                AsEnumerable<FTTokenType?>(FTTokenType.OpenTag),
-                Enumerable.Empty<FTTokenType?>())
-            );
-
             string OpacityTypePattern = $@"(?i)(opacity|o(?=(\=|{EscapedCloseTag})))(?-i)";
             Definitions.Add(new(FTTokenType.OpacityOpenTagType, $@"^{OpacityTypePattern}",
                 AsEnumerable<FTTokenType?>(FTTokenType.OpenTag),
                 Enumerable.Empty<FTTokenType?>())
             );
             Definitions.Add(new(FTTokenType.OpacityCloseTagType, $@"^(\\|\/){OpacityTypePattern}",
+                AsEnumerable<FTTokenType?>(FTTokenType.OpenTag),
+                Enumerable.Empty<FTTokenType?>())
+            );
+
+            string UnderlineTypePattern = $@"(?i)(underline|u(?=(\=|{EscapedCloseTag})))(?-i)";
+            Definitions.Add(new(FTTokenType.UnderlineOpenTagType, $@"^{UnderlineTypePattern}",
+                AsEnumerable<FTTokenType?>(FTTokenType.OpenTag),
+                Enumerable.Empty<FTTokenType?>())
+            );
+            Definitions.Add(new(FTTokenType.UnderlineCloseTagType, $@"^(\\|\/){UnderlineTypePattern}",
                 AsEnumerable<FTTokenType?>(FTTokenType.OpenTag),
                 Enumerable.Empty<FTTokenType?>())
             );
@@ -276,6 +278,11 @@ namespace MGUI.Core.UI.Text
                 Enumerable.Empty<FTTokenType?>())
             );
 
+            Definitions.Add(new(FTTokenType.UnderlineValue, $@"^(={UnderlineValuePattern})?",
+                AsEnumerable<FTTokenType?>(FTTokenType.UnderlineOpenTagType),
+                Enumerable.Empty<FTTokenType?>())
+            );
+
             string ColorHexPattern = @"#[a-fA-F0-9]{6,8}";
             string ColorNamePattern = @"[a-zA-Z]+";
             string ColorPattern = $@"({ColorHexPattern}|{ColorNamePattern})";
@@ -283,6 +290,7 @@ namespace MGUI.Core.UI.Text
                 AsEnumerable<FTTokenType?>(FTTokenType.ForegroundOpenTagType),
                 Enumerable.Empty<FTTokenType?>())
             );
+
             Definitions.Add(new(FTTokenType.BackgroundValue, $@"^={BackgroundValuePattern}",
                 AsEnumerable<FTTokenType?>(FTTokenType.BackgroundOpenTagType),
                 Enumerable.Empty<FTTokenType?>())
@@ -312,7 +320,7 @@ namespace MGUI.Core.UI.Text
             //  Invalid Token
             Definitions.Add(new(FTTokenType.InvalidToken, @"^.*",
                 Enumerable.Empty<FTTokenType?>(),
-                AsEnumerable<FTTokenType?>(null, FTTokenType.CloseTag, FTTokenType.StringValue, FTTokenType.LineBreak))
+                AsEnumerable<FTTokenType?>(null, FTTokenType.CloseTag, FTTokenType.StringLiteral, FTTokenType.LineBreak))
             );
 
 #if NEVER //DEBUG
@@ -327,12 +335,35 @@ namespace MGUI.Core.UI.Text
 
         //  Regex pattern that checks if the next character is either a close tag ']' or end of string, but does not consume that character (lookahead)
         private static readonly string CloseTagOrEndOfStringLookahead = $@"(?=({Regex.Escape(CloseTagChar.ToString())}|$))";
+        //  Regex pattern that checks if the next character is a close tag ']', but does not consume that character (lookahead)
+        private static readonly string CloseTagLookahead = $@"(?=({Regex.Escape(CloseTagChar.ToString())}))";
+
+        //  The underline Height (positive integer) followed by a vertical offset (integer, can be negative), followed by the underline's fill brush (usually a single color) 
+        //  All parameters are optional
+        //  EX: "[Underline=2 -1 Blue]" uses a solid blue brush to draw a 2px tall rectangle, offsetted upwards by 1px above the bottom of the text it's anchored to
+        //      "[Underline=4]" uses the TextBlock's current Foreground Color as the brush, to draw a 4px tall rectangle at the default location just below the text it's anchored to
+        private static readonly string UnderlineValuePattern = $@"((?<Height>\d+)(( (?<Offset>-?\d+))(( (?<Brush>.+?)))?)?)?{CloseTagOrEndOfStringLookahead}";
+        public static readonly Regex UnderlineValueParser = new(UnderlineValuePattern);
+        public static (int? Height, int? VerticalOffset, IFillBrush Brush) ParseUnderlineValue(string Value)
+        {
+            Match Match = UnderlineValueParser.Match(Value);
+
+            int? Height = Match.Groups["Height"].Success ? int.Parse(Match.Groups["Height"].Value) : null;
+            int? VerticalOffset = Match.Groups["Offset"].Success ? int.Parse(Match.Groups["Offset"].Value) : null;
+            IFillBrush Brush = null;
+            if (Match.Groups["Brush"].Success)
+            {
+                string BrushString = Match.Groups["Brush"].Value;
+                Brush = FillBrushStringConverter.ParseFillBrush(BrushString).ToFillBrush();
+            }
+
+            return (Height, VerticalOffset, Brush);
+        }
 
         //  The background fill brush (usually a single color) followed by an optional Padding Thickness
         //  EX: "[Background=Red 2,-4,2,8]" uses a solid red brush, with Padding="2,-4,2,8"
         private static readonly string BackgroundValuePattern = $@"(?<Brush>.+?)( (?<Padding>-?\d+(,-?\d+){{0,3}}))?{CloseTagOrEndOfStringLookahead}";
         public static readonly Regex BackgroundValueParser = new(BackgroundValuePattern);
-
         public static (IFillBrush Brush, Thickness Padding) ParseBackgroundValue(string Value)
         {
             Match Match = BackgroundValueParser.Match(Value);
@@ -404,7 +435,7 @@ namespace MGUI.Core.UI.Text
         }
 
         /// <param name="ShouldTokenizeLineBreaks">If true, linebreaks '\n', '\r', "\r\n" will be tokenized as <see cref="FTTokenType.LineBreak"/>.<br/>
-        /// If false, they will not be tokenized, and will instead remain as a substring inside a <see cref="FTTokenType.StringValue"/> token.<para/>
+        /// If false, they will not be tokenized, and will instead remain as a substring inside a <see cref="FTTokenType.StringLiteral"/> token.<para/>
         /// Warning - A linebreak is treated as the character literals: '\n', '\r', "\r\n", as opposed to the escaped strings such as @"\n". Be sure not to accidentally use a literal escape character '\\', such as if prefixing a hard-coded string with @.</param>
         public bool TryTokenize(string Text, bool ShouldTokenizeLineBreaks, out List<FTTokenMatch> Result)
         {
@@ -421,7 +452,7 @@ namespace MGUI.Core.UI.Text
         private static readonly string Pattern = $"^({SubPattern1}|{SubPattern2}|{SubPattern3})*";
 
         /// <param name="ShouldTokenizeLineBreaks">If true, linebreaks '\n', '\r', "\r\n" will be tokenized as <see cref="FTTokenType.LineBreak"/>.<br/>
-        /// If false, they will not be tokenized, and will instead remain as a substring inside a <see cref="FTTokenType.StringValue"/> token.<para/>
+        /// If false, they will not be tokenized, and will instead remain as a substring inside a <see cref="FTTokenType.StringLiteral"/> token.<para/>
         /// Warning - A linebreak is treated as the character literals: '\n', '\r', "\r\n", as opposed to the escaped strings such as @"\n". Be sure not to accidentally use a literal escape character '\\', such as if prefixing a hard-coded string with @.</param>
         public IEnumerable<FTTokenMatch> Tokenize(string Text, bool ShouldTokenizeLineBreaks)
         {
@@ -456,7 +487,7 @@ namespace MGUI.Core.UI.Text
                         {
                             foreach (FTTokenMatch Item in TokenizeLineBreaks(CurrentStringLiteral.ToString(), ShouldTokenizeLineBreaks))
                                 yield return Item;
-                            PreviousToken = FTTokenType.StringValue;
+                            PreviousToken = FTTokenType.StringLiteral;
                         }
 
                         CurrentStringLiteral.Clear();
@@ -491,7 +522,7 @@ namespace MGUI.Core.UI.Text
         private static readonly Regex LineBreakRegex = new("(\r\n|\r|\n)"); // "\r\n" for Windows, '\r' for Mac, '\n' for Linux
 
         /// <param name="Enabled">True if '\n', '\r', and "\r\n" characters should be tokenized as <see cref="FTTokenType.LineBreak"/>.<br/>
-        /// False if the entire <paramref name="Text"/> should be returned as a single <see cref="FTTokenType.StringValue"/> token.</param>
+        /// False if the entire <paramref name="Text"/> should be returned as a single <see cref="FTTokenType.StringLiteral"/> token.</param>
         public static IEnumerable<FTTokenMatch> TokenizeLineBreaks(string Text, bool Enabled = true)
         {
             if (string.IsNullOrEmpty(Text))
@@ -504,7 +535,7 @@ namespace MGUI.Core.UI.Text
                 {
                     int Index = Match.Index;
                     if (Index != 0)
-                        yield return new(FTTokenType.StringValue, Text.Substring(0, Index), "");
+                        yield return new(FTTokenType.StringLiteral, Text.Substring(0, Index), "");
                     yield return new(FTTokenType.LineBreak, Match.Value, "");
                     Text = Text.Substring(Index + Match.Length);
                     if (Text == string.Empty)
@@ -513,12 +544,12 @@ namespace MGUI.Core.UI.Text
 
                 if (Text != string.Empty)
                 {
-                    yield return new(FTTokenType.StringValue, Text, "");
+                    yield return new(FTTokenType.StringLiteral, Text, "");
                 }
             }
             else
             {
-                yield return new(FTTokenType.StringValue, Text, "");
+                yield return new(FTTokenType.StringLiteral, Text, "");
             }
         }
     }

@@ -224,6 +224,13 @@ namespace MGUI.Samples.FF7_Samples
                     }
                 };
             }
+
+            //  Handle clicking on the close button
+            MGButton CloseButton = Window.GetElementByName<MGButton>("CloseButton");
+            CloseButton.AddCommandHandler((btn, e) =>
+            {
+                this.Hide();
+            });
         }
 
         private bool TryUseItemOn(InventoryItem InventoryItem, PartyMember Character)

@@ -84,7 +84,6 @@ namespace MGUI.Core.UI
 	//tabcontrol - a separate default tabheader style that has like 'floating' tab headers. Just Underlined ContentPresenters instead of a full border. not touching the tabitem content's top border etc
 	//		should be easily achieved by just restyling the buttons to only have a bottom border, and have a bottom padding. but we probably also want the selected background to be null, and instead
 	//		have a brighter font color when hovered?
-	//mgdockpanel - lastchildfill property, default=true. if false, then the actualdockedchildren shouldn't  be different than dockedchildren. when changed, calls layoutchanged
 	//something for mouse cursors?
 	//		maybe an enum MouseCursorType
 	//		and MGElement would have MouseCursorType Cursor property
@@ -95,9 +94,6 @@ namespace MGUI.Core.UI
 	//		get the hovered element, and call hovered.Neighbors[Left]?.NavigateTo() which returns a new MouseState to use for next update tick? idk
     //textblock inline formatting:
     //      inlined images should have option for render size AND layout size, so you could, for example, have a zero-width image underneath specific text in the textblock
-    //      underline should allow specifying a color and stroke thickness, maybe also an offset
-    //          [Underline={Color} {Height} {YOffset}]
-    //          [Underline=Red 2 3] means to draw a Red underline that's 2px tall, and is moved down by 3px from the default Y position
     //Improve Grid/UniformGrid's default selection graphics
     //Bugfix MGTextBox's Caret positioning after moving to new line such as when inserting a linebreak
     //      only seems incorrect if the textbox's height changes? (I.E. it doesnt have a PreferredHeight and its not inside a ScrollViewer)
