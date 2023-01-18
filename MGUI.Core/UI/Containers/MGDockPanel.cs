@@ -25,15 +25,31 @@ namespace MGUI.Core.UI.Containers
             public bool IsTopOrBottom => Position.HasValue && (Position == Dock.Top || Position == Dock.Bottom);
         }
 
+        private bool _LastChildFill;
+        /// <summary>If true, the last child of this <see cref="MGDockPanel"/> will consume all remaining available space, regardless of it's <see cref="Dock"/> position.<para/>
+        /// Default value: true</summary>
+        public bool LastChildFill
+        {
+            get => _LastChildFill;
+            set
+            {
+                if (_LastChildFill != value)
+                {
+                    _LastChildFill = value;
+                    LayoutChanged(this, true);
+                }
+            }
+        }
+
         private readonly List<DockedChild> DockedChildren = new();
-        /// <summary>The last child will consume all remaining available space, thus ignoring its <see cref="DockedChild.Position"/> value.</summary>
+        /// <summary>The last child will consume all remaining available space if <see cref="LastChildFill"/> is true, thus ignoring its <see cref="DockedChild.Position"/> value.</summary>
         private IEnumerable<ActualDockedChild> ActualDockedChildren
         {
             get
             {
                 foreach (DockedChild Item in DockedChildren)
                 {
-                    if (Item == DockedChildren[^1])
+                    if (Item == DockedChildren[^1] && LastChildFill)
                         yield return new ActualDockedChild(Item.Item, null);
                     else
                         yield return new ActualDockedChild(Item.Item, Item.Position);
@@ -51,12 +67,12 @@ namespace MGUI.Core.UI.Containers
             return true;
         }
 
-        public MGDockPanel(MGWindow Window)
+        public MGDockPanel(MGWindow Window, bool LastChildFill = true)
             : base(Window, MGElementType.DockPanel)
         {
             using (BeginInitializing())
             {
-
+                this.LastChildFill = LastChildFill;
             }
         }
 

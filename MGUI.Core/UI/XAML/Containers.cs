@@ -302,11 +302,16 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.DockPanel;
 
+        public bool? LastChildFill { get; set; }
+
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGDockPanel(Window);
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
             MGDockPanel DockPanel = Element as MGDockPanel;
+
+            if (LastChildFill.HasValue)
+                DockPanel.LastChildFill = LastChildFill.Value;
 
             foreach (Element Child in Children)
             {

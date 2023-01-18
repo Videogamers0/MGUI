@@ -1,12 +1,8 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         Left="200" Top="200" MinHeight="0" SizeToContent="WidthAndHeight" WindowStyle="None">
-    <Grid Width="300" Height="250" Background="LightGray" RowLengths="150[80,],10,*[80,]" ColumnLengths="*[80,],12,180[80,]">
-        <Border Row="0" Column="0" Background="Red" Content="Content of Cell=(0,0)" />
-        <Border Row="2" Column="0" Background="Magenta" Content="Content of Cell=(2,0)" />
-        <Border Row="0" Column="2" Background="Orange" Content="Content of Cell=(0,2)" />
-        <Border Row="2" Column="2" Background="MediumPurple" Content="Content of Cell=(2,2)" />
-
-        <GridSplitter Row="1" Column="0" ColumnSpan="3" />
-        <GridSplitter Row="0" Column="1" RowSpan="3" />
-    </Grid>
+    <DockPanel Background="Red" Width="250" Height="120" LastChildFill="False">
+        <Border Dock="Left" Background="Green" Content="Docked Left" />
+        <Border Dock="Top" Background="Purple" Content="Docked Top" />
+        <Border Dock="Bottom" Background="Orange" Content="Docked Bottom but is last child, spans all remaining space if !LastChildFill" />
+    </DockPanel>
 </Window>
