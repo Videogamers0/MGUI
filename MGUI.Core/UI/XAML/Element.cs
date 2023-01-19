@@ -223,8 +223,7 @@ namespace MGUI.Core.UI.XAML
                 if (IsEnabled.HasValue)
                     Element.IsEnabled = IsEnabled.Value;
 
-                if (Background != null)
-                    Element.BackgroundBrush.NormalValue = Background.ToFillBrush();
+                ApplyBackground(Element);
                 if (TextForeground.HasValue)
                     Element.DefaultTextForeground.NormalValue = TextForeground.Value.ToXNAColor();
 
@@ -245,6 +244,12 @@ namespace MGUI.Core.UI.XAML
                 foreach (PropertyBinding Binding in this.Bindings.Where(x => x.Mode == BindingMode.OneWay))
                     Element.OneWayBindings.Add(Binding);
             }
+        }
+
+        protected void ApplyBackground(MGElement Element)
+        {
+            if (Background != null)
+                Element.BackgroundBrush.NormalValue = Background.ToFillBrush();
         }
 
         protected abstract MGElement CreateElementInstance(MGWindow Window, MGElement Parent);

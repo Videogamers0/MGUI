@@ -561,10 +561,15 @@ namespace MGUI.Core.UI
             {
                 this.DropdownItemTemplate = (Item) =>
                 {
-                    MGButton Button = CreateDefaultDropdownButton();
                     MGElement Content = Settings.DropdownItemTemplate.GetContent(SelfOrParentWindow, this, Item);
-                    Button.SetContent(Content);
-                    return Button;
+                    if (Content is MGButton ButtonContent)
+                        return ButtonContent;
+                    else
+                    {
+                        MGButton Button = CreateDefaultDropdownButton();
+                        Button.SetContent(Content);
+                        return Button;
+                    }
                 };
             }
 

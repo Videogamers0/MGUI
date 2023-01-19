@@ -1739,7 +1739,6 @@ namespace MGUI.Core.UI.XAML
         {
             MGWindow Window = Element as MGWindow;
             ResizeGrip.ApplySettings(Window, Window.ResizeGripComponent.Element);
-            Border.ApplySettings(Window, Window.BorderComponent.Element);
             TitleBar.ApplySettings(Window, Window.TitleBarComponent.Element);
             TitleBarTextBlock.ApplySettings(Window, Window.TitleBarTextBlockElement);
             CloseButton.ApplySettings(Window, Window.CloseButtonElement);
@@ -1752,11 +1751,7 @@ namespace MGUI.Core.UI.XAML
 
             if (TitleText != null)
                 Window.TitleText = TitleText;
-            if (IsTitleBarVisible.HasValue)
-                Window.IsTitleBarVisible = IsTitleBarVisible.Value;
 
-            if (IsCloseButtonVisible.HasValue)
-                Window.IsCloseButtonVisible = IsCloseButtonVisible.Value;
             if (CanCloseWindow.HasValue)
                 Window.CanCloseWindow = CanCloseWindow.Value;
 
@@ -1782,6 +1777,16 @@ namespace MGUI.Core.UI.XAML
 
             if (WindowStyle != null)
                 Window.WindowStyle = WindowStyle.Value;
+
+            //  Apply these properties after setting WindowStyle because they may have been overwrriten when setting WindowStyle to WindowStyle.None
+            if (Padding != null)
+                Window.Padding = this.Padding.Value.ToThickness();
+            if (IsTitleBarVisible.HasValue)
+                Window.IsTitleBarVisible = IsTitleBarVisible.Value;
+            if (IsCloseButtonVisible.HasValue)
+                Window.IsCloseButtonVisible = IsCloseButtonVisible.Value;
+            ApplyBackground(Element);
+            Border.ApplySettings(Window, Window.BorderComponent.Element);
 
             if (SizeToContent != null)
                 Window.ApplySizeToContent(SizeToContent.Value, 10, 10, null, null, false);
