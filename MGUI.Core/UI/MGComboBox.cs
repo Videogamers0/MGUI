@@ -454,7 +454,7 @@ namespace MGUI.Core.UI
                 {
                     if (HoveredItem != null)
                     {
-                        e.SetHandled(Dropdown, false);
+                        e.SetHandledBy(Dropdown, false);
                         this.SelectedItem = HoveredItem;
                         IsDropdownOpen = false;
                     }
@@ -467,7 +467,7 @@ namespace MGUI.Core.UI
                         if (!Dropdown.RenderBounds.ContainsInclusive(LayoutSpacePosition))
                         {
                             IsDropdownOpen = false;
-                            e.SetHandled(Dropdown, false);
+                            e.SetHandledBy(Dropdown, false);
                         }
                     }
                 };
@@ -502,7 +502,7 @@ namespace MGUI.Core.UI
                 MouseHandler.LMBReleasedInside += (sender, e) =>
                 {
                     IsDropdownOpen = !IsDropdownOpen;
-                    e.SetHandled(this, false);
+                    e.SetHandledBy(this, false);
                 };
             }
         }

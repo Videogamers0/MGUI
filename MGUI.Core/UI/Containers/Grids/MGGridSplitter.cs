@@ -205,7 +205,7 @@ namespace MGUI.Core.UI.Containers.Grids
                         this.GridData = new(this, OwnerGrid, true);
                         IsDragging = true;
                         SpoofIsPressedWhileDrawingBackground = true;
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                     }
                 };
 

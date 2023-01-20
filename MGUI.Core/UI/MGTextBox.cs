@@ -926,7 +926,7 @@ namespace MGUI.Core.UI
                             }
                         }
 
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                     }
                     catch (Exception ex)
                     {
@@ -945,7 +945,7 @@ namespace MGUI.Core.UI
                             bool IsLeftEdge = LayoutSpacePosition.X <= CharInfo.CenterX;
                             int SelectionIndex = IsLeftEdge ? CharInfo.IndexInOriginalText : CharInfo.IndexInOriginalText + 1;
                             CurrentSelection = new(SelectionIndex, SelectionIndex);
-                            e.SetHandled(this, false);
+                            e.SetHandledBy(this, false);
                         }
                     }
                 };
@@ -998,7 +998,7 @@ namespace MGUI.Core.UI
                 {
                     LastKeyPress = new(e);
                     HandleKeyPress(e);
-                    e.SetHandled(this, false);
+                    e.SetHandledBy(this, false);
                 };
 
                 this.KeyboardHandler.Released += (sender, e) =>

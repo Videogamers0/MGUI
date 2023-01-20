@@ -289,7 +289,7 @@ namespace MGUI.Core.UI
                     {
                         SetValue(PreviewValue.Value);
                         PreviewValue = null;
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                     }
                 };
 
@@ -297,7 +297,7 @@ namespace MGUI.Core.UI
                 {
                     if (e.IsLMB && !IsReadonly)
                     {
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                     }
                 };
 

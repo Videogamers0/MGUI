@@ -77,7 +77,7 @@ namespace MGUI.Shared.Input.Keyboard
                     {
                         Pressed.Invoke(this, PressedArgs);
                         if (AlwaysHandlesEvents)
-                            PressedArgs.SetHandled(Owner, false);
+                            PressedArgs.SetHandledBy(Owner, false);
                     }
 
                     //  Invoke Key Released
@@ -86,7 +86,7 @@ namespace MGUI.Shared.Input.Keyboard
                     {
                         Released.Invoke(this, ReleasedArgs);
                         if (AlwaysHandlesEvents)
-                            ReleasedArgs.SetHandled(Owner, false);
+                            ReleasedArgs.SetHandledBy(Owner, false);
                     }
 
                     //  Invoke Key Clicked
@@ -95,7 +95,7 @@ namespace MGUI.Shared.Input.Keyboard
                     {
                         Clicked.Invoke(this, ClickedArgs);
                         if (AlwaysHandlesEvents)
-                            ClickedArgs.SetHandled(Owner, false);
+                            ClickedArgs.SetHandledBy(Owner, false);
                     }
                 }
             }

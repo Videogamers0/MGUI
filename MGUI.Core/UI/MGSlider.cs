@@ -371,7 +371,7 @@ namespace MGUI.Core.UI
                 {
                     if (IsHoveringNumberLine)
                     {
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                         HandleSliderInput(ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position).ToVector2());
                     }
                 };
@@ -387,7 +387,7 @@ namespace MGUI.Core.UI
                     if (e.IsLMB && IsHoveringThumb)
                     {
                         IsDraggingThumb = true;
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                     }
                 };
 
@@ -410,12 +410,12 @@ namespace MGUI.Core.UI
                         if (e.ScrollWheelDelta < 0 && !this.Value.IsAlmostEqual(Minimum))
                         {
                             SetValue(this.Value - DiscreteValueInterval.Value);
-                            e.SetHandled(this, false);
+                            e.SetHandledBy(this, false);
                         }
                         else if (e.ScrollWheelDelta > 0 && !this.Value.IsAlmostEqual(Maximum))
                         {
                             SetValue(this.Value + DiscreteValueInterval.Value);
-                            e.SetHandled(this, false);
+                            e.SetHandledBy(this, false);
                         }
                     }
                 };

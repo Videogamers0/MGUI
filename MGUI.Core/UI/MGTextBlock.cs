@@ -407,7 +407,7 @@ namespace MGUI.Core.UI
                                     if (Bounds.Contains(MousePosition))
                                     {
                                         Delegate(this);
-                                        e.SetHandled(this, false);
+                                        e.SetHandledBy(this, false);
                                         return;
                                     }
                                 }

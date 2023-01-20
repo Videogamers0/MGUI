@@ -91,6 +91,8 @@ namespace MGUI.Shared.Input.Mouse
 
         public MouseState PreviousState { get; private set; }
         public MouseState CurrentState { get; private set; }
+        /// <summary>True if the mouse position changed between the previous update and the current update.</summary>
+        public bool MouseMovedRecently => CurrentState.Position != PreviousState.Position;
 
         internal MouseTracker(InputTracker InputTracker, int ClickPositionThreshold = 2, int DragThreshold = 3)
         {

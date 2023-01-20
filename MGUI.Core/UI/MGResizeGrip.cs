@@ -153,7 +153,7 @@ namespace MGUI.Core.UI
                         SpoofIsPressedWhileDrawingBackground = false;
                         InitialWidth = Parent is MGWindow ? ParentWindow.WindowWidth : Parent.ActualWidth;
                         InitialHeight = Parent is MGWindow ? ParentWindow.WindowHeight : Parent.ActualHeight;
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                     }
                 };
 

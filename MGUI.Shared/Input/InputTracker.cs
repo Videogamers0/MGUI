@@ -29,7 +29,12 @@ namespace MGUI.Shared.Input
             this.HandledBy = default;
         }
 
-        public void SetHandled<T>(T HandledBy, bool OverwriteIfAlreadyHandled = false)
+        /// <summary>Deprecated - use <see cref="SetHandledBy{T}(T, bool)"/> instead.</summary>
+        [Obsolete("Deprecated - use SetHandledBy{T}(T, bool) instead.")]
+        public void SetHandled<T>(T HandledBy, bool OverwriteIfAlreadyHandled = false) where T : THandlerType
+            => SetHandledBy(HandledBy, OverwriteIfAlreadyHandled);
+
+        public void SetHandledBy<T>(T HandledBy, bool OverwriteIfAlreadyHandled = false)
             where T : THandlerType
         {
             if (!this.IsHandled || OverwriteIfAlreadyHandled)
@@ -39,6 +44,8 @@ namespace MGUI.Shared.Input
             }
         }
 
+        /// <summary>Resets <see cref="IsHandled"/> and <see cref="HandledBy"/> back to their default values.<br/>
+        /// (<see cref="IsHandled"/>=false, <see cref="HandledBy"/>=default)</summary>
         public void Reset()
         {
             this.IsHandled = false;

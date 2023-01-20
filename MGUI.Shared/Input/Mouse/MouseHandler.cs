@@ -225,7 +225,7 @@ namespace MGUI.Shared.Input.Mouse
                     {
                         Scrolled.Invoke(this, Tracker.CurrentScrollEvent);
                         if (AlwaysHandlesEvents)
-                            Tracker.CurrentScrollEvent.SetHandled(Owner, false);
+                            Tracker.CurrentScrollEvent.SetHandledBy(Owner, false);
                     }
                 }
 
@@ -263,7 +263,7 @@ namespace MGUI.Shared.Input.Mouse
                                     {
                                         PressedInside.Invoke(this, Args);
                                         if (AlwaysHandlesEvents)
-                                            Args.SetHandled(Owner, false);
+                                            Args.SetHandledBy(Owner, false);
                                     }
 
                                     if (InvokeEvenIfHandled || !Args.IsHandled)
@@ -275,7 +275,7 @@ namespace MGUI.Shared.Input.Mouse
                                                 {
                                                     LMBPressedInside.Invoke(this, Args);
                                                     if (AlwaysHandlesEvents)
-                                                        Args.SetHandled(Owner, false);
+                                                        Args.SetHandledBy(Owner, false);
                                                 }
                                                 break;
                                             case MouseButton.Middle:
@@ -283,7 +283,7 @@ namespace MGUI.Shared.Input.Mouse
                                                 {
                                                     MMBPressedInside.Invoke(this, Args);
                                                     if (AlwaysHandlesEvents)
-                                                        Args.SetHandled(Owner, false);
+                                                        Args.SetHandledBy(Owner, false);
                                                 }
                                                 break;
                                             case MouseButton.Right:
@@ -291,7 +291,7 @@ namespace MGUI.Shared.Input.Mouse
                                                 {
                                                     RMBPressedInside.Invoke(this, Args);
                                                     if (AlwaysHandlesEvents)
-                                                        Args.SetHandled(Owner, false);
+                                                        Args.SetHandledBy(Owner, false);
                                                 }
                                                 break;
                                         }
@@ -303,7 +303,7 @@ namespace MGUI.Shared.Input.Mouse
                                     {
                                         PressedOutside.Invoke(this, Args);
                                         if (AlwaysHandlesEvents)
-                                            Args.SetHandled(Owner, false);
+                                            Args.SetHandledBy(Owner, false);
                                     }
                                 }
                             }
@@ -325,7 +325,7 @@ namespace MGUI.Shared.Input.Mouse
                                     {
                                         ReleasedInside.Invoke(this, Args);
                                         if (AlwaysHandlesEvents)
-                                            Args.SetHandled(Owner, false);
+                                            Args.SetHandledBy(Owner, false);
                                     }
 
                                     if (InvokeEvenIfHandled || !Args.IsHandled)
@@ -337,7 +337,7 @@ namespace MGUI.Shared.Input.Mouse
                                                 {
                                                     LMBReleasedInside.Invoke(this, Args);
                                                     if (AlwaysHandlesEvents)
-                                                        Args.SetHandled(Owner, false);
+                                                        Args.SetHandledBy(Owner, false);
                                                 }
                                                 break;
                                             case MouseButton.Middle:
@@ -345,7 +345,7 @@ namespace MGUI.Shared.Input.Mouse
                                                 {
                                                     MMBReleasedInside.Invoke(this, Args);
                                                     if (AlwaysHandlesEvents)
-                                                        Args.SetHandled(Owner, false);
+                                                        Args.SetHandledBy(Owner, false);
                                                 }
                                                 break;
                                             case MouseButton.Right:
@@ -353,7 +353,7 @@ namespace MGUI.Shared.Input.Mouse
                                                 {
                                                     RMBReleasedInside.Invoke(this, Args);
                                                     if (AlwaysHandlesEvents)
-                                                        Args.SetHandled(Owner, false);
+                                                        Args.SetHandledBy(Owner, false);
                                                 }
                                                 break;
                                         }
@@ -365,7 +365,7 @@ namespace MGUI.Shared.Input.Mouse
                                     {
                                         ReleasedOutside.Invoke(this, Args);
                                         if (AlwaysHandlesEvents)
-                                            Args.SetHandled(Owner, false);
+                                            Args.SetHandledBy(Owner, false);
                                     }
                                 }
                             }
@@ -387,7 +387,7 @@ namespace MGUI.Shared.Input.Mouse
                                     {
                                         ClickedInside.Invoke(this, Args);
                                         if (AlwaysHandlesEvents)
-                                            Args.SetHandled(Owner, false);
+                                            Args.SetHandledBy(Owner, false);
                                     }
 
                                     if ((InvokeEvenIfHandled || !Args.IsHandled) && (InvokeEvenIfHandled || !Args.ReleasedArgs.IsHandled || Args.ReleasedArgs.HandledBy == Owner))
@@ -399,7 +399,7 @@ namespace MGUI.Shared.Input.Mouse
                                                 {
                                                     LMBClickedInside.Invoke(this, Args);
                                                     if (AlwaysHandlesEvents)
-                                                        Args.SetHandled(Owner, false);
+                                                        Args.SetHandledBy(Owner, false);
                                                 }
                                                 break;
                                             case MouseButton.Middle:
@@ -407,7 +407,7 @@ namespace MGUI.Shared.Input.Mouse
                                                 {
                                                     MMBClickedInside.Invoke(this, Args);
                                                     if (AlwaysHandlesEvents)
-                                                        Args.SetHandled(Owner, false);
+                                                        Args.SetHandledBy(Owner, false);
                                                 }
                                                 break;
                                             case MouseButton.Right:
@@ -415,7 +415,7 @@ namespace MGUI.Shared.Input.Mouse
                                                 {
                                                     RMBClickedInside.Invoke(this, Args);
                                                     if (AlwaysHandlesEvents)
-                                                        Args.SetHandled(Owner, false);
+                                                        Args.SetHandledBy(Owner, false);
                                                 }
                                                 break;
                                         }
@@ -427,7 +427,7 @@ namespace MGUI.Shared.Input.Mouse
                                     {
                                         ClickedOutside.Invoke(this, Args);
                                         if (AlwaysHandlesEvents)
-                                            Args.SetHandled(Owner, false);
+                                            Args.SetHandledBy(Owner, false);
                                     }
                                 }
                             }
@@ -465,13 +465,13 @@ namespace MGUI.Shared.Input.Mouse
                                     {
                                         DragStart.Invoke(this, DragStartPressed);
                                         if (AlwaysHandlesEvents)
-                                            DragStartPressed.SetHandled(Owner, false);
+                                            DragStartPressed.SetHandledBy(Owner, false);
                                     }
                                     else if (!IsMouseInsideViewport && DragStartOutside != null)
                                     {
                                         DragStartOutside.Invoke(this, DragStartPressed);
                                         if (AlwaysHandlesEvents)
-                                            DragStartPressed.SetHandled(Owner, false);
+                                            DragStartPressed.SetHandledBy(Owner, false);
                                     }
                                 }
 
@@ -484,13 +484,13 @@ namespace MGUI.Shared.Input.Mouse
                                     {
                                         DragStart.Invoke(this, DragStartMovedAfterPress);
                                         if (AlwaysHandlesEvents)
-                                            DragStartMovedAfterPress.SetHandled(Owner, false);
+                                            DragStartMovedAfterPress.SetHandledBy(Owner, false);
                                     }
                                     else if (!IsMouseInsideViewport && DragStartOutside != null)
                                     {
                                         DragStartOutside.Invoke(this, DragStartMovedAfterPress);
                                         if (AlwaysHandlesEvents)
-                                            DragStartMovedAfterPress.SetHandled(Owner, false);
+                                            DragStartMovedAfterPress.SetHandledBy(Owner, false);
                                     }
                                 }
                             }

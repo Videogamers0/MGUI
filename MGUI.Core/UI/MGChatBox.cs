@@ -135,7 +135,7 @@ namespace MGUI.Core.UI
                     if (e.Key == Keys.Enter)
                     {
                         SendMessage();
-                        e.SetHandled(this);
+                        e.SetHandledBy(this);
                     }
                 };
 

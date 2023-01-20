@@ -84,7 +84,7 @@ namespace MGUI.Core.UI
                 OnLeftClicked += (sender, e) =>
                 {
                     if (SetsHandledToTrue)
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                     Command(this, e);
                 };
             }

@@ -99,7 +99,7 @@ namespace MGUI.Core.UI
                 MouseHandler.LMBReleasedInside += (sender, e) =>
                 {
                     this.IsChecked = !this.IsChecked;
-                    e.SetHandled(this, false);
+                    e.SetHandledBy(this, false);
                 };
 
                 this.IsChecked = IsChecked;

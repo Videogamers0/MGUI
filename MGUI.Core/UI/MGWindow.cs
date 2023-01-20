@@ -696,7 +696,9 @@ namespace MGUI.Core.UI
 
                 OnBeginUpdate += (sender, e) =>
                 {
-                    HoveredElement = GetTopmostHoveredElement(e.UA);
+                    if (MouseHandler.Tracker.MouseMovedRecently || !IsLayoutValid || QueueLayoutRefresh)
+                        HoveredElement = GetTopmostHoveredElement(e.UA);
+
                     ValidateWindowSizeAndPosition();
 
                     if (!IsLayoutValid || QueueLayoutRefresh)
@@ -710,41 +712,41 @@ namespace MGUI.Core.UI
                 MouseHandler.PressedInside += (sender, e) =>
                 {
                     if (!AllowsClickThrough || IsModalWindow)
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                 };
                 MouseHandler.ReleasedInside += (sender, e) =>
                 {
                     if (!AllowsClickThrough || IsModalWindow)
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                 };
                 MouseHandler.DragStart += (sender, e) =>
                 {
                     if (!AllowsClickThrough || IsModalWindow)
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                 };
 #if true // Disallow scroll-wheel click-through
                 //TODO maybe the window should never auto-handle scroll wheel events?
                 MouseHandler.Scrolled += (sender, e) =>
                 {
                     if (!AllowsClickThrough || IsModalWindow)
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                 };
 #endif
 
                 MouseHandler.PressedOutside += (sender, e) =>
                 {
                     if (IsModalWindow)
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                 };
                 MouseHandler.ReleasedOutside += (sender, e) =>
                 {
                     if (IsModalWindow)
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                 };
                 MouseHandler.DragStartOutside += (sender, e) =>
                 {
                     if (IsModalWindow)
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                 };
 
                 OnBeginUpdateContents += (sender, e) =>
@@ -791,7 +793,7 @@ namespace MGUI.Core.UI
                     {
                         IsDraggingWindowPosition = true;
                         DragWindowPositionOffset = Point.Zero;
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                         Debug.WriteLine($"{nameof(MGWindow)}: Drag Start at: {e.Position}");
                     }
                 }
@@ -830,7 +832,7 @@ namespace MGUI.Core.UI
                             ModalWindow.Top += Delta.Y;
                         }
 
-                        MouseHandler.Tracker.CurrentButtonReleasedEvents[MouseButton.Left]?.SetHandled(this, false);
+                        MouseHandler.Tracker.CurrentButtonReleasedEvents[MouseButton.Left]?.SetHandledBy(this, false);
 
                         Debug.WriteLine($"{nameof(MGWindow)}: Drag End at: {e.EndPosition}");
                     }
@@ -849,7 +851,7 @@ namespace MGUI.Core.UI
             {
                 if (IsDraggingWindowPosition)
                 {
-                    MouseHandler.Tracker.CurrentButtonReleasedEvents[MouseButton.Left]?.SetHandled(this, false);
+                    MouseHandler.Tracker.CurrentButtonReleasedEvents[MouseButton.Left]?.SetHandledBy(this, false);
                 }
             };
         }

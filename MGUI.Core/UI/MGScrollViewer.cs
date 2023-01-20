@@ -337,14 +337,14 @@ namespace MGUI.Core.UI
                 {
                     if (IsHoveringVSB)
                     {
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                         Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
                         HandleScrollBarInput(Orientation.Vertical, e.Button, LayoutSpacePosition.Y);
                     }
 
                     if (IsHoveringHSB)
                     {
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                         Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
                         HandleScrollBarInput(Orientation.Horizontal, e.Button, LayoutSpacePosition.X);
                     }
@@ -356,13 +356,13 @@ namespace MGUI.Core.UI
                 {
                     if (IsHoveringVSB)
                     {
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                         IsDraggingVSB = true;
                     }
 
                     if (IsHoveringHSB)
                     {
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                         IsDraggingHSB = true;
                     }
                 };
@@ -396,7 +396,7 @@ namespace MGUI.Core.UI
                 {
                     if (IsDraggingVSB || IsDraggingHSB)
                     {
-                        MouseHandler.Tracker.CurrentButtonReleasedEvents[MouseButton.Left]?.SetHandled(this, false);
+                        MouseHandler.Tracker.CurrentButtonReleasedEvents[MouseButton.Left]?.SetHandledBy(this, false);
                     }
                 };
 
@@ -404,7 +404,7 @@ namespace MGUI.Core.UI
                 MouseHandler.ReleasedOutside += (sender, e) =>
                 {
                     if (e.IsLMB && (IsDraggingVSB || IsDraggingHSB))
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                 };
 
                 MouseHandler.Scrolled += (sender, e) =>
@@ -414,12 +414,12 @@ namespace MGUI.Core.UI
                     {
                         if (e.ScrollWheelDelta > 0 && VerticalOffset > 0)
                         {
-                            e.SetHandled(this, false);
+                            e.SetHandledBy(this, false);
                             VerticalOffset -= VerticalScrollInterval;
                         }
                         else if (e.ScrollWheelDelta < 0 && VerticalOffset < MaxVerticalOffset)
                         {
-                            e.SetHandled(this, false);
+                            e.SetHandledBy(this, false);
                             VerticalOffset += VerticalScrollInterval;
                         }
                     }
@@ -428,12 +428,12 @@ namespace MGUI.Core.UI
                     {
                         if (e.ScrollWheelDelta > 0 && HorizontalOffset > 0)
                         {
-                            e.SetHandled(this, false);
+                            e.SetHandledBy(this, false);
                             HorizontalOffset -= VerticalScrollInterval;
                         }
                         else if (e.ScrollWheelDelta < 0 && HorizontalOffset < MaxHorizontalOffset)
                         {
-                            e.SetHandled(this, false);
+                            e.SetHandledBy(this, false);
                             HorizontalOffset += VerticalScrollInterval;
                         }
                     }

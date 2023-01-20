@@ -527,7 +527,7 @@ namespace MGUI.Core.UI
                     if (IsContextMenuOpen)
                     {
                         TryCloseContextMenu();
-                        e.SetHandled(this, false);
+                        e.SetHandledBy(this, false);
                     }
                 };
 

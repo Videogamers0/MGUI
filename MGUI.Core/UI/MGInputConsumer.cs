@@ -26,25 +26,25 @@ namespace MGUI.Core.UI
                 MouseHandler.PressedInside += (sender, e) =>
                 {
                     if (HandlesMousePresses)
-                        e.SetHandled(this);
+                        e.SetHandledBy(this);
                 };
 
                 MouseHandler.ReleasedInside += (sender, e) =>
                 {
                     if (HandlesMouseReleases)
-                        e.SetHandled(this);
+                        e.SetHandledBy(this);
                 };
 
                 MouseHandler.DragStart += (sender, e) =>
                 {
                     if (HandlesMouseDrags)
-                        e.SetHandled(this);
+                        e.SetHandledBy(this);
                 };
 
                 MouseHandler.Scrolled += (sender, e) =>
                 {
                     if (HandlesMouseScroll)
-                        e.SetHandled(this);
+                        e.SetHandledBy(this);
                 };
             }
         }

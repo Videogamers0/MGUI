@@ -736,7 +736,7 @@ namespace MGUI.Core.UI
 				{
 					if (ContextMenu?.TryOpenContextMenu(e.Position) == true)
 					{
-						e.SetHandled(ContextMenu, false);
+						e.SetHandledBy(ContextMenu, false);
 					}
 				};
             }
