@@ -879,6 +879,44 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private DateTime? HoverStartTime = null;
 
+        protected internal MGElement GetTopmostHoveredElement(ElementUpdateArgs UA)
+        {
+            MGElement Result = null;
+            ComputeTopmostHoveredElement(UA.IsEnabled, UA.IsHitTestVisible, true, ref Result);
+            return Result;
+        }
+
+        private void ComputeTopmostHoveredElement(bool IsParentEnabled, bool IsParentHitTestVisible, bool CanParentReceiveMouseInput, ref MGElement Result)
+        {
+            bool ComputedIsEnabled = IsParentEnabled && this.IsEnabled;
+            bool ComputedIsHitTestVisible = IsParentHitTestVisible && this.IsHitTestVisible;
+
+            SecondaryVisualState SecondaryVisualState = !ComputedIsHitTestVisible || SelfOrParentWindow.HasModalWindow ? SecondaryVisualState.None :
+                IsLMBPressed ? SecondaryVisualState.Pressed :
+                IsHovered ? SecondaryVisualState.Hovered : SecondaryVisualState.None;
+
+            bool BaseCanReceiveInput = (Visibility == Visibility.Visible || (Visibility == Visibility.Hidden && CanHandleInputsWhileHidden)) && ComputedIsEnabled && ComputedIsHitTestVisible
+                && (!RecentDrawWasClipped || (Visibility == Visibility.Hidden && CanHandleInputsWhileHidden));
+            bool CanReceiveMouseInput = BaseCanReceiveInput && CanParentReceiveMouseInput;
+
+            foreach (MGElement Component in Components.Where(x => x.DrawBeforeBackground).Select(x => x.BaseElement))
+                Component.ComputeTopmostHoveredElement(ComputedIsEnabled, ComputedIsHitTestVisible, CanReceiveMouseInput, ref Result);
+            foreach (MGElement Component in Components.Where(x => x.DrawBeforeSelf).Select(x => x.BaseElement))
+                Component.ComputeTopmostHoveredElement(ComputedIsEnabled, ComputedIsHitTestVisible, CanReceiveMouseInput, ref Result);
+
+            if (CanReceiveMouseInput && SecondaryVisualState == SecondaryVisualState.Hovered)
+            {
+                Result = this;
+            }
+
+            foreach (MGElement Component in Components.Where(x => x.DrawBeforeContents).Select(x => x.BaseElement))
+                Component.ComputeTopmostHoveredElement(ComputedIsEnabled, ComputedIsHitTestVisible, CanReceiveMouseInput, ref Result);
+            foreach (MGElement Child in GetVisualTreeChildren())
+                Child.ComputeTopmostHoveredElement(ComputedIsEnabled, ComputedIsHitTestVisible, CanReceiveMouseInput, ref Result);
+            foreach (MGElement Component in Components.Where(x => x.DrawAfterContents).Select(x => x.BaseElement))
+                Component.ComputeTopmostHoveredElement(ComputedIsEnabled, ComputedIsHitTestVisible, CanReceiveMouseInput, ref Result);
+        }
+
         public void Update(ElementUpdateArgs UA)
 		{ 
             bool ComputedIsEnabled = UA.IsEnabled && this.IsEnabled;
@@ -910,7 +948,11 @@ namespace MGUI.Core.UI
             };
 
             PrimaryVisualState PrimaryVisualState = !ComputedIsEnabled ? PrimaryVisualState.Disabled : ComputedIsSelected ? PrimaryVisualState.Selected : PrimaryVisualState.Normal;
-            SecondaryVisualState SecondaryVisualState = !ComputedIsHitTestVisible || SelfOrParentWindow.HasModalWindow ? SecondaryVisualState.None : IsLMBPressed ? SecondaryVisualState.Pressed : IsHovered ? SecondaryVisualState.Hovered : SecondaryVisualState.None;
+            SecondaryVisualState SecondaryVisualState = 
+                !ComputedIsHitTestVisible || SelfOrParentWindow.HasModalWindow ? SecondaryVisualState.None : 
+                IsLMBPressed ? SecondaryVisualState.Pressed : 
+                IsHovered && IsSelfOrAncestorOf(SelfOrParentWindow.HoveredElement) ? SecondaryVisualState.Hovered : 
+                SecondaryVisualState.None;
             this.VisualState = new(PrimaryVisualState, SecondaryVisualState);
 
             ElementUpdateEventArgs UpdateEventArgs = new(this, UA);
@@ -939,9 +981,6 @@ namespace MGUI.Core.UI
 				&& (!RecentDrawWasClipped || (Visibility == Visibility.Hidden && CanHandleInputsWhileHidden));
             this._CanReceiveMouseInput = BaseCanReceiveInput && (Parent?._CanReceiveMouseInput ?? true);
 			this._CanReceiveKeyboardInput = BaseCanReceiveInput && (Parent?._CanReceiveKeyboardInput ?? true);
-
-            if (_CanReceiveMouseInput && SecondaryVisualState == SecondaryVisualState.Hovered && (ElementType != MGElementType.Border || !IsComponent) && this is not MGMultiContentHost)
-                SelfOrParentWindow.HoveredElement = this;
 
             OnBeginUpdateContents?.Invoke(this, UpdateEventArgs);
 			foreach (MGElement Component in Components.Where(x => x.UpdateBeforeContents).Select(x => x.BaseElement))
@@ -1522,6 +1561,22 @@ namespace MGUI.Core.UI
                 Result = default;
                 return false;
             }
+        }
+
+        /// <summary>Returns true if this <see cref="MGElement"/> is the same reference as the given <paramref name="Element"/>,<br/>
+        /// or if this <see cref="MGElement"/> is a parent of the given <paramref name="Element"/> anywhere along the visual tree (does not need to be the immediate parent)</summary>
+        public bool IsSelfOrAncestorOf(MGElement Element)
+        {
+            MGElement Current = Element;
+
+            while (Current != null)
+            {
+                if (Current == this)
+                    return true;
+                Current = Current.Parent;
+            }
+
+            return false;
         }
 
         //TODO maybe we should have parameters like:

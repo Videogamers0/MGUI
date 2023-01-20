@@ -696,7 +696,7 @@ namespace MGUI.Core.UI
 
                 OnBeginUpdate += (sender, e) =>
                 {
-                    HoveredElement = null;
+                    HoveredElement = GetTopmostHoveredElement(e.UA);
                     ValidateWindowSizeAndPosition();
 
                     if (!IsLayoutValid || QueueLayoutRefresh)

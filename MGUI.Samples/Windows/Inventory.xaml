@@ -3,7 +3,7 @@
         Left="300" Top="350" SizeToContent="WidthAndHeight" IsTitleBarVisible="False" IsUserResizable="False" AllowsClickThrough="True">
     <OverlayPanel TextForeground="Black" HorizontalAlignment="Center" VerticalAlignment="Center">
         <Button Name="Button_Close" HorizontalAlignment="Right" VerticalAlignment="Top" Content="[b]X" TextForeground="Red" Padding="3,2,3,0"
-                BorderBrush="RGB(91,43,42)" BorderThickness="2" Background="rgb(242,191,114)" />
+                BorderBrush="RGB(91,43,42)" BorderThickness="2" Background="rgb(242,191,114)" ZIndex="100" />
 
         <InputConsumer Margin="0,12,12,0">
             <TabControl Name="Tabs" Background="RGB(255,203,123)" BorderBrush="RGB(177,78,5)" BorderThickness="0" MinWidth="300" MinHeight="300" Padding="0">

@@ -1,8 +1,8 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         Left="200" Top="200" MinHeight="0" SizeToContent="WidthAndHeight" WindowStyle="None">
-    <DockPanel Background="Red" Width="250" Height="120" LastChildFill="False">
-        <Border Dock="Left" Background="Green" Content="Docked Left" />
-        <Border Dock="Top" Background="Purple" Content="Docked Top" />
-        <Border Dock="Bottom" Background="Orange" Content="Docked Bottom but is last child, spans all remaining space if !LastChildFill" />
-    </DockPanel>
+    <OverlayPanel Background="Red" Width="200" Height="50">
+        <Button Background="Purple" Content="First child" Offset="15, 3, 62, 25" ZIndex="0.01" />
+        <Button Background="Orange" Content="Second child" Offset="5, 0, 50, 10" ZIndex="10" VerticalAlignment="Bottom" />
+        <Button Background="Green" Content="Third child" Offset="120, 10, 4, 18" ZIndex="-10" />
+    </OverlayPanel>
 </Window>
