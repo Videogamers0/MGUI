@@ -483,7 +483,7 @@ namespace MGUI.Core.UI
                 {
                     _Header = value;
 
-                    RowDefinition HeaderRow = HeaderGrid.Rows.First();
+                    RowDefinition HeaderRow = HeaderGrid.Rows[0];
                     using (HeaderGrid.AllowChangingContentTemporarily())
                     {
                         HeaderGrid.ClearCellContent(HeaderRow, HeaderColumn);

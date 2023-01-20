@@ -165,6 +165,11 @@ namespace MGUI.Core.UI
         /// <summary>The fallback value to use for <see cref="MGTextBlock.ActualForeground"/> when there is no foreground color applied to the <see cref="MGTextBlock"/> or its parents.</summary>
         public ThemeManagedVisualStateColorBrush TextBlockFallbackForeground { get; }
 
+        /// <summary>The default offset from the current mouse position to draw <see cref="MGToolTip"/>s at.<br/>
+        /// This value is used to initialize <see cref="MGToolTip.DrawOffset"/><para/>
+        /// Default value: (6, 6)</summary>
+        public Point ToolTipOffset { get; set; }
+
         public ThemeFontSettings FontSettings { get; }
 
         public enum BuiltInTheme
@@ -190,6 +195,7 @@ namespace MGUI.Core.UI
         public MGTheme(BuiltInTheme ThemeType, string DefaultFontFamily)
         {
             FontSettings = new(DefaultFontFamily);
+            ToolTipOffset = new(6, 6);
 
             _Backgrounds = new();
 

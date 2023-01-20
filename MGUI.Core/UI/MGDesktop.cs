@@ -462,11 +462,11 @@ namespace MGUI.Core.UI
                     if (ActiveToolTip != null && ActiveContextMenu != null && ActiveToolTip.ParentWindow == ActiveContextMenu)
                     {
                         ActiveContextMenu?.Draw(DA);
-                        ActiveToolTip?.DrawAtMousePosition(DA);
+                        ActiveToolTip?.DrawAtDefaultPosition(DA);
                     }
                     else
                     {
-                        ActiveToolTip?.DrawAtMousePosition(DA);
+                        ActiveToolTip?.DrawAtDefaultPosition(DA);
                         ActiveContextMenu?.Draw(DA);
                     }
                 }

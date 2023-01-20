@@ -19,6 +19,10 @@ namespace MGUI.Core.UI
         /// Default value: false</summary>
         public bool ShowOnDisabled { get; set; }
 
+        /// <summary>An offset from the current mouse cursor position to draw this <see cref="MGToolTip"/> at.<para/>
+        /// Default value: <see cref="MGTheme.ToolTipOffset"/></summary>
+        public Point DrawOffset { get; set; }
+
         public MGToolTip(MGWindow Window, MGElement Host, int Width, int Height, MGTheme Theme = null)
             : base(Window.Desktop, Theme ?? Window.Theme, Window, MGElementType.ToolTip, 0, 0, Width, Height)
         {
@@ -29,9 +33,9 @@ namespace MGUI.Core.UI
                 this.BorderThickness = new(2);
                 //this.DefaultTextForeground = Color.White;
                 this.ShowOnDisabled = false;
-                this.Padding = new(10);
-                this.MinWidth = 50;
-                this.MinHeight = 50;
+                this.Padding = new(5);
+                this.MinWidth = 10;
+                this.MinHeight = 10;
                 this.IsUserResizable = false;
                 this.IsTitleBarVisible = false;
 
@@ -54,10 +58,11 @@ namespace MGUI.Core.UI
             }
         }
 
-        public void DrawAtMousePosition(ElementDrawArgs DA)
+        public void DrawAtDefaultPosition(ElementDrawArgs DA) => DrawAtMousePosition(DA, DrawOffset.X, DrawOffset.Y);
+        public void DrawAtMousePosition(ElementDrawArgs DA, int XOffset = 5, int YOffset = 5)
         {
             Point CurrentMousePosition = InputTracker.Mouse.CurrentPosition;
-            Draw(DA with { Offset = DA.Offset + CurrentMousePosition + new Point(5, 5) });
+            Draw(DA with { Offset = DA.Offset + CurrentMousePosition + new Point(XOffset, YOffset) });
         }
     }
 }
