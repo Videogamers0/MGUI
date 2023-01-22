@@ -704,6 +704,8 @@ namespace MGUI.Core.UI
 
                 OnBeginUpdate += (sender, e) =>
                 {
+                    bool ShouldUpdateHoveredElement = MouseHandler.Tracker.MouseMovedRecently || !IsLayoutValid || QueueLayoutRefresh;
+
                     ValidateWindowSizeAndPosition();
 
                     if (!IsLayoutValid || QueueLayoutRefresh)
@@ -712,7 +714,7 @@ namespace MGUI.Core.UI
                         UpdateLayout(new(this.Left, this.Top, this.WindowWidth, this.WindowHeight));
                     }
 
-                    if (MouseHandler.Tracker.MouseMovedRecently || !IsLayoutValid || QueueLayoutRefresh)
+                    if (ShouldUpdateHoveredElement)
                         HoveredElement = GetTopmostHoveredElement(e.UA);
 
                     if (MouseHandler.Tracker.MouseLeftButtonPressedRecently)
