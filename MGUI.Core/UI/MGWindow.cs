@@ -17,6 +17,7 @@ using MGUI.Shared.Input.Mouse;
 using MGUI.Shared.Input.Keyboard;
 using MGUI.Shared.Rendering;
 using Microsoft.Xna.Framework.Graphics;
+using MGUI.Core.UI.Containers.Grids;
 
 namespace MGUI.Core.UI
 {
@@ -541,7 +542,14 @@ namespace MGUI.Core.UI
         /// See also:<br/><see cref="MGElement.GetTheme()"/><br/><see cref="MGDesktop.Theme"/></summary>
         public MGTheme Theme { get; set; }
 
-        protected internal MGElement HoveredElement { get; set; }
+        /// <summary>The inner-most element of the visual tree that the mouse was hovering at the moment that the left mouse button was pressed.<br/>
+        /// Null if the left mouse button is currently released or the mouse wasn't hovering an element when the button was pressed down.<para/>
+        /// See also: <see cref="HoveredElement"/></summary>
+        public MGElement PressedElement { get; private set; }
+        /// <summary>The inner-most element of the visual tree that the mouse is currently hovering, if any.<para/>
+        /// If the mouse is hovering several sibling elements (such as children of an <see cref="MGOverlayPanel"/>, or elements placed inside the same cell of an <see cref="MGGrid"/>)<br/>
+        /// then this property prioritizes the topmost element.</summary>
+        public MGElement HoveredElement { get; private set; }
 
         /// <summary>If true, this <see cref="MGWindow"/>'s layout will be recomputed at the start of the next update tick.</summary>
         public bool QueueLayoutRefresh { get; set; }
@@ -696,9 +704,6 @@ namespace MGUI.Core.UI
 
                 OnBeginUpdate += (sender, e) =>
                 {
-                    if (MouseHandler.Tracker.MouseMovedRecently || !IsLayoutValid || QueueLayoutRefresh)
-                        HoveredElement = GetTopmostHoveredElement(e.UA);
-
                     ValidateWindowSizeAndPosition();
 
                     if (!IsLayoutValid || QueueLayoutRefresh)
@@ -706,6 +711,14 @@ namespace MGUI.Core.UI
                         QueueLayoutRefresh = false;
                         UpdateLayout(new(this.Left, this.Top, this.WindowWidth, this.WindowHeight));
                     }
+
+                    if (MouseHandler.Tracker.MouseMovedRecently || !IsLayoutValid || QueueLayoutRefresh)
+                        HoveredElement = GetTopmostHoveredElement(e.UA);
+
+                    if (MouseHandler.Tracker.MouseLeftButtonPressedRecently)
+                        PressedElement = GetTopmostHoveredElement(e.UA);
+                    else if (MouseHandler.Tracker.MouseLeftButtonReleasedRecently)
+                        PressedElement = null;
                 };
 
                 //  Ensure all mouse events that haven't already been handled by a child element of this window are handled, so that the mouse events won't fall-through to underneath this window

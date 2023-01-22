@@ -91,6 +91,14 @@ namespace MGUI.Shared.Input.Mouse
 
         public MouseState PreviousState { get; private set; }
         public MouseState CurrentState { get; private set; }
+
+        /// <summary>True if the mouse left button was just pressed during the current update.<para/>
+        /// See also: <see cref="MouseLeftButtonReleasedRecently"/></summary>
+        public bool MouseLeftButtonPressedRecently => _CurrentButtonPressedEvents[MouseButton.Left] != null;
+        /// <summary>True if the mouse left button was just released during the current update.<para/>
+        /// See also: <see cref="MouseLeftButtonPressedRecently"/></summary>
+        public bool MouseLeftButtonReleasedRecently => _CurrentButtonReleasedEvents[MouseButton.Left] != null;
+
         /// <summary>True if the mouse position changed between the previous update and the current update.</summary>
         public bool MouseMovedRecently => CurrentState.Position != PreviousState.Position;
 

@@ -543,11 +543,18 @@ namespace MGUI.Core.UI
 		public MouseHandler MouseHandler { get; }
         public KeyboardHandler KeyboardHandler { get; }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public bool IsHovered => MouseHandler.IsHovered;
-        /// <summary>True if <see cref="MouseButton.Left"/> is currently pressed overtop of this <see cref="MGElement"/></summary>
+        /// <summary>True if <see cref="MouseButton.Left"/> was pressed overtop of this <see cref="MGElement"/> and has not been released yet.<para/>
+        /// This property can be true even if the mouse isn't overtop of this <see cref="MGElement"/> (if pressed overtop, but then moved outside and not yet released)<para/>
+        /// You may want to consider checking for <see cref="VisualState"/>'s <see cref="SecondaryVisualState.Pressed"/> instead.<para/>
+        /// See also: <see cref="MGWindow.PressedElement"/> (You might also want to call <see cref="IsSelfOrAncestorOf(MGElement)"/> on the <see cref="MGWindow.PressedElement"/>)</summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsLMBPressed => MouseHandler.IsButtonPressedInside(MouseButton.Left);
+
+        /// <summary>Warning - this property can be true even if this <see cref="MGElement"/> is entirely occluded by another <see cref="MGElement"/> overtop it.<para/>
+        /// You may want to consider checking for <see cref="VisualState"/>'s <see cref="SecondaryVisualState.Hovered"/> instead.<para/>
+        /// See also: <see cref="MGWindow.HoveredElement"/> (You might also want to call <see cref="IsSelfOrAncestorOf(MGElement)"/> on the <see cref="MGWindow.HoveredElement"/>)</summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public bool IsHovered => MouseHandler.IsHovered;
 
         protected IMouseViewport AsIViewport() => this;
         protected IMouseHandlerHost AsIMouseHandlerHost() => this;
@@ -888,12 +895,11 @@ namespace MGUI.Core.UI
 
         private void ComputeTopmostHoveredElement(bool IsParentEnabled, bool IsParentHitTestVisible, bool CanParentReceiveMouseInput, ref MGElement Result)
         {
+            if (Visibility != Visibility.Visible)
+                return;
+
             bool ComputedIsEnabled = IsParentEnabled && this.IsEnabled;
             bool ComputedIsHitTestVisible = IsParentHitTestVisible && this.IsHitTestVisible;
-
-            SecondaryVisualState SecondaryVisualState = !ComputedIsHitTestVisible || SelfOrParentWindow.HasModalWindow ? SecondaryVisualState.None :
-                IsLMBPressed ? SecondaryVisualState.Pressed :
-                IsHovered ? SecondaryVisualState.Hovered : SecondaryVisualState.None;
 
             bool BaseCanReceiveInput = (Visibility == Visibility.Visible || (Visibility == Visibility.Hidden && CanHandleInputsWhileHidden)) && ComputedIsEnabled && ComputedIsHitTestVisible
                 && (!RecentDrawWasClipped || (Visibility == Visibility.Hidden && CanHandleInputsWhileHidden));
@@ -904,7 +910,7 @@ namespace MGUI.Core.UI
             foreach (MGElement Component in Components.Where(x => x.DrawBeforeSelf).Select(x => x.BaseElement))
                 Component.ComputeTopmostHoveredElement(ComputedIsEnabled, ComputedIsHitTestVisible, CanReceiveMouseInput, ref Result);
 
-            if (CanReceiveMouseInput && SecondaryVisualState == SecondaryVisualState.Hovered)
+            if (CanReceiveMouseInput && ComputedIsHitTestVisible && !SelfOrParentWindow.HasModalWindow && this.IsHovered)
             {
                 Result = this;
             }
@@ -950,7 +956,7 @@ namespace MGUI.Core.UI
             PrimaryVisualState PrimaryVisualState = !ComputedIsEnabled ? PrimaryVisualState.Disabled : ComputedIsSelected ? PrimaryVisualState.Selected : PrimaryVisualState.Normal;
             SecondaryVisualState SecondaryVisualState = 
                 !ComputedIsHitTestVisible || SelfOrParentWindow.HasModalWindow ? SecondaryVisualState.None : 
-                IsLMBPressed ? SecondaryVisualState.Pressed : 
+                IsLMBPressed && IsSelfOrAncestorOf(SelfOrParentWindow.PressedElement) ? SecondaryVisualState.Pressed : 
                 IsHovered && IsSelfOrAncestorOf(SelfOrParentWindow.HoveredElement) ? SecondaryVisualState.Hovered : 
                 SecondaryVisualState.None;
             this.VisualState = new(PrimaryVisualState, SecondaryVisualState);
@@ -959,10 +965,13 @@ namespace MGUI.Core.UI
 
             OnBeginUpdate?.Invoke(this, UpdateEventArgs);
 
-			if (ComputedIsHitTestVisible && Visibility == Visibility.Visible && IsHovered)
-				HoverStartTime ??= DateTime.Now;
-			else
-				HoverStartTime = null;
+            if (ComputedIsHitTestVisible && Visibility == Visibility.Visible &&
+                (SecondaryVisualState == SecondaryVisualState.Hovered || (IsHovered && SecondaryVisualState == SecondaryVisualState.Pressed)))
+            {
+                HoverStartTime ??= DateTime.Now;
+            }
+            else
+                HoverStartTime = null;
 
 			if (!RecentDrawWasClipped && HoverStartTime.HasValue && !SelfOrParentWindow.HasModalWindow)
 			{
