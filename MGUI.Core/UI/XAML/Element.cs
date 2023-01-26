@@ -75,12 +75,17 @@ namespace MGUI.Core.UI.XAML
         [Category("Behavior")]
         public bool? IsEnabled { get; set; }
 
-        //public VisualStateBrush Background
+        [Category("Appearance")]
+        public Thickness? BackgroundRenderPadding { get; set; }
         [Category("Appearance")]
         public FillBrush Background { get; set; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [Browsable(false)]
         public FillBrush BG { get => Background; set => Background = value; }
+        [Category("Appearance")]
+        public FillBrush DisabledBackground { get; set; }
+        [Category("Appearance")]
+        public FillBrush SelectedBackground { get; set; }
         [Category("Appearance")]
         public XAMLColor? TextForeground { get; set; }
 
@@ -223,6 +228,8 @@ namespace MGUI.Core.UI.XAML
                 if (IsEnabled.HasValue)
                     Element.IsEnabled = IsEnabled.Value;
 
+                if (BackgroundRenderPadding.HasValue)
+                    Element.BackgroundRenderPadding = BackgroundRenderPadding.Value.ToThickness();
                 ApplyBackground(Element);
                 if (TextForeground.HasValue)
                     Element.DefaultTextForeground.NormalValue = TextForeground.Value.ToXNAColor();
@@ -250,6 +257,10 @@ namespace MGUI.Core.UI.XAML
         {
             if (Background != null)
                 Element.BackgroundBrush.NormalValue = Background.ToFillBrush();
+            if (DisabledBackground != null)
+                Element.BackgroundBrush.DisabledValue = DisabledBackground.ToFillBrush();
+            if (SelectedBackground != null)
+                Element.BackgroundBrush.SelectedValue = SelectedBackground.ToFillBrush();
         }
 
         protected abstract MGElement CreateElementInstance(MGWindow Window, MGElement Parent);

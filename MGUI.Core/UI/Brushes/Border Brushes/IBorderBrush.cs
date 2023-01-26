@@ -9,14 +9,9 @@ using System.Threading.Tasks;
 
 namespace MGUI.Core.UI.Brushes.Border_Brushes
 {
-    /// <summary>See also: <see cref="MGUniformBorderBrush"/>, <see cref="MGDockedBorderBrush"/></summary>
+    /// <summary>See also:<br/><see cref="MGUniformBorderBrush"/><br/><see cref="MGDockedBorderBrush"/><br/><see cref="MGBandedBorderBrush"/><br/><see cref="MGTexturedBorderBrush"/></summary>
     public interface IBorderBrush : ICloneable
     {
-        public IFillBrush GetLeft();
-        public IFillBrush GetTop();
-        public IFillBrush GetRight();
-        public IFillBrush GetBottom();
-
         public void Draw(ElementDrawArgs DA, MGElement Element, Rectangle Bounds, Thickness BT);
 
         public IBorderBrush Copy();

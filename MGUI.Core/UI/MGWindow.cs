@@ -630,15 +630,18 @@ namespace MGUI.Core.UI
                 this.TitleBarComponent = new(TitleBarElement, true, false, true, true, false, false, false,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Top, ComponentSize.Size));
                 AddComponent(TitleBarComponent);
-
+#if NEVER
                 TitleBarElement.OnEndDraw += (sender, e) =>
                 {
+                    //  Attempt to draw the window's border around just the titlebar, so that the border is also drawn just underneath the title bar
                     if (IsTitleBarVisible)
                     {
-                        Rectangle TitleBottomEdge = new(TitleBarElement.LayoutBounds.Left, TitleBarElement.LayoutBounds.Bottom - BorderThickness.Top, TitleBarElement.LayoutBounds.Width, BorderThickness.Top);
-                        BorderElement.BorderBrush.GetTop().Draw(e.DA, this, TitleBottomEdge);
+                        Rectangle TargetBounds = new(TitleBarElement.LayoutBounds.Left - BorderThickness.Left, TitleBarElement.LayoutBounds.Top - BorderThickness.Top, 
+                            TitleBarElement.LayoutBounds.Width + BorderThickness.Width, TitleBarElement.LayoutBounds.Height + BorderThickness.Top + BorderThickness.Bottom / 2);
+                        BorderElement.BorderBrush.Draw(e.DA, this, TargetBounds, BorderThickness);
                     }
                 };
+#endif
 
                 this.CloseButtonElement = new(this, x => { TryCloseWindow(); });
                 CloseButtonElement.MinWidth = 12;
@@ -701,7 +704,7 @@ namespace MGUI.Core.UI
                 ElementsByName = new();
                 OnDirectOrNestedContentAdded += Element_Added;
                 OnDirectOrNestedContentRemoved += Element_Removed;
-
+                
                 OnBeginUpdate += (sender, e) =>
                 {
                     bool ShouldUpdateHoveredElement = MouseHandler.Tracker.MouseMovedRecently || !IsLayoutValid || QueueLayoutRefresh;
@@ -786,9 +789,9 @@ namespace MGUI.Core.UI
                 MakeDraggable();
             }
         }
-        #endregion Constructors
+#endregion Constructors
 
-        #region Drag Window Position
+#region Drag Window Position
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool IsDraggingWindowPosition = false;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -870,9 +873,9 @@ namespace MGUI.Core.UI
                 }
             };
         }
-        #endregion Drag Window Position
+#endregion Drag Window Position
 
-        #region Indexed Elements
+#region Indexed Elements
         private Dictionary<string, MGElement> ElementsByName { get; }
 
         public MGElement GetElementByName(string Name) => ElementsByName[Name];
@@ -984,7 +987,7 @@ namespace MGUI.Core.UI
                 }
             }
         }
-        #endregion Indexed Elements
+#endregion Indexed Elements
 
         private VisualStateFillBrush PreviousBackgroundBrush = null;
 

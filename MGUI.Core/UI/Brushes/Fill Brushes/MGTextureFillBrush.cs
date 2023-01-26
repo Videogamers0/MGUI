@@ -17,21 +17,23 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
         public readonly Rectangle? SourceRect;
         public readonly Stretch Stretch;
         public readonly float Opacity;
+        public readonly Color Color;
 
         //TODO Option to make it tesselate if Stretch is not Fill/UniformToFill? (LinearWrap SamplerState?)
         //      So if Stretch is None or UniformToFill, the empty space would instead be filled up with LinearWrap texture
 
         /// <param name="RegionName">The name of the <see cref="NamedTextureRegion"/> used to reference the texture settings by. This name must exist in <see cref="MGDesktop.NamedRegions"/><para/>
         /// See also: <see cref="MGDesktop.NamedTextures"/>, <see cref="MGDesktop.NamedRegions"/></param>
-        public MGTextureFillBrush(MGDesktop Desktop, string RegionName, Stretch Stretch = Stretch.Fill, float Opacity = 1.0f)
-            : this(Desktop.NamedTextures[Desktop.NamedRegions[RegionName].TextureName], Desktop.NamedRegions[RegionName].SourceRect, Stretch, Opacity) { }
+        public MGTextureFillBrush(MGDesktop Desktop, string RegionName, Stretch Stretch = Stretch.Fill, float Opacity = 1.0f, Color? Color = null)
+            : this(Desktop.NamedTextures[Desktop.NamedRegions[RegionName].TextureName], Desktop.NamedRegions[RegionName].SourceRect, Stretch, Opacity, Color ?? Desktop.NamedRegions[RegionName].Color) { }
 
-        public MGTextureFillBrush(Texture2D Texture, Rectangle? SourceRect, Stretch Stretch = Stretch.Fill, float Opacity = 1.0f)
+        public MGTextureFillBrush(Texture2D Texture, Rectangle? SourceRect, Stretch Stretch = Stretch.Fill, float Opacity = 1.0f, Color? Color = null)
         {
             this.Texture = Texture;
             this.SourceRect = SourceRect;
             this.Stretch = Stretch;
             this.Opacity = Opacity;
+            this.Color = Color ?? Microsoft.Xna.Framework.Color.White;
         }
 
         private int UnstretchedWidth => SourceRect?.Width ?? Texture?.Width ?? 0;
@@ -76,11 +78,11 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
                     throw new NotImplementedException($"Unrecognized {nameof(Stretch)}: {Stretch}");
                 }
 
-                DA.DT.DrawTextureTo(Texture, SourceRect, Destination.GetTranslated(DA.Offset), Color.White * DA.Opacity * this.Opacity);
+                DA.DT.DrawTextureTo(Texture, SourceRect, Destination.GetTranslated(DA.Offset), Color * DA.Opacity * this.Opacity);
             }
         }
 
-        public IFillBrush Copy() => new MGTextureFillBrush(Texture, SourceRect, Stretch, Opacity);
+        public IFillBrush Copy() => new MGTextureFillBrush(Texture, SourceRect, Stretch, Opacity, Color);
     }
 
 }

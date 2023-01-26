@@ -51,11 +51,6 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
                 Brush.Draw(DA, Element, new(Bounds.Left + BT.Left, Bounds.Bottom - BT.Bottom, Bounds.Width - BT.Width, BT.Bottom));
         }
 
-        public IFillBrush GetLeft() => Brush;
-        public IFillBrush GetTop() => Brush;
-        public IFillBrush GetRight() => Brush;
-        public IFillBrush GetBottom() => Brush;
-
         public IBorderBrush Copy() => new MGUniformBorderBrush(Brush.Copy());
 
         public static explicit operator MGUniformBorderBrush(Color color) => new(color);

@@ -173,10 +173,12 @@ namespace MGUI.Shared.Helpers
                 @this.Width * ScaleFactor, @this.Height * ScaleFactor);
         }
 
-
         [DebuggerStepThrough]
         public static Rectangle GetTranslated(this Rectangle @this, Point Offset)
             => new(@this.X + Offset.X, @this.Y + Offset.Y, @this.Width, @this.Height);
+        [DebuggerStepThrough]
+        public static Rectangle GetTranslated(this Rectangle @this, int X, int Y)
+            => new(@this.X + X, @this.Y + Y, @this.Width, @this.Height);
 
         /// <summary>Returns a new <see cref="Rectangle"/> that is expanded on all sides by the given <paramref name="Amount"/></summary>
         [DebuggerStepThrough]

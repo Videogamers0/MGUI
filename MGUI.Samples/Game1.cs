@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using ColumnDefinition = MGUI.Core.UI.Containers.Grids.ColumnDefinition;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using RowDefinition = MGUI.Core.UI.Containers.Grids.RowDefinition;
 
 namespace MGUI.Samples
@@ -80,6 +81,9 @@ namespace MGUI.Samples
             Desktop.Windows.Clear();
             MGWindow Tmp = XAMLParser.LoadRootWindow(Desktop, ReadEmbeddedResourceAsString(CurrentAssembly, $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Temp.xaml"));
             Desktop.Windows.Add(Tmp);
+
+            //MGBorder Border = Tmp.GetElementByName<MGBorder>("TestTexturedBorder");
+            //Border.BorderBrush = new MGTexturedBorderBrush(Content.Load<Texture2D>(@"Border Textures\1_RightEdge"), Content.Load<Texture2D>(@"Border Textures\1_BottomRightCorner"), TextureTransforms.CreateStandardRotated(Edge.Right, Corner.BottomRight));
 #endif
 
             base.Initialize();
@@ -436,7 +440,6 @@ namespace MGUI.Samples
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
             // TODO: use this.Content to load your game content here
         }
 

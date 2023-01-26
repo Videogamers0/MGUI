@@ -27,5 +27,7 @@ namespace MGUI.Shared.Helpers
         public static Size AsSize(this Point @this) => new(@this.X, @this.Y);
 
         public static Point Negate(this Point @this) => new(-@this.X, -@this.Y);
+
+        public static Point AsPositive(this Point @this) => new(Math.Abs(@this.X), Math.Abs(@this.Y));
     }
 }

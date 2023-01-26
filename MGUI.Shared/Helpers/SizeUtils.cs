@@ -25,7 +25,6 @@ namespace MGUI.Shared.Helpers
         public static Size Clamp(this Size @this, Size Min, Size Max) =>
             new(Math.Clamp(@this.Width, Min.Width, Max.Width), Math.Clamp(@this.Height, Min.Height, Max.Height));
 
-
         public static SizeF Add(this SizeF @this, SizeF other, float MinWidth, float MinHeight)
             => new(Math.Max(MinWidth, @this.Width + other.Width), Math.Max(MinHeight,@this.Height + other.Height));
 

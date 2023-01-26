@@ -78,14 +78,6 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
             }
         }
 
-        //This would be slightly annoying to implement and probably won't be used anywhere so screw it.
-        //Would need to make a new type of IFillBrush, MGBandedFillBrush, which takes in multiple brushes and weights just like this class does
-        //and draws them in order. So then GetLeft() would return a new BandedFillBrush with all of this object's bands etc
-        public IFillBrush GetLeft() => throw new NotImplementedException($"{nameof(MGBandedBorderBrush)}.{nameof(GetLeft)} is not implemented.");
-        public IFillBrush GetTop() => throw new NotImplementedException($"{nameof(MGBandedBorderBrush)}.{nameof(GetTop)} is not implemented.");
-        public IFillBrush GetRight() => throw new NotImplementedException($"{nameof(MGBandedBorderBrush)}.{nameof(GetRight)} is not implemented.");
-        public IFillBrush GetBottom() => throw new NotImplementedException($"{nameof(MGBandedBorderBrush)}.{nameof(GetBottom)} is not implemented.");
-
         public IBorderBrush Copy() => new MGBandedBorderBrush(Bands.Select(x => new MGBorderBand(x.Brush.Copy(), x.ThicknessWeight)).ToArray());
     }
 }

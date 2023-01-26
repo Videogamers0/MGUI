@@ -81,17 +81,22 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
-	//tabcontrol - a separate default tabheader style that has like 'floating' tab headers. Just Underlined ContentPresenters instead of a full border. not touching the tabitem content's top border etc
-	//		should be easily achieved by just restyling the buttons to only have a bottom border, and have a bottom padding. but we probably also want the selected background to be null, and instead
-	//		have a brighter font color when hovered?
-	//something for mouse cursors?
-	//		maybe an enum MouseCursorType
-	//		and MGElement would have MouseCursorType Cursor property
-	//		then MGDesktop defines some textures (and drawing offsets) associated with each MouseCursorType, and bool UseHardwareCursor
-	//		If usehardwarecursor=false, then after drawing the desktop, get the hovered element, and draw the texture associated with its MGElement.Cursor
-	//something really basic for Gamepads? Maybe just a simple way to 'spoof' a mousestate that's hovering a particular MGElement
-	//		like MGElement.NavigateTo, Dictionary<Direction, MGElement> Neighbors. So if you press GamePad Left, it would basically just 
-	//		get the hovered element, and call hovered.Neighbors[Left]?.NavigateTo() which returns a new MouseState to use for next update tick? idk
+    //add fillbrushes and borderbrushes to xaml, such as CompositedFillBrush. Maybe we also want a CompositedBorderBrush?
+    //add support for specifying tabcontrol's UnselectedTabHeaderTemplate and SelectedTabHeaderTemplate in XAML
+    //implement some basic converters for the PropertyBinding markup extension. at least need a BooleanToVisibilityConverter (has a Visibility TrueValue, Visibility FalseValue. Defaults to TrueValue=Visible, False=Collapsed)
+    //		this would allow making inverse converters easily. or making one that converts to hidden instead of collapsed
+    //		also make an InverseBooleanConverter.
+    //tabcontrol - a separate default tabheader style that has like 'floating' tab headers. Just Underlined ContentPresenters instead of a full border. not touching the tabitem content's top border etc
+    //		should be easily achieved by just restyling the buttons to only have a bottom border, and have a bottom padding. but we probably also want the selected background to be null, and instead
+    //		have a brighter font color when hovered?
+    //something for mouse cursors?
+    //		maybe an enum MouseCursorType
+    //		and MGElement would have MouseCursorType Cursor property
+    //		then MGDesktop defines some textures (and drawing offsets) associated with each MouseCursorType, and bool UseHardwareCursor
+    //		If usehardwarecursor=false, then after drawing the desktop, get the hovered element, and draw the texture associated with its MGElement.Cursor
+    //something really basic for Gamepads? Maybe just a simple way to 'spoof' a mousestate that's hovering a particular MGElement
+    //		like MGElement.NavigateTo, Dictionary<Direction, MGElement> Neighbors. So if you press GamePad Left, it would basically just 
+    //		get the hovered element, and call hovered.Neighbors[Left]?.NavigateTo() which returns a new MouseState to use for next update tick? idk
     //textblock inline formatting:
     //      inlined images should have option for render size AND layout size, so you could, for example, have a zero-width image underneath specific text in the textblock
     //Improve Grid/UniformGrid's default selection graphics
@@ -622,6 +627,10 @@ namespace MGUI.Core.UI
         /// <summary>This property is only true if both this <see cref="MGElement"/> and every parent along the visual tree have <see cref="IsEnabled"/>==true.</summary>
         public bool DerivedIsEnabled => IsEnabled && (Parent?.DerivedIsEnabled ?? IsEnabled);
 
+        /// <summary>A padding to use when drawing the <see cref="BackgroundBrush"/>.<br/>Default = (0,0,0,0).<para/>
+        /// A negative value allows the background to span a larger rectangular region, such as if the element's border contained some transparent pixels that you would want to fill with the <see cref="BackgroundBrush"/>.</summary>
+        public Thickness BackgroundRenderPadding { get; set; }
+
         /// <summary>The <see cref="IFillBrush"/>es to use for this <see cref="MGElement"/>'s background, depending on the current <see cref="VisualState"/>.<para/>
         /// See also: <see cref="BackgroundUnderlay"/>, <see cref="BackgroundOverlay"/></summary>
         public VisualStateFillBrush BackgroundBrush { get; set; }
@@ -713,6 +722,7 @@ namespace MGUI.Core.UI
 				this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
 				this.VerticalContentAlignment = VerticalAlignment.Stretch;
 
+                this.BackgroundRenderPadding = new(0);
                 this.BackgroundBrush = ActualTheme.GetBackgroundBrush(ElementType);
                 this.DefaultTextForeground = new VisualStateSetting<Color?>(null, null, null);
 
@@ -1140,9 +1150,10 @@ namespace MGUI.Core.UI
         public virtual void DrawBackground(ElementDrawArgs DA, Rectangle LayoutBounds)
 		{
             Rectangle BorderlessBounds = !HasBorder ? LayoutBounds : LayoutBounds.GetCompressed(GetBorder().BorderThickness);
-            BackgroundBrush.GetUnderlay(DA.VisualState.Primary)?.Draw(DA, this, BorderlessBounds);
+            Rectangle BackgroundBounds = BorderlessBounds.GetCompressed(BackgroundRenderPadding);
+            BackgroundBrush.GetUnderlay(DA.VisualState.Primary)?.Draw(DA, this, BackgroundBounds);
             SecondaryVisualState SecondaryState = DA.VisualState.GetSecondaryState(SpoofIsPressedWhileDrawingBackground, SpoofIsHoveredWhileDrawingBackground);
-            BackgroundBrush.GetFillOverlay(SecondaryState)?.Draw(DA, this, BorderlessBounds);
+            BackgroundBrush.GetFillOverlay(SecondaryState)?.Draw(DA, this, BackgroundBounds);
         }
 
         public virtual void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds) 
