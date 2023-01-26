@@ -109,7 +109,7 @@ namespace MGUI.Core.UI.XAML
     [TypeConverter(typeof(FillBrushStringConverter))]
     public abstract class FillBrush
     {
-        public abstract IFillBrush ToFillBrush();
+        public abstract IFillBrush ToFillBrush(MGDesktop Desktop);
     }
 
     public class FillBrushStringConverter : TypeConverter
@@ -163,7 +163,7 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(SolidFillBrush)}: {Color}";
 
-        public override IFillBrush ToFillBrush() => new MGSolidFillBrush(Color.ToXNAColor());
+        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGSolidFillBrush(Color.ToXNAColor());
     }
 
     public class GradientFillBrush : FillBrush
@@ -184,7 +184,127 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(GradientFillBrush)}: {TopLeftColor} {TopRightColor} {BottomRightColor} {BottomLeftColor}";
 
-        public override IFillBrush ToFillBrush() => new MGGradientFillBrush(TopLeftColor.ToXNAColor(), TopRightColor.ToXNAColor(), BottomRightColor.ToXNAColor(), BottomLeftColor.ToXNAColor());
+        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGGradientFillBrush(TopLeftColor.ToXNAColor(), TopRightColor.ToXNAColor(), BottomRightColor.ToXNAColor(), BottomLeftColor.ToXNAColor());
+    }
+
+    public class DiagonalGradientFillBrush : FillBrush
+    {
+        public XAMLColor Color1 { get; set; }
+        public XAMLColor Color2 { get; set; }
+        public CornerType Color1Position { get; set; } = CornerType.TopLeft;
+
+        public DiagonalGradientFillBrush() : this(new XAMLColor(), new XAMLColor(), CornerType.TopLeft) { }
+        public DiagonalGradientFillBrush(XAMLColor Color1, XAMLColor Color2, CornerType Color1Position)
+        {
+            this.Color1 = Color1;
+            this.Color2 = Color2;
+            this.Color1Position = Color1Position;
+        }
+
+        public override string ToString() => $"{nameof(DiagonalGradientFillBrush)}: {Color1} ({Color1Position}) / {Color2}";
+
+        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGDiagonalGradientFillBrush(Color1.ToXNAColor(), Color2.ToXNAColor(), Color1Position);
+    }
+
+    public class TextureFillBrush : FillBrush
+    {
+        public string TextureRegionName { get; set; }
+        public Stretch Stretch { get; set; } = Stretch.Fill;
+        public float Opacity { get; set; } = 1.0f;
+        public XAMLColor Color { get; set; } = new XAMLColor();
+
+        public TextureFillBrush() : this(null, Stretch.Fill, 1.0f, new XAMLColor()) { }
+        public TextureFillBrush(string TextureRegionName, Stretch Stretch, float Opacity, XAMLColor Color)
+        {
+            this.TextureRegionName = TextureRegionName;
+            this.Stretch = Stretch;
+            this.Opacity = Opacity;
+            this.Color = Color;
+        }
+
+        public override string ToString() => $"{nameof(TextureFillBrush)}: {TextureRegionName} ({Stretch})";
+
+        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGTextureFillBrush(Desktop, TextureRegionName, Stretch, Opacity, Color.ToXNAColor());
+    }
+
+#if UseWPF
+    [ContentProperty(nameof(FillBrush))]
+#endif
+    public class BorderedFillBrush : FillBrush
+    {
+        public Thickness BorderThickness { get; set; }
+        public BorderBrush BorderBrush { get; set; }
+        public FillBrush FillBrush { get; set; }
+        public bool PadFillBoundsByBorderThickness { get; set; } = false;
+
+        public BorderedFillBrush() : this(new Thickness(0), null, null, false) { }
+        public BorderedFillBrush(Thickness BorderThickness, BorderBrush BorderBrush, FillBrush FillBrush, bool PadFillBoundsByBorderThickness)
+        {
+            this.BorderThickness = BorderThickness;
+            this.BorderBrush = BorderBrush;
+            this.FillBrush = FillBrush;
+            this.PadFillBoundsByBorderThickness = PadFillBoundsByBorderThickness;
+        }
+
+        public override string ToString() => $"{nameof(BorderedFillBrush)}: {BorderBrush} / {FillBrush}";
+
+        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGBorderedFillBrush(BorderThickness.ToThickness(), BorderBrush?.ToBorderBrush(Desktop), FillBrush?.ToFillBrush(Desktop), PadFillBoundsByBorderThickness);
+    }
+
+#if UseWPF
+    [ContentProperty(nameof(Brushes))]
+#endif
+    public class CompositedFillBrush : FillBrush
+    {
+        public List<FillBrush> Brushes { get; set; } = new();
+
+        public CompositedFillBrush() : this(new List<FillBrush>()) { }
+        public CompositedFillBrush(IEnumerable<FillBrush> Brushes)
+        {
+            this.Brushes = Brushes.ToList();
+        }
+
+        public override string ToString() => $"{nameof(CompositedFillBrush)}: {Brushes.Count} brush(es)";
+
+        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGCompositedFillBrush(Brushes.Select(x => x.ToFillBrush(Desktop)).ToArray());
+    }
+
+#if UseWPF
+    [ContentProperty(nameof(Brush))]
+#endif
+    public class PaddedFillBrush : FillBrush
+    {
+        public FillBrush Brush { get; set; }
+        public Thickness Padding { get; set; }
+
+        public float? Scale { get; set; }
+
+        public int? MinWidth { get; set; }
+        public int? MinHeight { get; set; }
+        public int? MaxWidth { get; set; }
+        public int? MaxHeight { get; set; }
+
+        public HorizontalAlignment? HorizontalAlignment { get; set; }
+        public VerticalAlignment? VerticalAlignment { get; set; }
+
+        public PaddedFillBrush() : this(null, new(0), null, null, null, null, null, null, null) { }
+        public PaddedFillBrush(FillBrush Brush, Thickness Padding, float? Scale, int? MinWidth, int? MinHeight, int? MaxWidth, int? MaxHeight, 
+            HorizontalAlignment? HorizontalAlignment, VerticalAlignment? VerticalAlignment)
+        {
+            this.Brush = Brush;
+            this.Padding = Padding;
+            this.Scale = Scale;
+            this.MinWidth = MinWidth;
+            this.MinHeight = MinHeight;
+            this.MaxWidth = MaxWidth;
+            this.MaxHeight = MaxHeight;
+            this.HorizontalAlignment = HorizontalAlignment;
+            this.VerticalAlignment = VerticalAlignment;
+        }
+
+        public override string ToString() => $"{nameof(PaddedFillBrush)}: {Brush}";
+
+        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGPaddedFillBrush(Brush?.ToFillBrush(Desktop), Padding.ToThickness(), Scale, MinWidth, MinHeight, MaxWidth, MaxHeight, HorizontalAlignment, VerticalAlignment);
     }
     #endregion Fill Brush
 
@@ -192,7 +312,7 @@ namespace MGUI.Core.UI.XAML
     [TypeConverter(typeof(BorderBrushStringConverter))]
     public abstract class BorderBrush
     {
-        public abstract IBorderBrush ToBorderBrush();
+        public abstract IBorderBrush ToBorderBrush(MGDesktop Desktop);
     }
 
     public class BorderBrushStringConverter : TypeConverter
@@ -224,6 +344,9 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
+#if UseWPF
+    [ContentProperty(nameof(Brush))]
+#endif
     public class UniformBorderBrush : BorderBrush
     {
         public FillBrush Brush { get; set; }
@@ -236,7 +359,7 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(UniformBorderBrush)}: {Brush}";
 
-        public override IBorderBrush ToBorderBrush() => new MGUniformBorderBrush(Brush.ToFillBrush());
+        public override IBorderBrush ToBorderBrush(MGDesktop Desktop) => new MGUniformBorderBrush(Brush.ToFillBrush(Desktop));
     }
 
     public class DockedBorderBrush : BorderBrush
@@ -257,7 +380,7 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(DockedBorderBrush)}: {Left}, {Top}, {Right}, {Bottom}";
 
-        public override IBorderBrush ToBorderBrush() => new MGDockedBorderBrush(Left.ToFillBrush(), Top.ToFillBrush(), Right.ToFillBrush(), Bottom.ToFillBrush());
+        public override IBorderBrush ToBorderBrush(MGDesktop Desktop) => new MGDockedBorderBrush(Left.ToFillBrush(Desktop), Top.ToFillBrush(Desktop), Right.ToFillBrush(Desktop), Bottom.ToFillBrush(Desktop));
     }
 
 #if UseWPF
@@ -275,15 +398,46 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(BandedBorderBrush)}: {Bands.Count} band(s)";
 
-        public override IBorderBrush ToBorderBrush() => new MGBandedBorderBrush(Bands.Select(x => x.ToBorderBand()).ToArray());
+        public override IBorderBrush ToBorderBrush(MGDesktop Desktop) => new MGBandedBorderBrush(Bands.Select(x => x.ToBorderBand(Desktop)).ToArray());
     }
 
+#if UseWPF
+    [ContentProperty(nameof(Brush))]
+#endif
     public class BorderBand
     {
         public BorderBrush Brush { get; set; } = new UniformBorderBrush(new SolidFillBrush(new XAMLColor(255, 255, 255, 0)));
         public double ThicknessWeight { get; set; } = 1.0;
 
-        public MGBorderBand ToBorderBand() => new(Brush.ToBorderBrush(), ThicknessWeight);
+        public MGBorderBand ToBorderBand(MGDesktop Desktop) => new(Brush.ToBorderBrush(Desktop), ThicknessWeight);
+    }
+
+    public class TexturedBorderBrush : BorderBrush
+    {
+        public string EdgeTextureRegionName { get; set; }
+        public XAMLColor? EdgeColor { get; set; }
+        public string CornerTextureRegionName { get; set; }
+        public XAMLColor? CornerColor { get; set; }
+        public float Opacity { get; set; } = 1.0f;
+
+        public Edge? EdgeBasis { get; set; } = Edge.Left;
+        public Corner? CornerBasis { get; set; } = Corner.TopLeft;
+        private TextureTransforms Transforms => EdgeBasis.HasValue && CornerBasis.HasValue ? TextureTransforms.CreateStandardRotated(EdgeBasis.Value, CornerBasis.Value) : new();
+
+        public TexturedBorderBrush() : this(null, null, null, null, 1.0f) { }
+        public TexturedBorderBrush(string EdgeTextureRegionName, XAMLColor? EdgeColor, string CornerTextureRegionName, XAMLColor? CornerColor, float Opacity)
+        {
+            this.EdgeTextureRegionName = EdgeTextureRegionName;
+            this.EdgeColor = EdgeColor;
+            this.CornerTextureRegionName = CornerTextureRegionName;
+            this.CornerColor = CornerColor;
+            this.Opacity = Opacity;
+        }
+
+        public override string ToString() => $"{nameof(TexturedBorderBrush)}: {EdgeTextureRegionName} / {CornerTextureRegionName}";
+
+        public override IBorderBrush ToBorderBrush(MGDesktop Desktop)
+            => new MGTexturedBorderBrush(Desktop, EdgeTextureRegionName, CornerTextureRegionName, EdgeColor?.ToXNAColor(), CornerColor?.ToXNAColor(), Transforms, Opacity);
     }
     #endregion Border Brush
 }

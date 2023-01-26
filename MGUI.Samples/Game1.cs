@@ -54,6 +54,13 @@ namespace MGUI.Samples
             this.MGUIRenderer = new(new GameRenderHost<Game1>(this));
             this.Desktop = new(MGUIRenderer);
 
+            //  XAML uses named resources to reference Texture2D objects.
+            //  Calling Desktop.AddNamedTexture/Desktop.AddNamedRegion allows us to initialize things like Images in XAML
+            Desktop.AddNamedTexture("BorderEdgeTexture1", Content.Load<Texture2D>(Path.Combine("Border Textures", "1_RightEdge")));
+            Desktop.AddNamedRegion(new NamedTextureRegion("BorderEdgeTexture1", "BorderEdgeRegion1", null, null));
+            Desktop.AddNamedTexture("BorderCornerTexture1", Content.Load<Texture2D>(Path.Combine("Border Textures", "1_BottomRightCorner")));
+            Desktop.AddNamedRegion(new NamedTextureRegion("BorderCornerTexture1", "BorderCornerRegion1", null, null));
+
             //  Note: If reading XAML markup from .xaml files, make sure they're set to BuildAction=EmbeddedResource
             Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
 #if true
@@ -81,9 +88,6 @@ namespace MGUI.Samples
             Desktop.Windows.Clear();
             MGWindow Tmp = XAMLParser.LoadRootWindow(Desktop, ReadEmbeddedResourceAsString(CurrentAssembly, $"{nameof(MGUI)}.{nameof(Samples)}.Windows.Temp.xaml"));
             Desktop.Windows.Add(Tmp);
-
-            //MGBorder Border = Tmp.GetElementByName<MGBorder>("TestTexturedBorder");
-            //Border.BorderBrush = new MGTexturedBorderBrush(Content.Load<Texture2D>(@"Border Textures\1_RightEdge"), Content.Load<Texture2D>(@"Border Textures\1_BottomRightCorner"), TextureTransforms.CreateStandardRotated(Edge.Right, Corner.BottomRight));
 #endif
 
             base.Initialize();

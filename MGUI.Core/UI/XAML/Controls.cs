@@ -82,10 +82,12 @@ namespace MGUI.Core.UI.XAML
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
+            MGDesktop Desktop = Element.GetDesktop();
+
             MGBorder Border = Element as MGBorder;
 
             if (BorderBrush != null)
-                Border.BorderBrush = BorderBrush.ToBorderBrush();
+                Border.BorderBrush = BorderBrush.ToBorderBrush(Desktop);
             if (BorderThickness.HasValue)
                 Border.BorderThickness = BorderThickness.Value.ToThickness();
 
@@ -341,6 +343,8 @@ namespace MGUI.Core.UI.XAML
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
+            MGDesktop Desktop = Element.GetDesktop();
+
             MGExpander Expander = Element as MGExpander;
             ExpanderToggleButton.ApplySettings(Expander, Expander.ExpanderToggleButton);
             HeadersPanel.ApplySettings(Expander, Expander.HeadersPanelComponent.Element);
@@ -348,11 +352,11 @@ namespace MGUI.Core.UI.XAML
             if (ExpanderButtonSize.HasValue)
                 Expander.ExpanderButtonSize = ExpanderButtonSize.Value;
             if (ExpanderButtonBorderBrush != null)
-                Expander.ExpanderButtonBorderBrush = ExpanderButtonBorderBrush.ToBorderBrush();
+                Expander.ExpanderButtonBorderBrush = ExpanderButtonBorderBrush.ToBorderBrush(Desktop);
             if (ExpanderButtonBorderThickness.HasValue)
                 Expander.ExpanderButtonBorderThickness = ExpanderButtonBorderThickness.Value.ToThickness();
             if (ExpanderButtonBackgroundBrush != null)
-                Expander.ExpanderButtonBackgroundBrush.NormalValue = ExpanderButtonBackgroundBrush.ToFillBrush();
+                Expander.ExpanderButtonBackgroundBrush.NormalValue = ExpanderButtonBackgroundBrush.ToFillBrush(Desktop);
             if (ExpanderDropdownArrowColor.HasValue)
                 Expander.ExpanderDropdownArrowColor = ExpanderDropdownArrowColor.Value.ToXNAColor();
             if (ExpanderDropdownArrowSize.HasValue)
@@ -416,13 +420,15 @@ namespace MGUI.Core.UI.XAML
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
+            MGDesktop Desktop = Element.GetDesktop();
+
             MGGroupBox GroupBox = Element as MGGroupBox;
 
             Expander.ApplySettings(GroupBox, GroupBox.Expander);
             HeaderPresenter.ApplySettings(GroupBox, GroupBox.HeaderPresenter);
 
             if (BorderBrush != null)
-                GroupBox.BorderBrush = (MGUniformBorderBrush)BorderBrush.ToBorderBrush();
+                GroupBox.BorderBrush = (MGUniformBorderBrush)BorderBrush.ToBorderBrush(Desktop);
             if (BorderThickness.HasValue)
                 GroupBox.BorderThickness = BorderThickness.Value.ToThickness();
             if (IsExpandable.HasValue)
@@ -602,6 +608,8 @@ namespace MGUI.Core.UI.XAML
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
+            MGDesktop Desktop = Element.GetDesktop();
+
             MGProgressBar ProgressBar = Element as MGProgressBar;
             Border.ApplySettings(Parent, ProgressBar.BorderComponent.Element);
             ValueTextBlock.ApplySettings(Parent, ProgressBar.ValueComponent.Element);
@@ -624,9 +632,9 @@ namespace MGUI.Core.UI.XAML
                 ProgressBar.Size = Size.Value;
 
             if (CompletedBrush != null)
-                ProgressBar.CompletedBrush.NormalValue = CompletedBrush.ToFillBrush();
+                ProgressBar.CompletedBrush.NormalValue = CompletedBrush.ToFillBrush(Desktop);
             if (IncompleteBrush != null)
-                ProgressBar.IncompleteBrush.NormalValue = IncompleteBrush.ToFillBrush();
+                ProgressBar.IncompleteBrush.NormalValue = IncompleteBrush.ToFillBrush(Desktop);
 
             if (Orientation.HasValue)
                 ProgressBar.Orientation = Orientation.Value;
@@ -814,10 +822,12 @@ namespace MGUI.Core.UI.XAML
         public FillBrush Fill { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
-            => new MGRectangle(Window, Width ?? 16, Height ?? 16, Stroke?.ToXNAColor() ?? Color.Transparent, StrokeThickness ?? 1, Fill?.ToFillBrush());
+            => new MGRectangle(Window, Width ?? 16, Height ?? 16, Stroke?.ToXNAColor() ?? Color.Transparent, StrokeThickness ?? 1, Fill?.ToFillBrush(Window.Desktop));
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
+            MGDesktop Desktop = Element.GetDesktop();
+
             MGRectangle Rectangle = Element as MGRectangle;
 
             if (Stroke.HasValue)
@@ -825,7 +835,7 @@ namespace MGUI.Core.UI.XAML
             if (StrokeThickness.HasValue)
                 Rectangle.StrokeThickness = StrokeThickness.Value;
             if (Fill != null)
-                Rectangle.Fill = Fill.ToFillBrush();
+                Rectangle.Fill = Fill.ToFillBrush(Desktop);
         }
 
         protected internal override IEnumerable<Element> GetChildren() => Enumerable.Empty<Element>();
@@ -894,6 +904,8 @@ namespace MGUI.Core.UI.XAML
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
+            MGDesktop Desktop = Element.GetDesktop();
+
             MGScrollViewer ScrollViewer = Element as MGScrollViewer;
 
             if (VerticalScrollBarVisibility.HasValue)
@@ -906,14 +918,14 @@ namespace MGUI.Core.UI.XAML
                 ScrollViewer.HorizontalOffset = HorizontalOffset.Value;
 
             if (ScrollBarUnfocusedOuterBrush != null)
-                ScrollViewer.ScrollBarOuterBrush.NormalValue = ScrollBarUnfocusedOuterBrush.ToFillBrush();
+                ScrollViewer.ScrollBarOuterBrush.NormalValue = ScrollBarUnfocusedOuterBrush.ToFillBrush(Desktop);
             if (ScrollBarFocusedOuterBrush != null)
-                ScrollViewer.ScrollBarOuterBrush.SelectedValue = ScrollBarFocusedOuterBrush.ToFillBrush();
+                ScrollViewer.ScrollBarOuterBrush.SelectedValue = ScrollBarFocusedOuterBrush.ToFillBrush(Desktop);
 
             if (ScrollBarUnfocusedInnerBrush != null)
-                ScrollViewer.ScrollBarInnerBrush.NormalValue = ScrollBarUnfocusedInnerBrush.ToFillBrush();
+                ScrollViewer.ScrollBarInnerBrush.NormalValue = ScrollBarUnfocusedInnerBrush.ToFillBrush(Desktop);
             if (ScrollBarFocusedInnerBrush != null)
-                ScrollViewer.ScrollBarInnerBrush.SelectedValue = ScrollBarFocusedInnerBrush.ToFillBrush();
+                ScrollViewer.ScrollBarInnerBrush.SelectedValue = ScrollBarFocusedInnerBrush.ToFillBrush(Desktop);
 
             base.ApplyDerivedSettings(Parent, Element);
         }
@@ -1009,6 +1021,8 @@ namespace MGUI.Core.UI.XAML
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
+            MGDesktop Desktop = Element.GetDesktop();
+
             MGSlider Slider = Element as MGSlider;
 
             if (Minimum.HasValue || MaxHeight.HasValue)
@@ -1026,9 +1040,9 @@ namespace MGUI.Core.UI.XAML
             if (NumberLineBorderThickness.HasValue)
                 Slider.NumberLineBorderThickness = NumberLineBorderThickness.Value.ToThickness();
             if (NumberLineBorderBrush != null)
-                Slider.NumberLineBorderBrush = NumberLineBorderBrush.ToBorderBrush();
+                Slider.NumberLineBorderBrush = NumberLineBorderBrush.ToBorderBrush(Desktop);
             if (NumberLineFillBrush != null)
-                Slider.NumberLineFillBrush = NumberLineFillBrush.ToFillBrush();
+                Slider.NumberLineFillBrush = NumberLineFillBrush.ToFillBrush(Desktop);
 
             if (TickFrequency.HasValue)
                 Slider.TickFrequency = TickFrequency.Value;
@@ -1041,9 +1055,9 @@ namespace MGUI.Core.UI.XAML
             if (TickBorderThickness.HasValue)
                 Slider.TickBorderThickness = TickBorderThickness.Value.ToThickness();
             if (TickBorderBrush != null)
-                Slider.TickBorderBrush = TickBorderBrush.ToBorderBrush();
+                Slider.TickBorderBrush = TickBorderBrush.ToBorderBrush(Desktop);
             if (TickFillBrush != null)
-                Slider.TickFillBrush = TickFillBrush.ToFillBrush();
+                Slider.TickFillBrush = TickFillBrush.ToFillBrush(Desktop);
 
             if (ThumbWidth.HasValue)
                 Slider.ThumbWidth = ThumbWidth.Value;
@@ -1052,15 +1066,15 @@ namespace MGUI.Core.UI.XAML
             if (ThumbBorderThickness.HasValue)
                 Slider.ThumbBorderThickness = ThumbBorderThickness.Value.ToThickness();
             if (ThumbBorderBrush != null)
-                Slider.ThumbBorderBrush = ThumbBorderBrush.ToBorderBrush();
+                Slider.ThumbBorderBrush = ThumbBorderBrush.ToBorderBrush(Desktop);
             if (ThumbFillBrush != null)
-                Slider.ThumbFillBrush = ThumbFillBrush.ToFillBrush();
+                Slider.ThumbFillBrush = ThumbFillBrush.ToFillBrush(Desktop);
 
             if (Orientation.HasValue)
                 Slider.Orientation = Orientation.Value;
 
             if (Foreground != null)
-                Slider.Foreground = Foreground.ToFillBrush();
+                Slider.Foreground = Foreground.ToFillBrush(Desktop);
 
             if (AcceptsMouseScrollWheel.HasValue)
                 Slider.AcceptsMouseScrollWheel = AcceptsMouseScrollWheel.Value;
@@ -1222,12 +1236,14 @@ namespace MGUI.Core.UI.XAML
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
+            MGDesktop Desktop = Element.GetDesktop();
+
             MGTabControl TabControl = Element as MGTabControl;
             Border.ApplySettings(Parent, TabControl.BorderComponent.Element);
             HeadersPanel.ApplySettings(TabControl, TabControl.HeadersPanelComponent.Element);
 
             if (HeaderAreaBackground != null)
-                TabControl.HeaderAreaBackground.NormalValue = HeaderAreaBackground.ToFillBrush();
+                TabControl.HeaderAreaBackground.NormalValue = HeaderAreaBackground.ToFillBrush(Desktop);
 
             foreach (TabItem Child in Tabs)
             {
@@ -1608,11 +1624,13 @@ namespace MGUI.Core.UI.XAML
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
+            MGDesktop Desktop = Element.GetDesktop();
+
             MGToggleButton ToggleButton = Element as MGToggleButton;
             Border.ApplySettings(Parent, ToggleButton.BorderComponent.Element);
 
             if (CheckedBackgroundBrush != null)
-                ToggleButton.CheckedBackgroundBrush = CheckedBackgroundBrush.ToFillBrush();
+                ToggleButton.CheckedBackgroundBrush = CheckedBackgroundBrush.ToFillBrush(Desktop);
             if (CheckedTextForeground.HasValue)
                 ToggleButton.CheckedTextForeground = CheckedTextForeground.Value.ToXNAColor();
             if (IsChecked.HasValue)

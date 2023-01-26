@@ -620,6 +620,8 @@ namespace MGUI.Core.UI
         //  Do not modify the method signature.
         internal void LoadSettings(ListBox Settings)
         {
+            MGDesktop Desktop = GetDesktop();
+
             Settings.OuterBorder.ApplySettings(this, OuterBorder);
             Settings.InnerBorder.ApplySettings(this, InnerBorder);
             Settings.TitleBorder.ApplySettings(this, TitleBorder);
@@ -665,7 +667,7 @@ namespace MGUI.Core.UI
                 SelectionMode = Settings.SelectionMode.Value;
 
             if (Settings.AlternatingRowBackgrounds != null && Settings.AlternatingRowBackgrounds.Any())
-                AlternatingRowBackgrounds = Settings.AlternatingRowBackgrounds.Select(x => x.ToFillBrush()).ToList().AsReadOnly();
+                AlternatingRowBackgrounds = Settings.AlternatingRowBackgrounds.Select(x => x.ToFillBrush(Desktop)).ToList().AsReadOnly();
             else
                 AlternatingRowBackgrounds = new List<IFillBrush>().AsReadOnly();
 

@@ -255,12 +255,14 @@ namespace MGUI.Core.UI.XAML
 
         protected void ApplyBackground(MGElement Element)
         {
+            MGDesktop Desktop = Element.GetDesktop();
+
             if (Background != null)
-                Element.BackgroundBrush.NormalValue = Background.ToFillBrush();
+                Element.BackgroundBrush.NormalValue = Background.ToFillBrush(Desktop);
             if (DisabledBackground != null)
-                Element.BackgroundBrush.DisabledValue = DisabledBackground.ToFillBrush();
+                Element.BackgroundBrush.DisabledValue = DisabledBackground.ToFillBrush(Desktop);
             if (SelectedBackground != null)
-                Element.BackgroundBrush.SelectedValue = SelectedBackground.ToFillBrush();
+                Element.BackgroundBrush.SelectedValue = SelectedBackground.ToFillBrush(Desktop);
         }
 
         protected abstract MGElement CreateElementInstance(MGWindow Window, MGElement Parent);

@@ -81,7 +81,8 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
-    //add fillbrushes and borderbrushes to xaml, such as CompositedFillBrush. Maybe we also want a CompositedBorderBrush?
+    //Bugfix: Window.HoveredElement/Window.PressedElement needs to be updated if you scrolled a ScrollViewer, even if mouse position didn't change.
+    //Maybe make a CompositedBorderBrush, like CompositedFillBrush it's just a wrapper for 0-many border brushes that are drawn in sequence overtop of each other.
     //add support for specifying tabcontrol's UnselectedTabHeaderTemplate and SelectedTabHeaderTemplate in XAML
     //implement some basic converters for the PropertyBinding markup extension. at least need a BooleanToVisibilityConverter (has a Visibility TrueValue, Visibility FalseValue. Defaults to TrueValue=Visible, False=Collapsed)
     //		this would allow making inverse converters easily. or making one that converts to hidden instead of collapsed

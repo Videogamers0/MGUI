@@ -90,6 +90,8 @@ namespace MGUI.Core.UI.XAML
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
+            MGDesktop Desktop = Element.GetDesktop();
+
             MGGridSplitter GridSplitter = Element as MGGridSplitter;
 
             if (Size.HasValue)
@@ -97,7 +99,7 @@ namespace MGUI.Core.UI.XAML
             if (TickSize.HasValue)
                 GridSplitter.TickSize = TickSize.Value.ToSize();
             if (Foreground != null)
-                GridSplitter.Foreground.NormalValue = Foreground.ToFillBrush();
+                GridSplitter.Foreground.NormalValue = Foreground.ToFillBrush(Desktop);
         }
 
         protected internal override IEnumerable<Element> GetChildren() => Enumerable.Empty<Element>();
@@ -145,6 +147,8 @@ namespace MGUI.Core.UI.XAML
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
+            MGDesktop Desktop = Element.GetDesktop();
+
             MGGrid Grid = Element as MGGrid;
 
             if (RowLengths != null)
@@ -174,9 +178,9 @@ namespace MGUI.Core.UI.XAML
             if (CanDeselectByClickingSelectedCell.HasValue)
                 Grid.CanDeselectByClickingSelectedCell = CanDeselectByClickingSelectedCell.Value;
             if (SelectionBackground != null)
-                Grid.SelectionBackground = SelectionBackground.ToFillBrush();
+                Grid.SelectionBackground = SelectionBackground.ToFillBrush(Desktop);
             if (SelectionOverlay != null)
-                Grid.SelectionOverlay = SelectionOverlay.ToFillBrush();
+                Grid.SelectionOverlay = SelectionOverlay.ToFillBrush(Desktop);
 
             if (GridLineIntersectionHandling.HasValue)
                 Grid.GridLineIntersectionHandling = GridLineIntersectionHandling.Value;
@@ -185,9 +189,9 @@ namespace MGUI.Core.UI.XAML
             if (GridLineMargin.HasValue)
                 Grid.GridLineMargin = GridLineMargin.Value;
             if (HorizontalGridLineBrush != null)
-                Grid.HorizontalGridLineBrush = HorizontalGridLineBrush.ToFillBrush();
+                Grid.HorizontalGridLineBrush = HorizontalGridLineBrush.ToFillBrush(Desktop);
             if (VerticalGridLineBrush != null)
-                Grid.VerticalGridLineBrush = VerticalGridLineBrush.ToFillBrush();
+                Grid.VerticalGridLineBrush = VerticalGridLineBrush.ToFillBrush(Desktop);
 
             if (RowSpacing.HasValue)
                 Grid.RowSpacing = RowSpacing.Value;
@@ -249,6 +253,8 @@ namespace MGUI.Core.UI.XAML
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
+            MGDesktop Desktop = Element.GetDesktop();
+
             MGUniformGrid Grid = Element as MGUniformGrid;
 
             if (Rows.HasValue)
@@ -267,9 +273,9 @@ namespace MGUI.Core.UI.XAML
             if (CanDeselectByClickingSelectedCell.HasValue)
                 Grid.CanDeselectByClickingSelectedCell = CanDeselectByClickingSelectedCell.Value;
             if (SelectionBackground != null)
-                Grid.SelectionBackground = SelectionBackground.ToFillBrush();
+                Grid.SelectionBackground = SelectionBackground.ToFillBrush(Desktop);
             if (SelectionOverlay != null)
-                Grid.SelectionOverlay = SelectionOverlay.ToFillBrush();
+                Grid.SelectionOverlay = SelectionOverlay.ToFillBrush(Desktop);
 
             if (GridLineIntersectionHandling.HasValue)
                 Grid.GridLineIntersectionHandling = GridLineIntersectionHandling.Value;
@@ -278,9 +284,9 @@ namespace MGUI.Core.UI.XAML
             if (GridLineMargin.HasValue)
                 Grid.GridLineMargin = GridLineMargin.Value;
             if (HorizontalGridLineBrush != null)
-                Grid.HorizontalGridLineBrush = HorizontalGridLineBrush.ToFillBrush();
+                Grid.HorizontalGridLineBrush = HorizontalGridLineBrush.ToFillBrush(Desktop);
             if (VerticalGridLineBrush != null)
-                Grid.VerticalGridLineBrush = VerticalGridLineBrush.ToFillBrush();
+                Grid.VerticalGridLineBrush = VerticalGridLineBrush.ToFillBrush(Desktop);
 
             if (RowSpacing.HasValue)
                 Grid.RowSpacing = RowSpacing.Value;
@@ -288,7 +294,7 @@ namespace MGUI.Core.UI.XAML
                 Grid.ColumnSpacing = ColumnSpacing.Value;
 
             if (CellBackground != null)
-                Grid.CellBackground.NormalValue = CellBackground.ToFillBrush();
+                Grid.CellBackground.NormalValue = CellBackground.ToFillBrush(Desktop);
 
             foreach (Element Child in Children)
             {
