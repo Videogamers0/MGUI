@@ -551,6 +551,8 @@ namespace MGUI.Core.UI
         /// then this property prioritizes the topmost element.</summary>
         public MGElement HoveredElement { get; private set; }
 
+        internal bool InvalidatePressedAndHoveredElements { get; set; } = false;
+
         /// <summary>If true, this <see cref="MGWindow"/>'s layout will be recomputed at the start of the next update tick.</summary>
         public bool QueueLayoutRefresh { get; set; }
 
@@ -704,10 +706,10 @@ namespace MGUI.Core.UI
                 ElementsByName = new();
                 OnDirectOrNestedContentAdded += Element_Added;
                 OnDirectOrNestedContentRemoved += Element_Removed;
-                
+
                 OnBeginUpdate += (sender, e) =>
                 {
-                    bool ShouldUpdateHoveredElement = MouseHandler.Tracker.MouseMovedRecently || !IsLayoutValid || QueueLayoutRefresh;
+                    bool ShouldUpdateHoveredElement = MouseHandler.Tracker.MouseMovedRecently || !IsLayoutValid || QueueLayoutRefresh || InvalidatePressedAndHoveredElements;
 
                     ValidateWindowSizeAndPosition();
 
@@ -742,15 +744,11 @@ namespace MGUI.Core.UI
                     if (!AllowsClickThrough || IsModalWindow)
                         e.SetHandledBy(this, false);
                 };
-#if true // Disallow scroll-wheel click-through
-                //TODO maybe the window should never auto-handle scroll wheel events?
                 MouseHandler.Scrolled += (sender, e) =>
                 {
                     if (!AllowsClickThrough || IsModalWindow)
                         e.SetHandledBy(this, false);
                 };
-#endif
-
                 MouseHandler.PressedOutside += (sender, e) =>
                 {
                     if (IsModalWindow)

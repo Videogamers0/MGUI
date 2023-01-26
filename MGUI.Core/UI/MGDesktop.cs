@@ -91,7 +91,8 @@ namespace MGUI.Core.UI
 
         internal MGToolTip QueuedToolTip { get; set; } = null;
 
-        public static TimeSpan DefaultToolTipShowDelay = TimeSpan.FromSeconds(0.40);
+        /// <summary>Default value: 0.4s</summary>
+        public static TimeSpan DefaultToolTipShowDelay { get; set; } = TimeSpan.FromSeconds(0.40);
 
         /// <summary>The amount of time that the mouse must hover a particular <see cref="MGElement"/> before its <see cref="MGElement.ToolTip"/> can be shown.<para/>
         /// Default value: <see cref="DefaultToolTipShowDelay"/></summary>

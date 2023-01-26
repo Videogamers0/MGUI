@@ -129,6 +129,7 @@ namespace MGUI.Core.UI
                 if (_VerticalOffset != ClampedValue)
                 {
                     _VerticalOffset = ClampedValue;
+                    ParentWindow.InvalidatePressedAndHoveredElements = true;
                 }
             }
         }
@@ -185,6 +186,7 @@ namespace MGUI.Core.UI
                 if (_HorizontalOffset != ClampedValue)
                 {
                     _HorizontalOffset = ClampedValue;
+                    ParentWindow.InvalidatePressedAndHoveredElements = true;
                 }
             }
         }

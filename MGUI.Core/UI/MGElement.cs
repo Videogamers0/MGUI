@@ -81,7 +81,6 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
-    //Bugfix: Window.HoveredElement/Window.PressedElement needs to be updated if you scrolled a ScrollViewer, even if mouse position didn't change.
     //Maybe make a CompositedBorderBrush, like CompositedFillBrush it's just a wrapper for 0-many border brushes that are drawn in sequence overtop of each other.
     //add support for specifying tabcontrol's UnselectedTabHeaderTemplate and SelectedTabHeaderTemplate in XAML
     //implement some basic converters for the PropertyBinding markup extension. at least need a BooleanToVisibilityConverter (has a Visibility TrueValue, Visibility FalseValue. Defaults to TrueValue=Visible, False=Collapsed)
@@ -547,6 +546,8 @@ namespace MGUI.Core.UI
         #region Input
         protected InputTracker InputTracker => GetDesktop().InputTracker;
 		public MouseHandler MouseHandler { get; }
+        /// <summary>Warning - the events within this handler might never be invoked if <see cref="IKeyboardHandlerHost.CanReceiveKeyboardInput"/> or <see cref="CanHandleKeyboardInput"/> are false.<para/>
+        /// See also: <see cref="MGDesktop.FocusedKeyboardHandler"/></summary>
         public KeyboardHandler KeyboardHandler { get; }
 
         /// <summary>True if <see cref="MouseButton.Left"/> was pressed overtop of this <see cref="MGElement"/> and has not been released yet.<para/>
@@ -629,7 +630,9 @@ namespace MGUI.Core.UI
         public bool DerivedIsEnabled => IsEnabled && (Parent?.DerivedIsEnabled ?? IsEnabled);
 
         /// <summary>A padding to use when drawing the <see cref="BackgroundBrush"/>.<br/>Default = (0,0,0,0).<para/>
-        /// A negative value allows the background to span a larger rectangular region, such as if the element's border contained some transparent pixels that you would want to fill with the <see cref="BackgroundBrush"/>.</summary>
+        /// A negative value allows the background to span a larger rectangular region, such as if the element's border contained some transparent pixels that you would want to fill with the <see cref="BackgroundBrush"/>.<para/>
+        /// Warning - negative padding does NOT increase this element's layout bounds.<br/>
+        /// If using a large enough negative padding, some of the background may be rendered outside of this element's bounds, and thus might be clipped if <see cref="ClipToBounds"/> is true.</summary>
         public Thickness BackgroundRenderPadding { get; set; }
 
         /// <summary>The <see cref="IFillBrush"/>es to use for this <see cref="MGElement"/>'s background, depending on the current <see cref="VisualState"/>.<para/>
@@ -694,6 +697,97 @@ namespace MGUI.Core.UI
 		/// <summary>To improve performance, consider invoking this method during constructor initialization.<para/>
 		/// This will defer layout updates until the <see cref="DeferEventsTransaction"/> is disposed.</summary>
 		protected internal DeferEventsTransaction BeginInitializing() => InitializationManager.DeferEvents();
+
+        #region Delayed Actions
+        public enum InvokeLaterPriority
+        {
+            /// <summary>See also: <see cref="MGElement.OnBeginUpdate"/></summary>
+            OnBeginUpdate,
+            /// <summary>See also: <see cref="MGElement.OnBeginUpdateContents"/></summary>
+            OnBeginUpdateContents,
+            /// <summary>See also: <see cref="MGElement.OnEndUpdateContents"/></summary>
+            OnEndUpdateContents,
+            /// <summary>See also: <see cref="MGElement.OnEndUpdate"/></summary>
+            OnEndUpdate
+        }
+
+        /// <summary>Invokes the given <paramref name="Action"/> after a certain number of update ticks given by <paramref name="FrameDelay"/>.</summary>
+        /// <param name="Action"></param>
+        /// <param name="FrameDelay">How many update ticks to wait before executing the <paramref name="Action"/>.<br/>
+        /// Must be > 0. If 1, the <paramref name="Action"/> will be executed during the next update.</param>
+        /// <param name="Priority">Determines what part of the update tick the action should be invoked during</param>
+        public void InvokeLater(Action Action, int FrameDelay, InvokeLaterPriority Priority)
+        {
+            if (Action == null)
+                throw new ArgumentNullException(nameof(Action));
+            if (FrameDelay <= 0)
+                throw new ArgumentException($"{nameof(FrameDelay)} must be > 0");
+
+            switch (Priority)
+            {
+                case InvokeLaterPriority.OnBeginUpdate:
+                    {
+                        int RemainingFrames = FrameDelay;
+                        void Handler(object sender, ElementUpdateEventArgs args)
+                        {
+                            RemainingFrames--;
+                            if (RemainingFrames <= 0)
+                            {
+                                try { Action(); }
+                                finally { OnBeginUpdate -= Handler; }
+                            }
+                        }
+                        OnBeginUpdate += Handler;
+                    }
+                    break;
+                case InvokeLaterPriority.OnBeginUpdateContents:
+                    {
+                        int RemainingFrames = FrameDelay;
+                        void Handler(object sender, ElementUpdateEventArgs args)
+                        {
+                            RemainingFrames--;
+                            if (RemainingFrames <= 0)
+                            {
+                                try { Action(); }
+                                finally { OnBeginUpdateContents -= Handler; }
+                            }
+                        }
+                        OnBeginUpdateContents += Handler;
+                    }
+                    break;
+                case InvokeLaterPriority.OnEndUpdateContents:
+                    {
+                        int RemainingFrames = FrameDelay;
+                        void Handler(object sender, ElementUpdateEventArgs args)
+                        {
+                            RemainingFrames--;
+                            if (RemainingFrames <= 0)
+                            {
+                                try { Action(); }
+                                finally { OnEndUpdateContents -= Handler; }
+                            }
+                        }
+                        OnEndUpdateContents += Handler;
+                    }
+                    break;
+                case InvokeLaterPriority.OnEndUpdate:
+                    {
+                        int RemainingFrames = FrameDelay;
+                        void Handler(object sender, ElementUpdateEventArgs args)
+                        {
+                            RemainingFrames--;
+                            if (RemainingFrames <= 0)
+                            {
+                                try { Action(); }
+                                finally { OnEndUpdate -= Handler; }
+                            }
+                        }
+                        OnEndUpdate += Handler;
+                    }
+                    break;
+            }
+        }
+        #endregion Delayed Actions
 
         protected MGElement(MGWindow ParentWindow, MGElementType ElementType)
 			: this(ParentWindow.Desktop, ParentWindow, ElementType)
