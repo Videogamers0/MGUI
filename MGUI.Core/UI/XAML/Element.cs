@@ -86,8 +86,13 @@ namespace MGUI.Core.UI.XAML
         public FillBrush DisabledBackground { get; set; }
         [Category("Appearance")]
         public FillBrush SelectedBackground { get; set; }
+
         [Category("Appearance")]
         public XAMLColor? TextForeground { get; set; }
+        [Category("Appearance")]
+        public XAMLColor? DisabledTextForeground { get; set; }
+        [Category("Appearance")]
+        public XAMLColor? SelectedTextForeground { get; set; }
 
         [Category("Appearance")]
         public Visibility? Visibility { get; set; }
@@ -231,8 +236,13 @@ namespace MGUI.Core.UI.XAML
                 if (BackgroundRenderPadding.HasValue)
                     Element.BackgroundRenderPadding = BackgroundRenderPadding.Value.ToThickness();
                 ApplyBackground(Element);
+
                 if (TextForeground.HasValue)
                     Element.DefaultTextForeground.NormalValue = TextForeground.Value.ToXNAColor();
+                if (DisabledTextForeground.HasValue)
+                    Element.DefaultTextForeground.DisabledValue = DisabledTextForeground.Value.ToXNAColor();
+                if (SelectedTextForeground.HasValue)
+                    Element.DefaultTextForeground.SelectedValue = SelectedTextForeground.Value.ToXNAColor();
 
                 if (Visibility.HasValue)
                     Element.Visibility = Visibility.Value;

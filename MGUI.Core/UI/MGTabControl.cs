@@ -84,31 +84,31 @@ namespace MGUI.Core.UI
             }
         }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Func<MGTabItem, MGButton> _UnselectedTabHeaderTemplate;
-        /// <summary>Creates the wrapper element that hosts the given <see cref="MGTabItem"/>'s <see cref="MGTabItem.Header"/> for tabs that aren't selected.<para/>
-        /// See also: <see cref="SelectedTabHeaderTemplate"/></summary>
-        public Func<MGTabItem, MGButton> UnselectedTabHeaderTemplate
+        public void ApplyDefaultSelectedTabHeaderStyle(MGButton Button)
         {
-            get => _UnselectedTabHeaderTemplate;
-            set
-            {
-                if (_UnselectedTabHeaderTemplate != value)
-                {
-                    _UnselectedTabHeaderTemplate = value;
-                    foreach (KeyValuePair<MGTabItem, MGButton> KVP in ActualTabHeaders.ToList())
-                    {
-                        MGTabItem Tab = KVP.Key;
-                        if (!Tab.IsTabSelected)
-                            UpdateHeaderWrapper(Tab);
-                    }
-                }
-            }
+            Button.BorderThickness = new(1, 1, 1, 0);
+            Button.BorderBrush = MGUniformBorderBrush.Black;
+            Button.Padding = new(8, 5, 8, 5);
+            Button.BackgroundBrush = GetTheme().SelectedTabHeaderBackground.GetValue(true);
+            //Button.DefaultTextForeground.SetAll(Color.Black);
+            Button.VerticalAlignment = VerticalAlignment.Bottom;
+        }
+
+        public void ApplyDefaultUnselectedTabHeaderStyle(MGButton Button)
+        {
+            Button.BorderThickness = new(1, 1, 1, 0);
+            Button.BorderBrush = MGUniformBorderBrush.Gray;
+            Button.Padding = new(8, 3, 8, 3);
+            Button.BackgroundBrush = GetTheme().UnselectedTabHeaderBackground.GetValue(true);
+            //Button.DefaultTextForeground.SetAll(Color.Black);
+            Button.Opacity = 0.9f;
+            Button.VerticalAlignment = VerticalAlignment.Bottom;
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<MGTabItem, MGButton> _SelectedTabHeaderTemplate;
         /// <summary>Creates the wrapper element that hosts the given <see cref="MGTabItem"/>'s <see cref="MGTabItem.Header"/> for the selected tab.<para/>
+        /// Default style: <see cref="ApplyDefaultSelectedTabHeaderStyle(MGButton)"/><para/>
         /// See also: <see cref="UnselectedTabHeaderTemplate"/></summary>
         public Func<MGTabItem, MGButton> SelectedTabHeaderTemplate
         {
@@ -128,6 +128,29 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Func<MGTabItem, MGButton> _UnselectedTabHeaderTemplate;
+        /// <summary>Creates the wrapper element that hosts the given <see cref="MGTabItem"/>'s <see cref="MGTabItem.Header"/> for tabs that aren't selected.<para/>
+        /// Default style: <see cref="ApplyDefaultUnselectedTabHeaderStyle(MGButton)"/><para/>
+        /// See also: <see cref="SelectedTabHeaderTemplate"/></summary>
+        public Func<MGTabItem, MGButton> UnselectedTabHeaderTemplate
+        {
+            get => _UnselectedTabHeaderTemplate;
+            set
+            {
+                if (_UnselectedTabHeaderTemplate != value)
+                {
+                    _UnselectedTabHeaderTemplate = value;
+                    foreach (KeyValuePair<MGTabItem, MGButton> KVP in ActualTabHeaders.ToList())
+                    {
+                        MGTabItem Tab = KVP.Key;
+                        if (!Tab.IsTabSelected)
+                            UpdateHeaderWrapper(Tab);
+                    }
+                }
+            }
+        }
+
         private void UpdateHeaderWrapper(MGTabItem Tab)
         {
             if (Tab != null && ActualTabHeaders.TryGetValue(Tab, out MGButton OldHeaderWrapper))
@@ -135,6 +158,7 @@ namespace MGUI.Core.UI
                 MGButton NewHeaderWrapper = Tab.IsTabSelected ? SelectedTabHeaderTemplate(Tab) : UnselectedTabHeaderTemplate(Tab);
                 if (ManagedReplaceHeadersPanelChild(OldHeaderWrapper, NewHeaderWrapper))
                 {
+                    NewHeaderWrapper.IsSelected = Tab.IsTabSelected;
                     OldHeaderWrapper.SetContent(null as MGElement);
                     NewHeaderWrapper.SetContent(Tab.Header);
                     ActualTabHeaders[Tab] = NewHeaderWrapper;
@@ -302,22 +326,15 @@ namespace MGUI.Core.UI
 
                 this.SelectedTabHeaderTemplate = (MGTabItem TabItem) =>
                 {
-                    MGButton Button = new(Window, new(1, 1, 1, 0), MGUniformBorderBrush.Black, x => TabItem.IsTabSelected = true);
-                    Button.Padding = new(8, 5, 8, 5);
-                    Button.BackgroundBrush = GetTheme().SelectedTabHeaderBackground.GetValue(true);
-                    //Button.DefaultTextForeground.SetAll(Color.Black);
-                    Button.VerticalAlignment = VerticalAlignment.Bottom;
+                    MGButton Button = new(TabItem.SelfOrParentWindow, x => TabItem.IsTabSelected = true);
+                    ApplyDefaultSelectedTabHeaderStyle(Button);
                     return Button;
                 };
 
                 this.UnselectedTabHeaderTemplate = (MGTabItem TabItem) =>
                 {
-                    MGButton Button = new(Window, new(1, 1, 1, 0), MGUniformBorderBrush.Gray, x => TabItem.IsTabSelected = true);
-                    Button.Padding = new(8, 3, 8, 3);
-                    Button.BackgroundBrush = GetTheme().UnselectedTabHeaderBackground.GetValue(true);
-                    //Button.DefaultTextForeground.SetAll(Color.Black);
-                    Button.Opacity = 0.9f;
-                    Button.VerticalAlignment = VerticalAlignment.Bottom;
+                    MGButton Button = new(TabItem.SelfOrParentWindow, x => TabItem.IsTabSelected = true);
+                    ApplyDefaultUnselectedTabHeaderStyle(Button);
                     return Button;
                 };
             }

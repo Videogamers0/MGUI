@@ -1226,10 +1226,17 @@ namespace MGUI.Core.UI.XAML
         [Browsable(false)]
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
+        [Category("Appearance")]
         public StackPanel HeadersPanel { get; set; } = new();
         [Category("Appearance")]
         public FillBrush HeaderAreaBackground { get; set; }
 
+        [Category("Appearance")]
+        public Button SelectedTabHeaderTemplate { get; set; }
+        [Category("Appearance")]
+        public Button UnselectedTabHeaderTemplate { get; set; }
+
+        [Category("Data")]
         public List<TabItem> Tabs { get; set; } = new();
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTabControl(Window);
@@ -1244,6 +1251,38 @@ namespace MGUI.Core.UI.XAML
 
             if (HeaderAreaBackground != null)
                 TabControl.HeaderAreaBackground.NormalValue = HeaderAreaBackground.ToFillBrush(Desktop);
+
+            if (SelectedTabHeaderTemplate != null)
+            {
+                TabControl.SelectedTabHeaderTemplate = (TabItem) =>
+                {
+                    MGButton Button = new(TabItem.SelfOrParentWindow, x => TabItem.IsTabSelected = true);
+                    TabControl.ApplyDefaultSelectedTabHeaderStyle(Button);
+                    SelectedTabHeaderTemplate.ApplySettings(TabItem, Button);
+
+                    //  When a Tab is selected, the wrapper Button is implcitly set to IsSelected=true.
+                    //  If the user specifies a Background but not a SelectedBackground, they probably
+                    //  meant to specify a SelectedBackground since the regular Background would do nothing
+                    if (SelectedTabHeaderTemplate.Background != null && SelectedTabHeaderTemplate.SelectedBackground == null)
+                        Button.BackgroundBrush.SelectedValue = Button.BackgroundBrush.NormalValue;
+                    //  Same as above but for TextForeground
+                    if (SelectedTabHeaderTemplate.TextForeground != null && SelectedTabHeaderTemplate.SelectedTextForeground == null)
+                        Button.DefaultTextForeground.SelectedValue = Button.DefaultTextForeground.NormalValue;
+
+                    return Button;
+                };
+            }
+
+            if (UnselectedTabHeaderTemplate != null)
+            {
+                TabControl.UnselectedTabHeaderTemplate = (TabItem) =>
+                {
+                    MGButton Button = new(TabItem.SelfOrParentWindow, x => TabItem.IsTabSelected = true);
+                    TabControl.ApplyDefaultUnselectedTabHeaderStyle(Button);
+                    UnselectedTabHeaderTemplate.ApplySettings(TabItem, Button);
+                    return Button;
+                };
+            }
 
             foreach (TabItem Child in Tabs)
             {

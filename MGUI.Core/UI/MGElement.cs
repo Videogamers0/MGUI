@@ -82,13 +82,9 @@ namespace MGUI.Core.UI
 
     //TODO:
     //Maybe make a CompositedBorderBrush, like CompositedFillBrush it's just a wrapper for 0-many border brushes that are drawn in sequence overtop of each other.
-    //add support for specifying tabcontrol's UnselectedTabHeaderTemplate and SelectedTabHeaderTemplate in XAML
     //implement some basic converters for the PropertyBinding markup extension. at least need a BooleanToVisibilityConverter (has a Visibility TrueValue, Visibility FalseValue. Defaults to TrueValue=Visible, False=Collapsed)
     //		this would allow making inverse converters easily. or making one that converts to hidden instead of collapsed
     //		also make an InverseBooleanConverter.
-    //tabcontrol - a separate default tabheader style that has like 'floating' tab headers. Just Underlined ContentPresenters instead of a full border. not touching the tabitem content's top border etc
-    //		should be easily achieved by just restyling the buttons to only have a bottom border, and have a bottom padding. but we probably also want the selected background to be null, and instead
-    //		have a brighter font color when hovered?
     //something for mouse cursors?
     //		maybe an enum MouseCursorType
     //		and MGElement would have MouseCursorType Cursor property

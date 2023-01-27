@@ -1,13 +1,34 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         Left="200" Top="200" MinHeight="0" SizeToContent="WidthAndHeight" WindowStyle="None">
-    <Border BorderThickness="12" Background="Red">
+    <Border BorderThickness="12" Background="DarkBlue" Padding="10">
         <Border.BorderBrush>
             <TexturedBorderBrush EdgeTextureRegionName="BorderEdgeRegion1" CornerTextureRegionName="BorderCornerRegion1" EdgeBasis="Right" CornerBasis="BottomRight" />
         </Border.BorderBrush>
-        <OverlayPanel Width="200" Height="50">
+        <!--<OverlayPanel Width="200" Height="50">
             <Button Background="Purple" Content="First child" Offset="15, 3, 62, 25" ZIndex="0.01" />
             <Button Background="Orange" Content="Second child" Offset="5, 0, 50, 10" ZIndex="10" VerticalAlignment="Bottom" />
             <Button Background="Green" Content="Third child" Offset="120, 10, 4, 18" ZIndex="-10" />
-        </OverlayPanel>
+        </OverlayPanel>-->
+        <Grid RowLengths="*" ColumnLengths="auto,auto" ColumnSpacing="20">
+            <TabControl Row="0" Column="0" HeaderAreaBackground="rgb(120,120,150)">
+                <TabControl.SelectedTabHeaderTemplate>
+                    <Button BorderThickness="0,0,0,3" Padding="4,2" Margin="6,4" Background="White * 0.15" BorderBrush="Black" MinWidth="50" TextForeground="Black" />
+                </TabControl.SelectedTabHeaderTemplate>
+                <TabControl.UnselectedTabHeaderTemplate>
+                    <Button BorderThickness="0,0,0,2" Padding="4,2" Margin="6,4" Background="Transparent" BorderBrush="rgb(80,80,80)" MinWidth="50" TextForeground="rgb(40,40,40)" />
+                </TabControl.UnselectedTabHeaderTemplate>
+                <TabItem Header="Gameplay" Content="Content of Gameplay tab" />
+                <TabItem Header="Graphics" Content="Content of Graphics tab" />
+                <TabItem Header="Audio" Content="Content of Audio tab" />
+                <TabItem Header="Controls" Content="Content of Controls tab" />
+            </TabControl>
+
+            <TabControl Row="0" Column="1">
+                <TabItem Header="Gameplay" Content="Content of Gameplay tab" />
+                <TabItem Header="Graphics" Content="Content of Graphics tab" />
+                <TabItem Header="Audio" Content="Content of Audio tab" />
+                <TabItem Header="Controls" Content="Content of Controls tab" />
+            </TabControl>
+        </Grid>
     </Border>
 </Window>
