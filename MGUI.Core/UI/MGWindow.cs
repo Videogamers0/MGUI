@@ -502,8 +502,23 @@ namespace MGUI.Core.UI
         /// then the <see cref="Action{MGElement}"/> with the name "ABC" will be invoked when clicking the substring "This text invokes a delegate when clicked"</summary>
         public IReadOnlyDictionary<string, Action<MGElement>> NamedActions => _NamedActions;
 
-        public void AddNamedAction(string Name, Action<MGElement> Action) => _NamedActions.Add(Name, Action);
-        public void RemoveNamedAction(string Name) => _NamedActions.Remove(Name);
+        public void AddNamedAction(string Name, Action<MGElement> Action)
+        {
+            _NamedActions.Add(Name, Action);
+            OnActionRegistered?.Invoke(this, Name);
+        }
+        public void RemoveNamedAction(string Name)
+        {
+            _NamedActions.Remove(Name);
+            OnActionUnregistered?.Invoke(this, Name);
+        }
+
+        /// <summary>Invoked when a new value is added to <see cref="NamedActions"/> via <see cref="AddNamedAction(string, Action{MGElement})"/><para/>
+        /// See also: <see cref="OnActionUnregistered"/></summary>
+        public event EventHandler<string> OnActionRegistered;
+        /// <summary>Invoked when a value is removed from <see cref="NamedActions"/> via <see cref="RemoveNamedAction(string)"/><para/>
+        /// See also: <see cref="OnActionRegistered"/></summary>
+        public event EventHandler<string> OnActionUnregistered;
         #endregion Named Actions
 
         #region Named ToolTips

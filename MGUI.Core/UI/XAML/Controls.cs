@@ -116,12 +116,43 @@ namespace MGUI.Core.UI.XAML
         [Browsable(false)]
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
+        /// <summary>The name of the delegate to invoke when clicking this <see cref="Button"/>.<br/>
+        /// This name should exist in <see cref="MGWindow.NamedActions"/>, otherwise nothing will be invoked when clicking this <see cref="Button"/><para/>
+        /// See also: <see cref="MGWindow.AddNamedAction(string, Action{MGElement})"/></summary>
+        [Category("Behavior")]
+        public string CommandName { get; set; }
+
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGButton(Window);
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
         {
+            MGDesktop Desktop = Element.GetDesktop();
+
             MGButton Button = Element as MGButton;
             Border.ApplySettings(Button, Button.BorderComponent.Element);
+
+            if (CommandName != null)
+            {
+                MGWindow Window = Button.ParentWindow;
+                if (Window.NamedActions.TryGetValue(CommandName, out var Command))
+                {
+                    Button.AddCommandHandler((btn, e) => { Command(Button); });
+                }
+                else
+                {
+                    //  Listen for when the command with the given name is registered to the window
+                    void WindowActionRegistered(object sender, string name)
+                    {
+                        if (name == CommandName)
+                        {
+                            Button.AddCommandHandler((btn, e) => { Window.NamedActions[CommandName](Button); });
+                            Window.OnActionRegistered -= WindowActionRegistered;
+                        }
+                    }
+
+                    Window.OnActionRegistered += WindowActionRegistered;
+                }
+            }
 
             base.ApplyDerivedSettings(Parent, Element);
         }

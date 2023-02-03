@@ -15,7 +15,7 @@
                     <Button BorderThickness="0,0,0,3" Padding="4,2" Margin="6,4" Background="White * 0.15" BorderBrush="Black" MinWidth="50" TextForeground="Black" />
                 </TabControl.SelectedTabHeaderTemplate>
                 <TabControl.UnselectedTabHeaderTemplate>
-                    <Button BorderThickness="0,0,0,2" Padding="4,2" Margin="6,4" Background="Transparent" BorderBrush="rgb(80,80,80)" MinWidth="50" TextForeground="rgb(40,40,40)" />
+                    <Button BorderThickness="0,0,0,0" Padding="4,2" Margin="6,4,6,7" Background="Transparent" BorderBrush="rgb(80,80,80)" MinWidth="50" TextForeground="rgb(40,40,40)" />
                 </TabControl.UnselectedTabHeaderTemplate>
                 <TabItem Header="Gameplay" Content="Content of Gameplay tab" />
                 <TabItem Header="Graphics" Content="Content of Graphics tab" />
