@@ -31,6 +31,7 @@ namespace MGUI.Core.UI
         TabControl,
         TabItem,
         ContentPresenter,
+        ContextualContentPresenter,
         HeaderedContentPresenter,
         GridSplitter,
 

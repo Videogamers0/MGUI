@@ -81,6 +81,9 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
+	//add MinLines/MaxLines properties to mgtextbox. defaults to null. when changed, call layoutchanged. the logic for computing the size should truncate the lines down to maxlines
+	//if the # lines is < minlines, get the height of the text content of any line (or measure the height of a space char if there are no lines) and multiply it by minlines.
+	//		so for each missing line, add that lineheight
     //Maybe make a CompositedBorderBrush, like CompositedFillBrush it's just a wrapper for 0-many border brushes that are drawn in sequence overtop of each other.
     //implement some basic converters for the PropertyBinding markup extension. at least need a BooleanToVisibilityConverter (has a Visibility TrueValue, Visibility FalseValue. Defaults to TrueValue=Visible, False=Collapsed)
     //		this would allow making inverse converters easily. or making one that converts to hidden instead of collapsed
@@ -1018,7 +1021,7 @@ namespace MGUI.Core.UI
 
             foreach (MGElement Component in Components.Where(x => x.DrawBeforeContents).Select(x => x.BaseElement))
                 Component.ComputeTopmostHoveredElement(ComputedIsEnabled, ComputedIsHitTestVisible, CanReceiveMouseInput, ref Result);
-            foreach (MGElement Child in GetVisualTreeChildren())
+            foreach (MGElement Child in GetVisualTreeChildren(false, true))
                 Child.ComputeTopmostHoveredElement(ComputedIsEnabled, ComputedIsHitTestVisible, CanReceiveMouseInput, ref Result);
             foreach (MGElement Component in Components.Where(x => x.DrawAfterContents).Select(x => x.BaseElement))
                 Component.ComputeTopmostHoveredElement(ComputedIsEnabled, ComputedIsHitTestVisible, CanReceiveMouseInput, ref Result);
@@ -1118,8 +1121,10 @@ namespace MGUI.Core.UI
 
 		protected virtual void UpdateContents(ElementUpdateArgs UA)
         {
-            foreach (MGElement Child in GetVisualTreeChildren().Reverse().ToList())
-                Child.Update(UA);
+            foreach (MGElement InactiveChild in GetVisualTreeChildren(true, false).Reverse().ToList())
+                InactiveChild.Update(UA with { IsHitTestVisible = false });
+            foreach (MGElement ActiveChild in GetVisualTreeChildren(false, true).Reverse().ToList())
+                ActiveChild.Update(UA);
         }
 
         public event EventHandler<ElementUpdateEventArgs> OnBeginUpdate;
@@ -1646,7 +1651,17 @@ namespace MGUI.Core.UI
         #endregion Layout
 
         #region Visual Tree
-        public virtual IEnumerable<MGElement> GetVisualTreeChildren() => GetChildren();
+        /// <param name="IncludeActive">If true, active content will also be enumerated. Recommended value: true</param>
+        /// <param name="IncludeInactive">If true, inactive content (child content which is unable to receive inputs, regardless of its <see cref="IsHitTestVisible"/> value,<br/>
+        /// such as an unselected tab within a <see cref="MGTabControl"/>) will also be enumerated.</param>
+        public virtual IEnumerable<MGElement> GetVisualTreeChildren(bool IncludeInactive, bool IncludeActive)
+        {
+            if (IncludeActive)
+            {
+                foreach (MGElement Child in GetChildren())
+                    yield return Child;
+            }
+        }
 
         public enum TreeTraversalMode
         {
@@ -1722,7 +1737,7 @@ namespace MGUI.Core.UI
 				}
             }
 
-            foreach (MGElement Child in GetVisualTreeChildren())
+            foreach (MGElement Child in GetVisualTreeChildren(true, true))
 			{
 				foreach (T Item in Child.TraverseVisualTree<T>(true, IncludeComponents, TraversalMode))
 					yield return Item;

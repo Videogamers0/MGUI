@@ -34,7 +34,17 @@ namespace MGUI.Core.UI
             }
         }
 
-        public override IEnumerable<MGElement> GetVisualTreeChildren() => _Tabs;
+        public override IEnumerable<MGElement> GetVisualTreeChildren(bool IncludeInactive, bool IncludeActive)
+        {
+            if (IncludeInactive)
+            {
+                foreach (MGTabItem Item in _Tabs.Where(x => !x.IsTabSelected))
+                    yield return Item;
+            }
+
+            if (IncludeActive && SelectedTab != null)
+                yield return SelectedTab;
+        }
 
         #region Border
         /// <summary>Provides direct access to this element's border.</summary>
@@ -344,17 +354,6 @@ namespace MGUI.Core.UI
         {
             MGTabItem TabItem = sender as MGTabItem;
             this.ActualTabHeaders[TabItem].SetContent(e.NewValue);
-        }
-
-        protected override void UpdateContents(ElementUpdateArgs UA)
-        {
-            foreach (MGElement Child in GetVisualTreeChildren().ToList())
-            {
-                if (Child == SelectedTab || !_Tabs.Contains(Child))
-                    Child.Update(UA);
-                else
-                    Child.Update(UA with { IsHitTestVisible = false });
-            }
         }
 
         public override void DrawBackground(ElementDrawArgs DA, Rectangle LayoutBounds)

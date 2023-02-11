@@ -62,6 +62,38 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
+    public class ContextualContentPresenter : Element
+    {
+        [Category("Behavior")]
+        public bool Value { get; set; }
+
+        public Element TrueContent { get; set; } = null;
+        public Element FalseContent { get; set; } = null;
+
+        public override MGElementType ElementType => MGElementType.ContextualContentPresenter;
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGContextualContentPresenter(Window, Value, null, null);
+
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        {
+            MGWindow Window = Element.SelfOrParentWindow;
+            MGContextualContentPresenter ContextualContentPresenter = Element as MGContextualContentPresenter;
+
+            if (TrueContent != null)
+                ContextualContentPresenter.TrueContent = TrueContent.ToElement<MGElement>(Window, ContextualContentPresenter);
+            if (FalseContent != null)
+                ContextualContentPresenter.FalseContent = FalseContent.ToElement<MGElement>(Window, ContextualContentPresenter);
+            ContextualContentPresenter.Value = Value;
+        }
+
+        protected internal override IEnumerable<Element> GetChildren()
+        {
+            if (TrueContent != null)
+                yield return TrueContent;
+            if (FalseContent != null)
+                yield return FalseContent;
+        }
+    }
+
     public class Border : SingleContentHost
     {
         public override MGElementType ElementType => MGElementType.Border;
