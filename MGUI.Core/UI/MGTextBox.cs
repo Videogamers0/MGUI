@@ -243,6 +243,25 @@ namespace MGUI.Core.UI
 
         internal TextRenderInfo TextRenderInfo { get; }
 
+        /// <summary>The minimum # of lines to display, regardless of how many lines the actual text content requires.<para/>
+        /// Default value: 0<para/>
+        /// See also: <see cref="MaxLines"/>, <see cref="MGTextBlock.MinLines"/>, <see cref="MGTextBlock.MaxLines"/></summary>
+        public int MinLines
+        {
+            get => TextBlockElement.MinLines;
+            set => TextBlockElement.MinLines = value;
+        }
+
+        /// <summary>The maximum # of lines to display, regardless of how many lines the actual text content requires.<br/>
+        /// Use null to indicate there is no maximum.<para/>
+        /// Default value: null<para/>
+        /// See also: <see cref="MinLines"/>, <see cref="MGTextBlock.MinLines"/>, <see cref="MGTextBlock.MaxLines"/></summary>
+        public int? MaxLines
+        {
+            get => TextBlockElement.MaxLines;
+            set => TextBlockElement.MaxLines = value;
+        }
+
         public bool WrapText
         {
             get => TextBlockElement.WrapText;

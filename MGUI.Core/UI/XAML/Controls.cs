@@ -1434,6 +1434,10 @@ namespace MGUI.Core.UI.XAML
         public XAMLColor? Foreground { get; set; }
         public string Text { get; set; }
         [Category("Layout")]
+        public int? MinLines { get; set; }
+        [Category("Layout")]
+        public int? MaxLines { get; set; }
+        [Category("Layout")]
         public bool? WrapText { get; set; }
         [Category("Layout")]
         public float? LinePadding { get; set; }
@@ -1470,6 +1474,10 @@ namespace MGUI.Core.UI.XAML
                 TextBlock.Foreground.NormalValue = Foreground.Value.ToXNAColor();
             if (Text != null)
                 TextBlock.Text = Text;
+            if (MinLines.HasValue)
+                TextBlock.MinLines = MinLines.Value;
+            if (MaxLines.HasValue)
+                TextBlock.MaxLines = MaxLines.Value;
             if (WrapText.HasValue)
                 TextBlock.WrapText = WrapText.Value;
             if (LinePadding.HasValue)
@@ -1506,6 +1514,10 @@ namespace MGUI.Core.UI.XAML
         public string Text { get; set; }
         [Category("Layout")]
         public bool? WrapText { get; set; }
+        [Category("Layout")]
+        public int? MinLines { get; set; }
+        [Category("Layout")]
+        public int? MaxLines { get; set; }
 
         public TextBlock Placeholder { get; set; } = new();
         public string PlaceholderText { get; set; }
@@ -1568,6 +1580,10 @@ namespace MGUI.Core.UI.XAML
                 TextBox.SetText(Text);
             if (WrapText.HasValue)
                 TextBox.WrapText = WrapText.Value;
+            if (MinLines.HasValue)
+                TextBox.MinLines = MinLines.Value;
+            if (MaxLines.HasValue)
+                TextBox.MaxLines = MaxLines.Value;
 
             if (PlaceholderText != null)
                 TextBox.PlaceholderText = PlaceholderText;

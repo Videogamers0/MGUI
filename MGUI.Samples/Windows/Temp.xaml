@@ -4,12 +4,8 @@
         <Border.BorderBrush>
             <TexturedBorderBrush EdgeTextureRegionName="BorderEdgeRegion1" CornerTextureRegionName="BorderCornerRegion1" EdgeBasis="Right" CornerBasis="BottomRight" />
         </Border.BorderBrush>
-        <!--<OverlayPanel Width="200" Height="50">
-            <Button Background="Purple" Content="First child" Offset="15, 3, 62, 25" ZIndex="0.01" />
-            <Button Background="Orange" Content="Second child" Offset="5, 0, 50, 10" ZIndex="10" VerticalAlignment="Bottom" />
-            <Button Background="Green" Content="Third child" Offset="120, 10, 4, 18" ZIndex="-10" />
-        </OverlayPanel>-->
-        <Grid RowLengths="*" ColumnLengths="auto,auto" ColumnSpacing="20">
+        
+        <Grid RowLengths="*,auto" ColumnLengths="auto,auto" RowSpacing="10" ColumnSpacing="20">
             <TabControl Row="0" Column="0" HeaderAreaBackground="rgb(120,120,150)">
                 <TabControl.SelectedTabHeaderTemplate>
                     <Button BorderThickness="0,0,0,3" Padding="4,2" Margin="6,4" Background="White * 0.15" BorderBrush="Black" MinWidth="50" TextForeground="Black" />

@@ -361,6 +361,41 @@ namespace MGUI.Core.UI
             }
         }
 
+        private int _MinLines;
+        /// <summary>The minimum # of lines to display, regardless of how many lines the actual text content requires.<para/>
+        /// Default value: 0<para/>
+        /// See also: <see cref="MaxLines"/></summary>
+        public int MinLines
+        {
+            get => _MinLines;
+            set
+            {
+                if (_MinLines != value)
+                {
+                    _MinLines = value;
+                    LayoutChanged(this, true);
+                }
+            }
+        }
+
+        private int? _MaxLines;
+        /// <summary>The maximum # of lines to display, regardless of how many lines the actual text content requires.<br/>
+        /// Use null to indicate there is no maximum.<para/>
+        /// Default value: null<para/>
+        /// See also: <see cref="MinLines"/></summary>
+        public int? MaxLines
+        {
+            get => _MaxLines;
+            set
+            {
+                if (_MaxLines != value)
+                {
+                    _MaxLines = value;
+                    LayoutChanged(this, true);
+                }
+            }
+        }
+
         public HorizontalAlignment TextAlignment { get; set; }
 
         /// <param name="FontSize">If null, uses the font size specified by <see cref="ThemeFontSettings.DefaultFontSize"/>.<para/>
@@ -382,6 +417,8 @@ namespace MGUI.Core.UI
                 this.IsItalic = false;
                 this.IsUnderlined = false;
                 this.Text = Text;
+                this.MinLines = 0;
+                this.MaxLines = null;
                 this.Foreground = new VisualStateSetting<Color?>(Foreground, Foreground, Foreground);
                 this.LinePadding = 2;
                 this.TextAlignment = HorizontalAlignment.Left;
@@ -532,7 +569,14 @@ namespace MGUI.Core.UI
                 return CachedMeasurement.Value;
 
             List<MGTextLine> Lines = MGTextLine.ParseLines(this, RemainingSize.Width, WrapText, Runs, IgnoreEmptySpaceLines).ToList();
-            Vector2 Size = new(Lines.Select(x => x.LineWidth).DefaultIfEmpty(0).Max(), Lines.Sum(x => x.LineTotalHeight) + LinePadding * (Lines.Count - 1));
+            List<MGTextLine> MeasuredLines = Lines;
+            if (MaxLines.HasValue && MeasuredLines.Count > MaxLines.Value)
+                MeasuredLines = MeasuredLines.Take(MaxLines.Value).ToList();
+
+            Vector2 Size = new(MeasuredLines.Select(x => x.LineWidth).DefaultIfEmpty(0).Max(), MeasuredLines.Sum(x => x.LineTotalHeight) + LinePadding * Math.Max(0, MeasuredLines.Count - 1));
+            if (MinLines > MeasuredLines.Count)
+                Size = Size.SetY(Size.Y + (MinLines - MeasuredLines.Count) * (FontHeight + LinePadding));
+
             Thickness Measurement = new((int)Math.Ceiling(Size.X), (int)Math.Ceiling(Size.Y), 0, 0);
 
             ElementMeasurement SelfMeasurement = new(RemainingSize, Measurement, SharedSize, new(0));

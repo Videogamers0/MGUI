@@ -81,9 +81,6 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
-	//add MinLines/MaxLines properties to mgtextbox. defaults to null. when changed, call layoutchanged. the logic for computing the size should truncate the lines down to maxlines
-	//if the # lines is < minlines, get the height of the text content of any line (or measure the height of a space char if there are no lines) and multiply it by minlines.
-	//		so for each missing line, add that lineheight
     //Maybe make a CompositedBorderBrush, like CompositedFillBrush it's just a wrapper for 0-many border brushes that are drawn in sequence overtop of each other.
     //implement some basic converters for the PropertyBinding markup extension. at least need a BooleanToVisibilityConverter (has a Visibility TrueValue, Visibility FalseValue. Defaults to TrueValue=Visible, False=Collapsed)
     //		this would allow making inverse converters easily. or making one that converts to hidden instead of collapsed
