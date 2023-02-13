@@ -1,6 +1,7 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Left="500" Top="50" Width="350" Height="420" TitleText="[ToolTip=Test2][Action=TestAction][img=SkullAndCrossbones 16x16][/Action][/ToolTip] [b]Window [ToolTip=Test1]Title[/ToolTip] Text[/b]">
+        Left="440" Top="20" Width="350" Height="420" 
+        TitleText="[ToolTip=Test2][Action=TestAction][img=SkullAndCrossbones 16x16][/Action][/ToolTip] [b]Window [ToolTip=Test1]Title[/ToolTip] Text[/b]">
     <!--<Window.TitleBar>
         <DockPanel BG="LightGreen" Padding="16,4">
             <TextBlock Text="ABC" Dock="Left" />

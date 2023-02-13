@@ -1,6 +1,6 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:MGUI.Samples.FF7_Samples;assembly=MGUI.Samples"
+        xmlns:local="clr-namespace:MGUI.Samples.Dialogs.FF7;assembly=MGUI.Samples"
         WindowStyle="None" Width="600" Height="470">
     <OverlayPanel>
         <OverlayPanel.Styles>

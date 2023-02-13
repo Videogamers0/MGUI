@@ -1,0 +1,128 @@
+﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        Left="440" Top="20" MinHeight="0" Width="660" SizeToContent="Height" TitleText="TextBlock" Padding="10">
+    <Window.Styles>
+        <Style Name="Header1" TargetType="TextBlock">
+            <Setter Property="IsBold" Value="True" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style TargetType="Separator">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Height" Value="2" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Opacity" Value="0.25" />
+        </Style>
+        <Style TargetType="Expander">
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="Background" Value="White * 0.1" />
+        </Style>
+    </Window.Styles>
+    
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
+        <StackPanel Orientation="Vertical" Spacing="10">
+            <TextBlock StyleNames="Header1" Text="TextBlocks:" HorizontalAlignment="Center" />
+            <Separator/>
+            <TextBlock FontSize="10" Text="[b]TextBlocks[/b] display text content, and also have basic support for inlined images and formatting." />
+
+            <Expander IsExpanded="True">
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="Common Properties" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
+                    <TextBlock>
+                        Call [c=Turquoise][i]TextBlock.TrySetFont([c=LightBlue][s=Blue]string[/s][/c] FontFamily, [c=LightBlue][s=Blue]string[/s][/c] FontSize[/s][/c])[/i][/c] 
+                        to change the FontFamily and FontSize. TextBlocks default to [i]Arial[/i] FontFamily. To use a different FontFamily, you must add a FontSet to the FontManager 
+                        via [c=Turquoise][i]Desktop.FontManager.AddFontSet(...)[/i][/c]. A FontSet represents a collection of SpriteFonts all belonging to the same FontFamily but
+                        with varying sizes and styles (such as Arial 12pt, Arial Bold 12pt, Arial Italic 12pt, Arial 14pt, Arial Bold 14pt etc). To change the default values, you can
+                        modify [c=Turquoise][i]Window.GetTheme().FontSettings[/i][/c].
+                    </TextBlock>
+                    <Separator/>
+                    <TextBlock>
+                        Set [c=Turquoise][i]TextBlock.IsBold[/i][/c] / [c=Turquoise][i]TextBlock.IsItalic[/i][/c] / [c=Turquoise][i]TextBlock.IsUnderlined[/i][/c] to [c=LightBlue][s=Blue]true[/s][/c]
+                        to set the entire Text content to [b]Bold[/b], [i]Italic[/i], or [u]Underlined[/u]. These FontStyles can also be applied partially to specific pieces of text by using 
+                        [Action=OpenTextBlockFormattingWiki][u][c=#3483eb]inline-formatting codes[/c][/u][/Action].
+                    </TextBlock>
+                    <Separator/>
+                    <TextBlock>
+                        Set [c=Turquoise][i]TextBlock.Foreground[/i][/c] to change the [c=yellow]Foreground color[/c] that the text content is drawn with. If no value is set,
+                        the TextBlock will attempt to resolve its foreground color from it's parent's [c=Turquoise][i]Element.DefaultTextForeground[/i][/c].
+                    </TextBlock>
+                    <Separator/>
+                    <TextBlock>
+                        Set [c=Turquoise][i]TextBlock.WrapText[/i][/c] to [c=LightBlue][s=Blue]false[/s][/c] if you don't want the text content to wrap to a newline when it runs out of horizontal space 
+                        (Default value = [c=LightBlue][s=Blue]true[/s][/c]).
+                    </TextBlock>
+                    <Separator/>
+                    <TextBlock>
+                        Set [c=Turquoise][i]TextBlock.LinePadding[/i][/c] to adjust how much empty space is reserved in between consecutive lines of text (Default value = 2px)
+                    </TextBlock>
+                    <Separator/>
+                    <TextBlock>
+                        Set [c=Turquoise][i]TextBlock.TextAlignment[/i][/c] to adjust how the content of each line of text is aligned (Default value = Left).
+                    </TextBlock>
+                </StackPanel>
+            </Expander>
+            
+            <Expander IsExpanded="True">
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="Inline Formatting:" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="4" Margin="26,0,0,0">
+                    <TextBlock>
+                        Set [c=Turquoise][i]TextBlock.IsBold[/i][/c] to [c=LightBlue][s=Blue]true[/s][/c] 
+                        or wrap your text in [c=yellow]\[b][/c]{Text}[c=yellow]\[\b][/c] to make your text [b]bold[/b].
+                    </TextBlock>
+                    <Separator />
+                    <TextBlock>
+                        Set [c=Turquoise][i]TextBlock.IsItalic[/i][/c] to [c=LightBlue][s=Blue]true[/s][/c] 
+                        or wrap your text in [c=yellow]\[i][/c]{Text}[c=yellow]\[\i][/c] to make your text [i]italic[/i].
+                    </TextBlock>
+                    <Separator />
+                    <TextBlock>
+                        Set [c=Turquoise][i]TextBlock.IsUnderlined[/i][/c] to [c=LightBlue][s=Blue]true[/s][/c] 
+                        to apply a [u]1px underline[/u] to your text using the same color as the text's foreground. 
+                        Or wrap your text in [c=yellow]\[u][/c]{Text}[c=yellow]\[\u][/c].
+                        You may also specify an optional height, offset, and brush, such as: 
+                        [c=yellow]\[u=3 0 Orange][/c]{Text}[c=yellow]\[/u][/c] to apply a [u=3 0 Orange]3px Orange underline[/u]
+                        Underlines can be used to mimic a [u=1 -7]strikethrough[/u] by offsetting it upwards:
+                        [c=yellow]\[u=1 -7][/c]{Text}[c=yellow]\[\u][/c].
+                    </TextBlock>
+                    <Separator />
+                    <TextBlock>
+                        Set [c=Turquoise][i]Element.Opacity[/i][/c] or wrap your text in [c=yellow]\[opacity={value}][/c]{Text}[c=yellow]\[\opacity][/c] 
+                        to modify the text's [opacity=0.7]op[/opacity][opacity=0.5]ac[/opacity][opacity=0.3]it[/opacity][opacity=0.15]y[/opacity].
+                    </TextBlock>
+                    <Separator />
+                    <TextBlock>
+                        Set [c=Turquoise][i]TextBlock.Foreground[/i][/c] or wrap your text in [c=yellow]\[color={value}][/c]{Text}[c=yellow]\[color][/c] 
+                        to modify the text's [color=Red]Foreground [/color][color=Orange]color[/color]. Color values should either be an HTML color name, such as [c=Green]Green[/c], 
+                        or a hex value containing the RGB (or ARGB) values, such as [c=#ffdaa520]#ffdaa520[/c].
+                    </TextBlock>
+                    <Separator />
+                    <TextBlock>
+                        Set [c=Turquoise][i]Element.Background[/i][/c] or wrap your text in [c=yellow]\[background={value}][/c]{Text}[c=yellow]\[\background][/c] 
+                        to modify the text's [bg=MediumPurple]Background color[/bg]. Background values should either be an HTML color name, such as [c=Green]Green[/c], 
+                        or a hex value containing the RGB (or ARGB) values, such as [c=#ffdaa520]#ffdaa520[/c]. You can also specify 2 colors, separated by a [c=yellow]|[/c] 
+                        to apply a [bg=Navy|LightBlue]Gradient background[/bg]. You may also specify an optional padding, such as [bg=MediumPurple 2,1,4,1]\[background=MediumPurple 2,1,4,1][/bg] 
+                        to make the background larger (or [bg=MediumPurple -5]smaller[/bg] with negative values).
+                    </TextBlock>
+                    <Separator />
+                    <TextBlock>
+                        Set [c=Turquoise][i]TextBlock.IsShadowed[/i][/c] to [c=LightBlue][s=Blue]true[/s][/c] (and set [c=Turquoise][i]TextBlock.ShadowColor[/i][/c]) 
+                        or wrap your text in [c=yellow]\[shadow={color}][/c]{Text}[c=yellow]\[/shadow][/c] to apply a [s=red]shadow[/s] to the text. 
+                        Color values should either be an HTML color name, such as [c=Green]Green[/c], or a hex value containing the RGB (or ARGB) values, such as [c=#ffdaa520]#ffdaa520[/c]. 
+                        You may also specify an optional offset, such as [s=red -1 -2]\[Shadow=Red -1 -2][/s] (default = 1 1).
+                    </TextBlock>
+                    <Separator />
+                    <TextBlock>
+                        Wrap your text in [c=yellow]\[Image={Name}][/c] to put an image [Image=ArrowRightGreen] inline with the text content. 
+                        To reference a texture for {Name}, you must first add it to [c=Turquoise][i]Desktop.NamedRegions[/i][/c].
+                        You may also specify optional dimensions, such as [c=yellow]\[Image=ArrowRightGreen 24,16][/c] ([Image=ArrowRightGreen 24,16]).
+                    </TextBlock>
+                    <Separator />
+                    <TextBlock Foreground="#3483eb" IsUnderlined="True" Text="[Action=OpenTextBlockFormattingWiki]More info. here[/Action]" HorizontalAlignment="Center" FontSize="14"
+                               ToolTip="https://github.com/Videogamers0/MGUI/wiki/Text-Formatting" />
+                </StackPanel>
+            </Expander>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

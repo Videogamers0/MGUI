@@ -18,37 +18,46 @@
     <NoWarn>1701;1702</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Windows\CharacterStats.xaml" />
-    <None Remove="Windows\Debug.xaml" />
-    <None Remove="Windows\Inventory.xaml" />
-    <None Remove="Windows\ListViewSample.xaml" />
-    <None Remove="Windows\Registration.xaml" />
-    <None Remove="Windows\StylesTest.xaml" />
-    <None Remove="Windows\Temp.xaml" />
+    <None Remove="Controls\Compendium.xaml" />
+    <None Remove="Controls\ListView.xaml" />
+    <None Remove="Controls\TextBlock.xaml" />
+    <None Remove="Dialogs\Debugging\Debug1.xaml" />
+    <None Remove="Dialogs\Debugging\Debug2.xaml" />
+    <None Remove="Dialogs\FF7\FF7Inventory.xaml" />
+    <None Remove="Dialogs\Registration.xaml" />
+    <None Remove="Dialogs\Stardew Valley\SDVInventory.xaml" />
+    <None Remove="Dialogs\XAMLDesignerWindow.xaml" />
+    <None Remove="Features\Styles.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="FF7 Samples\InventoryUI.xaml">
+    <EmbeddedResource Include="Compendium.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\CharacterStats.xaml">
+    <EmbeddedResource Include="Controls\ListView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\Debug.xaml">
+    <EmbeddedResource Include="Controls\TextBlock.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\Inventory.xaml">
+    <EmbeddedResource Include="Dialogs\Debugging\Debug1.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\ListViewSample.xaml">
+    <EmbeddedResource Include="Dialogs\Debugging\Debug2.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\Registration.xaml">
+    <EmbeddedResource Include="Dialogs\FF7\FF7Inventory.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\StylesTest.xaml">
+    <EmbeddedResource Include="Dialogs\Registration.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\Temp.xaml">
+    <EmbeddedResource Include="Dialogs\Stardew Valley\SDVInventory.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\XAMLDesignerWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Features\Styles.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
   </ItemGroup>

@@ -1,10 +1,10 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Left="50" Top="50" MinWidth="300" SizeToContent="Height">
-    
+        Left="440" Top="20" MinWidth="300" SizeToContent="Height">
+
     <!-- Replace the window's Title bar with custom content -->
     <Window.TitleBar>
-        <!-- The root-element of the window's Title bar must always be an MGDockPanel, but we can add whatever we want to it -->
+        <!-- The root-element of the window's Title bar must always be an DockPanel, but we can add whatever we want to it -->
         <DockPanel Padding="5,2">
             <Rectangle Dock="Left" Width="16" Height="16" Stroke="Gray" StrokeThickness="1" Fill="Black" Margin="0,0,5,0">
                 <Rectangle.ToolTip>
@@ -13,23 +13,23 @@
                     </ToolTip>
                 </Rectangle.ToolTip>
             </Rectangle>
-            
+
             <TextBlock FontSize="10" Foreground="White" Text="Registration Form" />
         </DockPanel>
     </Window.TitleBar>
-    
+
     <DockPanel Margin="5">
         <!-- Window header -->
         <StackPanel Dock="Top" Orientation="Vertical">
             <TextBlock Dock="Top" HorizontalAlignment="Center" FontSize="14" Foreground="Orange" Text="Register for a new account" />
             <Separator Size="3" Orientation="Horizontal" Background="Orange * 0.5" />
         </StackPanel>
-        
+
         <!-- Register -->
         <Button Name="Button_Register" Dock="Bottom" Background="Orange" HorizontalAlignment="Center" Padding="25,5">
             <TextBlock Text="[b]Register[/b]" FontSize="14" />
         </Button>
-        
+
         <Border BorderBrush="Black" BorderThickness="1">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="8" Margin="0,10,0,15" Background="White * 0.08">
                 <StackPanel Orientation="Vertical">
@@ -39,7 +39,7 @@
                             <Setter Property="Spacing" Value="2" />
                         </Style>
                     </StackPanel.Styles>
-                    
+
                     <!-- Email -->
                     <HeaderedContentPresenter>
                         <HeaderedContentPresenter.Header>
@@ -72,7 +72,7 @@
                         <PasswordBox Name="TextBox_Password" PasswordCharacter="*" Text="Hunter2" />
                     </HeaderedContentPresenter>
                     <Spacer Height="16" />
-                    
+
                     <!-- Terms of service -->
                     <CheckBox Name="CheckBox_TOS" IsChecked="true">
                         <TextBlock Text="I agree to the [Action=OpenTOS][color=#3483eb][i][u]Terms of service[/u][/i][/color][/Action]" />

@@ -1,0 +1,4 @@
+﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        Left="440" Top="20" MinHeight="0" Width="650" Height="800" TitleText="XAML Designer" Padding="10">
+    <XAMLDesigner />
+</Window>

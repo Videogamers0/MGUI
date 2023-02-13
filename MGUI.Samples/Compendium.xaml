@@ -1,0 +1,113 @@
+﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        Left="20" Top="20" Width="400" SizeToContent="Height" TitleText="[Image=Computer 16x16] Compendium" Padding="10" IsUserResizable="False">
+    <Window.Styles>
+        <Style Name="Header1" TargetType="TextBlock">
+            <Setter Property="IsBold" Value="True" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style TargetType="Separator">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Height" Value="2" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Opacity" Value="0.25" />
+        </Style>
+        <Style TargetType="Expander">
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="Background" Value="White * 0.1" />
+        </Style>
+        <Style TargetType="UniformGrid">
+            <Setter Property="RowSpacing" Value="5" />
+            <Setter Property="ColumnSpacing" Value="5" />
+            <Setter Property="CellSize" Value="104,24" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
+        <StackPanel Orientation="Vertical" Spacing="10" Margin="2">
+
+            <TextBlock FontSize="10" Text="Developer note: The transparent ones aren't implemented yet. Will add more samples and documentation soon... probably..." />
+
+            <!-- Controls -->
+            <Expander IsExpanded="True">
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="Controls" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
+                    <TextBlock FontSize="10" Text="These samples demonstrate usage of some common elements (controls):" />
+                    <UniformGrid Rows="6" Columns="3">
+                        <UniformGrid.Styles>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontSize" Value="10" />
+                            </Style>
+                        </UniformGrid.Styles>
+                        <ToggleButton Row="0" Column="0" Content="ComboBox" Opacity="0.25" />
+                        <ToggleButton Row="0" Column="1" Content="ContextMenu" Opacity="0.25" />
+                        <ToggleButton Row="0" Column="2" Content="ContextualContentPresenter" Opacity="0.25" ToolTip="ContextualContentPresenter" />
+                        <ToggleButton Row="1" Column="0" Content="DockPanel" Opacity="0.25" />
+                        <ToggleButton Row="1" Column="1" Content="Expander" Opacity="0.25" />
+                        <ToggleButton Row="1" Column="2" Content="Grid" Opacity="0.25" />
+                        <ToggleButton Row="2" Column="0" Content="ListBox" Opacity="0.25" />
+                        <ToggleButton Row="2" Column="1" Content="ListView" Name="ListView_Toggle" />
+                        <ToggleButton Row="2" Column="2" Content="ProgressBar" Opacity="0.25" />
+                        <ToggleButton Row="3" Column="0" Content="RadioButton" Opacity="0.25" />
+                        <ToggleButton Row="3" Column="1" Content="ScrollViewer" Opacity="0.25" />
+                        <ToggleButton Row="3" Column="2" Content="Slider" Opacity="0.25" />
+                        <ToggleButton Row="4" Column="0" Content="StackPanel" Opacity="0.25" />
+                        <ToggleButton Row="4" Column="1" Content="TabControl" Opacity="0.25" />
+                        <ToggleButton Row="4" Column="2" Content="TextBlock" Name="TextBlock_Toggle" />
+                        <ToggleButton Row="5" Column="0" Content="TextBox" Opacity="0.25" />
+                        <ToggleButton Row="5" Column="1" Content="ToolTip" Opacity="0.25" />
+                        <ToggleButton Row="5" Column="2" Content="Window" Opacity="0.25" />
+                    </UniformGrid>
+                </StackPanel>
+            </Expander>
+            
+            <!-- Features -->
+            <Expander IsExpanded="True">
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="Features" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
+                    <TextBlock FontSize="10" Text="These samples describe some of the common features that [i]MGUI[/i] supports:" />
+                    <UniformGrid Rows="3" Columns="3">
+                        <UniformGrid.Styles>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontSize" Value="10" />
+                            </Style>
+                        </UniformGrid.Styles>
+                        <ToggleButton Row="0" Column="0" Content="XAML" Opacity="0.25" />
+                        <ToggleButton Row="0" Column="1" Content="Styles" Name="Styles_Toggle" />
+                        <ToggleButton Row="0" Column="2" Content="Bindings" Opacity="0.25" />
+                        <ToggleButton Row="1" Column="0" Content="Theme" Opacity="0.25" />
+                        <ToggleButton Row="1" Column="1" Content="VisualState" Opacity="0.25" />
+                        <ToggleButton Row="1" Column="2" Content="BorderBrush" Opacity="0.25" />
+                        <ToggleButton Row="2" Column="0" Content="FillBrush" Opacity="0.25" />
+                    </UniformGrid>
+                </StackPanel>
+            </Expander>
+
+            <!-- Dialogs -->
+            <Expander IsExpanded="True">
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="Dialogs" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
+                    <TextBlock FontSize="10" Text="These samples showcase dialogs created with [i]MGUI[/i]:" />
+                    <UniformGrid Rows="2" Columns="3">
+                        <UniformGrid.Styles>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontSize" Value="10" />
+                            </Style>
+                        </UniformGrid.Styles>
+                        <ToggleButton Row="0" Column="0" Content="FF7 Inventory" Name="FF7Inventory_Toggle" />
+                        <ToggleButton Row="0" Column="1" Content="Stardew Valley" Name="SDVInventory_Toggle" />
+                        <ToggleButton Row="0" Column="2" Content="Registration" Name="Registration_Toggle" />
+                        <ToggleButton Row="1" Column="0" Content="XAML Designer" Name="XAMLDesigner_Toggle" />
+                        <ToggleButton Row="1" Column="1" Content="Debug1" Name="Debug1_Toggle" TextForeground="Yellow" Opacity="0.7" />
+                        <ToggleButton Row="1" Column="2" Content="Debug2" Name="Debug2_Toggle" TextForeground="Yellow" Opacity="0.7" />
+                    </UniformGrid>
+                </StackPanel>
+            </Expander>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

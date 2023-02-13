@@ -1,0 +1,82 @@
+﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        Left="440" Top="20" MinHeight="0" Width="780" Height="720" TitleText="TextBlock" Padding="10">
+    <Window.Styles>
+        <Style Name="Header1" TargetType="TextBlock">
+            <Setter Property="IsBold" Value="True" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style TargetType="Separator">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Height" Value="2" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Opacity" Value="0.25" />
+        </Style>
+        <Style TargetType="Expander">
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="Background" Value="White * 0.1" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
+        <StackPanel Orientation="Vertical" Spacing="10">
+            <TextBlock StyleNames="Header1" Text="Styles:" HorizontalAlignment="Center" />
+            <Separator/>
+            <TextBlock FontSize="10">
+                [b]Styles[/b] are a XAML feature that allows you to manage property values of several controls simultaneously. 
+                They're sort of like a poor-man's version of WPF's styles.
+            </TextBlock>
+            <TextBlock FontSize="10">
+                You may add 0 to many styles to any element via [c=Turquoise][i]Element.Styles[/i][/c]. Each style must specify a TargetType 
+                and may contain 0 to many setters. Each setter must specify a Property and a Value. All setters of the style will be applied to all
+                children of the desired TargetType.
+            </TextBlock>
+            <TextBlock FontSize="10">
+                If you give your Style a Name, then the Style will only be applied to child elements that opt-in to it via [c=Turquoise][i]Element.StyleNames[/i][/c].
+                You may opt-in to multiple styles by delimiting the names with a comma.
+            </TextBlock>
+
+            <Expander IsExpanded="True">
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="Example XAML" />
+                </Expander.Header>
+                <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
+                    <TextBox Name="Example_TextBox" />
+                </ScrollViewer>
+            </Expander>
+
+            <Expander IsExpanded="True">
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="Result" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0" Padding="6" Background="rgb(16,16,64)" MaxWidth="280" HorizontalAlignment="Left">
+                    <TextBlock FontSize="10" Text="Pay close attention to the Foreground colors and HorizontalAlignments of the TextBlocks:" />
+                    <StackPanel Orientation="Vertical" Spacing="5">
+                        <StackPanel.Styles>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Right" />
+                            </Style>
+                        </StackPanel.Styles>
+                        <TextBlock Background="RGB(40,40,40)" Text="One" IsStyleable="False" />
+                        <TextBlock Background="RGB(40,40,40)" Text="Two" />
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel.Styles>
+                                <Style TargetType="TextBlock" Name="Explicit1">
+                                    <Setter Property="HorizontalAlignment" Value="Center" />
+                                    <Setter Property="Foreground" Value="Red" />
+                                </Style>
+                                <Style TargetType="TextBlock" Name="Explicit2">
+                                    <Setter Property="HorizontalAlignment" Value="Left" />
+                                </Style>
+                            </StackPanel.Styles>
+                            <TextBlock Background="RGB(40,40,40)" Text="Three" StyleNames="Explicit1" />
+                            <TextBlock Background="RGB(40,40,40)" Text="Four" StyleNames="Explicit1,Explicit2" Foreground="Orange" />
+                            <TextBlock Background="RGB(40,40,40)" Text="Five" Foreground="Blue" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <TextBlock Foreground="#3483eb" IsUnderlined="True" Text="[Action=OpenStylesWiki]More info. here[/Action]" HorizontalAlignment="Center" FontSize="14"
+                       ToolTip="https://github.com/Videogamers0/MGUI/wiki/XAML#styles" />
+        </StackPanel>
+    </ScrollViewer>
+</Window>

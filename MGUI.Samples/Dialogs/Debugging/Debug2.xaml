@@ -1,10 +1,10 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="200" Top="200" MinHeight="0" SizeToContent="WidthAndHeight" WindowStyle="None">
+        Left="440" Top="20" MinHeight="0" SizeToContent="WidthAndHeight" WindowStyle="None">
     <Border BorderThickness="12" Background="DarkBlue" Padding="10">
         <Border.BorderBrush>
             <TexturedBorderBrush EdgeTextureRegionName="BorderEdgeRegion1" CornerTextureRegionName="BorderCornerRegion1" EdgeBasis="Right" CornerBasis="BottomRight" />
         </Border.BorderBrush>
-        
+
         <Grid RowLengths="*,auto" ColumnLengths="auto,auto" RowSpacing="10" ColumnSpacing="20">
             <TabControl Row="0" Column="0" HeaderAreaBackground="rgb(120,120,150)">
                 <TabControl.SelectedTabHeaderTemplate>

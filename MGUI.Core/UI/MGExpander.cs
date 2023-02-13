@@ -172,6 +172,15 @@ namespace MGUI.Core.UI
         public MGComponent<MGStackPanel> HeadersPanelComponent { get; }
         private MGStackPanel HeadersPanelElement { get; }
 
+        /// <summary>Margin between the bottom of the header and the top of the expandable content.<para/>
+        /// Functionally equivalent to the bottom margin of <see cref="HeadersPanelElement"/>'s <see cref="MGElement.Margin"/><para/>
+        /// Default value: 3</summary>
+        public int HeaderBottomMargin
+        {
+            get => HeadersPanelElement.Margin.Bottom;
+            set => HeadersPanelElement.Margin = HeadersPanelElement.Margin.ChangeBottom(value);
+        }
+
         public MGExpander(MGWindow Window, bool IsExpanded = true) 
             : base(Window, MGElementType.Expander)
         {
@@ -179,9 +188,11 @@ namespace MGUI.Core.UI
             {
                 this.HeadersPanelElement = new(Window, Orientation.Horizontal) { Spacing = 6 };
                 this.HeadersPanelComponent = new(HeadersPanelElement, ComponentUpdatePriority.BeforeContents, ComponentDrawPriority.AfterContents,
-                    true, false, true, true, false, false, false,
-                    (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Top, ComponentSize.Size));
+                    true, false, true, true, false, false, true,
+                    (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds.GetCompressed(Padding), HorizontalAlignment.Stretch, VerticalAlignment.Top, ComponentSize.Size));
                 AddComponent(HeadersPanelComponent);
+
+                this.HeaderBottomMargin = 3;
 
                 this.ExpanderToggleButton = new(Window, IsExpanded);
                 ExpanderToggleButton.VerticalAlignment = VerticalAlignment.Center;

@@ -137,7 +137,7 @@ namespace MGUI.Core.UI
                 Tmp.CanChangeContent = false;
 
                 MGGrid MainGrid = new(ParentWindow);
-                MainGrid.AddRows(ConstrainedGridLength.ParseMultiple("*[150,],15,142[140,]"));
+                MainGrid.AddRows(ConstrainedGridLength.ParseMultiple("*[150,],15,200[140,]"));
                 MainGrid.AddColumn(GridLength.CreateWeightedLength(1.0));
                 MainGrid.TryAddChild(0, 0, MarkupPresenter);
                 MainGrid.TryAddChild(2, 0, Tmp);

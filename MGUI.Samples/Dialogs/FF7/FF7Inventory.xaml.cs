@@ -1,43 +1,21 @@
-﻿using MGUI.Core.UI;
-using MGUI.Core.UI.XAML;
+﻿using MGUI.Core.UI.XAML;
+using MGUI.Core.UI;
 using MGUI.Shared.Helpers;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using MonoGame.Extended;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
-using System.ComponentModel;
 using System.Collections.ObjectModel;
 
-namespace MGUI.Samples.FF7_Samples
+namespace MGUI.Samples.Dialogs.FF7
 {
-    [Flags]
-    public enum StatusAilments
-    {
-        None = 0,
-        Poison = 1 << 0,
-        Sleep = 1 << 1,
-        Silence = 1 << 2,
-        Confusion = 1 << 3,
-        Slow = 1 << 4,
-        Haste = 1 << 5,
-        Stop = 1 << 6,
-        Downed = 1 << 7,
-        Darkness = 1 << 8,
-        Petrify = 1 << 9,
-        Frog = 1 << 10,
-        All = None | Poison | Sleep | Silence | Confusion | Slow | Haste | Stop | Downed | Darkness | Petrify | Frog
-    }
-
-    public readonly record struct Item(string Name, string Description, int HPRecovery, double HPRecoveryPercent, int MPRecovery, double MPRecoveryPercent,
-        StatusAilments HealedAilments = StatusAilments.None, StatusAilments AppliedAilments = StatusAilments.None);
-
     public class InventoryItem : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -45,7 +23,7 @@ namespace MGUI.Samples.FF7_Samples
         /// <summary>Notify Property Changed for the given <paramref name="szPropertyName"/></summary>
         public void NPC(string szPropertyName) { NotifyPropertyChanged(szPropertyName); }
 
-        public Inventory Inventory { get; }
+        public FF7Inventory Inventory { get; }
         public Item Item { get; }
         public string Name => Item.Name;
         public string Description => Item.Description;
@@ -68,7 +46,7 @@ namespace MGUI.Samples.FF7_Samples
 
         public event EventHandler<EventArgs<int>> QuantityChanged;
 
-        public InventoryItem(Inventory Inventory, Item Item, int Quantity)
+        public InventoryItem(FF7Inventory Inventory, Item Item, int Quantity)
         {
             this.Inventory = Inventory;
             this.Item = Item;
@@ -76,7 +54,7 @@ namespace MGUI.Samples.FF7_Samples
         }
     }
 
-    public class Inventory
+    public class FF7Inventory : SampleBase
     {
         public Texture2D ItemIcon { get; }
 
@@ -111,29 +89,6 @@ namespace MGUI.Samples.FF7_Samples
             return InventoryItem;
         }
 
-        private bool _IsVisible;
-        public bool IsVisible
-        {
-            get => _IsVisible;
-            private set
-            {
-                if (_IsVisible != value)
-                {
-                    _IsVisible = value;
-
-                    if (IsVisible)
-                        Desktop.Windows.Add(Window);
-                    else
-                        Desktop.Windows.Remove(Window);
-                }
-            }
-        }
-
-        public void Show() => IsVisible = true;
-        public void Hide() => IsVisible = false;
-
-        public MGDesktop Desktop { get; }
-        public MGWindow Window { get; }
         public Party Party { get; }
 
         private PartyMember _SelectedPartyMember;
@@ -173,20 +128,26 @@ namespace MGUI.Samples.FF7_Samples
         private MGListBox<InventoryItem> ItemsList { get; }
         private MGTextBlock ItemDescriptionLabel { get; }
 
-        public Inventory(ContentManager Content, MGDesktop Desktop, Party Party, Action<Inventory> InitializeItems)
+        public FF7Inventory(ContentManager Content, MGDesktop Desktop)
+            : base(Content, Desktop, $"{nameof(Dialogs)}.{nameof(FF7)}", $"{nameof(FF7Inventory)}.xaml")
         {
-            this.ItemIcon = Content.Load<Texture2D>(Path.Combine("Icons", "Item"));
-            Desktop.AddNamedTexture("FF7ItemIcon", ItemIcon);
-
-            this.Desktop = Desktop;
-            this.Party = Party;
-
-            string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.{nameof(FF7_Samples)}.{nameof(Inventory)}UI.xaml";
-            string XAML = ReadEmbeddedResourceAsString(Assembly.GetExecutingAssembly(), ResourceName);
-            this.Window = XAMLParser.LoadRootWindow(Desktop, XAML, false, true, null);
-
             Rectangle WindowScreenBounds = MGElement.ApplyAlignment(Desktop.ValidScreenBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new(Window.WindowWidth, Window.WindowHeight));
             Window.TopLeft = WindowScreenBounds.TopLeft();
+
+            ItemIcon = Content.Load<Texture2D>(Path.Combine("Icons", "Item"));
+            Desktop.AddNamedTexture("FF7ItemIcon", ItemIcon);
+
+            //  Create a sample Party
+            this.Party = new();
+            PartyMember Barret = Party.AddMember("Barret", Content.Load<Texture2D>(Path.Combine("Portraits", "Barret")), 65077, 1601, 199);
+            Barret.CurrentHP = (int)(Barret.CurrentHP * 0.92);
+            Barret.CurrentMP = (int)(Barret.CurrentMP * 0.90);
+            PartyMember Cloud = Party.AddMember("Cloud", Content.Load<Texture2D>(Path.Combine("Portraits", "Cloud")), 70140, 1455, 232);
+            Cloud.CurrentHP = (int)(Cloud.CurrentHP * 0.77);
+            Cloud.CurrentMP = (int)(Cloud.CurrentMP * 0.48);
+            PartyMember RedXIII = Party.AddMember("Red XIII", Content.Load<Texture2D>(Path.Combine("Portraits", "Red XIII")), 55126, 1477, 204);
+            RedXIII.CurrentHP = (int)(RedXIII.CurrentHP * 0.65);
+            RedXIII.CurrentMP = (int)(RedXIII.CurrentMP * 0.80);
 
             MGListBox<PartyMember> PartyList = Window.GetElementByName<MGListBox<PartyMember>>("PartyList");
             PartyList.SetItemsSource(Party.Members.ToList());
@@ -198,8 +159,25 @@ namespace MGUI.Samples.FF7_Samples
                 Border.BackgroundBrush.SelectedValue = null;
             };
 
-            InitializeItems?.Invoke(this);
-            this.ItemsList = Window.GetElementByName<MGListBox<InventoryItem>>("ItemsList");
+            //  Add some items to the inventory
+            AddItem(Item.Potion, 43);
+            AddItem(Item.HiPotion, 16);
+            AddItem(Item.XPotion, 1);
+            AddItem(Item.MiniEther, 7);
+            AddItem(Item.Ether, 2);
+            AddItem(Item.TurboEther, 7);
+            AddItem(Item.Elixir, 1);
+            AddItem(Item.PhoenixDown, 6);
+            AddItem(Item.PoisonousBrew, 25);
+            AddItem(Item.Antidote, 22);
+            AddItem(Item.EyeDrop, 12);
+            AddItem(Item.Soft, 15);
+            AddItem(Item.MaidensKiss, 4);
+            AddItem(Item.EchoScreen, 10);
+            AddItem(Item.Remedy, 5);
+            AddItem(Item.Megalixir, 2);
+
+            ItemsList = Window.GetElementByName<MGListBox<InventoryItem>>("ItemsList");
             ItemsList.SetItemsSource(_Items);
 
             ItemsList.ItemContainerStyle = (Border) =>
@@ -209,9 +187,9 @@ namespace MGUI.Samples.FF7_Samples
                 Border.Padding = new(6, 3);
             };
 
-            ItemsList.SelectionChanged += (sender, e) => { this.SelectedItem = e.FirstOrDefault()?.Data; };
+            ItemsList.SelectionChanged += (sender, e) => { SelectedItem = e.FirstOrDefault()?.Data; };
 
-            this.ItemDescriptionLabel = Window.GetElementByName<MGTextBlock>("ItemDescriptionLabel");
+            ItemDescriptionLabel = Window.GetElementByName<MGTextBlock>("ItemDescriptionLabel");
 
             //  When a character is clicked, try to use the selected item on them
             foreach (MGListBoxItem<PartyMember> PartyMember in PartyList.ListBoxItems)
@@ -227,10 +205,7 @@ namespace MGUI.Samples.FF7_Samples
 
             //  Handle clicking on the close button
             MGButton CloseButton = Window.GetElementByName<MGButton>("CloseButton");
-            CloseButton.AddCommandHandler((btn, e) =>
-            {
-                this.Hide();
-            });
+            CloseButton.AddCommandHandler((btn, e) => { Hide(); });
         }
 
         private bool TryUseItemOn(InventoryItem InventoryItem, PartyMember Character)
@@ -272,13 +247,6 @@ namespace MGUI.Samples.FF7_Samples
             }
 
             return false;
-        }
-
-        private static string ReadEmbeddedResourceAsString(Assembly CurrentAssembly, string ResourceName)
-        {
-            using (Stream ResourceStream = CurrentAssembly.GetManifestResourceStream(ResourceName))
-            using (StreamReader Reader = new StreamReader(ResourceStream))
-                return Reader.ReadToEnd();
         }
     }
 }

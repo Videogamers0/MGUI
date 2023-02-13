@@ -1,0 +1,143 @@
+﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Left="420" Top="20" SizeToContent="WidthAndHeight" WindowStyle="None" AllowsClickThrough="True">
+    <OverlayPanel TextForeground="Black" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Button Name="Button_Close" HorizontalAlignment="Right" VerticalAlignment="Top" Content="[b]X" TextForeground="Red" Padding="3,2,3,0"
+                BorderBrush="RGB(91,43,42)" BorderThickness="2" Background="rgb(242,191,114)" ZIndex="100" />
+
+        <InputConsumer Margin="0,12,12,0">
+            <TabControl Background="RGB(255,203,123)" BorderBrush="RGB(177,78,5)" BorderThickness="0" MinWidth="300" MinHeight="300" Padding="0">
+                <TabControl.HeadersPanel>
+                    <StackPanel Orientation="Horizontal" Margin="35,0,0,0" Spacing="0" />
+                </TabControl.HeadersPanel>
+                <TabControl.SelectedTabHeaderTemplate>
+                    <Button Padding="2,1" BorderThickness="2,2,2,0" BorderBrush="rgb(177,78,5)" Background="rgb(255,210,132)" VerticalAlignment="Bottom" />
+                </TabControl.SelectedTabHeaderTemplate>
+                <TabControl.UnselectedTabHeaderTemplate>
+                    <Button Padding="2,3" BorderThickness="2,2,2,0" BorderBrush="rgb(177,78,5)" Background="rgb(228,174,110)" VerticalAlignment="Bottom" />
+                </TabControl.UnselectedTabHeaderTemplate>
+
+                <TabItem Padding="0">
+                    <TabItem.Header>
+                        <TextBlock Text="[b]1" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
+
+                    <!-- Content of the first tab -->
+                    <Border BorderThickness="9">
+                        <Border.BorderBrush>
+                            <BandedBorderBrush>
+                                <BorderBand Brush="RGB(133,54,5)" />
+                                <BorderBand Brush="RGB(250,147,5)" />
+                                <BorderBand Brush="RGB(177,78,5)" />
+                            </BandedBorderBrush>
+                        </Border.BorderBrush>
+
+                        <StackPanel Orientation="Vertical">
+
+                            <!-- 4x12 grid of 48x48 px slots -->
+                            <UniformGrid Name="UniformGrid_Inventory" Rows="4" Columns="12" CellSize="48,48" Margin="16,8,16,12" HeaderRowHeight="15" RowSpacing="3">
+                                <UniformGrid.Styles>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="Gray" />
+                                        <Setter Property="FontSize" Value="8" />
+                                        <Setter Property="HorizontalAlignment" Value="Center" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                    </Style>
+                                </UniformGrid.Styles>
+                                <TextBlock Foreground="Red" Text="1" Row="0" Column="0" />
+                                <TextBlock Text="2" Row="0" Column="1" />
+                                <TextBlock Text="3" Row="0" Column="2" />
+                                <TextBlock Text="4" Row="0" Column="3" />
+                                <TextBlock Text="5" Row="0" Column="4" />
+                                <TextBlock Text="6" Row="0" Column="5" />
+                                <TextBlock Text="7" Row="0" Column="6" />
+                                <TextBlock Text="8" Row="0" Column="7" />
+                                <TextBlock Text="9" Row="0" Column="8" />
+                                <TextBlock Text="0" Row="0" Column="9" />
+                                <TextBlock Text="-" Row="0" Column="10" />
+                                <TextBlock Text="=" Row="0" Column="11" />
+                            </UniformGrid>
+
+                            <Separator Orientation="Horizontal" Size="3" Margin="0" Background="RGB(133,54,5)" />
+                            <Separator Orientation="Horizontal" Size="3" Margin="0" Background="RGB(250,147,5)" />
+                            <Separator Orientation="Horizontal" Size="3" Margin="0" Background="RGB(177,78,5)" />
+
+                            <DockPanel Margin="12,10,12,12">
+                                <Grid Dock="Left" RowLengths="48,48,48,auto" ColumnLengths="48,100,48">
+                                    <!-- Note: If you specify 4 colors, delimited by a hyphen, it will create an MGDockedBorderBrush (Left, Top, Right, Bottom) -->
+                                    <Border Row="0" Column="0" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+                                    <Border Row="1" Column="0" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+                                    <Border Row="2" Column="0" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+
+                                    <Border Row="0" Column="1" RowSpan="3" Margin="9,0" BorderThickness="9" Background="RGB(56,170,255)">
+                                        <Border.BorderBrush>
+                                            <BandedBorderBrush>
+                                                <BorderBand Brush="RGB(133,54,5)" />
+                                                <BorderBand Brush="RGB(250,147,5)" />
+                                                <BorderBand Brush="RGB(177,78,5)" />
+                                            </BandedBorderBrush>
+                                        </Border.BorderBrush>
+
+                                        <!--<Image Texture="texture_name..."></Image>-->
+                                    </Border>
+
+                                    <Border Row="0" Column="2" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+                                    <Border Row="1" Column="2" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+                                    <Border Row="2" Column="2" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+
+                                    <TextBlock Row="3" Column="0" ColumnSpan="3" Margin="0,12,0,0" Text="Character Name" HorizontalAlignment="Center" FontSize="14" />
+                                </Grid>
+
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Margin="15,15,15,65">
+                                    <TextBlock Text="Farm Name" FontSize="20" HorizontalAlignment="Center" />
+                                    <Grid HorizontalAlignment="Center" RowSpacing="12" ColumnSpacing="8" RowLengths="auto,auto" ColumnLengths="auto,auto">
+                                        <TextBlock Row="0" Column="0" Text="Current Funds:" FontSize="18" HorizontalAlignment="Right" />
+                                        <TextBlock Row="0" Column="1"  Text="999,999g" FontSize="18" HorizontalAlignment="Left" />
+
+                                        <TextBlock Row="1" Column="0" Text="Total Earnings:" FontSize="18" HorizontalAlignment="Right" />
+                                        <TextBlock Row="1" Column="1" Text="2,147,483,647g" FontSize="18" HorizontalAlignment="Left" />
+                                    </Grid>
+                                </StackPanel>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="[b]2" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="[b]3" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="[b]4" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="[b]5" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="[b]6" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="[b]7" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="[b]8" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
+                </TabItem>
+            </TabControl>
+        </InputConsumer>
+    </OverlayPanel>
+</Window>

@@ -1,0 +1,79 @@
+﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Left="440" Top="20" MinHeight="0" Width="600" Height="600" TitleText="ListView" Padding="10">
+    <Window.Styles>
+        <Style Name="Header1" TargetType="TextBlock">
+            <Setter Property="IsBold" Value="True" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style TargetType="Separator">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Height" Value="2" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Opacity" Value="0.25" />
+        </Style>
+        <Style TargetType="Expander">
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="Background" Value="White * 0.1" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
+        <StackPanel Orientation="Vertical" Spacing="10">
+            <TextBlock StyleNames="Header1" Text="ListViews:" HorizontalAlignment="Center" />
+            <Separator/>
+            <TextBlock FontSize="10">
+                [b]ListViews[/b] display a Table of data. You may configure 1 or more columns, and the rows are automatically generated 
+                based on the [c=Turquoise][i]ListView.ItemsSource[/i][/c] collection.
+            </TextBlock>
+
+            <Expander IsExpanded="True">
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="Common Properties" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
+                    <TextBlock Text="TODO" />
+                </StackPanel>
+            </Expander>
+
+            <Expander>
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="Example" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
+                    <TextBlock FontSize="10">
+                        The following [c=Turquoise][i]ListView[/i][/c] contains 3 columns. You can place any content you want in each column, 
+                        though these are just using [c=Turquoise][i]TextBlocks[/i][/c]. This [c=Turquoise][i]ListView[/i][/c] uses dynamic logic
+                        to color the names blue for men and pink for women.
+                    </TextBlock>
+                    <ListView Width="320" MaxHeight="260" Name="ListView_Sample1" HorizontalAlignment="Left"
+                              xmlns:local="clr-namespace:MGUI.Samples.Controls;assembly=MGUI.Samples" ItemType="{x:Type local:Person}">
+                        <ListViewColumn Width="50">
+                            <ListViewColumn.Header>
+                                <TextBlock IsBold="True" TextAlignment="Center" Text="Id" />
+                            </ListViewColumn.Header>
+                            <ListViewColumn.CellTemplate>
+                                <ContentTemplate>
+                                    <!-- MGUI doesn't support data bindings like WPF, but it does have a very basic kind of binding with the {PropertyBinding} markup extension -->
+                                    <!-- PropertyBindings currently only support OneWay or OneTime bindings, and don't support converters, triggers, nor nested property paths yet (such as "Path=Foo.Bar") -->
+                                    <!-- If you need more advanced binding, you'll need to define the column's CellTemplate with c# code -->
+                                    <TextBlock HorizontalAlignment="Center" Foreground="LightYellow" Text="{PropertyBinding Path=Id, Mode=OneTime, FallbackValue='&lt;Id&gt;'}" />
+                                </ContentTemplate>
+                            </ListViewColumn.CellTemplate>
+                        </ListViewColumn>
+                        <ListViewColumn Width="*">
+                            <ListViewColumn.Header>
+                                <TextBlock IsBold="True" TextAlignment="Center" Text="First Name" />
+                            </ListViewColumn.Header>
+                        </ListViewColumn>
+                        <ListViewColumn Width="*">
+                            <ListViewColumn.Header>
+                                <TextBlock IsBold="True" TextAlignment="Center" Text="Last Name" />
+                            </ListViewColumn.Header>
+                        </ListViewColumn>
+                    </ListView>
+                </StackPanel>
+            </Expander>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

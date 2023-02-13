@@ -71,6 +71,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        public bool TrySetFontSize(int FontSize) => TrySetFont(FontFamily, FontSize);
         public bool TrySetFont(string FontFamily, int FontSize)
         {
             if (this.FontFamily != FontFamily || this.FontSize != FontSize)
@@ -820,7 +821,8 @@ namespace MGUI.Core.UI
                             int UnderlineYOffset = UnderlineSettings.VerticalOffset;
                             IFillBrush UnderlineBrush = TextRun.Settings.Underline.Brush ?? Foreground.AsFillBrush();
 
-                            RectangleF Destination = new RectangleF(CurrentX, TextYPosition + Line.LineTextHeight - 2 + UnderlineYOffset, TextSize.X, UnderlineHeight).CreateTransformedF(Transform);
+                            RectangleF Destination = new RectangleF(CurrentX, TextYPosition + Line.LineTextHeight - 2 + UnderlineYOffset, TextSize.X, UnderlineHeight);
+                                //.CreateTransformedF(Transform); // IFillBrush.Draw will already account for ElementDrawArgs.Offset
                             UnderlineBrush.Draw(DA.SetOpacity(ActualOpacity), this, Destination.RoundUp());
                             //DT.FillRectangle(Vector2.Zero, Destination, Foreground);
                         }

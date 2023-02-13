@@ -3,7 +3,9 @@ using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -221,6 +223,13 @@ namespace MGUI.Shared.Helpers
                 Items.RemoveAt(Items.Count - 1);
                 return Value;
             }
+        }
+
+        public static string ReadEmbeddedResourceAsString(Assembly CurrentAssembly, string ResourceName)
+        {
+            using (Stream ResourceStream = CurrentAssembly.GetManifestResourceStream(ResourceName))
+            using (StreamReader Reader = new StreamReader(ResourceStream))
+                return Reader.ReadToEnd();
         }
     }
 }

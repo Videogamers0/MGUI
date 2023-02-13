@@ -1404,6 +1404,9 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
+#if UseWPF
+    [ContentProperty(nameof(Text))]
+#endif
     public class TextBlock : Element
     {
         public override MGElementType ElementType => MGElementType.TextBlock;
@@ -1766,12 +1769,16 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
+    [TypeConverter(typeof(ToolTipStringConverter))]
     public class ToolTip : Window
     {
         public override MGElementType ElementType => MGElementType.ToolTip;
 
         [Category("Behavior")]
         public bool? ShowOnDisabled { get; set; }
+
+        [Category("Layout")]
+        public Size? DrawOffset { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
             => new MGToolTip(Window, Parent, Width ?? 0, Height ?? 0);
@@ -1782,8 +1789,35 @@ namespace MGUI.Core.UI.XAML
 
             if (ShowOnDisabled.HasValue)
                 ToolTip.ShowOnDisabled = ShowOnDisabled.Value;
+            if (DrawOffset.HasValue)
+                ToolTip.DrawOffset = new Point(DrawOffset.Value.Width, DrawOffset.Value.Height);
 
             base.ApplyDerivedSettings(Parent, Element);
+        }
+    }
+
+    public class ToolTipStringConverter : TypeConverter
+    {
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        {
+            if (sourceType == typeof(string))
+                return true;
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+        {
+            if (value is string stringValue)
+            {
+                ToolTip ToolTip = new();
+                ToolTip.Padding = new(6, 3);
+                ToolTip.Content = new TextBlock() { Text = stringValue };
+                ToolTip.Background = new SolidFillBrush(new XAMLColor(56, 56, 56, 212));
+                ToolTip.TextForeground = new XAMLColor(240, 240, 240);
+                return ToolTip;
+            }
+
+            return base.ConvertFrom(context, culture, value);
         }
     }
 
@@ -1926,6 +1960,12 @@ namespace MGUI.Core.UI.XAML
 
             if (SizeToContent != null)
                 Window.ApplySizeToContent(SizeToContent.Value, 10, 10, null, null, false);
+            else if (!Width.HasValue && !Height.HasValue)
+                Window.ApplySizeToContent(UI.SizeToContent.WidthAndHeight, 10, 10, null, null, false);
+            else if (!Width.HasValue)
+                Window.ApplySizeToContent(UI.SizeToContent.Width, 10, 10, null, null, false);
+            else if (!Height.HasValue)
+                Window.ApplySizeToContent(UI.SizeToContent.Height, 10, 10, null, null, false);
 
             if (Scale != null)
                 Window.Scale = Scale.Value;
@@ -1948,6 +1988,20 @@ namespace MGUI.Core.UI.XAML
             yield return TitleBar;
             yield return TitleBarTextBlock;
             yield return CloseButton;
+        }
+    }
+
+    public class XAMLDesigner : Element
+    {
+        public override MGElementType ElementType => MGElementType.XAMLDesigner;
+
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGXAMLDesigner(Window);
+
+        protected internal override IEnumerable<Element> GetChildren() => Enumerable.Empty<Element>();
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        {
+            MGXAMLDesigner Designer = Element as MGXAMLDesigner;
+
         }
     }
 }

@@ -31,6 +31,7 @@ namespace MGUI.Core.UI
                 this.Host = Host;
                 this.BorderBrush = Color.Black.AsFillBrush().AsUniformBorderBrush();
                 this.BorderThickness = new(2);
+                this.DrawOffset = (this.Theme ?? Window.GetTheme()).ToolTipOffset;
                 //this.DefaultTextForeground = Color.White;
                 this.ShowOnDisabled = false;
                 this.Padding = new(5);

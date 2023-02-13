@@ -111,7 +111,6 @@ namespace MGUI.Core.UI
             Button.Padding = new(8, 3, 8, 3);
             Button.BackgroundBrush = GetTheme().UnselectedTabHeaderBackground.GetValue(true);
             //Button.DefaultTextForeground.SetAll(Color.Black);
-            Button.Opacity = 0.9f;
             Button.VerticalAlignment = VerticalAlignment.Bottom;
         }
 

@@ -153,7 +153,7 @@ namespace MGUI.Core.UI
         public Size ApplySizeToContent(SizeToContent Value, int MinWidth = 50, int MinHeight = 50, int? MaxWidth = 1920, int? MaxHeight = 1080, bool UpdateLayoutImmediately = true)
         {
             Size MinSize = new(MinWidth, MinHeight);
-            Size MaxSize = new(Math.Min(GetDesktop().ValidScreenBounds.Width, MaxWidth ?? int.MaxValue), Math.Min(GetDesktop().ValidScreenBounds.Height, MaxHeight ?? int.MaxValue));
+            Size MaxSize = new(Math.Min(GetDesktop().ValidScreenBounds.Width - Left, MaxWidth ?? int.MaxValue), Math.Min(GetDesktop().ValidScreenBounds.Height - Top, MaxHeight ?? int.MaxValue));
             Size AvailableSize = GetActualAvailableSize(new Size(WindowWidth, WindowHeight), Value).Clamp(MinSize, MaxSize);
             UpdateMeasurement(AvailableSize, out _, out Thickness FullSize, out _, out _);
             Size Size = FullSize.Size.Clamp(MinSize, MaxSize);
