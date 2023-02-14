@@ -40,24 +40,24 @@
                                 <Setter Property="FontSize" Value="10" />
                             </Style>
                         </UniformGrid.Styles>
-                        <ToggleButton Row="0" Column="0" Content="ComboBox" Opacity="0.25" />
-                        <ToggleButton Row="0" Column="1" Content="ContextMenu" Opacity="0.25" />
-                        <ToggleButton Row="0" Column="2" Content="ContextualContentPresenter" Opacity="0.25" ToolTip="ContextualContentPresenter" />
-                        <ToggleButton Row="1" Column="0" Content="DockPanel" Opacity="0.25" />
-                        <ToggleButton Row="1" Column="1" Content="Expander" Opacity="0.25" />
-                        <ToggleButton Row="1" Column="2" Content="Grid" Opacity="0.25" />
-                        <ToggleButton Row="2" Column="0" Content="ListBox" Opacity="0.25" />
+                        <ToggleButton Row="0" Column="0" Content="ComboBox" Name="ComboBox_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="0" Column="1" Content="ContextMenu" Name="ContextMenu_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="0" Column="2" Content="ContextualContentPresenter" Name="ContextualContentPresenter_Toggle" Opacity="0.25" ToolTip="ContextualContentPresenter" />
+                        <ToggleButton Row="1" Column="0" Content="DockPanel" Name="DockPanel_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="1" Column="1" Content="Expander" Name="Expander_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="1" Column="2" Content="Grid" Name="Grid_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="2" Column="0" Content="ListBox" Name="ListBox_Toggle" Opacity="0.25" />
                         <ToggleButton Row="2" Column="1" Content="ListView" Name="ListView_Toggle" />
-                        <ToggleButton Row="2" Column="2" Content="ProgressBar" Opacity="0.25" />
-                        <ToggleButton Row="3" Column="0" Content="RadioButton" Opacity="0.25" />
-                        <ToggleButton Row="3" Column="1" Content="ScrollViewer" Opacity="0.25" />
-                        <ToggleButton Row="3" Column="2" Content="Slider" Opacity="0.25" />
-                        <ToggleButton Row="4" Column="0" Content="StackPanel" Opacity="0.25" />
-                        <ToggleButton Row="4" Column="1" Content="TabControl" Opacity="0.25" />
+                        <ToggleButton Row="2" Column="2" Content="ProgressBar" Name="ProgressBar_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="3" Column="0" Content="RadioButton" Name="RadioButton_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="3" Column="1" Content="ScrollViewer" Name="ScrollViewer_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="3" Column="2" Content="Slider" Name="Slider_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="4" Column="0" Content="StackPanel" Name="StackPanel_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="4" Column="1" Content="TabControl" Name="TabControl_Toggle" Opacity="0.25" />
                         <ToggleButton Row="4" Column="2" Content="TextBlock" Name="TextBlock_Toggle" />
-                        <ToggleButton Row="5" Column="0" Content="TextBox" Opacity="0.25" />
-                        <ToggleButton Row="5" Column="1" Content="ToolTip" Opacity="0.25" />
-                        <ToggleButton Row="5" Column="2" Content="Window" Opacity="0.25" />
+                        <ToggleButton Row="5" Column="0" Content="TextBox" Name="TextBox_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="5" Column="1" Content="ToolTip" Name="ToolTip_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="5" Column="2" Content="Window" Name="Window_Toggle" Opacity="0.25" />
                     </UniformGrid>
                 </StackPanel>
             </Expander>
@@ -75,13 +75,13 @@
                                 <Setter Property="FontSize" Value="10" />
                             </Style>
                         </UniformGrid.Styles>
-                        <ToggleButton Row="0" Column="0" Content="XAML" Opacity="0.25" />
+                        <ToggleButton Row="0" Column="0" Content="XAML" Name="XAML_Toggle" Opacity="0.25" />
                         <ToggleButton Row="0" Column="1" Content="Styles" Name="Styles_Toggle" />
-                        <ToggleButton Row="0" Column="2" Content="Bindings" Opacity="0.25" />
-                        <ToggleButton Row="1" Column="0" Content="Theme" Opacity="0.25" />
-                        <ToggleButton Row="1" Column="1" Content="VisualState" Opacity="0.25" />
-                        <ToggleButton Row="1" Column="2" Content="BorderBrush" Opacity="0.25" />
-                        <ToggleButton Row="2" Column="0" Content="FillBrush" Opacity="0.25" />
+                        <ToggleButton Row="0" Column="2" Content="Bindings" Name="Bindings_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="1" Column="0" Content="Theme" Name="Theme_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="1" Column="1" Content="VisualState" Name="VisualState_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="1" Column="2" Content="BorderBrush" Name="BorderBrush_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="2" Column="0" Content="FillBrush" Name="FillBrush_Toggle" Opacity="0.25" />
                     </UniformGrid>
                 </StackPanel>
             </Expander>

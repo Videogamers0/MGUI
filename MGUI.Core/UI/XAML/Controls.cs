@@ -1515,6 +1515,7 @@ namespace MGUI.Core.UI.XAML
         public TextBlock TextBlock { get; set; } = new();
 
         public string Text { get; set; }
+        public int? FontSize { get; set; }
         [Category("Layout")]
         public bool? WrapText { get; set; }
         [Category("Layout")]
@@ -1581,6 +1582,8 @@ namespace MGUI.Core.UI.XAML
 
             if (Text != null)
                 TextBox.SetText(Text);
+            if (FontSize.HasValue)
+                TextBox.TrySetFontSize(FontSize.Value);
             if (WrapText.HasValue)
                 TextBox.WrapText = WrapText.Value;
             if (MinLines.HasValue)

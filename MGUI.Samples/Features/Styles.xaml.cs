@@ -14,7 +14,6 @@ namespace MGUI.Samples.Features
             : base(Content, Desktop, $"{nameof(Features)}", $"Styles.xaml")
         {
             MGTextBox ExampleTextBox = Window.GetElementByName<MGTextBox>("Example_TextBox");
-            ExampleTextBox.TextBlockComponent.Element.TrySetFontSize(10);
 
             Window.AddNamedAction("OpenStylesWiki", x =>
             {

@@ -57,6 +57,9 @@ namespace MGUI.Core.UI
         protected virtual string GetTextBackingField() => _Text ?? "";
         protected virtual void SetTextBackingField(string Value) => _Text = Value;
 
+        public int FontSize => TextBlockElement.FontSize;
+        public bool TrySetFontSize(int Value) => TextBlockElement.TrySetFontSize(Value);
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _Text;
         /// <summary>To set this value, use <see cref="SetText(string)"/>.<para/>
