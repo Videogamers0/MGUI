@@ -383,7 +383,9 @@ namespace MGUI.Core.UI.XAML
         [Category("Border")]
         public Thickness? ExpanderButtonBorderThickness { get; set; }
         [Category("Appearance")]
-        public FillBrush ExpanderButtonBackgroundBrush { get; set; }
+        public FillBrush ExpanderButtonExpandedBackgroundBrush { get; set; }
+        [Category("Appearance")]
+        public FillBrush ExpanderButtonCollapsedBackgroundBrush { get; set; }
         [Category("Appearance")]
         public XAMLColor? ExpanderDropdownArrowColor { get; set; }
         [Category("Layout")]
@@ -392,6 +394,8 @@ namespace MGUI.Core.UI.XAML
         [Category("Layout")]
         public int? HeaderSpacingWidth { get; set; }
         public Element Header { get; set; }
+        [Category("Layout")]
+        public VerticalAlignment? HeaderVerticalAlignment { get; set; }
 
         [Category("Behavior")]
         public bool? IsExpanded { get; set; }
@@ -418,8 +422,10 @@ namespace MGUI.Core.UI.XAML
                 Expander.ExpanderButtonBorderBrush = ExpanderButtonBorderBrush.ToBorderBrush(Desktop);
             if (ExpanderButtonBorderThickness.HasValue)
                 Expander.ExpanderButtonBorderThickness = ExpanderButtonBorderThickness.Value.ToThickness();
-            if (ExpanderButtonBackgroundBrush != null)
-                Expander.ExpanderButtonBackgroundBrush.NormalValue = ExpanderButtonBackgroundBrush.ToFillBrush(Desktop);
+            if (ExpanderButtonExpandedBackgroundBrush != null)
+                Expander.ExpanderButtonBackgroundBrush.SelectedValue = ExpanderButtonExpandedBackgroundBrush.ToFillBrush(Desktop);
+            if (ExpanderButtonCollapsedBackgroundBrush != null)
+                Expander.ExpanderButtonBackgroundBrush.NormalValue = ExpanderButtonCollapsedBackgroundBrush.ToFillBrush(Desktop);
             if (ExpanderDropdownArrowColor.HasValue)
                 Expander.ExpanderDropdownArrowColor = ExpanderDropdownArrowColor.Value.ToXNAColor();
             if (ExpanderDropdownArrowSize.HasValue)
@@ -429,6 +435,8 @@ namespace MGUI.Core.UI.XAML
                 Expander.HeaderSpacingWidth = HeaderSpacingWidth.Value;
             if (Header != null)
                 Expander.Header = Header.ToElement<MGElement>(Element.SelfOrParentWindow, Parent);
+            if (HeaderVerticalAlignment.HasValue)
+                Expander.HeaderVerticalAlignment = HeaderVerticalAlignment.Value;
 
             if (IsExpanded.HasValue)
                 Expander.IsExpanded = IsExpanded.Value;

@@ -18,8 +18,8 @@ namespace MGUI.Core.UI
     public class MGExpander : MGSingleContentHost
     {
         #region Expander Button
-        public static int DefaultExpanderButtonSize = 20;
-        public static int DefaultExpanderDropdownArrowSize = 10;
+        public static int DefaultExpanderButtonSize { get; set; } = 20;
+        public static int DefaultExpanderDropdownArrowSize { get; set; } = 10;
 
         public MGToggleButton ExpanderToggleButton { get; }
 
@@ -104,11 +104,31 @@ namespace MGUI.Core.UI
             }
         }
 
+        /// <summary>Convenience property that just gets or sets <see cref="Header"/>'s <see cref="MGElement.VerticalAlignment"/>.<para/>
+        /// This property is null if there is no <see cref="Header"/>.<para/>
+        /// This value is not maintained if <see cref="Header"/> is set to a new value. 
+        /// For example, if you set <see cref="HeaderVerticalAlignment"/> to <see cref="VerticalAlignment.Bottom"/>,
+        /// but then set <see cref="Header"/> to a new value with <see cref="MGElement.VerticalAlignment"/>=<see cref="VerticalAlignment.Center"/>,
+        /// the new <see cref="Header"/> will not automatically be changed to <see cref="VerticalAlignment.Bottom"/></summary>
+        public VerticalAlignment? HeaderVerticalAlignment
+        {
+            get => Header?.VerticalAlignment;
+            set
+            {
+                if (value.HasValue && Header != null)
+                {
+                    Header.VerticalAlignment = value.Value;
+                }
+            }
+        }
+
         public bool HasHeader => Header != null;
         #endregion Header
 
+        #region IsExpanded
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsExpanded;
+        /// <summary>See also: <see cref="IsCollapsed"/></summary>
         public bool IsExpanded
         {
             get => _IsExpanded;
@@ -130,6 +150,7 @@ namespace MGUI.Core.UI
                         return;
 
                     _IsExpanded = value;
+                    ExpanderToggleButton.IsChecked = IsExpanded;
 
                     foreach (MGElement Item in BoundItems)
                         Item.Visibility = IsExpanded ? ExpandedVisibility : CollapsedVisibility;
@@ -143,15 +164,27 @@ namespace MGUI.Core.UI
             }
         }
 
-        public bool IsCollapsed => !IsExpanded;
+        /// <summary>This value is always the opposite of <see cref="IsExpanded"/></summary>
+        public bool IsCollapsed
+        {
+            get => !IsExpanded;
+            set => IsExpanded = !value;
+        }
 
-        public event EventHandler<CancelEventArgs> PreviewExpanding;
-        public event EventHandler<CancelEventArgs> PreviewCollapsing;
+        /// <summary>Invoked just before <see cref="IsExpanded"/> is changed. (Invoked before <see cref="PreviewExpanding"/> and <see cref="PreviewCollapsing"/>)</summary>
         public event EventHandler<CancelEventArgs> PreviewExpandedStateChanging;
+        /// <summary>Invoked just before <see cref="IsExpanded"/> is set to true. (Invoked after <see cref="PreviewExpandedStateChanging"/>)</summary>
+        public event EventHandler<CancelEventArgs> PreviewExpanding;
+        /// <summary>Invoked just before <see cref="IsExpanded"/> is set to false. (Invoked after <see cref="PreviewExpandedStateChanging"/>)</summary>
+        public event EventHandler<CancelEventArgs> PreviewCollapsing;
 
+        /// <summary>Invoked after <see cref="IsExpanded"/> is changed. (Invoked before <see cref="Expanded"/> and <see cref="Collapsed"/>)</summary>
         public event EventHandler<bool> ExpandedStateChanged;
+        /// <summary>Invoked after <see cref="IsExpanded"/> is set to true. (Invoked after <see cref="ExpandedStateChanged"/>)</summary>
         public event EventHandler<EventArgs> Expanded;
+        /// <summary>Invoked after <see cref="IsExpanded"/> is set to false. (Invoked after <see cref="ExpandedStateChanged"/>)</summary>
         public event EventHandler<EventArgs> Collapsed;
+        #endregion IsExpanded
 
         /// <summary>The <see cref="Visibility"/> value to apply to <see cref="MGSingleContentHost.Content"/> when <see cref="IsExpanded"/>=true<para/>
         /// Default value: <see cref="Visibility.Visible"/></summary>

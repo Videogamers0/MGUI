@@ -171,8 +171,6 @@ namespace MGUI.Samples
             Debug2 = new(Content, Desktop);
             BindVisibility(Debug2, "Debug2_Toggle");
             #endregion Dialogs
-
-            //Window.AddNamedAction("OpenTextBlockSamples", x => { TextBlockSamples.Show(); });
         }
 
         private void BindVisibility(SampleBase Sample, string ToggleButtonName, bool IsChecked = false)

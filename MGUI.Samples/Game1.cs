@@ -1,11 +1,4 @@
 ﻿using MGUI.Core.UI;
-using MGUI.Core.UI.Brushes.Border_Brushes;
-using MGUI.Core.UI.Brushes.Fill_Brushes;
-using MGUI.Core.UI.Containers;
-using MGUI.Core.UI.Containers.Grids;
-using MGUI.Core.UI.Text;
-using MGUI.Core.UI.XAML;
-using MGUI.Samples.Dialogs.FF7;
 using MGUI.Shared.Helpers;
 using MGUI.Shared.Rendering;
 using Microsoft.Xna.Framework;
@@ -14,10 +7,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace MGUI.Samples
 {
@@ -29,6 +20,7 @@ namespace MGUI.Samples
         private MainRenderer MGUIRenderer { get; set; }
         private MGDesktop Desktop { get; set; }
 
+        //  IObservableUpdate implementation
         public event EventHandler<TimeSpan> PreviewUpdate;
         public event EventHandler<EventArgs> EndUpdate;
 
@@ -59,7 +51,6 @@ namespace MGUI.Samples
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)

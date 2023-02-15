@@ -1,9 +1,15 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="" Padding="10">
+        Left="440" Top="20" MinHeight="0" Width="500" Height="600" TitleText="Expander" Padding="10">
     <Window.Styles>
         <Style Name="Header1" TargetType="TextBlock">
             <Setter Property="IsBold" Value="True" />
             <Setter Property="FontSize" Value="14" />
+            <Setter Property="IsShadowed" Value="True" />
+            <Setter Property="ShadowColor" Value="Black" />
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="IsShadowed" Value="True" />
+            <Setter Property="ShadowColor" Value="Black" />
         </Style>
         <Style TargetType="Separator">
             <Setter Property="Margin" Value="0" />
@@ -19,35 +25,50 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
         <StackPanel Orientation="Vertical" Spacing="10">
-            <TextBlock StyleNames="Header1" Text=":" HorizontalAlignment="Center" />
+            <TextBlock StyleNames="Header1" Text="Expander:" HorizontalAlignment="Center" />
             <Separator/>
-            <TextBlock FontSize="10" Text="[b][/b]" />
+            <TextBlock FontSize="10" Text="Expanders are specialized toggle buttons where the toggle controls the visibility of the child content." />
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Common Properties" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
-
-                </StackPanel>
+            <Expander IsExpanded="True" Name="Expander1">
+                <Border BorderBrush="Red" BorderThickness="1" Background="Red * 0.2" HorizontalAlignment="Left" Padding="4">
+                    <TextBlock TextAlignment="Center" FontSize="10" Text="This is the content of an expander.\nClick the expander button to show/hide this content." />
+                </Border>
             </Expander>
+            <TextBlock Name="TextBlock1" />
+            <Separator/>
 
+            <TextBlock FontSize="10">
+                You can customize the expander's graphics by modifying [c=Turquoise][i]Expander.ExpanderToggleButton[/i][/c] 
+                or any of its convenience properties such as 
+                [c=Turquoise][i]ExpanderButtonSize[/i][/c], [c=Turquoise][i]ExpanderButtonBorderBrush[/i][/c], 
+                [c=Turquoise][i]ExpanderButtonBorderThickness[/i][/c], [c=Turquoise][i]ExpanderButtonBackgroundBrush[/i][/c], 
+                [c=Turquoise][i]ExpanderButtonSize[/i][/c].
+            </TextBlock>
+            <Expander IsExpanded="False" ExpanderButtonSize="32" Header="Big expander button" HeaderVerticalAlignment="Center" />
+            <Expander IsExpanded="False" ExpanderButtonBorderBrush="Red" ExpanderButtonBorderThickness="2" Header="2px Red border" />
+            <Expander IsExpanded="False" ExpanderButtonExpandedBackgroundBrush="Green|rgb(32,32,32)" ExpanderButtonCollapsedBackgroundBrush="Yellow|rgb(32,32,32)"
+                      Header="Diagonal gradient background (Green to black when [c=Turquoise][i]IsExpanded[/i][/c]=[c=LightBlue][s=Blue]true[/s][/c], Yellow to black when [c=Turquoise][i]IsExpanded[/i][/c]=[c=LightBlue][s=Blue]false[/s][/c]" />
+            <Separator/>
+            <TextBlock FontSize="10">
+                Set [c=Turquoise][i]ExpanderDropdownArrowColor[/i][/c] and [c=Turquoise][i]ExpanderDropdownArrowSize[/i][/c] to change the graphics of the arrow icon in the center of the toggle button.
+            </TextBlock>
+            <Expander ExpanderDropdownArrowSize="8" ExpanderDropdownArrowColor="Black" Header="Small black dropdown icon" />
+            <Expander ExpanderDropdownArrowSize="12" ExpanderDropdownArrowColor="Brown" Header="Large brown dropdown icon" />
+
+            <TextBlock FontSize="10">
+                To use your own icon, set the color to Transparent and either subscribe to [c=Turquoise][i]ExpanderToggleButton.OnEndDraw[/i][/c] or micro-manage [c=Turquoise][i]ExpanderToggleButton.Content[/i][/c].
+            </TextBlock>
+            <Expander Name="CustomIconExpander" IsExpanded="False" ExpanderDropdownArrowColor="Transparent" Header="Expander with custom drawing inside its toggle button" />
+            <Separator/>
+
+            <TextBlock FontSize="10">
+                Set [c=Turquoise][i]Expander.Header[/i][/c] to place any content you want to the right of the toggle button
+            </TextBlock>
             <Expander IsExpanded="True">
                 <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Example XAML" />
+                    <CheckBox IsChecked="True" Content="This CheckBox is the expander's Header" />
                 </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
-                    <TextBox Name="Example_TextBox" FontSize="10" />
-                </ScrollViewer>
-            </Expander>
-
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Result" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0" Background="rgb(16,16,64)">
-
-                </StackPanel>
+                <TextBlock Text="This TextBlock is the Content of the Expander" />
             </Expander>
         </StackPanel>
     </ScrollViewer>
