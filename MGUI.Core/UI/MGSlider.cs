@@ -56,9 +56,15 @@ namespace MGUI.Core.UI
         {
             float ActualValue = GetActualValue(DesiredValue);
             if (Value != ActualValue)
+            {
+                float Previous = Value;
                 _Value = ActualValue;
+                ValueChanged?.Invoke(this, new(Previous, Value));
+            }
             return ActualValue;
         }
+
+        public event EventHandler<EventArgs<float>> ValueChanged;
 
         /// <summary>Returns a valid value for <see cref="Value"/>.<para/>
         /// The given <paramref name="DesiredValue"/> will be clamped to the range [<see cref="Minimum"/>, <see cref="Maximum"/>],<br/>
@@ -100,7 +106,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float? _DiscreteValueInterval;
-        /// <summary>Only relevant if <see cref="UseDiscreteValues"/>==true. Represents the interval that <see cref="Value"/> will snap to.</summary>
+        /// <summary>Only relevant if <see cref="UseDiscreteValues"/> is true. Represents the interval that <see cref="Value"/> will snap to.</summary>
         public float? DiscreteValueInterval
         {
             get => _DiscreteValueInterval;

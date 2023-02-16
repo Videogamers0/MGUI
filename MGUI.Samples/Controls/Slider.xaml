@@ -1,6 +1,9 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="" Padding="10">
+        Left="440" Top="20" MinHeight="0" Width="620" Height="800" TitleText="Slider" Padding="10">
     <Window.Styles>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10" />
+        </Style>
         <Style Name="Header1" TargetType="TextBlock">
             <Setter Property="IsBold" Value="True" />
             <Setter Property="FontSize" Value="14" />
@@ -19,36 +22,165 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
         <StackPanel Orientation="Vertical" Spacing="10">
-            <TextBlock StyleNames="Header1" Text=":" HorizontalAlignment="Center" />
+            <TextBlock StyleNames="Header1" Text="Slider:" HorizontalAlignment="Center" />
             <Separator/>
-            <TextBlock FontSize="10" Text="[b][/b]" />
+            <TextBlock Text="Sliders are number lines with a Thumb grip, allowing the user to drag the thumb to select a numeric value." />
+            <Separator/>
+            <Slider Minimum="0" Maximum="10" Value="5" />
+            <Separator/>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Common Properties" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]Minimum[/i][/c] and [c=Turquoise][i]Maximum[/i][/c] to control the valid range of values. 
+                    Set [c=Turquoise][i]Value[/i][/c] to control the current value of the thumb grip.
+                </TextBlock>
+                <DockPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <TextBlock Dock="Top">
+                        This slider's [c=Turquoise][i]Minimum[/i][/c] is set to 20, and it's [c=Turquoise][i]Maximum[/i][/c] is 30.
+                    </TextBlock>
+                    <DockPanel>
+                        <Slider Name="Slider1" VerticalAlignment="Center" Dock="Left" Width="200" Minimum="20" Maximum="30" Value="25" />
+                        <DockPanel VerticalAlignment="Center">
+                            <TextBlock Dock="Left" Text="Current value:" />
+                            <TextBlock IsBold="True" Name="TextBlock1" />
+                        </DockPanel>
+                    </DockPanel>
+                </DockPanel>
+            </DockPanel>
+            <Separator/>
 
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]UseDiscreteValues[/i][/c] to [c=LightBlue][s=Blue]true[/s][/c] and set [c=Turquoise][i]DiscreteValueInterval[/i][/c] 
+                    to make the slider's value snap to specific discrete values instead of a allowing a continuous range. 
+                </TextBlock>
+                <DockPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <TextBlock Dock="Top">
+                        This slider will snap to values that are a multiple of 2.5
+                    </TextBlock>
+                    <DockPanel>
+                        <Slider Name="Slider2" VerticalAlignment="Center" Dock="Left" Width="200" Minimum="10" Maximum="40" Value="20" UseDiscreteValues="True" DiscreteValueInterval="2.5" />
+                        <DockPanel VerticalAlignment="Center">
+                            <TextBlock Dock="Left" Text="Current value:" />
+                            <TextBlock IsBold="True" Name="TextBlock2" />
+                        </DockPanel>
+                    </DockPanel>
+                </DockPanel>
+            </DockPanel>
+            <Separator/>
+            
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]NumberLineSize[/i][/c], [c=Turquoise][i]ThumbWidth[/i][/c], and [c=Turquoise][i]ThumbHeight[/i][/c]
+                    to control how large the slider's graphics are.
+                </TextBlock>
+                <StackPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <TextBlock Text="This slider has a 12px tall number line" />
+                    <Slider Width="200" NumberLineSize="12" />
+                    <TextBlock Text="This slider has a 20x20 square thumb grip" />
+                    <Slider Width="200" ThumbWidth="20" ThumbHeight="20" />
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Example XAML" />
-                </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
-                    <TextBox Name="Example_TextBox" FontSize="10" />
-                </ScrollViewer>
-            </Expander>
-
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Result" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0" Background="rgb(16,16,64)">
-
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]NumberLineBorderThickness[/i][/c], [c=Turquoise][i]NumberLineBorderBrush[/i][/c], and [c=Turquoise][i]NumberLineFillBrush[/i][/c]
+                    to change the number line's appearance.
+                </TextBlock>
+                <StackPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <TextBlock Text="This slider has a 1px red border for its number line" />
+                    <Slider Width="200" NumberLineBorderBrush="Red" NumberLineBorderThickness="1" />
+                    <TextBlock Text="This slider uses a Green to Yellow gradient for its number line" />
+                    <Slider Width="200" NumberLineFillBrush="Green|Yellow" NumberLineSize="12" />
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]ThumbBorderThickness[/i][/c], [c=Turquoise][i]ThumbBorderBrush[/i][/c], and [c=Turquoise][i]ThumbFillBrush[/i][/c]
+                    to change the thumb grip's appearance.
+                </TextBlock>
+                <StackPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <TextBlock Text="This slider has a 1px red border for its thumb grip" />
+                    <Slider Width="200" ThumbBorderBrush="Red" ThumbBorderThickness="1" />
+                    <TextBlock Text="This slider uses a Green to Yellow gradient for its thumb grip" />
+                    <Slider Width="200" ThumbFillBrush="Green|Yellow" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]DrawTicks[/i][/c] to [c=LightBlue][s=Blue]true[/s][/c] and set [c=Turquoise][i]TickFrequency[/i][/c] 
+                    to add tick marks to the number line.
+                </TextBlock>
+                <StackPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <TextBlock Text="This slider ranges from 0 to 10, with a tick mark at every even integer" />
+                    <Slider Width="200" Minimum="0" Maximum="10" DrawTicks="True" TickFrequency="2" />
+                    <TextBlock>
+                        A tick mark is always drawn on the left and right edge. 
+                        This slider ranges from [c=yellow]1[/c] to 10, with [c=Turquoise][i]TickFrequency[/i][/c]=[c=LightBlue][s=Blue]2[/s][/c]. 
+                        Notice that the rightmost tick, and the tick just left of it don't differ by exactly 2
+                        because the total range is not evenly divisible by the TickFrequency.
+                    </TextBlock>
+                    <Slider Width="200" Minimum="1" Maximum="10" DrawTicks="True" TickFrequency="2" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]TickWidth[/i][/c], [c=Turquoise][i]TickHeight[/i][/c], [c=Turquoise][i]TickBorderThickness[/i][/c], 
+                    [c=Turquoise][i]TickBorderBrush[/i][/c], and [c=Turquoise][i]TickFillBrush[/i][/c]
+                    to change the appearance of tick marks.
+                </TextBlock>
+                <StackPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <TextBlock Text="This slider has 12px wide tick marks" />
+                    <Slider Width="200" Minimum="0" Maximum="5" DrawTicks="True" TickFrequency="1" TickWidth="12" />
+                    <TextBlock Text="This slider uses a 1px Red border around each tick mark" />
+                    <Slider Width="200" Minimum="0" Maximum="5" DrawTicks="True" TickFrequency="1" TickBorderBrush="Red" TickBorderThickness="1" TickWidth="6" />
+                    <TextBlock Text="This slider uses a Green to Yellow gradient to fill in each tick mark" />
+                    <Slider Width="200" Minimum="0" Maximum="5" DrawTicks="True" TickFrequency="1" TickWidth="6" TickFillBrush="Green|Yellow" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]Orientation[/i][/c] to control the axis that the slider is drawn to (Vertical or Horizontal)
+                </TextBlock>
+                <StackPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <TextBlock Text="This slider uses [c=Turquoise][i]Orientation[/i][/c]=[c=LightBlue][s=Blue]Horizontal[/s][/c] (default)" />
+                    <Slider Width="100" HorizontalAlignment="Center" />
+                    <Spacer Height="8" />
+                    <TextBlock Text="This slider uses [c=Turquoise][i]Orientation[/i][/c]=[c=LightBlue][s=Blue]Vertical[/s][/c]" />
+                    <Slider Height="100" Orientation="Vertical" />
+                </StackPanel>
+            </DockPanel>
+            <Separator />
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Get creative! You can combine things like tick marks with snapping, and customize all the graphics:
+                </TextBlock>
+                <DockPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <Slider Name="Slider3" Dock="Left" Width="400" Minimum="0" Maximum="100" DrawTicks="True" TickFrequency="10" UseDiscreteValues="True" DiscreteValueInterval="5"
+                            NumberLineSize="8" ThumbWidth="10" ThumbHeight="24" TickWidth="2" TickHeight="10"
+                            NumberLineBorderBrush="Transparent" NumberLineBorderThickness="0"
+                            TickBorderBrush="Transparent" TickBorderThickness="0" TickFillBrush="rgb(222,226,230)"
+                            ThumbBorderBrush="Black" ThumbBorderThickness="0" ThumbFillBrush="Crimson">
+                        <Slider.NumberLineFillBrush>
+                            <GradientFillBrush TopLeftColor="rgb(210,218,220)" TopRightColor="rgb(222,226,230)" BottomRightColor="rgb(222,226,230)" BottomLeftColor="rgb(210,218,220)" />
+                        </Slider.NumberLineFillBrush>
+                    </Slider>
+                    <DockPanel VerticalAlignment="Center">
+                        <TextBlock Dock="Left" Text="Current value:" />
+                        <TextBlock IsBold="True" Name="TextBlock3" />
+                    </DockPanel>
+                </DockPanel>
+            </DockPanel>
         </StackPanel>
     </ScrollViewer>
 </Window>
