@@ -42,15 +42,15 @@ namespace MGUI.Core.UI
         public MGComponent<MGTextBlock> ValueComponent { get; }
         private MGTextBlock ValueElement { get; }
 
-        public enum ValueDisplayType
-        {
-            /// <summary>The current <see cref="Value"/> will not be shown.</summary>
-            None,
-            /// <summary>The current <see cref="Value"/> will be shown (up to 2 decimal places)</summary>
-            AsExact,
-            /// <summary>The current <see cref="Value"/>, but will be displayed using its percentage (<see cref="ValuePercent"/>)</summary>
-            AsPercent
-        }
+        //public enum ValueDisplayType
+        //{
+        //    /// <summary>The current <see cref="Value"/> will not be shown.</summary>
+        //    None,
+        //    /// <summary>The current <see cref="Value"/> will be shown (up to 2 decimal places)</summary>
+        //    AsExact,
+        //    /// <summary>The current <see cref="Value"/> will be shown, but will be displayed using its percentage (<see cref="ValuePercent"/>)</summary>
+        //    AsPercent
+        //}
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _ShowValue;
@@ -82,7 +82,7 @@ namespace MGUI.Core.UI
         /// A format string to use when computing the text to display.<para/>
         /// "{{Minimum}}", "{{Maximum}}", "{{Value}}", and "{{ValuePercent}}" will be replaced with their actual underlying values when formatting the string.<br/>
         /// "{{Value-Minimum}}" will be replaced with the mathematical result of: <see cref="Value"/> - <see cref="Minimum"/><br/>
-        /// "{{Maximum-Minimum}}" will be replaced with the mathemtical result of: <see cref="Maximum"/> - <see cref="Minimum"/><para/>
+        /// "{{Maximum-Minimum}}" will be replaced with the mathematical result of: <see cref="Maximum"/> - <see cref="Minimum"/><para/>
         /// Default value: <see cref="RecommendedPercentageValueDisplayFormat"/><para/>
         /// This value supports some basic text markdown, such as "[b]" for bold text, "[fg=Red]" to set the text foreground color to a given value, "[opacity=0.5]" etc.<para/>
         /// See also: <see cref="ShowValue"/>, <see cref="Minimum"/>, <see cref="Maximum"/>, <see cref="Value"/>, <see cref="ValuePercent"/>,<br/>

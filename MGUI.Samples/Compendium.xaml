@@ -48,7 +48,7 @@
                         <ToggleButton Row="1" Column="2" Content="Grid" Name="Grid_Toggle" Opacity="0.25" />
                         <ToggleButton Row="2" Column="0" Content="ListBox" Name="ListBox_Toggle" Opacity="0.25" />
                         <ToggleButton Row="2" Column="1" Content="ListView" Name="ListView_Toggle" />
-                        <ToggleButton Row="2" Column="2" Content="ProgressBar" Name="ProgressBar_Toggle" Opacity="0.25" />
+                        <ToggleButton Row="2" Column="2" Content="ProgressBar" Name="ProgressBar_Toggle" />
                         <ToggleButton Row="3" Column="0" Content="RadioButton" Name="RadioButton_Toggle" Opacity="0.25" />
                         <ToggleButton Row="3" Column="1" Content="ScrollViewer" Name="ScrollViewer_Toggle" Opacity="0.25" />
                         <ToggleButton Row="3" Column="2" Content="Slider" Name="Slider_Toggle" />

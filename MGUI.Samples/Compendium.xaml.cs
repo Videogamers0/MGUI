@@ -51,6 +51,8 @@ namespace MGUI.Samples
         public void Show() => IsVisible = true;
         public void Hide() => IsVisible = false;
 
+        /// <param name="Initialize">Optional. This delegate is invoked before the XAML content is parsed, 
+        /// so you may wish to use this delegate to add resources to the <paramref name="Desktop"/> that may be required in order to parse the XAML.</param>
         protected SampleBase(ContentManager Content, MGDesktop Desktop, string ProjectFolderName, string XAMLFilename, MGTheme Theme = null, Action Initialize = null)
         {
             this.Content = Content;
@@ -171,6 +173,10 @@ namespace MGUI.Samples
             Debug2 = new(Content, Desktop);
             BindVisibility(Debug2, "Debug2_Toggle");
             #endregion Dialogs
+
+#if DEBUG
+            //ProgressBarSamples.Show();
+#endif
         }
 
         private void BindVisibility(SampleBase Sample, string ToggleButtonName, bool IsChecked = false)

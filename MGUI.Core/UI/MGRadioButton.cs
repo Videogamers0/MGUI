@@ -60,9 +60,13 @@ namespace MGUI.Core.UI
                     _CheckedItem = Value;
                     Previous?.HandleCheckStateChanged();
                     CheckedItem?.HandleCheckStateChanged();
+                    CheckedItemChanged?.Invoke(this, new EventArgs<MGRadioButton>(Previous, CheckedItem));
                 }
             }
         }
+
+        /// <summary>Invoked when <see cref="CheckedItem"/> is set to a new value.</summary>
+        public event EventHandler<EventArgs<MGRadioButton>> CheckedItemChanged;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ObservableCollection<MGRadioButton> _RadioButtons { get; }

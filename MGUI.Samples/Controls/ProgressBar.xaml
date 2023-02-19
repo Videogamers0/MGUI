@@ -1,5 +1,5 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="" Padding="10">
+        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="ProgressBar" Padding="10">
     <Window.Styles>
         <Style Name="Header1" TargetType="TextBlock">
             <Setter Property="IsBold" Value="True" />
@@ -19,36 +19,232 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
         <StackPanel Orientation="Vertical" Spacing="10">
-            <TextBlock StyleNames="Header1" Text=":" HorizontalAlignment="Center" />
+            <TextBlock StyleNames="Header1" Text="ProgressBar:" HorizontalAlignment="Center" />
             <Separator/>
-            <TextBlock FontSize="10" Text="[b][/b]" />
+            <TextBlock FontSize="10">
+                ProgressBars are rectangular bars that fill up according to their [c=Turquoise][i]Minimum[/i][/c], [c=Turquoise][i]Maximum[/i][/c], and [c=Turquoise][i]Value[/i][/c]
+            </TextBlock>
+            <Separator/>
+            <ProgressBar Name="ProgressBar1" Minimum="0" Maximum="100" Value="0" />
+            <DockPanel>
+                <ToggleButton Name="ToggleButton1" Padding="10,2" IsChecked="True" Dock="Left" Margin="0,0,10,0" Content="Loop" VerticalAlignment="Center" />
+                <Button Dock="Left" Margin="0,0,10,0" Padding="10,2" Content="Reset Progress" VerticalAlignment="Center" CommandName="ResetProgressBar1Progress" />
+                <DockPanel VerticalAlignment="Center">
+                    <TextBlock Dock="Left" Text="Speed:" VerticalAlignment="Center" Margin="0,0,5,0" />
+                    <Slider Name="Slider1" Minimum="0" Maximum="0.4" Value="0.12" UseDiscreteValues="True" DiscreteValueInterval="0.02" DrawTicks="True" TickFrequency="0.04" />
+                </DockPanel>
+            </DockPanel>
+            <Separator />
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Common Properties" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]CompletedBrush[/i][/c], [c=Turquoise][i]IncompleteBrush[/i][/c], and [c=Turquoise][i]Background[/i][/c]
+                    to control the bar's appearance.
+                </TextBlock>
+                <DockPanel Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <TextBlock Dock="Top">
+                        This ProgressBar's [c=Turquoise][i]CompletedBrush[/i][/c] is set to Red, and it's [c=Turquoise][i]IncompleteBrush[/i][/c] is Gray.
+                        It also has a 1px Gold border.
+                    </TextBlock>
+                    
+                    <DockPanel Dock="Bottom">
+                        <ToggleButton Name="ToggleButton2" Padding="10,2" IsChecked="True" Dock="Left" Margin="0,0,10,0" Content="Loop" VerticalAlignment="Center" />
+                        <Button Dock="Left" Margin="0,0,10,0" Padding="10,2" Content="Reset Progress" VerticalAlignment="Center" CommandName="ResetProgressBar2Progress" />
+                        <DockPanel VerticalAlignment="Center">
+                            <TextBlock Dock="Left" Text="Speed:" VerticalAlignment="Center" Margin="0,0,5,0" />
+                            <Slider Name="Slider2" Minimum="0" Maximum="0.4" Value="0.20" UseDiscreteValues="True" DiscreteValueInterval="0.02" DrawTicks="True" TickFrequency="0.04" />
+                        </DockPanel>
+                    </DockPanel>
 
+                    <ProgressBar Name="ProgressBar2" Minimum="0" Maximum="100" Value="0" CompletedBrush="Red" IncompleteBrush="Gray" Margin="0,3,0,6" BorderBrush="Gold" BorderThickness="1" />
+                </DockPanel>
+            </DockPanel>
+            <Separator/>
+
+            <StackPanel Orientation="Vertical" Background="White * 0.1">
+                <DockPanel Padding="4">
+                    <TextBlock Dock="Top">
+                        This ProgressBar's [c=Turquoise][i]IncompleteBrush[/i][/c] is set to a TextureFillBrush. 
+                        Notice that the texture is stretched/compressed to fit exactly to the bounds of the incomplete portion of the bar.
+                    </TextBlock>
+
+                    <DockPanel Dock="Bottom">
+                        <ToggleButton Name="ToggleButton3" Padding="10,2" IsChecked="True" Dock="Left" Margin="0,0,10,0" Content="Loop" VerticalAlignment="Center" />
+                        <Button Dock="Left" Margin="0,0,10,0" Padding="10,2" Content="Reset Progress" VerticalAlignment="Center" CommandName="ResetProgressBar3Progress" />
+                        <DockPanel VerticalAlignment="Center">
+                            <TextBlock Dock="Left" Text="Speed:" VerticalAlignment="Center" Margin="0,0,5,0" />
+                            <Slider Name="Slider3" Minimum="0" Maximum="0.4" Value="0.16" UseDiscreteValues="True" DiscreteValueInterval="0.02" DrawTicks="True" TickFrequency="0.04" />
+                        </DockPanel>
+                    </DockPanel>
+
+                    <DockPanel Dock="Top" HorizontalAlignment="Left">
+                        <TextBlock Dock="Left" Margin="0,0,8,0" Text="Using this texture:" VerticalAlignment="Center" />
+                        <Border BorderBrush="Black" BorderThickness="1">
+                            <Image Dock="Top" TextureName="AngryMeteor" RegionName="BorderlessSteelFloor" Stretch="Uniform" Width="40" Height="40" />
+                        </Border>
+                    </DockPanel>
+
+                    <ProgressBar Name="ProgressBar3" Minimum="0" Maximum="100" Value="0" Margin="0,3,0,6">
+                        <ProgressBar.IncompleteBrush>
+                            <TextureFillBrush TextureRegionName="BorderlessSteelFloor" Stretch="Fill" />
+                        </ProgressBar.IncompleteBrush>
+                    </ProgressBar>
+                </DockPanel>
+
+                <DockPanel Padding="4">
+                    <TextBlock Dock="Top">
+                        You may instead want to set [c=Turquoise][i]Background[/i][/c] to the TextureFillBrush.
+                        Since the Background always spans the entire ProgressBar's bounds, the texture will not vary based on the ProgressBar's [c=Turquoise][i]Value[/i][/c].
+                    </TextBlock>
+
+                    <DockPanel Dock="Bottom">
+                        <ToggleButton Name="ToggleButton4" Padding="10,2" IsChecked="True" Dock="Left" Margin="0,0,10,0" Content="Loop" VerticalAlignment="Center" />
+                        <Button Dock="Left" Margin="0,0,10,0" Padding="10,2" Content="Reset Progress" VerticalAlignment="Center" CommandName="ResetProgressBar4Progress" />
+                        <DockPanel VerticalAlignment="Center">
+                            <TextBlock Dock="Left" Text="Speed:" VerticalAlignment="Center" Margin="0,0,5,0" />
+                            <Slider Name="Slider4" Minimum="0" Maximum="0.4" Value="0.16" UseDiscreteValues="True" DiscreteValueInterval="0.02" DrawTicks="True" TickFrequency="0.04" />
+                        </DockPanel>
+                    </DockPanel>
+
+                    <ProgressBar Name="ProgressBar4" Minimum="0" Maximum="100" Value="0" Margin="0,3,0,6" IncompleteBrush="Transparent">
+                        <ProgressBar.Background>
+                            <TextureFillBrush TextureRegionName="BorderlessSteelFloor" Stretch="Fill" />
+                        </ProgressBar.Background>
+                    </ProgressBar>
+                </DockPanel>
+            </StackPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]Size[/i][/c] to control how big the bar is
+                    (Affects the [i]Height[/i] of a Horizontal ProgressBar, or the [i]Width[/i] of a Vertical ProgressBar)
+                </TextBlock>
+                <DockPanel Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <TextBlock Dock="Top">
+                        This ProgressBar's [c=Turquoise][i]Size[/i][/c] is set to 36px.
+                    </TextBlock>
+
+                    <DockPanel Dock="Bottom">
+                        <ToggleButton Name="ToggleButton5" Padding="10,2" IsChecked="True" Dock="Left" Margin="0,0,10,0" Content="Loop" VerticalAlignment="Center" />
+                        <Button Dock="Left" Margin="0,0,10,0" Padding="10,2" Content="Reset Progress" VerticalAlignment="Center" CommandName="ResetProgressBar5Progress" />
+                        <DockPanel VerticalAlignment="Center">
+                            <TextBlock Dock="Left" Text="Speed:" VerticalAlignment="Center" Margin="0,0,5,0" />
+                            <Slider Name="Slider5" Minimum="0" Maximum="0.4" Value="0.20" UseDiscreteValues="True" DiscreteValueInterval="0.02" DrawTicks="True" TickFrequency="0.04" />
+                        </DockPanel>
+                    </DockPanel>
+
+                    <ProgressBar Name="ProgressBar5" Minimum="0" Maximum="100" Value="0" Size="36" Margin="0,3,0,6" />
+                </DockPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]ShowValue[/i][/c] to [c=LightBlue][s=Blue]true[/s][/c] to display the progress bar's current [c=Turquoise][i]Value[/i][/c].
+                    Set [c=Turquoise][i]ValueDisplayFormat[/i][/c] and [c=Turquoise][i]NumberFormat[/i][/c] to control how the value is converted to a string.
+                </TextBlock>
+                <DockPanel Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <DockPanel Dock="Bottom">
+                        <ToggleButton Name="ToggleButton6" Padding="10,2" IsChecked="True" Dock="Left" Margin="0,0,10,0" Content="Loop" VerticalAlignment="Center" />
+                        <Button Dock="Left" Margin="0,0,10,0" Padding="10,2" Content="Reset Progress" VerticalAlignment="Center" CommandName="ResetProgressBar6Progress" />
+                        <DockPanel VerticalAlignment="Center">
+                            <TextBlock Dock="Left" Text="Speed:" VerticalAlignment="Center" Margin="0,0,5,0" />
+                            <Slider Name="Slider6" Minimum="0" Maximum="0.2" Value="0.04" UseDiscreteValues="True" DiscreteValueInterval="0.01" DrawTicks="True" TickFrequency="0.02" />
+                        </DockPanel>
+                    </DockPanel>
+
+                    <DockPanel Margin="0,3,0,6">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Dock="Bottom" Spacing="10">
+                            <StackPanel.Styles>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontSize" Value="8" />
+                                </Style>
+                                <Style TargetType="RadioButton">
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                </Style>
+                            </StackPanel.Styles>
+                            <RadioButton GroupName="ValueDisplayMode" Name="RBExact" Content="Exact" IsChecked="True" />
+                            <RadioButton GroupName="ValueDisplayMode" Name="RBExactAndTotal" Content="Exact / Total" />
+                            <RadioButton GroupName="ValueDisplayMode" Name="RBIntegerPercent" Content="Percentage (Whole number)" />
+                            <RadioButton GroupName="ValueDisplayMode" Name="RBDecimalPercent" Content="Percentage (Decimal)" />
+                        </StackPanel>
+
+                        <ProgressBar Name="ProgressBar6" Minimum="0" Maximum="80" Value="0" ShowValue="True" Margin="0,0,0,4" />
+                    </DockPanel>
+                </DockPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]Orientation[/i][/c] to control the axis the progress bar is drawn to (Default = [c=LightBlue][s=Blue]Horizontal[/s][/c])
+                </TextBlock>
+                <DockPanel Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <TextBlock Dock="Top">
+                        This ProgressBar's [c=Turquoise][i]Orientation[/i][/c] is set to [c=LightBlue][s=Blue]Vertical[/s][/c].
+                    </TextBlock>
+
+                    <DockPanel Dock="Bottom">
+                        <ToggleButton Name="ToggleButton7" Padding="10,2" IsChecked="True" Dock="Left" Margin="0,0,10,0" Content="Loop" VerticalAlignment="Center" />
+                        <Button Dock="Left" Margin="0,0,10,0" Padding="10,2" Content="Reset Progress" VerticalAlignment="Center" CommandName="ResetProgressBar7Progress" />
+                        <DockPanel VerticalAlignment="Center">
+                            <TextBlock Dock="Left" Text="Speed:" VerticalAlignment="Center" Margin="0,0,5,0" />
+                            <Slider Name="Slider7" Minimum="0" Maximum="0.4" Value="0.20" UseDiscreteValues="True" DiscreteValueInterval="0.02" DrawTicks="True" TickFrequency="0.04" />
+                        </DockPanel>
+                    </DockPanel>
+
+                    <ProgressBar Name="ProgressBar7" HorizontalAlignment="Center" Orientation="Vertical" Height="150" Minimum="0" Maximum="100" Value="0" Size="36" Margin="0,3,0,6" />
+                </DockPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]IsReversed[/i][/c] to control the progress bar's flow direction 
+                    (default = Left to Right, or Top to Bottom depending on [c=LightBlue][s=Blue]Orientation[/s][/c])
+                </TextBlock>
+                <DockPanel Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <TextBlock Dock="Top">
+                        This ProgressBar's [c=Turquoise][i]IsReversed[/i][/c] is set to [c=LightBlue][s=Blue]true[/s][/c]
+                    </TextBlock>
+
+                    <DockPanel Dock="Bottom">
+                        <ToggleButton Name="ToggleButton8" Padding="10,2" IsChecked="True" Dock="Left" Margin="0,0,10,0" Content="Loop" VerticalAlignment="Center" />
+                        <Button Dock="Left" Margin="0,0,10,0" Padding="10,2" Content="Reset Progress" VerticalAlignment="Center" CommandName="ResetProgressBar8Progress" />
+                        <DockPanel VerticalAlignment="Center">
+                            <TextBlock Dock="Left" Text="Speed:" VerticalAlignment="Center" Margin="0,0,5,0" />
+                            <Slider Name="Slider8" Minimum="0" Maximum="0.4" Value="0.20" UseDiscreteValues="True" DiscreteValueInterval="0.02" DrawTicks="True" TickFrequency="0.04" />
+                        </DockPanel>
+                    </DockPanel>
+
+                    <ProgressBar Name="ProgressBar8" IsReversed="True" Minimum="0" Maximum="100" Value="0" ShowValue="True" Margin="0,3,0,6" />
+                </DockPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    More samples:
+                </TextBlock>
+
+                <StackPanel Background="White * 0.1" Padding="4" Margin="0,4,0,0" Orientation="Vertical" Spacing="8">
+                    <ProgressBar Name="ProgressBar9" Minimum="0" Maximum="100" Value="0" ShowValue="True" CompletedBrush="Green|LightGreen" IncompleteBrush="rgb(32,32,32)" 
+                                 BorderBrush="rgb(0,66,10)" BorderThickness="3" />
+                    <ProgressBar Name="ProgressBar10" Minimum="0" Maximum="100" Value="0" Size="12" CompletedBrush="LightBlue" Background="Blue|Black"
+                                 BorderBrush="rgb(0,0,77)" BorderThickness="2" />
+                    <ProgressBar Name="ProgressBar11" Size="6" BorderThickness="0,0,0,1" BorderBrush="Black"
+                                 Minimum="0" Maximum="100" Value="0"
+                                 CompletedBrush="rgb(56,114,217)|rgb(155,178,220)|rgb(155,178,220)|rgb(56,114,217)" 
+                                 IncompleteBrush="rgb(60,0,0)" />
+                    <!-- Note: This ProgressBar's CompletedBrush is set to an MGProgressBarGradientBrush in the c# code -->
+                    <!-- Which uses a different color based on what percent of the bar is filled -->
+                    <ProgressBar Name="ProgressBar12" Minimum="0" Maximum="100" Value="0" ShowValue="True" IncompleteBrush="rgb(32,32,32)" 
+                                 ValueDisplayFormat="[b][s=LightBlue]{{Value}}[/b][/s] / [b][s=LightBlue]{{Maximum}}[/b][/s]"
+                                 NumberFormat="0" BorderBrush="Black" BorderThickness="2" />
                 </StackPanel>
-            </Expander>
+            </DockPanel>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Example XAML" />
-                </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
-                    <TextBox Name="Example_TextBox" FontSize="10" />
-                </ScrollViewer>
-            </Expander>
-
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Result" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0" Background="rgb(16,16,64)">
-
-                </StackPanel>
-            </Expander>
         </StackPanel>
     </ScrollViewer>
 </Window>

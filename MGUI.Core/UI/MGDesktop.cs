@@ -403,7 +403,9 @@ namespace MGUI.Core.UI
                 ("CheckMarkGreen", 5, 4),
 
                 ("Computer", 4, 10),
-                ("Save", 4, 11)
+                ("Save", 4, 11),
+
+                ("SteelFloor", 2, 2)
             };
             foreach (var (Name, Row, Column) in Icons)
             {
