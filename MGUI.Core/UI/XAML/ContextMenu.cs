@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,9 +19,16 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.ContextMenu;
 
+        [Category("Data")]
+        public Button ButtonWrapperTemplate { get; set; }
+
+        [Category("Behavior")]
         public bool? CanOpen { get; set; }
+        [Category("Behavior")]
         public bool? StaysOpenOnItemSelected { get; set; }
+        [Category("Behavior")]
         public bool? StaysOpenOnItemToggled { get; set; }
+        [Category("Behavior")]
         public float? AutoCloseThreshold { get; set; }
 
         public List<ContextMenuItem> Items { get; set; } = new();
@@ -28,7 +36,9 @@ namespace MGUI.Core.UI.XAML
         public ScrollViewer ScrollViewer { get; set; } = new();
         public StackPanel ItemsPanel { get; set; } = new();
 
+        [Category("Layout")]
         public int? HeaderWidth { get; set; }
+        [Category("Layout")]
         public int? HeaderHeight { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -59,6 +69,16 @@ namespace MGUI.Core.UI.XAML
             if (HeaderWidth.HasValue || HeaderHeight.HasValue)
                 ContextMenu.HeaderSize = new(HeaderWidth ?? ContextMenu.HeaderSize.Width, HeaderHeight ?? ContextMenu.HeaderSize.Height);
 
+            if (ButtonWrapperTemplate != null)
+            {
+                ContextMenu.ButtonWrapperTemplate = (Item) =>
+                {
+                    MGButton Button = ContextMenu.CreateDefaultDropdownButton(ContextMenu);
+                    ButtonWrapperTemplate.ApplySettings(Button.Parent, Button);
+                    return Button;
+                };
+            }
+
             foreach (ContextMenuItem Item in Items)
             {
                 _ = Item.ToElement<MGContextMenuItem>(Element.SelfOrParentWindow, ContextMenu);
@@ -74,6 +94,9 @@ namespace MGUI.Core.UI.XAML
 
             yield return ScrollViewer;
             yield return ItemsPanel;
+
+            if (ButtonWrapperTemplate != null)
+                yield return ButtonWrapperTemplate;
 
             foreach (ContextMenuItem Item in Items)
                 yield return Item;
@@ -104,6 +127,7 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.ContextMenuItem;
 
+        public string CommandId { get; set; }
         public Image Icon { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
@@ -121,6 +145,8 @@ namespace MGUI.Core.UI.XAML
         {
             MGContextMenuButton ContextMenuButton = Element as MGContextMenuButton;
 
+            if (CommandId != null)
+                ContextMenuButton.CommandId = CommandId;
             if (Icon != null)
                 ContextMenuButton.Icon = Icon.ToElement<MGImage>(ContextMenuButton.SelfOrParentWindow, ContextMenuButton);
 

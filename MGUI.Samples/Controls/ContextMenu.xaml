@@ -1,6 +1,9 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="" Padding="10">
+        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="ContextMenu" Padding="10">
     <Window.Styles>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10" />
+        </Style>
         <Style Name="Header1" TargetType="TextBlock">
             <Setter Property="IsBold" Value="True" />
             <Setter Property="FontSize" Value="14" />
@@ -19,36 +22,183 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
         <StackPanel Orientation="Vertical" Spacing="10">
-            <TextBlock StyleNames="Header1" Text=":" HorizontalAlignment="Center" />
+            <TextBlock StyleNames="Header1" Text="ContextMenu:" HorizontalAlignment="Center" />
             <Separator/>
-            <TextBlock FontSize="10" Text="[b][/b]" />
+            <TextBlock>
+                ContextMenus are menus that appear when right-clicking their host element. 
+                They're drawn overtop of all other content, appearing at the position that the mouse was in the moment the host was right-clicked.
+            </TextBlock>
+            <Separator />
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Common Properties" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
-
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    A simple ContextMenu containing three commands:
+                </TextBlock>
+                <StackPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <ContextMenu>
+                        <ContextMenuButton Icon="GoldBullion">
+                            <TextBlock Foreground="Gold" IsBold="True" Text="Menu Item #1" />
+                        </ContextMenuButton>
+                        <ContextMenuButton Icon="SilverBullion">
+                            <TextBlock Foreground="Silver" IsBold="True" Text="Menu Item #2" />
+                        </ContextMenuButton>
+                        <ContextMenuButton Icon="BronzeBullion">
+                            <TextBlock Foreground="Brown" IsBold="True" Text="Menu Item #3" />
+                        </ContextMenuButton>
+                    </ContextMenu>
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Example XAML" />
-                </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
-                    <TextBox Name="Example_TextBox" FontSize="10" />
-                </ScrollViewer>
-            </Expander>
-
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Result" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0" Background="rgb(16,16,64)">
-
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    ContextMenus are typically anchored to a host. Set [c=Turquoise][i]Element.ContextMenu[/i][/c] to associate a ContextMenu with a host. 
+                    The ContextMenu is displayed at the mouse position when right-clicking the host:
+                </TextBlock>
+                <TextBlock Dock="Bottom">
+                    Clicking a menu item automatically closes the menu and invokes [c=Turquoise][i]ContextMenu.ItemSelected[/i][/c]. 
+                    You should subscribe to [c=Turquoise][i]ContextMenu.ItemSelected[/i][/c] to react to the menu item being chosen. 
+                    You may wish to set [c=Turquoise][i]ContextMenuButton.CommandId[/i][/c] on each menu item to easily determine what logic to execute in your subscribing code.
+                </TextBlock>
+                <StackPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <Button Padding="36,3">
+                        <Button.ContextMenu>
+                            <ContextMenu Name="ContextMenu1">
+                                <ContextMenuButton Icon="GoldBullion" CommandId="Cmd1">
+                                    <TextBlock Foreground="Gold" IsBold="True" Text="Menu Item #1" />
+                                </ContextMenuButton>
+                                <ContextMenuButton Icon="SilverBullion" CommandId="Cmd2">
+                                    <TextBlock Foreground="Silver" IsBold="True" Text="Menu Item #2" />
+                                </ContextMenuButton>
+                                <ContextMenuButton Icon="BronzeBullion" CommandId="Cmd3">
+                                    <TextBlock Foreground="Brown" IsBold="True" Text="Menu Item #3" />
+                                </ContextMenuButton>
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                        <TextBlock TextAlignment="Center" Text="Right click me!" />
+                    </Button>
+                    <TextBlock Name="TextBlock1" HorizontalAlignment="Center" Margin="0,2" IsShadowed="True" ShadowColor="Black" />
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Since ContextMenus are subclasses of [c=Turquoise][i]Window[/i][/c], you can change the Content of their title bar
+                    either by setting [c=Turquoise][i]TitleText[/i][/c] or defining your own [c=Turquoise][i]DockPanel[/i][/c] for [c=Turquoise][i]Window.TitleBar[/i][/c].
+                </TextBlock>
+                <StackPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <TextBlock Text="This ContextMenu has 2 ToggleButtons in its title bar Content" />
+                    <ContextMenu HorizontalAlignment="Left" Background="rgb(0,40,12)">
+                        <ContextMenu.TitleBar>
+                            <DockPanel Padding="4">
+                                <Grid RowLengths="auto" ColumnLengths="*,*" ColumnSpacing="6">
+                                    <ToggleButton Content="Toggle #1" IsChecked="True" Row="0" Column="0" />
+                                    <ToggleButton Content="Toggle #2" Row="0" Column="1" />
+                                </Grid>
+                            </DockPanel>
+                        </ContextMenu.TitleBar>
+                        <ContextMenuButton Icon="GoldBullion" CommandId="Cmd1">
+                            <TextBlock Foreground="Gold" IsBold="True" Text="Menu Item #1" />
+                        </ContextMenuButton>
+                        <ContextMenuButton Icon="SilverBullion" CommandId="Cmd2">
+                            <TextBlock Foreground="Silver" IsBold="True" Text="Menu Item #2" />
+                        </ContextMenuButton>
+                        <ContextMenuButton Icon="BronzeBullion" CommandId="Cmd3">
+                            <TextBlock Foreground="Brown" IsBold="True" Text="Menu Item #3" />
+                        </ContextMenuButton>
+                    </ContextMenu>
+                    <TextBlock Text="Or you can set [c=Turquoise][i]IsTitleBarVisible[/i][/c] to [c=LightBlue][s=Blue]false[/s][/c],\nto completely hide the title content." />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Each menu item's Content is automatically wrapped within a Button created by [c=Turquoise][i]ContextMenu.ButtonWrapperTemplate[/i][/c]. 
+                    You can change this template to modify the appearance of the menu items.
+                </TextBlock>
+                <StackPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <TextBlock Text="This ContextMenu has dark red buttons with more padding and margin" />
+                    <ContextMenu HorizontalAlignment="Left" IsTitleBarVisible="False">
+                        <ContextMenu.ButtonWrapperTemplate>
+                            <Button Background="rgb(62,10,10)" Margin="0,0,0,4" Padding="8,6" />
+                        </ContextMenu.ButtonWrapperTemplate>
+                        <ContextMenuButton Icon="GoldBullion" CommandId="Cmd1">
+                            <TextBlock Foreground="Gold" IsBold="True" Text="Menu Item #1" />
+                        </ContextMenuButton>
+                        <ContextMenuButton Icon="SilverBullion" CommandId="Cmd2">
+                            <TextBlock Foreground="Silver" IsBold="True" Text="Menu Item #2" />
+                        </ContextMenuButton>
+                        <ContextMenuButton Icon="BronzeBullion" CommandId="Cmd3">
+                            <TextBlock Foreground="Brown" IsBold="True" Text="Menu Item #3" />
+                        </ContextMenuButton>
+                    </ContextMenu>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    ContextMenus can have child items of 3 different types: [c=Turquoise][i]ContextMenuButton[/i][/c], [c=Turquoise][i]ContextMenuToggle[/i][/c],
+                    and [c=Turquoise][i]ContextMenuSeparator[/i][/c].
+                </TextBlock>
+                <StackPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <ContextMenu HorizontalAlignment="Left" TitleText="Left-Aligned Header Text">
+                        <ContextMenu.TitleBarTextBlock>
+                            <TextBlock IsBold="True" HorizontalAlignment="Left" IsShadowed="True" ShadowColor="Red" />
+                        </ContextMenu.TitleBarTextBlock>
+                        <ContextMenuButton Content="This is a [c=Turquoise][i]ContextMenuButton[/i][/c] with no Icon" />
+                        <ContextMenuButton Icon="Delete" Content="This is a [c=Turquoise][i]ContextMenuButton[/i][/c] with an Icon" />
+                        <ContextMenuSeparator Height="4" />
+                        <ContextMenuButton Content="Above this [c=Turquoise][i]ContextMenuButton[/i][/c] is a\n[c=Turquoise][i]ContextMenuSeparator[/i][/c] with Height=4" />
+                        <ContextMenuToggle IsChecked="True" Content="This is a [c=Turquoise][i]ContextMenuToggle[/i][/c]: Click it!" />
+                    </ContextMenu>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    ContextMenuItems can also have nested sub-menus by setting [c=Turquoise][i]ContextMenuItem.Submenu[/i][/c].
+                </TextBlock>
+                <StackPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <Button Content="Right-click me!" Padding="30,3">
+                        <Button.ContextMenu>
+                            <ContextMenu HorizontalAlignment="Left" TitleText="Submenu Sample">
+                                <ContextMenu.TitleBarTextBlock>
+                                    <TextBlock IsBold="True" HorizontalAlignment="Center" IsShadowed="True" ShadowColor="Black" />
+                                </ContextMenu.TitleBarTextBlock>
+                                <ContextMenuButton Content="This is a [c=Turquoise][i]ContextMenuButton[/i][/c] with no submenu" />
+                                <ContextMenuButton Content="This is a [c=Turquoise][i]ContextMenuButton[/i][/c] with an submenu: [s=Black][b]Hover it![/s][/b]">
+                                    <ContextMenuButton.Submenu>
+                                        <ContextMenu>
+                                            <ContextMenuButton Content="A submenu within a submenu">
+                                                <ContextMenuButton.Submenu>
+                                                    <ContextMenu>
+                                                        <ContextMenuToggle IsChecked="True" Content="Toggle #1" />
+                                                        <ContextMenuToggle IsChecked="True" Content="Toggle #2" />
+                                                    </ContextMenu>
+                                                </ContextMenuButton.Submenu>
+                                            </ContextMenuButton>
+                                            <ContextMenuButton Icon="GoldBullion" CommandId="Cmd1">
+                                                <TextBlock Foreground="Gold" IsBold="True" Text="Menu Item #1" />
+                                            </ContextMenuButton>
+                                            <ContextMenuButton Icon="SilverBullion" CommandId="Cmd2">
+                                                <TextBlock Foreground="Silver" IsBold="True" Text="Menu Item #2" />
+                                            </ContextMenuButton>
+                                            <ContextMenuButton Icon="BronzeBullion" CommandId="Cmd3">
+                                                <TextBlock Foreground="Brown" IsBold="True" Text="Menu Item #3" />
+                                            </ContextMenuButton>
+                                        </ContextMenu>
+                                    </ContextMenuButton.Submenu>
+                                </ContextMenuButton>
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
         </StackPanel>
     </ScrollViewer>
 </Window>

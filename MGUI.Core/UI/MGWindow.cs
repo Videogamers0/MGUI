@@ -701,7 +701,7 @@ namespace MGUI.Core.UI
 
                 OnHorizontalAlignmentChanged += (sender, e) =>
                 {
-                    if (e.NewValue != HorizontalAlignment.Stretch)
+                    if (ElementType == MGElementType.Window && e.NewValue != HorizontalAlignment.Stretch)
                     {
                         string Error = $"The {nameof(HorizontalAlignment)} of a root-level window element must always be set to: " +
                             $"{nameof(HorizontalAlignment)}.{nameof(HorizontalAlignment.Stretch)}";
@@ -710,7 +710,7 @@ namespace MGUI.Core.UI
                 };
                 OnVerticalAlignmentChanged += (sender, e) =>
                 {
-                    if (e.NewValue != VerticalAlignment.Stretch)
+                    if (ElementType == MGElementType.Window && e.NewValue != VerticalAlignment.Stretch)
                     {
                         string Error = $"The {nameof(VerticalAlignment)} of a root-level window element must always be set to: " +
                             $"{nameof(VerticalAlignment)}.{nameof(VerticalAlignment.Stretch)}";

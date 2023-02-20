@@ -527,6 +527,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
+    [TypeConverter(typeof(ImageStringConverter))]
     public class Image : Element
     {
         public override MGElementType ElementType => MGElementType.Image;
@@ -571,6 +572,27 @@ namespace MGUI.Core.UI.XAML
         }
 
         protected internal override IEnumerable<Element> GetChildren() => Enumerable.Empty<Element>();
+    }
+
+    public class ImageStringConverter : TypeConverter
+    {
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        {
+            if (sourceType == typeof(string))
+                return true;
+            return base.CanConvertFrom(context, sourceType);
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
+        {
+            if (value is string stringValue)
+            {
+                Image Image = new() { RegionName = stringValue };
+                return Image;
+            }
+
+            return base.ConvertFrom(context, culture, value);
+        }
     }
 
     public class InputConsumer : SingleContentHost

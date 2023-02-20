@@ -1,6 +1,9 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="ProgressBar" Padding="10">
     <Window.Styles>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10" />
+        </Style>
         <Style Name="Header1" TargetType="TextBlock">
             <Setter Property="IsBold" Value="True" />
             <Setter Property="FontSize" Value="14" />
@@ -22,7 +25,9 @@
             <TextBlock StyleNames="Header1" Text="ProgressBar:" HorizontalAlignment="Center" />
             <Separator/>
             <TextBlock FontSize="10">
-                ProgressBars are rectangular bars that fill up according to their [c=Turquoise][i]Minimum[/i][/c], [c=Turquoise][i]Maximum[/i][/c], and [c=Turquoise][i]Value[/i][/c]
+                ProgressBars are rectangular bars that fill up according to their [c=Turquoise][i]Minimum[/i][/c], [c=Turquoise][i]Maximum[/i][/c], and [c=Turquoise][i]Value[/i][/c].
+                Typically [c=Turquoise][i]Minimum[/i][/c] and [c=Turquoise][i]Maximum[/i][/c] are only set once during initialization and your code would periodically modify [c=Turquoise][i]Value[/i][/c]
+                as necessary (such as when a player takes damage if you were using the ProgressBar to represent their Health).
             </TextBlock>
             <Separator/>
             <ProgressBar Name="ProgressBar1" Minimum="0" Maximum="100" Value="0" />
@@ -202,7 +207,7 @@
             <DockPanel>
                 <TextBlock Dock="Top">
                     Set [c=Turquoise][i]IsReversed[/i][/c] to control the progress bar's flow direction 
-                    (default = Left to Right, or Top to Bottom depending on [c=LightBlue][s=Blue]Orientation[/s][/c])
+                    (default = Left to Right, or Bottom to Top depending on [c=LightBlue][s=Blue]Orientation[/s][/c])
                 </TextBlock>
                 <DockPanel Background="White * 0.1" Padding="4" Margin="0,4,0,0">
                     <TextBlock Dock="Top">

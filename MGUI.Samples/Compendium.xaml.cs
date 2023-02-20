@@ -175,7 +175,7 @@ namespace MGUI.Samples
             #endregion Dialogs
 
 #if DEBUG
-            //ProgressBarSamples.Show();
+            //ContextMenuSamples.Show();
 #endif
         }
 
