@@ -102,6 +102,9 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int PreviousHeight;
 
+        protected void InvokeWindowPositionChanged(Point PreviousPosition, Point NewPosition)
+            => OnWindowPositionChanged?.Invoke(this, new((PreviousPosition.X, PreviousPosition.Y), (NewPosition.X, NewPosition.Y)));
+
         /// <summary>Fires the <see cref="OnWindowPositionChanged"/> and/or <see cref="OnWindowSizeChanged"/> events if necessary.<para/>
         /// This method is automatically invoked at the beginning of <see cref="MGElement.Update(ElementUpdateArgs)"/>,<br/>
         /// but in rare cases you may want to manually invoke this after changing <see cref="Left"/>, <see cref="Top"/>, <see cref="WindowWidth"/>, or <see cref="WindowHeight"/> to make changes take effect immediately.</summary>
@@ -112,7 +115,7 @@ namespace MGUI.Core.UI
                 try
                 {
                     UpdateScaleTransforms();
-                    OnWindowPositionChanged?.Invoke(this, new((PreviousLeft, PreviousTop), (Left, Top)));
+                    InvokeWindowPositionChanged(new(PreviousLeft, PreviousTop), new(Left, Top));
                 }
                 finally
                 {

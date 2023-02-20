@@ -531,10 +531,42 @@ namespace MGUI.Core.UI
                     }
                 };
 
-                OnEndDraw += (sender, e) =>
+                //  Draw the submenu(s)
+                if (ParentWindow != null && ParentWindow.ElementType != MGElementType.ContextMenu)
                 {
-                    ActiveContextMenu?.Draw(e.DA.AsZeroOffset());
-                };
+                    //  If the ContextMenu is inside of another Window, don't draw the submenu until after the parent window is done drawing,
+                    //  so that the submenu is overtop of the rest of the parent window's content
+                    ParentWindow.OnEndDraw += (sender, e) =>
+                    {
+                        using (e.DA.DT.SetClipTargetTemporary(null, false))
+                        {
+                            ActiveContextMenu?.Draw(e.DA.AsZeroOffset());
+                        }
+                    };
+                }
+                else
+                {
+                    //  If the ContextMenu is its own root-level window, draw the submenu immediately after we're done drawing this ContextMenu
+                    OnEndDraw += (sender, e) =>
+                    {
+                        using (e.DA.DT.SetClipTargetTemporary(null, false))
+                        {
+                            ActiveContextMenu?.Draw(e.DA.AsZeroOffset());
+                        }
+                    };
+                }
+
+                //  Spaghetti logic for cases where you nest a ContextMenu directly inside of a Window,
+                //  rather than making this ContextMenu be its own root-level Window content via Element.ContextMenu
+                if (ParentWindow != null && ParentWindow.ElementType != MGElementType.ContextMenu)
+                {
+                    ParentWindow.OnWindowPositionChanged += (sender, e) =>
+                    {
+                        Point PreviousPosition = this.LayoutBounds.TopLeft();
+                        Point Offset = new(e.NewValue.Left - e.PreviousValue.Left, e.NewValue.Top - e.PreviousValue.Top);
+                        InvokeWindowPositionChanged(PreviousPosition, PreviousPosition + Offset);
+                    };
+                }
 
                 OnBeginUpdateContents += (sender, e) =>
                 {

@@ -162,40 +162,36 @@
                 <TextBlock Dock="Top">
                     ContextMenuItems can also have nested sub-menus by setting [c=Turquoise][i]ContextMenuItem.Submenu[/i][/c].
                 </TextBlock>
-                <StackPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
-                    <Button Content="Right-click me!" Padding="30,3">
-                        <Button.ContextMenu>
-                            <ContextMenu HorizontalAlignment="Left" TitleText="Submenu Sample">
-                                <ContextMenu.TitleBarTextBlock>
-                                    <TextBlock IsBold="True" HorizontalAlignment="Center" IsShadowed="True" ShadowColor="Black" />
-                                </ContextMenu.TitleBarTextBlock>
-                                <ContextMenuButton Content="This is a [c=Turquoise][i]ContextMenuButton[/i][/c] with no submenu" />
-                                <ContextMenuButton Content="This is a [c=Turquoise][i]ContextMenuButton[/i][/c] with an submenu: [s=Black][b]Hover it![/s][/b]">
-                                    <ContextMenuButton.Submenu>
-                                        <ContextMenu>
-                                            <ContextMenuButton Content="A submenu within a submenu">
-                                                <ContextMenuButton.Submenu>
-                                                    <ContextMenu>
-                                                        <ContextMenuToggle IsChecked="True" Content="Toggle #1" />
-                                                        <ContextMenuToggle IsChecked="True" Content="Toggle #2" />
-                                                    </ContextMenu>
-                                                </ContextMenuButton.Submenu>
-                                            </ContextMenuButton>
-                                            <ContextMenuButton Icon="GoldBullion" CommandId="Cmd1">
-                                                <TextBlock Foreground="Gold" IsBold="True" Text="Menu Item #1" />
-                                            </ContextMenuButton>
-                                            <ContextMenuButton Icon="SilverBullion" CommandId="Cmd2">
-                                                <TextBlock Foreground="Silver" IsBold="True" Text="Menu Item #2" />
-                                            </ContextMenuButton>
-                                            <ContextMenuButton Icon="BronzeBullion" CommandId="Cmd3">
-                                                <TextBlock Foreground="Brown" IsBold="True" Text="Menu Item #3" />
-                                            </ContextMenuButton>
-                                        </ContextMenu>
-                                    </ContextMenuButton.Submenu>
-                                </ContextMenuButton>
-                            </ContextMenu>
-                        </Button.ContextMenu>
-                    </Button>
+                <StackPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Orientation="Horizontal">
+                    <ContextMenu HorizontalAlignment="Left" TitleText="Submenu Sample">
+                        <ContextMenu.TitleBarTextBlock>
+                            <TextBlock IsBold="True" HorizontalAlignment="Center" IsShadowed="True" ShadowColor="Black" />
+                        </ContextMenu.TitleBarTextBlock>
+                        <ContextMenuButton Content="This is a [c=Turquoise][i]ContextMenuButton[/i][/c] with no submenu" />
+                        <ContextMenuButton Content="This is a [c=Turquoise][i]ContextMenuButton[/i][/c] with an submenu: [s=Black][b]Hover it![/s][/b]">
+                            <ContextMenuButton.Submenu>
+                                <ContextMenu>
+                                    <ContextMenuButton Content="A submenu within a submenu">
+                                        <ContextMenuButton.Submenu>
+                                            <ContextMenu>
+                                                <ContextMenuToggle IsChecked="True" Content="Toggle #1" />
+                                                <ContextMenuToggle IsChecked="True" Content="Toggle #2" />
+                                            </ContextMenu>
+                                        </ContextMenuButton.Submenu>
+                                    </ContextMenuButton>
+                                    <ContextMenuButton Icon="GoldBullion" CommandId="Cmd1">
+                                        <TextBlock Foreground="Gold" IsBold="True" Text="Menu Item #1" />
+                                    </ContextMenuButton>
+                                    <ContextMenuButton Icon="SilverBullion" CommandId="Cmd2">
+                                        <TextBlock Foreground="Silver" IsBold="True" Text="Menu Item #2" />
+                                    </ContextMenuButton>
+                                    <ContextMenuButton Icon="BronzeBullion" CommandId="Cmd3">
+                                        <TextBlock Foreground="Brown" IsBold="True" Text="Menu Item #3" />
+                                    </ContextMenuButton>
+                                </ContextMenu>
+                            </ContextMenuButton.Submenu>
+                        </ContextMenuButton>
+                    </ContextMenu>
                 </StackPanel>
             </DockPanel>
             <Separator/>

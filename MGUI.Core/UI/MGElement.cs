@@ -824,20 +824,8 @@ namespace MGUI.Core.UI
 
                 SelfOrParentWindow.OnWindowPositionChanged += (sender, e) =>
 				{
-#if NEVER
-					InvalidateLayout();
-#else
-					Rectangle PreviousLayoutBounds = LayoutBounds;
-
 					Point Offset = new(e.NewValue.Left - e.PreviousValue.Left, e.NewValue.Top - e.PreviousValue.Top);
-					this.AllocatedBounds = AllocatedBounds.GetTranslated(Offset);
-					this.RenderBounds = RenderBounds.GetTranslated(Offset);
-					this.LayoutBounds = LayoutBounds.GetTranslated(Offset);
-					this.StretchedContentBounds = StretchedContentBounds.GetTranslated(Offset);
-					this.AlignedContentBounds = AlignedContentBounds.GetTranslated(Offset);
-
-					OnLayoutBoundsChanged?.Invoke(this, new(PreviousLayoutBounds, LayoutBounds));
-#endif
+                    TranslateAllBounds(Offset);
 				};
 
 				this.MouseHandler.RMBReleasedInside += (sender, e) =>
@@ -921,6 +909,20 @@ namespace MGUI.Core.UI
         /// <summary>This value is typically <see cref="Point.Zero"/> except when this <see cref="MGElement"/> is a child of an <see cref="MGScrollViewer"/>,<br/>
         /// in which case the origin would be based on the <see cref="MGScrollViewer.HorizontalOffset"/> / <see cref="MGScrollViewer.VerticalOffset"/></summary>
         public Point Origin { get; private set; } = Point.Zero;
+
+        protected void TranslateAllBounds(Point Offset)
+        {
+            if (Offset != Point.Zero)
+            {
+                Rectangle PreviousLayoutBounds = LayoutBounds;
+                this.AllocatedBounds = AllocatedBounds.GetTranslated(Offset);
+                this.RenderBounds = RenderBounds.GetTranslated(Offset);
+                this.LayoutBounds = LayoutBounds.GetTranslated(Offset);
+                this.StretchedContentBounds = StretchedContentBounds.GetTranslated(Offset);
+                this.AlignedContentBounds = AlignedContentBounds.GetTranslated(Offset);
+                OnLayoutBoundsChanged?.Invoke(this, new(PreviousLayoutBounds, LayoutBounds));
+            }
+        }
 
         /// <summary>The screen space that this element is rendered to.<para/>
         /// Unlike <see cref="LayoutBounds"/>, this value always uses an origin of <see cref="Point.Zero"/>, rather than being relative to <see cref="Origin"/>,<br/>
