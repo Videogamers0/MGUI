@@ -78,11 +78,11 @@ namespace MGUI.Core.UI
             set => HeadersPanelElement.BackgroundBrush = value;
         }
 
-        private void ManagedAddHeadersPanelChild(MGSingleContentHost NewItem)
+        private bool ManagedAddHeadersPanelChild(MGSingleContentHost NewItem)
         {
             using (HeadersPanelElement.AllowChangingContentTemporarily())
             {
-                HeadersPanelElement.TryAddChild(NewItem);
+                return HeadersPanelElement.TryAddChild(NewItem);
             }
         }
 
@@ -91,6 +91,14 @@ namespace MGUI.Core.UI
             using (HeadersPanelElement.AllowChangingContentTemporarily())
             {
                 return HeadersPanelElement.TryReplaceChild(OldItem, NewItem);
+            }
+        }
+
+        private bool ManagedRemoveHeadersPanelChild(MGSingleContentHost ToRemove)
+        {
+            using (HeadersPanelElement.AllowChangingContentTemporarily())
+            {
+                return HeadersPanelElement.TryRemoveChild(ToRemove);
             }
         }
 
@@ -187,11 +195,20 @@ namespace MGUI.Core.UI
         {
             if (_Tabs.Contains(Tab))
             {
-                if (Tab.IsTabSelected && _Tabs.Count > 1)
-                    _Tabs.First(x => x != Tab).IsTabSelected = true;
+                MGButton TabHeader = ActualTabHeaders[Tab];
+                ActualTabHeaders.Remove(Tab);
+                int TabIndex = _Tabs.IndexOf(Tab);
 
                 _Tabs.Remove(Tab);
                 InvokeContentRemoved(Tab);
+
+                ManagedRemoveHeadersPanelChild(TabHeader);
+
+                if (SelectedTab == Tab)
+                {
+                    int NewSelectedTabIndex = Math.Max(0, TabIndex - 1); // Focus to left of the closed tab
+                    _ = TrySelectTabAtIndex(NewSelectedTabIndex);
+                }
             }
         }
 

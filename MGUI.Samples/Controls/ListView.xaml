@@ -2,6 +2,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Left="440" Top="20" MinHeight="0" Width="600" Height="600" TitleText="ListView" Padding="10">
     <Window.Styles>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10" />
+        </Style>
         <Style Name="Header1" TargetType="TextBlock">
             <Setter Property="IsBold" Value="True" />
             <Setter Property="FontSize" Value="14" />

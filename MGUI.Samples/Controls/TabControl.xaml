@@ -1,6 +1,9 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="" Padding="10">
+        Left="440" Top="20" MinHeight="0" Width="550" Height="710" TitleText="TabControl" Padding="10">
     <Window.Styles>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10" />
+        </Style>
         <Style Name="Header1" TargetType="TextBlock">
             <Setter Property="IsBold" Value="True" />
             <Setter Property="FontSize" Value="14" />
@@ -19,36 +22,125 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
         <StackPanel Orientation="Vertical" Spacing="10">
-            <TextBlock StyleNames="Header1" Text=":" HorizontalAlignment="Center" />
+            <TextBlock StyleNames="Header1" Text="TabControl:" HorizontalAlignment="Center" />
             <Separator/>
-            <TextBlock FontSize="10" Text="[b][/b]" />
+            <TextBlock>
+                TabControls contain 1 or more TabItems. Only 1 tab may be selected at a time, and only the selected tab's content is visible.
+            </TextBlock>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Common Properties" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
-
+            <TabControl Name="TabControl1">
+                <TabItem Header="Tab #1">
+                    <TextBlock Text="This is the content of [b]Tab #1[/b]" />
+                </TabItem>
+                <TabItem Header="Tab #2">
+                    <TextBlock Text="This is the content of [b]Tab #2[/b]" />
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <DockPanel>
+                            <!-- Note: When a tab is selected, it's header content is automatically set to IsSelected=true -->
+                            <!-- This may affect things like the Background, which has separate values for each VisualState (Normal, Selected, Disabled etc) -->
+                            <!-- Notice that we set the Background AND the SelectedBackground -->
+                            <Button Dock="Right" MinWidth="12" MinHeight="12" BorderThickness="1" BorderBrush="Black" Margin="6,1,1,1" Padding="2,-1"
+                                    Background="Crimson * 0.5" SelectedBackground="Crimson * 0.8" CommandName="CloseTab3">
+                                <TextBlock Foreground="White" IsShadowed="True" ShadowColor="Black" IsBold="True" Text="x" FontSize="8" />
+                            </Button>
+                            <TextBlock Text="Tab #3 with close btn" />
+                        </DockPanel>
+                    </TabItem.Header>
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Spacing="5">
+                        <TextBlock Text="This is the content of [b]Tab #3[/b]" />
+                        <TextBlock Text="You can close this tab by clicking the X in the tab header, or clicking the close button below" />
+                        <Button Content="Close this tab" HorizontalAlignment="Center" CommandName="CloseTab3" />
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+            
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Tab headers are Buttons that are placed inside of the [c=Turquoise][i]TabControl.HeadersPanelElement[/i][/c] (Which is a [i]StackPanel[/i]).
+                    The Buttons are created via [c=Turquoise][i]SelectedTabHeaderTemplate[/i][/c] and [c=Turquoise][i]UnselectedTabHeaderTemplate[/i][/c]
+                </TextBlock>
+                <StackPanel Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="4">
+                    <TextBlock Text="This TabControl uses customized Buttons for its Tab Headers. It also sets the background color of the [c=Turquoise][i]HeadersPanelElement[/i][/c]." />
+                    <TabControl HeaderAreaBackground="rgb(120,120,150)">
+                        <TabControl.SelectedTabHeaderTemplate>
+                            <Button BorderThickness="0,0,0,3" Padding="4,2" Margin="6,4" Background="White * 0.15" BorderBrush="Black" MinWidth="50" TextForeground="Black" />
+                        </TabControl.SelectedTabHeaderTemplate>
+                        <TabControl.UnselectedTabHeaderTemplate>
+                            <Button BorderThickness="0,0,0,0" Padding="4,2" Margin="6,4,6,7" Background="Transparent" BorderBrush="rgb(80,80,80)" MinWidth="50" TextForeground="rgb(40,40,40)" />
+                        </TabControl.UnselectedTabHeaderTemplate>
+                        <TabItem Header="Gameplay" Content="Content of Gameplay tab" />
+                        <TabItem Header="Graphics" Content="Content of Graphics tab" />
+                        <TabItem Header="Audio" Content="Content of Audio tab" />
+                        <TabItem Header="Controls" Content="Content of Controls tab" />
+                    </TabControl>
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Example XAML" />
-                </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
-                    <TextBox Name="Example_TextBox" FontSize="10" />
-                </ScrollViewer>
-            </Expander>
-
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Result" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0" Background="rgb(16,16,64)">
-
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    The [c=Turquoise][i]Background[/i][/c] of a TabControl only spans the bounds of the selected tab's Content. It does not affect the background of the header area.
+                </TextBlock>
+                <StackPanel Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="4">
+                    <TextBlock Text="This TabControl has a dark Green background." />
+                    <TabControl Background="rgb(8,70,14)">
+                        <TabItem Header="Gameplay" Content="Content of Gameplay tab" />
+                        <TabItem Header="Graphics" Content="Content of Graphics tab" />
+                        <TabItem Header="Audio" Content="Content of Audio tab" />
+                        <TabItem Header="Controls" Content="Content of Controls tab" />
+                    </TabControl>
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Inactive tabs are not drawn, but they are still updated each Update tick.
+                </TextBlock>
+                <StackPanel Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="4">
+                    <TabControl Background="rgb(66,0,0)">
+                        <TabControl.HeadersPanel>
+                            <StackPanel HorizontalAlignment="Center" />
+                        </TabControl.HeadersPanel>
+                        <TabControl.SelectedTabHeaderTemplate>
+                            <Button Background="rgb(124,20,14)" />
+                        </TabControl.SelectedTabHeaderTemplate>
+                        <TabControl.UnselectedTabHeaderTemplate>
+                            <Button Background="rgb(82,24,18)" />
+                        </TabControl.UnselectedTabHeaderTemplate>
+                        <TabItem Header="Tab #1">
+                            <StackPanel Orientation="Vertical" Spacing="5">
+                                <TextBlock Text="This StopWatch continues counting up even when this tab is not selected." />
+                                <DockPanel HorizontalAlignment="Left">
+                                    <TextBlock Dock="Left" VerticalAlignment="Center" Text="StopWatch #1:" Margin="0,0,5,0" />
+                                    <Stopwatch IsRunning="True" Elapsed="00:00:00" />
+                                </DockPanel>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="Tab #2">
+                            <StackPanel Orientation="Vertical" Spacing="5">
+                                <TextBlock Text="This StopWatch continues counting up even when this tab is not selected." />
+                                <DockPanel HorizontalAlignment="Left">
+                                    <TextBlock Dock="Left" VerticalAlignment="Center" Text="StopWatch #2:" Margin="0,0,5,0" />
+                                    <Stopwatch IsRunning="True" Elapsed="00:00:10" />
+                                </DockPanel>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="Tab #3">
+                            <StackPanel Orientation="Vertical" Spacing="5">
+                                <TextBlock Text="This StopWatch continues counting up even when this tab is not selected." />
+                                <DockPanel HorizontalAlignment="Left">
+                                    <TextBlock Dock="Left" VerticalAlignment="Center" Text="StopWatch #3:" Margin="0,0,5,0" />
+                                    <Stopwatch IsRunning="True" Elapsed="00:00:15" />
+                                </DockPanel>
+                            </StackPanel>
+                        </TabItem>
+                    </TabControl>
+                </StackPanel>
+            </DockPanel>
+
         </StackPanel>
     </ScrollViewer>
 </Window>

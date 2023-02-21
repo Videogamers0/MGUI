@@ -10,10 +10,20 @@ namespace MGUI.Samples.Controls
 {
     public class TabControlSamples : SampleBase
     {
+        private MGTabControl TabControl1 { get; }
+
         public TabControlSamples(ContentManager Content, MGDesktop Desktop)
             : base(Content, Desktop, $"{nameof(Controls)}", "TabControl.xaml")
         {
+            TabControl1 = Window.GetElementByName<MGTabControl>("TabControl1");
 
+            Window.AddNamedAction("CloseTab3", x =>
+            {
+                if (TabControl1.Tabs.Count == 3)
+                {
+                    TabControl1.RemoveTab(TabControl1.Tabs[2]);
+                }
+            });
         }
     }
 }
