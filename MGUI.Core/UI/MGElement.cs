@@ -1078,14 +1078,16 @@ namespace MGUI.Core.UI
 
 			if (!RecentDrawWasClipped && HoverStartTime.HasValue && !SelfOrParentWindow.HasModalWindow)
 			{
-				TimeSpan HoveredTime = DateTime.Now.Subtract(HoverStartTime.Value);
-                if (HoveredTime >= GetDesktop().ToolTipShowDelay)
-				{
-                    if (!TryGetToolTip(out MGToolTip ToolTip))
-                        ToolTip = this.ToolTip;
+                if (!TryGetToolTip(out MGToolTip ToolTip))
+                    ToolTip = this.ToolTip;
 
-                    if (ToolTip != null && (ComputedIsEnabled || ToolTip.ShowOnDisabled))
+                if (ToolTip != null && (ComputedIsEnabled || ToolTip.ShowOnDisabled))
+                {
+                    TimeSpan HoveredTime = DateTime.Now.Subtract(HoverStartTime.Value);
+                    if (HoveredTime >= ToolTip.ActualShowDelay)
+                    {
                         GetDesktop().QueuedToolTip = ToolTip;
+                    }
                 }
 			}
 

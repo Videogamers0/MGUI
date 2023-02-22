@@ -1810,6 +1810,9 @@ namespace MGUI.Core.UI.XAML
         [Category("Behavior")]
         public bool? ShowOnDisabled { get; set; }
 
+        [Category("Behavior")]
+        public TimeSpan? ShowDelay { get; set; }
+
         [Category("Layout")]
         public Size? DrawOffset { get; set; }
 
@@ -1822,6 +1825,8 @@ namespace MGUI.Core.UI.XAML
 
             if (ShowOnDisabled.HasValue)
                 ToolTip.ShowOnDisabled = ShowOnDisabled.Value;
+            if (ShowDelay.HasValue)
+                ToolTip.ShowDelayOverride = ShowDelay.Value;
             if (DrawOffset.HasValue)
                 ToolTip.DrawOffset = new Point(DrawOffset.Value.Width, DrawOffset.Value.Height);
 

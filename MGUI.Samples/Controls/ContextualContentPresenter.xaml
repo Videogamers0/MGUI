@@ -1,5 +1,5 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="" Padding="10">
+        Left="440" Top="20" MinHeight="0" Width="340" Height="350" TitleText="ContextualContentPresenter" Padding="10">
     <Window.Styles>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="10" />
@@ -22,36 +22,41 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
         <StackPanel Orientation="Vertical" Spacing="10">
-            <TextBlock StyleNames="Header1" Text=":" HorizontalAlignment="Center" />
+            <TextBlock StyleNames="Header1" Text="ContextualContentPresenter:" HorizontalAlignment="Center" />
             <Separator/>
-            <TextBlock FontSize="10" Text="[b][/b]" />
+            <TextBlock>
+                ContextualContentPresenter is a simple wrapper element that provides mutually-exclusive visibility of its 2 child elements.
+            </TextBlock>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Common Properties" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]TrueContent[/i][/c] and [c=Turquoise][i]FalseContent[/i][/c]. Exactly 1 of these 2 Contents will be visible based on [c=Turquoise][i]Value[/i][/c]
+                </TextBlock>
+                <StackPanel Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="4">
+                    <ToggleButton Name="ToggleButton1" HorizontalAlignment="Left">
+                        <TextBlock TextAlignment="Center" Text="Toggle [c=Turquoise][i]Value[/i][/c]" />
+                    </ToggleButton>
 
+                    <DockPanel>
+                        <TextBlock Name="TextBlock1" />
+                        <ContextualContentPresenter Name="CCP1" Value="False" Padding="10" Background="White * 0.2" HorizontalAlignment="Left">
+                            <ContextualContentPresenter.TrueContent>
+                                <StackPanel Orientation="Vertical" Spacing="2">
+                                    <TextBlock Text="This is the [c=Turquoise][i]TrueContent[/i][/c]" />
+                                    <TextBlock Text="It's visible when [c=Turquoise][i]Value[/i][/c]=[c=LightBlue][s=Blue]true[/s][/c]" />
+                                </StackPanel>
+                            </ContextualContentPresenter.TrueContent>
+                            <ContextualContentPresenter.FalseContent>
+                                <StackPanel Orientation="Vertical" Spacing="2">
+                                    <TextBlock Text="This is the [c=Turquoise][i]FalseContent[/i][/c]" />
+                                    <TextBlock Text="It's visible when [c=Turquoise][i]Value[/i][/c]=[c=LightBlue][s=Blue]false[/s][/c]" />
+                                </StackPanel>
+                            </ContextualContentPresenter.FalseContent>
+                        </ContextualContentPresenter>
+                    </DockPanel>
                 </StackPanel>
-            </Expander>
+            </DockPanel>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Example XAML" />
-                </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
-                    <TextBox Name="Example_TextBox" FontSize="10" />
-                </ScrollViewer>
-            </Expander>
-
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Result" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0" Background="rgb(16,16,64)">
-
-                </StackPanel>
-            </Expander>
         </StackPanel>
     </ScrollViewer>
 </Window>

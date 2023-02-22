@@ -1,5 +1,5 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="" Padding="10">
+        Left="440" Top="20" MinHeight="0" Width="500" Height="800" TitleText="RadioButton" Padding="10">
     <Window.Styles>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="10" />
@@ -22,36 +22,109 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
         <StackPanel Orientation="Vertical" Spacing="10">
-            <TextBlock StyleNames="Header1" Text=":" HorizontalAlignment="Center" />
+            <TextBlock StyleNames="Header1" Text="RadioButton:" HorizontalAlignment="Center" />
             <Separator/>
-            <TextBlock FontSize="10" Text="[b][/b]" />
+            <TextBlock>
+                RadioButtons are a variation of CheckBox that provides mutual-exclusion. Only 1 RadioButton within a particular group may be checked at a time.
+            </TextBlock>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Common Properties" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Each RadioButton belongs to a [c=Turquoise][i]RadioButtonGroup[/i][/c]. Set [c=Turquoise][i]GroupName[/i][/c] when creating the RadioButton.
+                </TextBlock>
+                <Grid ColumnLengths="auto,auto" ColumnSpacing="12" RowSpacing="2" RowLengths="auto,auto,auto,auto"
+                      Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <TextBlock Row="0" Column="0" Text="These 3 RadioButtons belong to\n[c=Turquoise][i]GroupName[/i][/c]=[c=LightBlue][s=Blue]WeaponType[/s][/c]" />
+                    <RadioButton Row="1" Column="0" GroupName="WeaponType" Content="Dual Wield" />
+                    <RadioButton Row="2" Column="0" GroupName="WeaponType" Content="Sword+Shield" />
+                    <RadioButton Row="3" Column="0" GroupName="WeaponType" Content="2H" />
 
+                    <TextBlock Row="0" Column="1" Text="These 2 RadioButtons belong to\n[c=Turquoise][i]GroupName[/i][/c]=[c=LightBlue][s=Blue]Sex[/s][/c]" />
+                    <RadioButton Row="1" Column="1" GroupName="Sex" Content="Girl" />
+                    <RadioButton Row="2" Column="1" GroupName="Sex" Content="Boy" />
+                </Grid>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Use [c=Turquoise][i]RadioButtonGroup.CheckedItem[/i][/c] to get/set which [c=Turquoise][i]RadioButton[/i][/c] is checked (or use [c=Turquoise][i]RadioButton.IsChecked[/i][/c])
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock Name="TextBlock1" />
+                    <RadioButton GroupName="WeaponType2" Content="Dual Wield" />
+                    <RadioButton GroupName="WeaponType2" Content="Sword+Shield" />
+                    <RadioButton GroupName="WeaponType2" Content="2H" />
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Example XAML" />
-                </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
-                    <TextBox Name="Example_TextBox" FontSize="10" />
-                </ScrollViewer>
-            </Expander>
-
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Result" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0" Background="rgb(16,16,64)">
-
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]BubbleComponentBorderColor[/i][/c], [c=Turquoise][i]BubbleComponentBorderThickness[/i][/c], 
+                    [c=Turquoise][i]BubbleComponentBackground[/i][/c], and [c=Turquoise][i]BubbleCheckedColor[/i][/c] to control the checkable circle's appearance.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <StackPanel.Styles>
+                        <Style TargetType="RadioButton">
+                            <Setter Property="BubbleComponentSize" Value="16" />
+                            <Setter Property="GroupName" Value="B" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <RadioButton IsChecked="True" BubbleCheckedColor="rgb(14,72,10)" BubbleComponentBackground="rgb(22,158,26)" Content="Light green background, Dark green bubble when checked" />
+                    <RadioButton BubbleComponentBorderColor="Navy" BubbleComponentBorderThickness="2" Content="2px Navy blue border" />
+                    <RadioButton BubbleComponentBackground="Orange" Content="Orange background" />
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]RadioButtonGroup.AllowNullCheckedItem[/i][/c] to [c=LightBlue][s=Blue]false[/s][/c] to allow all RadioButtons in a group to be unchecked.
+                    You can also set [c=Turquoise][i]RadioButtonGroup.AllowUnchecking[/i][/c] to let the user uncheck the current [c=Turquoise][i]CheckedItem[/i][/c] by clicking it.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <StackPanel.Styles>
+                        <Style TargetType="RadioButton">
+                            <Setter Property="GroupName" Value="ProgrammingLanguage" />
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <TextBlock Text="If you are a programmer, choose your favorite language.\nIf you're not a programmer, leave blank:" />
+                    <RadioButton Content="c#" />
+                    <RadioButton Content="c++" />
+                    <RadioButton Content="javascript">
+                        <RadioButton.ToolTip>
+                            <ToolTip Background="rgb(56,56,56,212)" TextForeground="rgb(240,240,240)" Padding="6,3" 
+                                     Content="If you choose this, you are a psychopath" ShowDelay="00:00:00.03" />
+                        </RadioButton.ToolTip>
+                    </RadioButton>
+                    <RadioButton Content="brainfuck">
+                        <RadioButton.ToolTip>
+                            <ToolTip Background="rgb(56,56,56,212)" TextForeground="rgb(240,240,240)" Padding="6,3" 
+                                     Content="If you choose this, you are a psychopath. But at least you didn't pick JavaScript..." ShowDelay="00:00:00.03" />
+                        </RadioButton.ToolTip>
+                    </RadioButton>
+                    <RadioButton Content="python" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]BubbleComponentSize[/i][/c] to make the checkable circle graphics bigger or smaller.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock Text="This RadioButton uses [c=Turquoise][i]BubbleComponentSize[/i][/c]=[c=LightBlue][s=Blue]20[/s][/c]" />
+                    <RadioButton Margin="30,0,0,0" BubbleComponentSize="20" GroupName="A" Content="Big bubble" VerticalContentAlignment="Center" />
+                    <TextBlock Text="This RadioButton uses [c=Turquoise][i]BubbleComponentSize[/i][/c]=[c=LightBlue][s=Blue]16[/s][/c]" />
+                    <RadioButton Margin="30,0,0,0" BubbleComponentSize="16" GroupName="A" Content="Medium bubble" VerticalContentAlignment="Center" />
+                    <TextBlock Text="This RadioButton uses [c=Turquoise][i]BubbleComponentSize[/i][/c]=[c=LightBlue][s=Blue]12[/s][/c]" />
+                    <RadioButton Margin="30,0,0,0" BubbleComponentSize="12" GroupName="A" Content="Tiny bubble" VerticalContentAlignment="Center" />
+                </StackPanel>
+            </DockPanel>
+
         </StackPanel>
     </ScrollViewer>
 </Window>

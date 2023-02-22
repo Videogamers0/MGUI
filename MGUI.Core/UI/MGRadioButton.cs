@@ -198,6 +198,8 @@ namespace MGUI.Core.UI
                 Group.AddRadioButton(this);
 
                 this.ButtonElement = new(Window, x => this.IsChecked = !this.IsChecked);
+                this.ButtonElement.MinHeight = 8;
+                this.ButtonElement.MinWidth = 8;
                 this.ButtonElement.Visibility = Visibility.Hidden;
                 this.ButtonElement.CanHandleInputsWhileHidden = true;
 
