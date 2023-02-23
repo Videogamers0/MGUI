@@ -172,17 +172,25 @@
                     to control the size of the dropdown Window.
                 </TextBlock>
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
-                    <TextBlock Text="This ComboBox has a very small maximum size for its dropdown window" />
+                    <TextBlock Text="This ComboBox has a very small maximum size for its dropdown window. It also overrides [c=Turquoise][i]DropdownScrollViewer[/i][/c] to use shades of [c=Purple][s=Black]Purple[/s][/c] for the scrollbar." />
                     <ComboBox ItemType="{x:Type System:String}" Width="180" DropdownArrowColor="Black" HorizontalAlignment="Left"
                               SelectedIndex="1" Background="MediumPurple" MaxDropdownWidth="110" MaxDropdownHeight="64">
+                        <ComboBox.DropdownScrollViewer>
+                            <ScrollViewer ScrollBarUnfocusedOuterBrush="rgb(33,27,42)" ScrollBarFocusedOuterBrush="rgb(41,34,51)"
+                                          ScrollBarUnfocusedInnerBrush="MediumPurple" ScrollBarFocusedInnerBrush="rgb(157,122,229)"
+                                          Background="rgb(22,16,38)" />
+                        </ComboBox.DropdownScrollViewer>
                         <System:String>Option 1</System:String>
                         <System:String>Option 2</System:String>
                         <System:String>Option 3</System:String>
                         <System:String>Option 4</System:String>
                     </ComboBox>
-                    <TextBlock Text="This ComboBox has a very large minimum size for its dropdown window" />
+                    <TextBlock Text="This ComboBox has a very large minimum size for its dropdown window. It also sets [c=Turquoise][i]Dropdown.Background[/i][/c] to a transparent [c=Purple][s=Black]Purple[/s][/c]." />
                     <ComboBox ItemType="{x:Type System:String}" Width="180" DropdownArrowColor="Black" HorizontalAlignment="Left"
                               SelectedIndex="2" Background="MediumPurple" MinDropdownWidth="240" MinDropdownHeight="200">
+                        <ComboBox.Dropdown>
+                            <Window Background="Purple * 0.5" />
+                        </ComboBox.Dropdown>
                         <System:String>Option 1</System:String>
                         <System:String>Option 2</System:String>
                         <System:String>Option 3</System:String>

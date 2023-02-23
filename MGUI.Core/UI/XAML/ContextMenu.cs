@@ -51,11 +51,11 @@ namespace MGUI.Core.UI.XAML
                 return new MGContextMenu(Window, Theme: Window?.Theme);
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGContextMenu ContextMenu = Element as MGContextMenu;
-            ScrollViewer.ApplySettings(ContextMenu, ContextMenu.ScrollViewerElement);
-            ItemsPanel.ApplySettings(ContextMenu, ContextMenu.ItemsPanel);
+            ScrollViewer.ApplySettings(ContextMenu, ContextMenu.ScrollViewerElement, false);
+            ItemsPanel.ApplySettings(ContextMenu, ContextMenu.ItemsPanel, false);
 
             if (CanOpen.HasValue)
                 ContextMenu.CanContextMenuOpen = CanOpen.Value;
@@ -74,17 +74,20 @@ namespace MGUI.Core.UI.XAML
                 ContextMenu.ButtonWrapperTemplate = (Item) =>
                 {
                     MGButton Button = ContextMenu.CreateDefaultDropdownButton(ContextMenu);
-                    ButtonWrapperTemplate.ApplySettings(Button.Parent, Button);
+                    ButtonWrapperTemplate.ApplySettings(Button.Parent, Button, true);
                     return Button;
                 };
             }
 
-            foreach (ContextMenuItem Item in Items)
+            if (IncludeContent)
             {
-                _ = Item.ToElement<MGContextMenuItem>(Element.SelfOrParentWindow, ContextMenu);
+                foreach (ContextMenuItem Item in Items)
+                {
+                    _ = Item.ToElement<MGContextMenuItem>(Element.SelfOrParentWindow, ContextMenu);
+                }
             }
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
 
         protected internal override IEnumerable<Element> GetChildren()
@@ -112,14 +115,14 @@ namespace MGUI.Core.UI.XAML
     {
         public ContextMenu Submenu { get; set; }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGWrappedContextMenuItem ContextMenuItem = Element as MGWrappedContextMenuItem;
 
             if (Submenu != null)
                 ContextMenuItem.Submenu = Submenu.ToElement<MGContextMenu>(ContextMenuItem.SelfOrParentWindow, ContextMenuItem);
 
-            //base.ApplyDerivedSettings(Parent, Element, NamedTextures);
+            //base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
     }
 
@@ -141,7 +144,7 @@ namespace MGUI.Core.UI.XAML
                 throw new InvalidOperationException($"The {nameof(Parent)} {nameof(MGElement)} of an {nameof(MGContextMenuButton)} should be of type {nameof(MGContextMenu)}");
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGContextMenuButton ContextMenuButton = Element as MGContextMenuButton;
 
@@ -150,7 +153,7 @@ namespace MGUI.Core.UI.XAML
             if (Icon != null)
                 ContextMenuButton.Icon = Icon.ToElement<MGImage>(ContextMenuButton.SelfOrParentWindow, ContextMenuButton);
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
 
         protected internal override IEnumerable<Element> GetChildren()
@@ -180,14 +183,14 @@ namespace MGUI.Core.UI.XAML
                 throw new InvalidOperationException($"The {nameof(Parent)} {nameof(MGElement)} of an {nameof(MGContextMenuButton)} should be of type {nameof(MGContextMenu)}");
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGContextMenuToggle ContextMenuToggle = Element as MGContextMenuToggle;
 
             if (IsChecked.HasValue)
                 ContextMenuToggle.IsChecked = IsChecked.Value;
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
     }
 
@@ -207,11 +210,11 @@ namespace MGUI.Core.UI.XAML
                 throw new InvalidOperationException($"The {nameof(Parent)} {nameof(MGElement)} of an {nameof(MGContextMenuButton)} should be of type {nameof(MGContextMenu)}");
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGContextMenuSeparator ContextMenuSeparator = Element as MGContextMenuSeparator;
-            Separator.ApplySettings(Element, ContextMenuSeparator.SeparatorElement);
-            base.ApplyDerivedSettings(Parent, Element);
+            Separator.ApplySettings(Element, ContextMenuSeparator.SeparatorElement, false);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
 
         protected internal override IEnumerable<Element> GetChildren()

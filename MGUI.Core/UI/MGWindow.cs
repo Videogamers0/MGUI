@@ -151,7 +151,8 @@ namespace MGUI.Core.UI
             return Size;
         }
 
-        /// <summary>Resizes this <see cref="MGWindow"/> to satisfy the given constraints. Note: The layout of child content isn't refreshed until the next update tick.</summary>
+        /// <summary>Resizes this <see cref="MGWindow"/> to satisfy the given constraints.</summary>
+        /// <param name="UpdateLayoutImmediately">If true, the layout of child content is refreshed immediately rather than waiting until the next update tick.</param>
         /// <returns>The computed size that this <see cref="MGWindow"/> will be changed to.</returns>
         public Size ApplySizeToContent(SizeToContent Value, int MinWidth = 50, int MinHeight = 50, int? MaxWidth = 1920, int? MaxHeight = 1080, bool UpdateLayoutImmediately = true)
         {

@@ -169,22 +169,23 @@ namespace MGUI.Core.UI.XAML
 
         protected internal List<PropertyBinding> Bindings { get; } = new();
 
-        /// <param name="ApplyBaseSettings">If not null, this action will be invoked before <see cref="ApplySettings(MGElement, MGElement)"/> executes.</param>
+        /// <param name="ApplyBaseSettings">If not null, this action will be invoked before <see cref="ApplySettings(MGElement, MGElement, bool)"/> executes.</param>
         public T ToElement<T>(MGWindow Window, MGElement Parent, Action<T> ApplyBaseSettings = null) 
             where T : MGElement
         {
             T Element = CreateElementInstance(Window, Parent) as T;
             ApplyBaseSettings?.Invoke(Element);
-            ApplySettings(Parent, Element);
+            ApplySettings(Parent, Element, true);
             return Element;
         }
 
-        protected internal void ApplySettings(MGElement Parent, MGElement Element)
+        /// <param name="IncludeContent">Recommended value: true. If true, the child XAML content, if any, will also be processed.</param>
+        protected internal void ApplySettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             using (Element.BeginInitializing())
             {
                 ApplyBaseSettings(Parent, Element, true);
-                ApplyDerivedSettings(Parent, Element);
+                ApplyDerivedSettings(Parent, Element, IncludeContent);
             }
         }
 
@@ -262,8 +263,11 @@ namespace MGUI.Core.UI.XAML
 
                 Element.Tag = this.Tag;
 
-                foreach (PropertyBinding Binding in this.Bindings.Where(x => x.Mode == BindingMode.OneWay))
-                    Element.OneWayBindings.Add(Binding);
+                if (IncludeBindings)
+                {
+                    foreach (PropertyBinding Binding in this.Bindings.Where(x => x.Mode == BindingMode.OneWay))
+                        Element.OneWayBindings.Add(Binding);
+                }
             }
         }
 
@@ -282,7 +286,8 @@ namespace MGUI.Core.UI.XAML
         }
 
         protected abstract MGElement CreateElementInstance(MGWindow Window, MGElement Parent);
-        protected internal abstract void ApplyDerivedSettings(MGElement Parent, MGElement Element);
+        /// <param name="IncludeContent">Recommended value: true. If true, child XAML content, if any, will also be processed.</param>
+        protected internal abstract void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent);
 
         protected internal abstract IEnumerable<Element> GetChildren();
 

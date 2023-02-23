@@ -23,7 +23,8 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.ContentPresenter;
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGContentPresenter(Window);
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element) => base.ApplyDerivedSettings(Parent, Element);
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
+            => base.ApplyDerivedSettings(Parent, Element, IncludeContent);
     }
 
     public class HeaderedContentPresenter : SingleContentHost
@@ -38,7 +39,7 @@ namespace MGUI.Core.UI.XAML
         public int? Spacing { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGHeaderedContentPresenter(Window, null, null);
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGHeaderedContentPresenter ContentPresenter = Element as MGHeaderedContentPresenter;
 
@@ -49,7 +50,7 @@ namespace MGUI.Core.UI.XAML
             if (Spacing.HasValue)
                 ContentPresenter.Spacing = Spacing.Value;
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
 
         protected internal override IEnumerable<Element> GetChildren()
@@ -73,7 +74,7 @@ namespace MGUI.Core.UI.XAML
         public override MGElementType ElementType => MGElementType.ContextualContentPresenter;
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGContextualContentPresenter(Window, Value, null, null);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGWindow Window = Element.SelfOrParentWindow;
             MGContextualContentPresenter ContextualContentPresenter = Element as MGContextualContentPresenter;
@@ -112,7 +113,7 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGBorder(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGDesktop Desktop = Element.GetDesktop();
 
@@ -123,7 +124,7 @@ namespace MGUI.Core.UI.XAML
             if (BorderThickness.HasValue)
                 Border.BorderThickness = BorderThickness.Value.ToThickness();
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
     }
 
@@ -156,12 +157,12 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGButton(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGDesktop Desktop = Element.GetDesktop();
 
             MGButton Button = Element as MGButton;
-            Border.ApplySettings(Button, Button.BorderComponent.Element);
+            Border.ApplySettings(Button, Button.BorderComponent.Element, false);
 
             if (CommandName != null)
             {
@@ -186,7 +187,7 @@ namespace MGUI.Core.UI.XAML
                 }
             }
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
     }
 
@@ -220,17 +221,17 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGChatBox(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGChatBox ChatBox = Element as MGChatBox;
-            Border.ApplySettings(ChatBox, ChatBox.BorderComponent.Element);
-            CurrentUserTextBlock.ApplySettings(ChatBox, ChatBox.CurrentUserTextBlock);
-            InputTextBox.ApplySettings(ChatBox, ChatBox.InputTextBox);
-            SendButton.ApplySettings(ChatBox, ChatBox.SendButton);
-            Separator.ApplySettings(ChatBox, ChatBox.Separator);
+            Border.ApplySettings(ChatBox, ChatBox.BorderComponent.Element, false);
+            CurrentUserTextBlock.ApplySettings(ChatBox, ChatBox.CurrentUserTextBlock, false);
+            InputTextBox.ApplySettings(ChatBox, ChatBox.InputTextBox, false);
+            SendButton.ApplySettings(ChatBox, ChatBox.SendButton, false);
+            Separator.ApplySettings(ChatBox, ChatBox.Separator, false);
 
             MessagesContainer.ItemType = ChatBox.MessagesContainer.GetType().GenericTypeArguments[0];
-            MessagesContainer.ApplySettings(ChatBox, ChatBox.MessagesContainer);
+            MessagesContainer.ApplySettings(ChatBox, ChatBox.MessagesContainer, false);
 
             if (MaxMessageLength.HasValue)
                 ChatBox.MaxMessageLength = MaxMessageLength.Value;
@@ -268,10 +269,10 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGCheckBox(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGCheckBox CheckBox = Element as MGCheckBox;
-            Button.ApplySettings(CheckBox, CheckBox.ButtonComponent.Element);
+            Button.ApplySettings(CheckBox, CheckBox.ButtonComponent.Element, true);
 
             if (CheckBoxComponentSize.HasValue)
                 CheckBox.CheckBoxComponentSize = CheckBoxComponentSize.Value;
@@ -284,7 +285,7 @@ namespace MGUI.Core.UI.XAML
             if (IsChecked.HasValue)
                 CheckBox.IsChecked = IsChecked.Value;
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
 
         protected internal override IEnumerable<Element> GetChildren()
@@ -353,6 +354,10 @@ namespace MGUI.Core.UI.XAML
         [Category("Layout")]
         public int? MaxDropdownHeight { get; set; }
 
+        public Window Dropdown { get; set; } = null;
+        public ScrollViewer DropdownScrollViewer { get; set; } = null;
+        public StackPanel DropdownStackPanel { get; set; } = null;
+
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
             Type GenericType = typeof(MGComboBox<>).MakeGenericType(new Type[] { ItemType });
@@ -360,11 +365,11 @@ namespace MGUI.Core.UI.XAML
             return Element as MGElement;
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             Type GenericType = typeof(MGComboBox<>).MakeGenericType(new Type[] { ItemType });
             MethodInfo Method = GenericType.GetMethod(nameof(MGComboBox<object>.LoadSettings), BindingFlags.Instance | BindingFlags.NonPublic);
-            Method.Invoke(Element, new object[] { this });
+            Method.Invoke(Element, new object[] { this, IncludeContent });
         }
 
         protected internal override IEnumerable<Element> GetChildren()
@@ -420,13 +425,13 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGExpander(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGDesktop Desktop = Element.GetDesktop();
 
             MGExpander Expander = Element as MGExpander;
-            ExpanderToggleButton.ApplySettings(Expander, Expander.ExpanderToggleButton);
-            HeadersPanel.ApplySettings(Expander, Expander.HeadersPanelComponent.Element);
+            ExpanderToggleButton.ApplySettings(Expander, Expander.ExpanderToggleButton, true);
+            HeadersPanel.ApplySettings(Expander, Expander.HeadersPanelComponent.Element, false);
 
             if (ExpanderButtonSize.HasValue)
                 Expander.ExpanderButtonSize = ExpanderButtonSize.Value;
@@ -457,7 +462,7 @@ namespace MGUI.Core.UI.XAML
             if (CollapsedVisibility.HasValue)
                 Expander.CollapsedVisibility = CollapsedVisibility.Value;
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
 
         protected internal override IEnumerable<Element> GetChildren()
@@ -501,14 +506,14 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGGroupBox(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGDesktop Desktop = Element.GetDesktop();
 
             MGGroupBox GroupBox = Element as MGGroupBox;
 
-            Expander.ApplySettings(GroupBox, GroupBox.Expander);
-            HeaderPresenter.ApplySettings(GroupBox, GroupBox.HeaderPresenter);
+            Expander.ApplySettings(GroupBox, GroupBox.Expander, true);
+            HeaderPresenter.ApplySettings(GroupBox, GroupBox.HeaderPresenter, false);
 
             if (BorderBrush != null)
                 GroupBox.BorderBrush = (MGUniformBorderBrush)BorderBrush.ToBorderBrush(Desktop);
@@ -523,7 +528,7 @@ namespace MGUI.Core.UI.XAML
             if (HeaderHorizontalPadding.HasValue)
                 GroupBox.HeaderHorizontalPadding = HeaderHorizontalPadding.Value;
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
 
         protected internal override IEnumerable<Element> GetChildren()
@@ -571,7 +576,7 @@ namespace MGUI.Core.UI.XAML
             }
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGImage Image = Element as MGImage;
 
@@ -622,7 +627,7 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGInputConsumer(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGInputConsumer InputConsumer = Element as MGInputConsumer;
 
@@ -635,7 +640,7 @@ namespace MGUI.Core.UI.XAML
             if (HandlesMouseScroll.HasValue)
                 InputConsumer.HandlesMouseScroll = HandlesMouseScroll.Value;
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
     }
 
@@ -648,14 +653,14 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGPasswordBox(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGPasswordBox PasswordBox = Element as MGPasswordBox;
 
             if (PasswordCharacter.HasValue)
                 PasswordBox.PasswordCharacter = PasswordCharacter.Value;
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
     }
 
@@ -711,13 +716,13 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGProgressBar(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGDesktop Desktop = Element.GetDesktop();
 
             MGProgressBar ProgressBar = Element as MGProgressBar;
-            Border.ApplySettings(Parent, ProgressBar.BorderComponent.Element);
-            ValueTextBlock.ApplySettings(Parent, ProgressBar.ValueComponent.Element);
+            Border.ApplySettings(Parent, ProgressBar.BorderComponent.Element, false);
+            ValueTextBlock.ApplySettings(Parent, ProgressBar.ValueComponent.Element, false);
 
             if (ShowValue.HasValue)
                 ProgressBar.ShowValue = ShowValue.Value;
@@ -787,10 +792,10 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGRadioButton(Window, GroupName ?? "");
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGRadioButton RadioButton = Element as MGRadioButton;
-            Button.ApplySettings(Parent, RadioButton.ButtonComponent.Element);
+            Button.ApplySettings(Parent, RadioButton.ButtonComponent.Element, false);
 
             if (BubbleComponentSize.HasValue)
                 RadioButton.BubbleComponentSize = BubbleComponentSize.Value;
@@ -807,7 +812,7 @@ namespace MGUI.Core.UI.XAML
             if (IsChecked.HasValue)
                 RadioButton.IsChecked = IsChecked.Value;
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
 
         protected internal override IEnumerable<Element> GetChildren()
@@ -868,7 +873,7 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGRatingControl(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGRatingControl RatingControl = Element as MGRatingControl;
 
@@ -929,7 +934,7 @@ namespace MGUI.Core.UI.XAML
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
             => new MGRectangle(Window, Width ?? 16, Height ?? 16, Stroke?.ToXNAColor() ?? Color.Transparent, StrokeThickness ?? 1, Fill?.ToFillBrush(Window.Desktop));
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGDesktop Desktop = Element.GetDesktop();
 
@@ -960,7 +965,7 @@ namespace MGUI.Core.UI.XAML
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
             => throw new InvalidOperationException($"Unsupported feature - cannot instantiate {nameof(MGResizeGrip)} through XAML.");
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGResizeGrip ResizeGrip = Element as MGResizeGrip;
 
@@ -1007,7 +1012,7 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGScrollViewer(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGDesktop Desktop = Element.GetDesktop();
 
@@ -1032,7 +1037,7 @@ namespace MGUI.Core.UI.XAML
             if (ScrollBarFocusedInnerBrush != null)
                 ScrollViewer.ScrollBarInnerBrush.SelectedValue = ScrollBarFocusedInnerBrush.ToFillBrush(Desktop);
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
     }
 
@@ -1048,7 +1053,7 @@ namespace MGUI.Core.UI.XAML
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
             => new MGSeparator(Window, Orientation ?? UI.Orientation.Horizontal);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGSeparator Separator = Element as MGSeparator;
 
@@ -1124,7 +1129,7 @@ namespace MGUI.Core.UI.XAML
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
             => new MGSlider(Window, Minimum ?? 0, Maximum ?? 100, Value ?? Minimum ?? 0);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGDesktop Desktop = Element.GetDesktop();
 
@@ -1192,7 +1197,7 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.Spacer;
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGSpacer(Window, Width ?? 0, Height ?? 0);
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element) { }
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent) { }
         protected internal override IEnumerable<Element> GetChildren() => Enumerable.Empty<Element>();
     }
 
@@ -1222,10 +1227,10 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGSpoiler(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGSpoiler Spoiler = Element as MGSpoiler;
-            Button.ApplySettings(Parent, Spoiler.ButtonComponent.Element);
+            Button.ApplySettings(Parent, Spoiler.ButtonComponent.Element, false);
 
             if (UnspoiledText != null)
                 Spoiler.UnspoiledText = UnspoiledText;
@@ -1234,7 +1239,7 @@ namespace MGUI.Core.UI.XAML
             if (IsRevealed.HasValue)
                 Spoiler.IsRevealed = IsRevealed.Value;
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
 
         protected internal override IEnumerable<Element> GetChildren()
@@ -1280,11 +1285,11 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGStopwatch(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGStopwatch StopWatch = Element as MGStopwatch;
-            Border.ApplySettings(Parent, StopWatch.BorderComponent.Element);
-            Value.ApplySettings(Parent, StopWatch.ValueComponent.Element);
+            Border.ApplySettings(Parent, StopWatch.BorderComponent.Element, false);
+            Value.ApplySettings(Parent, StopWatch.ValueComponent.Element, false);
 
             if (ValueDisplayFormat != null)
                 StopWatch.ValueDisplayFormat = ValueDisplayFormat;
@@ -1346,13 +1351,13 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTabControl(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGDesktop Desktop = Element.GetDesktop();
 
             MGTabControl TabControl = Element as MGTabControl;
-            Border.ApplySettings(Parent, TabControl.BorderComponent.Element);
-            HeadersPanel.ApplySettings(TabControl, TabControl.HeadersPanelComponent.Element);
+            Border.ApplySettings(Parent, TabControl.BorderComponent.Element, false);
+            HeadersPanel.ApplySettings(TabControl, TabControl.HeadersPanelComponent.Element, false);
 
             if (HeaderAreaBackground != null)
                 TabControl.HeaderAreaBackground.NormalValue = HeaderAreaBackground.ToFillBrush(Desktop);
@@ -1363,7 +1368,7 @@ namespace MGUI.Core.UI.XAML
                 {
                     MGButton Button = new(TabItem.SelfOrParentWindow, x => TabItem.IsTabSelected = true);
                     TabControl.ApplyDefaultSelectedTabHeaderStyle(Button);
-                    SelectedTabHeaderTemplate.ApplySettings(TabItem, Button);
+                    SelectedTabHeaderTemplate.ApplySettings(TabItem, Button, true);
 
                     //  When a Tab is selected, the wrapper Button is implcitly set to IsSelected=true.
                     //  If the user specifies a Background but not a SelectedBackground, they probably
@@ -1384,14 +1389,17 @@ namespace MGUI.Core.UI.XAML
                 {
                     MGButton Button = new(TabItem.SelfOrParentWindow, x => TabItem.IsTabSelected = true);
                     TabControl.ApplyDefaultUnselectedTabHeaderStyle(Button);
-                    UnselectedTabHeaderTemplate.ApplySettings(TabItem, Button);
+                    UnselectedTabHeaderTemplate.ApplySettings(TabItem, Button, true);
                     return Button;
                 };
             }
 
-            foreach (TabItem Child in Tabs)
+            if (IncludeContent)
             {
-                _ = Child.ToElement<MGTabItem>(TabControl.ParentWindow, TabControl);
+                foreach (TabItem Child in Tabs)
+                {
+                    _ = Child.ToElement<MGTabItem>(TabControl.ParentWindow, TabControl);
+                }
             }
         }
 
@@ -1426,14 +1434,14 @@ namespace MGUI.Core.UI.XAML
                 throw new InvalidOperationException($"The {nameof(Parent)} {nameof(MGElement)} of an {nameof(MGTabItem)} should be of type {nameof(MGTabControl)}");
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGTabItem TabItem = Element as MGTabItem;
 
             if (IsTabSelected.HasValue)
                 TabItem.IsTabSelected = IsTabSelected.Value;
 
-            //base.ApplyDerivedSettings(Parent, Element);
+            //base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
 
         protected internal override IEnumerable<Element> GetChildren()
@@ -1491,7 +1499,7 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTextBlock(Window, Text, Foreground?.ToXNAColor(), FontSize ?? null, AllowsInlineFormatting ?? true);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGTextBlock TextBlock = Element as MGTextBlock;
 
@@ -1613,14 +1621,14 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTextBox(Window, null);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGTextBox TextBox = Element as MGTextBox;
-            Border.ApplySettings(Parent, TextBox.BorderComponent.Element);
-            TextBlock.ApplySettings(Parent, TextBox.TextBlockComponent.Element);
-            Placeholder.ApplySettings(Parent, TextBox.PlaceholderTextBlockComponent.Element);
-            CharacterCounter.ApplySettings(Parent, TextBox.CharacterCountComponent.Element);
-            ResizeGrip.ApplySettings(Parent, TextBox.ResizeGripComponent.Element);
+            Border.ApplySettings(Parent, TextBox.BorderComponent.Element, false);
+            TextBlock.ApplySettings(Parent, TextBox.TextBlockComponent.Element, false);
+            Placeholder.ApplySettings(Parent, TextBox.PlaceholderTextBlockComponent.Element, false);
+            CharacterCounter.ApplySettings(Parent, TextBox.CharacterCountComponent.Element, false);
+            ResizeGrip.ApplySettings(Parent, TextBox.ResizeGripComponent.Element, false);
 
             if (Text != null)
                 TextBox.SetText(Text);
@@ -1727,11 +1735,11 @@ namespace MGUI.Core.UI.XAML
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
             => new MGTimer(Window, RemainingDuration ?? TimeSpan.FromSeconds(60.0), IsPaused ?? true, AllowsNegativeDuration ?? false);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGTimer Timer = Element as MGTimer;
-            Border.ApplySettings(Parent, Timer.BorderComponent.Element);
-            Value.ApplySettings(Parent, Timer.ValueComponent.Element);
+            Border.ApplySettings(Parent, Timer.BorderComponent.Element, false);
+            Value.ApplySettings(Parent, Timer.ValueComponent.Element, false);
 
             if (ValueDisplayFormat != null)
                 Timer.ValueDisplayFormat = ValueDisplayFormat;
@@ -1788,12 +1796,12 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGToggleButton(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGDesktop Desktop = Element.GetDesktop();
 
             MGToggleButton ToggleButton = Element as MGToggleButton;
-            Border.ApplySettings(Parent, ToggleButton.BorderComponent.Element);
+            Border.ApplySettings(Parent, ToggleButton.BorderComponent.Element, false);
 
             if (CheckedBackgroundBrush != null)
                 ToggleButton.CheckedBackgroundBrush = CheckedBackgroundBrush.ToFillBrush(Desktop);
@@ -1802,7 +1810,7 @@ namespace MGUI.Core.UI.XAML
             if (IsChecked.HasValue)
                 ToggleButton.IsChecked = IsChecked.Value;
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
 
         protected internal override IEnumerable<Element> GetChildren()
@@ -1831,7 +1839,7 @@ namespace MGUI.Core.UI.XAML
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
             => new MGToolTip(Window, Parent, Width ?? 0, Height ?? 0);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGToolTip ToolTip = Element as MGToolTip;
 
@@ -1842,7 +1850,7 @@ namespace MGUI.Core.UI.XAML
             if (DrawOffset.HasValue)
                 ToolTip.DrawOffset = new Point(DrawOffset.Value.Width, DrawOffset.Value.Height);
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
     }
 
@@ -1951,17 +1959,17 @@ namespace MGUI.Core.UI.XAML
             int WindowWidth = Math.Clamp(Width ?? 0, MinWidth ?? 0, MaxWidth ?? int.MaxValue);
             int WindowHeight = Math.Clamp(Height ?? 0, MinHeight ?? 0, MaxHeight ?? int.MaxValue);
             MGWindow Window = new(Desktop, Left ?? 0, Top ?? 0, WindowWidth, WindowHeight, Theme);
-            ApplySettings(null, Window);
+            ApplySettings(null, Window, true);
             return Window;
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGWindow Window = Element as MGWindow;
-            ResizeGrip.ApplySettings(Window, Window.ResizeGripComponent.Element);
-            TitleBar.ApplySettings(Window, Window.TitleBarComponent.Element);
-            TitleBarTextBlock.ApplySettings(Window, Window.TitleBarTextBlockElement);
-            CloseButton.ApplySettings(Window, Window.CloseButtonElement);
+            ResizeGrip.ApplySettings(Window, Window.ResizeGripComponent.Element, false);
+            TitleBar.ApplySettings(Window, Window.TitleBarComponent.Element, true);
+            TitleBarTextBlock.ApplySettings(Window, Window.TitleBarTextBlockElement, false);
+            CloseButton.ApplySettings(Window, Window.CloseButtonElement, true);
 
             if (IsUserResizable.HasValue)
                 Window.IsUserResizable = IsUserResizable.Value;
@@ -1993,7 +2001,7 @@ namespace MGUI.Core.UI.XAML
                 }
             }
 
-            base.ApplyDerivedSettings(Parent, Element);
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
 
             if (WindowStyle != null)
                 Window.WindowStyle = WindowStyle.Value;
@@ -2006,7 +2014,7 @@ namespace MGUI.Core.UI.XAML
             if (IsCloseButtonVisible.HasValue)
                 Window.IsCloseButtonVisible = IsCloseButtonVisible.Value;
             ApplyBackground(Element);
-            Border.ApplySettings(Window, Window.BorderComponent.Element);
+            Border.ApplySettings(Window, Window.BorderComponent.Element, IncludeContent);
 
             if (SizeToContent != null)
                 Window.ApplySizeToContent(SizeToContent.Value, 10, 10, null, null, false);
@@ -2048,7 +2056,7 @@ namespace MGUI.Core.UI.XAML
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGXAMLDesigner(Window);
 
         protected internal override IEnumerable<Element> GetChildren() => Enumerable.Empty<Element>();
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGXAMLDesigner Designer = Element as MGXAMLDesigner;
 

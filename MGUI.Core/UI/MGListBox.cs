@@ -618,16 +618,16 @@ namespace MGUI.Core.UI
 
         //  This method is invoked via reflection in MGUI.Core.UI.XAML.Lists.ListBox.ApplyDerivedSettings.
         //  Do not modify the method signature.
-        internal void LoadSettings(ListBox Settings)
+        internal void LoadSettings(ListBox Settings, bool IncludeContent)
         {
             MGDesktop Desktop = GetDesktop();
 
-            Settings.OuterBorder.ApplySettings(this, OuterBorder);
-            Settings.InnerBorder.ApplySettings(this, InnerBorder);
-            Settings.TitleBorder.ApplySettings(this, TitleBorder);
-            Settings.TitlePresenter.ApplySettings(this, TitlePresenter);
-            Settings.ScrollViewer.ApplySettings(this, ScrollViewer);
-            Settings.ItemsPanel.ApplySettings(this, ItemsPanel);
+            Settings.OuterBorder.ApplySettings(this, OuterBorder, false);
+            Settings.InnerBorder.ApplySettings(this, InnerBorder, false);
+            Settings.TitleBorder.ApplySettings(this, TitleBorder, false);
+            Settings.TitlePresenter.ApplySettings(this, TitlePresenter, false);
+            Settings.ScrollViewer.ApplySettings(this, ScrollViewer, false);
+            Settings.ItemsPanel.ApplySettings(this, ItemsPanel, false);
 
             if (Settings.Header != null)
                 Header = Settings.Header.ToElement<MGElement>(SelfOrParentWindow, this);
@@ -673,7 +673,7 @@ namespace MGUI.Core.UI
 
             if (Settings.ItemContainerStyle != null)
             {
-                this.ItemContainerStyle = (Border) => { Settings.ItemContainerStyle.ApplySettings(this, Border); };
+                this.ItemContainerStyle = (Border) => { Settings.ItemContainerStyle.ApplySettings(this, Border, false); };
             }
 
             if (Settings.ItemTemplate != null)

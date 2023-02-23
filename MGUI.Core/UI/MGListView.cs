@@ -335,11 +335,11 @@ namespace MGUI.Core.UI
 
         //  This method is invoked via reflection in MGUI.Core.UI.XAML.Lists.ListView.ApplyDerivedSettings.
         //  Do not modify the method signature.
-        internal void LoadSettings(ListView Settings)
+        internal void LoadSettings(ListView Settings, bool IncludeContent)
         {
-            Settings.HeaderGrid.ApplySettings(this, HeaderGrid);
-            Settings.ScrollViewer.ApplySettings(this, ScrollViewer);
-            Settings.DataGrid.ApplySettings(this, DataGrid);
+            Settings.HeaderGrid.ApplySettings(this, HeaderGrid, false);
+            Settings.ScrollViewer.ApplySettings(this, ScrollViewer, false);
+            Settings.DataGrid.ApplySettings(this, DataGrid, false);
 
             foreach (ListViewColumn ColumnDefinition in Settings.Columns)
             {

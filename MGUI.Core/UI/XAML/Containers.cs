@@ -37,9 +37,9 @@ namespace MGUI.Core.UI.XAML
         [Category("Data")]
         public Element Content { get; set; }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
-            if (Content != null)
+            if (IncludeContent && Content != null)
             {
                 MGSingleContentHost TypedElement = Element as MGSingleContentHost;
                 TypedElement.SetContent(Content.ToElement<MGElement>(Element.SelfOrParentWindow, Element));
@@ -88,7 +88,7 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGGridSplitter(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGDesktop Desktop = Element.GetDesktop();
 
@@ -145,7 +145,7 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGGrid(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGDesktop Desktop = Element.GetDesktop();
 
@@ -251,7 +251,7 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGUniformGrid(Window, Rows ?? 0, Columns ?? 0, CellSize?.ToSize() ?? MonoGame.Extended.Size.Empty);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGDesktop Desktop = Element.GetDesktop();
 
@@ -312,7 +312,7 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGDockPanel(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGDockPanel DockPanel = Element as MGDockPanel;
 
@@ -355,10 +355,10 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGStackPanel(Window, Orientation ?? UI.Orientation.Vertical);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGStackPanel StackPanel = Element as MGStackPanel;
-            Border.ApplySettings(Parent, StackPanel.BorderComponent.Element);
+            Border.ApplySettings(Parent, StackPanel.BorderComponent.Element, false);
 
             if (Orientation.HasValue)
                 StackPanel.Orientation = Orientation.Value;
@@ -379,7 +379,7 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGOverlayPanel(Window);
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             MGOverlayPanel OverlayPanel = Element as MGOverlayPanel;
 

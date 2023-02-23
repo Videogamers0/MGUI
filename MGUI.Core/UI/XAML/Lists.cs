@@ -127,11 +127,11 @@ namespace MGUI.Core.UI.XAML
             return Element as MGElement;
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             Type GenericType = typeof(MGListBox<>).MakeGenericType(new Type[] { ItemType });
             MethodInfo Method = GenericType.GetMethod(nameof(MGListBox<object>.LoadSettings), BindingFlags.Instance | BindingFlags.NonPublic);
-            Method.Invoke(Element, new object[] { this });
+            Method.Invoke(Element, new object[] { this, IncludeContent });
         }
 
         protected internal override IEnumerable<Element> GetChildren()
@@ -190,11 +190,11 @@ namespace MGUI.Core.UI.XAML
             return Element as MGElement;
         }
 
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element)
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
             Type GenericType = typeof(MGListView<>).MakeGenericType(new Type[] { ItemType });
             MethodInfo Method = GenericType.GetMethod(nameof(MGListView<object>.LoadSettings), BindingFlags.Instance | BindingFlags.NonPublic);
-            Method.Invoke(Element, new object[] { this });
+            Method.Invoke(Element, new object[] { this, IncludeContent });
         }
 
         protected internal override IEnumerable<Element> GetChildren()

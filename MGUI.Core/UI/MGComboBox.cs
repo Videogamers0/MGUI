@@ -345,9 +345,17 @@ namespace MGUI.Core.UI
         public int MinDropdownHeight { get; set; } = 100;
         public int MaxDropdownHeight { get; set; } = 360;
 
-        private MGWindow Dropdown { get; }
-        private MGScrollViewer DropdownSV { get; }
-        private MGStackPanel DropdownSP { get; }
+        /// <summary>The floating <see cref="MGWindow"/> used to display the content inside of the dropdown when <see cref="IsDropdownOpen"/> is true.<para/>
+        /// Warning - be careful when editing properties on this object. Some changes could break the combobox's functionality,<br/>
+        /// such as setting <see cref="MGWindow.IsTitleBarVisible"/> and <see cref="MGWindow.IsCloseButtonVisible"/> to true, and then clicking the close button.<para/>
+        /// See also: <see cref="DropdownSV"/>, <see cref="DropdownSP"/></summary>
+        public MGWindow Dropdown { get; }
+        /// <summary>The <see cref="MGScrollViewer"/> that the <see cref="Dropdown"/>'s Content is wrapped in.<para/>
+        /// See also: <see cref="Dropdown"/>, <see cref="DropdownSP"/></summary>
+        public MGScrollViewer DropdownSV { get; }
+        /// <summary>The <see cref="MGStackPanel"/> that the <see cref="ItemsSource"/>'s rows are added to.<para/>
+        /// See also: <see cref="Dropdown"/>, <see cref="DropdownSV"/></summary>
+        public MGStackPanel DropdownSP { get; }
 
         private bool IsDropdownContentValid;
         private void DropdownContentChanged()
@@ -562,10 +570,10 @@ namespace MGUI.Core.UI
 
         //  This method is invoked via reflection in MGUI.Core.UI.XAML.Controls.ComboBox.ApplyDerivedSettings.
         //  Do not modify the method signature.
-        internal void LoadSettings(ComboBox Settings)
+        internal void LoadSettings(ComboBox Settings, bool IncludeContent)
         {
-            Settings.Border.ApplySettings(this, BorderComponent.Element);
-            Settings.DropdownArrow.ApplySettings(this, DropdownArrowComponent.Element);
+            Settings.Border.ApplySettings(this, BorderComponent.Element, false);
+            Settings.DropdownArrow.ApplySettings(this, DropdownArrowComponent.Element, IncludeContent);
 
             if (Settings.DropdownArrowColor.HasValue)
                 DropdownArrowColor = Settings.DropdownArrowColor.Value.ToXNAColor();
@@ -578,6 +586,10 @@ namespace MGUI.Core.UI
                 MinDropdownHeight = Settings.MinDropdownHeight.Value;
             if (Settings.MaxDropdownHeight.HasValue)
                 MaxDropdownHeight = Settings.MaxDropdownHeight.Value;
+
+            Settings.Dropdown?.ApplySettings(Dropdown.Parent, Dropdown, false);
+            Settings.DropdownScrollViewer?.ApplySettings(DropdownSV.Parent, DropdownSV, false);
+            Settings.DropdownStackPanel?.ApplySettings(DropdownSP.Parent, DropdownSP, false);
 
             if (Settings.Items?.Any() == true)
             {
