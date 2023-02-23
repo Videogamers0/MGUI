@@ -369,6 +369,8 @@ namespace MGUI.Core.UI.Containers
             using (BeginInitializing())
             {
                 this.HeaderPresenter = new(Window);
+                this.HeaderPresenter.HorizontalAlignment = HorizontalAlignment.Center;
+                this.HeaderPresenter.VerticalAlignment = VerticalAlignment.Center;
                 this.HeaderPresenterComponent = new(HeaderPresenter, false, false, false, false, false, false, false,
                     (AvailableBounds, ComponentSize) => this.HeaderPosition switch
                     {

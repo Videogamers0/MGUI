@@ -80,6 +80,12 @@ namespace MGUI.Core.UI.XAML
                     int a = RGBMatch.Groups["AlphaComponent"].Success ? int.Parse(RGBMatch.Groups["AlphaComponent"].Value) : byte.MaxValue;
                     return DrawingColor.FromArgb(a, r, g, b);
                 }
+                //  Special case because System.Drawing.Color.Transparent [rgb(255,255,255,0)] is NOT the same as Microsoft.Xna.Framework.Color.Transparent [rgb(0,0,0,0)]
+                //  Drawing XNA color=(255,255,255,0) will render White, whereas drawing XNA color=(0,0,0,0) draws nothing.
+                else if (colorName.Equals("transparent", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    return DrawingColor.FromArgb(0, 0, 0, 0);
+                }
                 else
                 {
                     return ColorTranslator.FromHtml(colorName);

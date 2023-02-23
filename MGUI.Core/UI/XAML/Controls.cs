@@ -341,6 +341,18 @@ namespace MGUI.Core.UI.XAML
         [Category("Data")]
         public ContentTemplate SelectedItemTemplate { get; set; }
 
+        [Category("Data")]
+        public int? SelectedIndex { get; set; }
+
+        [Category("Layout")]
+        public int? MinDropdownWidth { get; set; }
+        [Category("Layout")]
+        public int? MaxDropdownWidth { get; set; }
+        [Category("Layout")]
+        public int? MinDropdownHeight { get; set; }
+        [Category("Layout")]
+        public int? MaxDropdownHeight { get; set; }
+
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
             Type GenericType = typeof(MGComboBox<>).MakeGenericType(new Type[] { ItemType });

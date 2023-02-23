@@ -86,6 +86,8 @@ namespace MGUI.Core.UI.XAML
         public FillBrush DisabledBackground { get; set; }
         [Category("Appearance")]
         public FillBrush SelectedBackground { get; set; }
+        [Category("Appearance")]
+        public XAMLColor? BackgroundFocusedColor { get; set; }
 
         [Category("Appearance")]
         public XAMLColor? TextForeground { get; set; }
@@ -167,24 +169,26 @@ namespace MGUI.Core.UI.XAML
 
         protected internal List<PropertyBinding> Bindings { get; } = new();
 
-        public T ToElement<T>(MGWindow Window, MGElement Parent) 
+        /// <param name="ApplyBaseSettings">If not null, this action will be invoked before <see cref="ApplySettings(MGElement, MGElement)"/> executes.</param>
+        public T ToElement<T>(MGWindow Window, MGElement Parent, Action<T> ApplyBaseSettings = null) 
             where T : MGElement
         {
-            MGElement Element = CreateElementInstance(Window, Parent);
+            T Element = CreateElementInstance(Window, Parent) as T;
+            ApplyBaseSettings?.Invoke(Element);
             ApplySettings(Parent, Element);
-            return Element as T;
+            return Element;
         }
 
         protected internal void ApplySettings(MGElement Parent, MGElement Element)
         {
             using (Element.BeginInitializing())
             {
-                ApplyBaseSettings(Parent, Element);
+                ApplyBaseSettings(Parent, Element, true);
                 ApplyDerivedSettings(Parent, Element);
             }
         }
 
-        private void ApplyBaseSettings(MGElement Parent, MGElement Element)
+        internal void ApplyBaseSettings(MGElement Parent, MGElement Element, bool IncludeBindings)
         {
             using (Element.BeginInitializing())
             {
@@ -273,6 +277,8 @@ namespace MGUI.Core.UI.XAML
                 Element.BackgroundBrush.DisabledValue = DisabledBackground.ToFillBrush(Desktop);
             if (SelectedBackground != null)
                 Element.BackgroundBrush.SelectedValue = SelectedBackground.ToFillBrush(Desktop);
+            if (BackgroundFocusedColor != null)
+                Element.BackgroundBrush.FocusedColor = BackgroundFocusedColor.Value.ToXNAColor();
         }
 
         protected abstract MGElement CreateElementInstance(MGWindow Window, MGElement Parent);

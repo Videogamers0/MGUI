@@ -23,14 +23,16 @@ namespace MGUI.Core.UI.XAML
         [Category("Data")]
         public Element Content { get; set; }
 
-        public MGElement GetContent(MGWindow Window, MGElement Parent, object DataContext)
+        /// <param name="ApplyBaseSettings">If not null, this action will be invoked before <see cref="Element.ApplySettings(MGElement, MGElement)"/> 
+        /// executes on the created <see cref="MGElement"/>.</param>
+        public MGElement GetContent(MGWindow Window, MGElement Parent, object DataContext, Action<MGElement> ApplyBaseSettings = null)
         {
             if (Content == null)
                 return null;
 
             Element ContentCopy = Content.Copy();
             PreProcessBindings(ContentCopy, DataContext);
-            MGElement Item = ContentCopy.ToElement<MGElement>(Window, Parent);
+            MGElement Item = ContentCopy.ToElement<MGElement>(Window, Parent, ApplyBaseSettings);
             if (DataContext is INotifyPropertyChanged NPC)
                 PostProcessBindings(Item, NPC);
 
@@ -55,7 +57,7 @@ namespace MGUI.Core.UI.XAML
                 {
                     //  Prioritize the underlying type in case the type is a Nullable
                     Type TargetType = Nullable.GetUnderlyingType(TargetProperty.PropertyType) ?? TargetProperty.PropertyType;
-                    object TargetValue = Value == null ? null : Convert.ChangeType(Value, TargetType);
+                    object TargetValue = Value == null ? null : Value.GetType().IsAssignableTo(TargetType) ? Value : Convert.ChangeType(Value, TargetType);
                     TargetProperty.SetValue(Element, TargetValue, null);
                 }
             }

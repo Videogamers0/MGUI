@@ -1,5 +1,8 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="" Padding="10">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:Local="clr-namespace:MGUI.Samples.Controls;assembly=MGUI.Samples"
+        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="ComboBox" Padding="10">
     <Window.Styles>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="10" />
@@ -22,36 +25,173 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
         <StackPanel Orientation="Vertical" Spacing="10">
-            <TextBlock StyleNames="Header1" Text=":" HorizontalAlignment="Center" />
+            <TextBlock StyleNames="Header1" Text="ComboBox:" HorizontalAlignment="Center" />
             <Separator/>
-            <TextBlock FontSize="10" Text="[b][/b]" />
+            <TextBlock>
+                ComboBoxes display a set of mutually-exclusive choices inside of a popup list. The currently-chosen value is displayed directly inside the ComboBox.
+            </TextBlock>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Common Properties" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
-                    
+            <Border Background="White * 0.1" Padding="5,2" HorizontalAlignment="Left" BorderThickness="0">
+                <HeaderedContentPresenter Dock="Left" Spacing="8" Header="This is a ComboBox with 5 choices:">
+                    <ComboBox ItemType="{x:Type System:String}" Width="150" SelectedIndex="0">
+                        <System:String>Option 1</System:String>
+                        <System:String>Option 2</System:String>
+                        <System:String>Option 3</System:String>
+                        <System:String>Option 4</System:String>
+                        <System:String>Option 5</System:String>
+                    </ComboBox>
+                </HeaderedContentPresenter>
+            </Border>
+            <Separator />
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    ComboBoxes require a Generic Type parameter which is used to restrict the [c=Turquoise][i]ComboBox.ItemsSource[/i][/c] collection.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        To specify a Generic Type in XAML, use the [i]x:Type MarkupExtension[/i]. 
+                        This XAML creates a [c=Turquoise][i]ComboBox&lt;[c=LightBlue][s=Blue]string[/s][/c]&gt;[/i][/c] and adds 3 [c=LightBlue][s=Blue]strings[/s][/c] to it.
+                    </TextBlock>
+                    <TextBox IsReadonly="True" Name="TextBox1" Background="rgb(12,16,82)" />
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Example XAML" />
-                </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
-                    <TextBox Name="Example_TextBox" FontSize="10" />
-                </ScrollViewer>
-            </Expander>
-
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Result" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0" Background="rgb(16,16,64)">
-                    
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]ItemsSource[/i][/c], [c=Turquoise][i]DropdownItemTemplate[/i][/c], and [c=Turquoise][i]SelectedItemTemplate[/i][/c]
+                    to control what items appear in the dropdown, and what content is displayed for each item.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock Text="This ComboBox displays a list of colors. Each item's content is a colored rectangle followed by the color name:" />
+                    <ComboBox Name="ComboBox1" HorizontalAlignment="Left" Width="180" ItemType="{x:Type Local:NamedColor}">
+                        <!-- Note: If you don't specify a SelectedItemTemplate, it will default to the same content as DropdownItemTemplate -->
+                        <ComboBox.DropdownItemTemplate>
+                            <ContentTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                    <Rectangle Stroke="Black" StrokeThickness="1" Width="16" Height="16" VerticalAlignment="Center" 
+                                               Fill="{PropertyBinding Path=FillBrush, Mode=OneTime}" />
+                                    <TextBlock VerticalAlignment="Center" Text="{PropertyBinding Path=Name, Mode=OneTime}" />
+                                </StackPanel>
+                            </ContentTemplate>
+                        </ComboBox.DropdownItemTemplate>
+                    </ComboBox>
+                    <TextBlock Text="This ComboBox uses a different template for the selected item:" />
+                    <ComboBox Name="ComboBox2" HorizontalAlignment="Left" Width="180" ItemType="{x:Type Local:NamedColor}"
+                              HorizontalContentAlignment="Stretch">
+                        <ComboBox.DropdownItemTemplate>
+                            <ContentTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                    <Rectangle Stroke="Black" StrokeThickness="1" Width="16" Height="16" VerticalAlignment="Center" 
+                                               Fill="{PropertyBinding Path=FillBrush, Mode=OneTime}" />
+                                    <TextBlock VerticalAlignment="Center" Text="{PropertyBinding Path=Name, Mode=OneTime}" />
+                                </StackPanel>
+                            </ContentTemplate>
+                        </ComboBox.DropdownItemTemplate>
+                        <ComboBox.SelectedItemTemplate>
+                            <ContentTemplate>
+                                <Border BorderBrush="Black * 0.3" BorderThickness="1" Margin="4,2" Padding="4,2" 
+                                        VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                                        Background="{PropertyBinding Path=FillBrush, Mode=OneTime}">
+                                    <TextBlock Text="{PropertyBinding Path=Name, Mode=OneTime}" IsBold="True" IsShadowed="True" ShadowColor="Black" Foreground="rgb(240,232,240)" />
+                                </Border>
+                            </ContentTemplate>
+                        </ComboBox.SelectedItemTemplate>
+                    </ComboBox>
+                    <TextBlock>
+                        Each item inside the dropdown is automatically wrapped inside of a Button. 
+                        You can customize the Button's appearance by making the outermost element of the
+                        [c=Turquoise][i]DropdownItemTemplate[/i][/c] be of type [c=Turquoise][i]Button[/i][/c].
+                    </TextBlock>
+                    <ComboBox Name="ComboBox3" HorizontalAlignment="Left" Width="180" ItemType="{x:Type Local:NamedColor}">
+                        <ComboBox.DropdownItemTemplate>
+                            <ContentTemplate>
+                                <!-- The items in this list use a Purple color for the selected item, a dark blue for unselected items, and a slightly lighter blue overlay for the hovered item -->
+                                <Button Padding="6,3" Background="rgb(0,0,56)" BackgroundFocusedColor="rgb(0,0,40,96)" SelectedBackground="Purple * 0.7"
+                                        BorderBrush="Gray" BorderThickness="1" Margin="0,4,0,0">
+                                    <StackPanel Orientation="Horizontal" Spacing="5">
+                                        <Rectangle Stroke="Black" StrokeThickness="1" Width="16" Height="16" VerticalAlignment="Center" 
+                                               Fill="{PropertyBinding Path=FillBrush, Mode=OneTime}" />
+                                        <TextBlock VerticalAlignment="Center" Text="{PropertyBinding Path=Name, Mode=OneTime}" />
+                                    </StackPanel>
+                                </Button>
+                            </ContentTemplate>
+                        </ComboBox.DropdownItemTemplate>
+                        <ComboBox.SelectedItemTemplate>
+                            <ContentTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                    <Rectangle Stroke="Black" StrokeThickness="1" Width="16" Height="16" VerticalAlignment="Center" 
+                                               Fill="{PropertyBinding Path=FillBrush, Mode=OneTime}" />
+                                    <TextBlock VerticalAlignment="Center" Text="{PropertyBinding Path=Name, Mode=OneTime}" />
+                                </StackPanel>
+                            </ContentTemplate>
+                        </ComboBox.SelectedItemTemplate>
+                    </ComboBox>
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]DropdownArrowColor[/i][/c] to customize the appearance of the arrow graphics on the right side of the ComboBox's Content.
+                    To use your own custom graphics, you can set [c=Turquoise][i]DropdownArrowColor[/i][/c]=[c=LightBlue][s=Blue]Transparent[/s][/c] and modify 
+                    [c=Turquoise][i]DropdownArrowElement[/i][/c] to draw your own content.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock Text="This ComboBox has a Red dropdown arrow" />
+                    <ComboBox ItemType="{x:Type System:String}" Width="180" DropdownArrowColor="Crimson" HorizontalAlignment="Left"
+                              SelectedIndex="1" Background="Orange">
+                        <System:String>Pizza</System:String>
+                        <System:String>Spaghetti</System:String>
+                        <System:String>Chicken</System:String>
+                        <System:String>Burger</System:String>
+                    </ComboBox>
+                    <TextBlock Text="This ComboBox uses a custom icon where the dropdown arrow is usually drawn" />
+                    <ComboBox ItemType="{x:Type System:String}" Width="180" DropdownArrowColor="Transparent" HorizontalAlignment="Left"
+                              SelectedIndex="0" Background="Purple">
+                        <ComboBox.DropdownArrow>
+                            <ContentPresenter>
+                                <Image Width="16" Height="16" RegionName="ArrowDownGreen" />
+                            </ContentPresenter>
+                        </ComboBox.DropdownArrow>
+                        <System:String>Option 1</System:String>
+                        <System:String>Option 2</System:String>
+                        <System:String>Option 3</System:String>
+                        <System:String>Option 4</System:String>
+                        <System:String>Option 5</System:String>
+                    </ComboBox>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]MinDropdownWidth[/i][/c], [c=Turquoise][i]MaxDropdownWidth[/i][/c], 
+                    [c=Turquoise][i]MinDropdownHeight[/i][/c], and [c=Turquoise][i]MaxDropdownHeight[/i][/c]
+                    to control the size of the dropdown Window.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock Text="This ComboBox has a very small maximum size for its dropdown window" />
+                    <ComboBox ItemType="{x:Type System:String}" Width="180" DropdownArrowColor="Black" HorizontalAlignment="Left"
+                              SelectedIndex="1" Background="MediumPurple" MaxDropdownWidth="110" MaxDropdownHeight="64">
+                        <System:String>Option 1</System:String>
+                        <System:String>Option 2</System:String>
+                        <System:String>Option 3</System:String>
+                        <System:String>Option 4</System:String>
+                    </ComboBox>
+                    <TextBlock Text="This ComboBox has a very large minimum size for its dropdown window" />
+                    <ComboBox ItemType="{x:Type System:String}" Width="180" DropdownArrowColor="Black" HorizontalAlignment="Left"
+                              SelectedIndex="2" Background="MediumPurple" MinDropdownWidth="240" MinDropdownHeight="200">
+                        <System:String>Option 1</System:String>
+                        <System:String>Option 2</System:String>
+                        <System:String>Option 3</System:String>
+                        <System:String>Option 4</System:String>
+                    </ComboBox>
+                </StackPanel>
+            </DockPanel>
+            <Spacer Height="100" />
+            
         </StackPanel>
     </ScrollViewer>
 </Window>
