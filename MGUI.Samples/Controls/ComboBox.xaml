@@ -134,6 +134,82 @@
 
             <DockPanel>
                 <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]MinDropdownWidth[/i][/c], [c=Turquoise][i]MaxDropdownWidth[/i][/c], 
+                    [c=Turquoise][i]MinDropdownHeight[/i][/c], and [c=Turquoise][i]MaxDropdownHeight[/i][/c]
+                    to control the size of the dropdown Window.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock Text="This ComboBox has a very small maximum size for its dropdown window." />
+                    <ComboBox ItemType="{x:Type System:String}" Width="180" DropdownArrowColor="Black" HorizontalAlignment="Left"
+                              SelectedIndex="1" Background="Turquoise" MaxDropdownWidth="110" MaxDropdownHeight="64">
+                        <ComboBox.SelectedItemTemplate>
+                            <ContentTemplate>
+                                <TextBlock Foreground="Black" FontSize="11" Text="{PropertyBinding Path=., Mode=OneTime}" />
+                            </ContentTemplate>
+                        </ComboBox.SelectedItemTemplate>
+                        <System:String>Option 1</System:String>
+                        <System:String>Option 2</System:String>
+                        <System:String>Option 3</System:String>
+                        <System:String>Option 4</System:String>
+                    </ComboBox>
+                    <TextBlock Text="This ComboBox has a very large minimum size for its dropdown window." />
+                    <ComboBox ItemType="{x:Type System:String}" Width="180" DropdownArrowColor="Black" HorizontalAlignment="Left"
+                              SelectedIndex="2" Background="Turquoise" MinDropdownWidth="240" MinDropdownHeight="200">
+                        <ComboBox.SelectedItemTemplate>
+                            <ContentTemplate>
+                                <TextBlock Foreground="Black" FontSize="11" Text="{PropertyBinding Path=., Mode=OneTime}" />
+                            </ContentTemplate>
+                        </ComboBox.SelectedItemTemplate>
+                        <System:String>Option 1</System:String>
+                        <System:String>Option 2</System:String>
+                        <System:String>Option 3</System:String>
+                        <System:String>Option 4</System:String>
+                    </ComboBox>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    You can also customize [c=Turquoise][i]Dropdown[/i][/c], [c=Turquoise][i]DropdownScrollViewer[/i][/c], 
+                    and [c=Turquoise][i]DropdownStackPanel[/i][/c] for more detailed control over the dropdown's appearance.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        This ComboBox sets [c=Turquoise][i]Dropdown.Background[/i][/c] to a slightly transparent [c=Purple][s=Black]Purple[/s][/c] and gives it a 2px Black Border.
+                        It also modifies the ScrollViewer's [c=Turquoise][i]Background[/i][/c] to [c=MediumPurple][i]MediumPurple[/i][/c] and increases the [c=Turquoise][i]Padding[/i][/c].
+                    </TextBlock>
+                    <ComboBox ItemType="{x:Type System:String}" Width="200" DropdownArrowColor="Black" HorizontalAlignment="Left"
+                              SelectedIndex="2" Background="MediumPurple" MinDropdownHeight="160">
+                        <ComboBox.Dropdown>
+                            <Window BorderBrush="Black" BorderThickness="2" Background="Purple * 0.8" />
+                        </ComboBox.Dropdown>
+                        <ComboBox.DropdownScrollViewer>
+                            <ScrollViewer Padding="5" Background="MediumPurple" VerticalAlignment="Top" />
+                        </ComboBox.DropdownScrollViewer>
+                        <System:String>Option 1</System:String>
+                        <System:String>Option 2</System:String>
+                        <System:String>Option 3</System:String>
+                    </ComboBox>
+                    <TextBlock Text="This ComboBox overrides [c=Turquoise][i]DropdownScrollViewer[/i][/c] properties to use shades of [c=Purple][s=Black]Purple[/s][/c] for the scrollbar." />
+                    <ComboBox ItemType="{x:Type System:String}" Width="200" DropdownArrowColor="Black" HorizontalAlignment="Left"
+                              SelectedIndex="1" Background="MediumPurple" MaxDropdownHeight="100">
+                        <ComboBox.DropdownScrollViewer>
+                            <ScrollViewer ScrollBarUnfocusedOuterBrush="rgb(33,27,42)" ScrollBarFocusedOuterBrush="rgb(41,34,51)"
+                                          ScrollBarUnfocusedInnerBrush="MediumPurple" ScrollBarFocusedInnerBrush="rgb(157,122,229)"
+                                          Background="rgb(66,48,110)" />
+                        </ComboBox.DropdownScrollViewer>
+                        <System:String>Option 1</System:String>
+                        <System:String>Option 2</System:String>
+                        <System:String>Option 3</System:String>
+                        <System:String>Option 4</System:String>
+                    </ComboBox>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
                     Set [c=Turquoise][i]DropdownArrowColor[/i][/c] to customize the appearance of the arrow graphics on the right side of the ComboBox's Content.
                     To use your own custom graphics, you can set [c=Turquoise][i]DropdownArrowColor[/i][/c]=[c=LightBlue][s=Blue]Transparent[/s][/c] and modify 
                     [c=Turquoise][i]DropdownArrowElement[/i][/c] to draw your own content.
@@ -167,39 +243,35 @@
 
             <DockPanel>
                 <TextBlock Dock="Top">
-                    Set [c=Turquoise][i]MinDropdownWidth[/i][/c], [c=Turquoise][i]MaxDropdownWidth[/i][/c], 
-                    [c=Turquoise][i]MinDropdownHeight[/i][/c], and [c=Turquoise][i]MaxDropdownHeight[/i][/c]
-                    to control the size of the dropdown Window.
+                    Set [c=Turquoise][i]DropdownHeader[/i][/c] and/or [c=Turquoise][i]DropdownFooter[/i][/c] to add additional static content to the top or bottom of the dropdown window.
                 </TextBlock>
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
-                    <TextBlock Text="This ComboBox has a very small maximum size for its dropdown window. It also overrides [c=Turquoise][i]DropdownScrollViewer[/i][/c] to use shades of [c=Purple][s=Black]Purple[/s][/c] for the scrollbar." />
-                    <ComboBox ItemType="{x:Type System:String}" Width="180" DropdownArrowColor="Black" HorizontalAlignment="Left"
-                              SelectedIndex="1" Background="MediumPurple" MaxDropdownWidth="110" MaxDropdownHeight="64">
-                        <ComboBox.DropdownScrollViewer>
-                            <ScrollViewer ScrollBarUnfocusedOuterBrush="rgb(33,27,42)" ScrollBarFocusedOuterBrush="rgb(41,34,51)"
-                                          ScrollBarUnfocusedInnerBrush="MediumPurple" ScrollBarFocusedInnerBrush="rgb(157,122,229)"
-                                          Background="rgb(22,16,38)" />
-                        </ComboBox.DropdownScrollViewer>
-                        <System:String>Option 1</System:String>
-                        <System:String>Option 2</System:String>
-                        <System:String>Option 3</System:String>
-                        <System:String>Option 4</System:String>
-                    </ComboBox>
-                    <TextBlock Text="This ComboBox has a very large minimum size for its dropdown window. It also sets [c=Turquoise][i]Dropdown.Background[/i][/c] to a transparent [c=Purple][s=Black]Purple[/s][/c]." />
-                    <ComboBox ItemType="{x:Type System:String}" Width="180" DropdownArrowColor="Black" HorizontalAlignment="Left"
-                              SelectedIndex="2" Background="MediumPurple" MinDropdownWidth="240" MinDropdownHeight="200">
-                        <ComboBox.Dropdown>
-                            <Window Background="Purple * 0.5" />
-                        </ComboBox.Dropdown>
-                        <System:String>Option 1</System:String>
-                        <System:String>Option 2</System:String>
-                        <System:String>Option 3</System:String>
-                        <System:String>Option 4</System:String>
+                    <TextBlock Text="This ComboBox has custom header and footer content inside the dropdown." />
+                    <ComboBox ItemType="{x:Type System:String}" Width="180" HorizontalAlignment="Left"
+                              SelectedIndex="0" Background="Navy" MaxDropdownWidth="180">
+                        <ComboBox.DropdownHeader>
+                            <Border Background="rgb(12,18,55)" Padding="8,3">
+                                <TextBlock FontSize="9" TextAlignment="Center" Text="Select your favorite programming language:" />
+                            </Border>
+                        </ComboBox.DropdownHeader>
+                        <ComboBox.DropdownFooter>
+                            <Border Background="rgb(12,18,55)" Padding="8,3">
+                                <TextBlock FontSize="8" TextAlignment="Center" Text="Don't pick JavaScript, it sucks" />
+                            </Border>
+                        </ComboBox.DropdownFooter>
+                        <System:String>c#</System:String>
+                        <System:String>c++</System:String>
+                        <System:String>c</System:String>
+                        <System:String>java</System:String>
+                        <System:String>javascript</System:String>
+                        <System:String>rust</System:String>
+                        <System:String>python</System:String>
+                        <System:String>other</System:String>
                     </ComboBox>
                 </StackPanel>
             </DockPanel>
-            <Spacer Height="100" />
-            
+
+            <Spacer Height="70" />
         </StackPanel>
     </ScrollViewer>
 </Window>

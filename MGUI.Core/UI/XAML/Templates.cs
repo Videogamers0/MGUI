@@ -114,6 +114,21 @@ namespace MGUI.Core.UI.XAML
                 return false;
             }
 
+            //  Special case: A path of "." just refers to the entire DataContext, rather than a property within the DataContext
+            if (PropertyName == ".")
+            {
+                if (!DataContext.GetType().IsAssignableTo(typeof(T)))
+                {
+                    PropertyValue = default;
+                    return false;
+                }
+                else
+                {
+                    PropertyValue = (T)DataContext;
+                    return true;
+                }
+            }
+
             //  Get the property
             Type DataType = DataContext.GetType();
             PropertyInfo Property = DataType.GetProperty(PropertyName);

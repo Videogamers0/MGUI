@@ -198,10 +198,13 @@ namespace MGUI.Core.UI.XAML
             if (ColumnSpacing.HasValue)
                 Grid.ColumnSpacing = ColumnSpacing.Value;
 
-            foreach (Element Child in Children)
+            if (IncludeContent)
             {
-                MGElement ChildElement = Child.ToElement<MGElement>(Grid.SelfOrParentWindow, Grid);
-                Grid.TryAddChild(Child.GridRow, Child.GridColumn, new GridSpan(Child.GridRowSpan, Child.GridColumnSpan, Child.GridAffectsMeasure), ChildElement);
+                foreach (Element Child in Children)
+                {
+                    MGElement ChildElement = Child.ToElement<MGElement>(Grid.SelfOrParentWindow, Grid);
+                    Grid.TryAddChild(Child.GridRow, Child.GridColumn, new GridSpan(Child.GridRowSpan, Child.GridColumnSpan, Child.GridAffectsMeasure), ChildElement);
+                }
             }
         }
     }
@@ -296,10 +299,13 @@ namespace MGUI.Core.UI.XAML
             if (CellBackground != null)
                 Grid.CellBackground.NormalValue = CellBackground.ToFillBrush(Desktop);
 
-            foreach (Element Child in Children)
+            if (IncludeContent)
             {
-                MGElement ChildElement = Child.ToElement<MGElement>(Grid.SelfOrParentWindow, Grid);
-                Grid.TryAddChild(Child.GridRow, Child.GridColumn, ChildElement);
+                foreach (Element Child in Children)
+                {
+                    MGElement ChildElement = Child.ToElement<MGElement>(Grid.SelfOrParentWindow, Grid);
+                    Grid.TryAddChild(Child.GridRow, Child.GridColumn, ChildElement);
+                }
             }
         }
     }
@@ -319,10 +325,13 @@ namespace MGUI.Core.UI.XAML
             if (LastChildFill.HasValue)
                 DockPanel.LastChildFill = LastChildFill.Value;
 
-            foreach (Element Child in Children)
+            if (IncludeContent)
             {
-                MGElement ChildElement = Child.ToElement<MGElement>(DockPanel.ParentWindow, DockPanel);
-                DockPanel.TryAddChild(ChildElement, Child.Dock);
+                foreach (Element Child in Children)
+                {
+                    MGElement ChildElement = Child.ToElement<MGElement>(DockPanel.ParentWindow, DockPanel);
+                    DockPanel.TryAddChild(ChildElement, Child.Dock);
+                }
             }
         }
     }
@@ -365,10 +374,13 @@ namespace MGUI.Core.UI.XAML
             if (Spacing.HasValue)
                 StackPanel.Spacing = Spacing.Value;
 
-            foreach (Element Child in Children)
+            if (IncludeContent)
             {
-                MGElement ChildElement = Child.ToElement<MGElement>(StackPanel.ParentWindow, StackPanel);
-                StackPanel.TryAddChild(ChildElement);
+                foreach (Element Child in Children)
+                {
+                    MGElement ChildElement = Child.ToElement<MGElement>(StackPanel.ParentWindow, StackPanel);
+                    StackPanel.TryAddChild(ChildElement);
+                }
             }
         }
     }
@@ -383,10 +395,13 @@ namespace MGUI.Core.UI.XAML
         {
             MGOverlayPanel OverlayPanel = Element as MGOverlayPanel;
 
-            foreach (Element Child in Children)
+            if (IncludeContent)
             {
-                MGElement ChildElement = Child.ToElement<MGElement>(OverlayPanel.ParentWindow, OverlayPanel);
-                OverlayPanel.TryAddChild(ChildElement, Child.Offset.ToThickness(), Child.ZIndex);
+                foreach (Element Child in Children)
+                {
+                    MGElement ChildElement = Child.ToElement<MGElement>(OverlayPanel.ParentWindow, OverlayPanel);
+                    OverlayPanel.TryAddChild(ChildElement, Child.Offset.ToThickness(), Child.ZIndex);
+                }
             }
         }
     }

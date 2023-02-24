@@ -563,12 +563,44 @@ namespace MGUI.Core.UI
 
         /// <summary>The inner-most element of the visual tree that the mouse was hovering at the moment that the left mouse button was pressed.<br/>
         /// Null if the left mouse button is currently released or the mouse wasn't hovering an element when the button was pressed down.<para/>
-        /// See also: <see cref="HoveredElement"/></summary>
-        public MGElement PressedElement { get; private set; }
+        /// See also: <see cref="HoveredElement"/>, <see cref="PressedElementChanged"/></summary>
+        private MGElement _PressedElement;
+        public MGElement PressedElement
+        {
+            get => _PressedElement;
+            private set
+            {
+                if (_PressedElement != value)
+                {
+                    MGElement Previous = PressedElement;
+                    _PressedElement = value;
+                    PressedElementChanged?.Invoke(this, new(Previous, PressedElement));
+                }
+            }
+        }
+
+        public event EventHandler<EventArgs<MGElement>> PressedElementChanged;
+
         /// <summary>The inner-most element of the visual tree that the mouse is currently hovering, if any.<para/>
         /// If the mouse is hovering several sibling elements (such as children of an <see cref="MGOverlayPanel"/>, or elements placed inside the same cell of an <see cref="MGGrid"/>)<br/>
-        /// then this property prioritizes the topmost element.</summary>
-        public MGElement HoveredElement { get; private set; }
+        /// then this property prioritizes the topmost element.<para/>
+        /// See also: <see cref="PressedElement"/>, <see cref="HoveredElementChanged"/></summary>
+        private MGElement _HoveredElement;
+        public MGElement HoveredElement
+        {
+            get => _HoveredElement;
+            private set
+            {
+                if (_HoveredElement != value)
+                {
+                    MGElement Previous = HoveredElement;
+                    _HoveredElement = value;
+                    HoveredElementChanged?.Invoke(this, new(Previous, HoveredElement));
+                }
+            }
+        }
+
+        public event EventHandler<EventArgs<MGElement>> HoveredElementChanged;
 
         internal bool InvalidatePressedAndHoveredElements { get; set; } = false;
 

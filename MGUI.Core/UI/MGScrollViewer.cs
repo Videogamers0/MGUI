@@ -117,6 +117,12 @@ namespace MGUI.Core.UI
         public Rectangle? PaddedHSBBounds => HSBBounds?.GetCompressed(ScrollBarPadding);
 
         #region Offset
+        /// <summary>Invoked when either <see cref="HorizontalOffset"/> or <see cref="VerticalOffset"/> changes.<para/>
+        /// See also: <see cref="HorizontalOffsetChanged"/>, <see cref="VerticalOffsetChanged"/></summary>
+        public event EventHandler<EventArgs> OffsetChanged;
+        public event EventHandler<EventArgs<float>> VerticalOffsetChanged;
+        public event EventHandler<EventArgs<float>> HorizontalOffsetChanged;
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _VerticalOffset;
         /// <summary>See also: <see cref="MaxVerticalOffset"/></summary>
@@ -128,11 +134,15 @@ namespace MGUI.Core.UI
                 float ClampedValue = Math.Clamp(value, 0, MaxVerticalOffset);
                 if (_VerticalOffset != ClampedValue)
                 {
+                    float Previous = VerticalOffset;
                     _VerticalOffset = ClampedValue;
                     ParentWindow.InvalidatePressedAndHoveredElements = true;
+                    VerticalOffsetChanged?.Invoke(this, new(Previous, VerticalOffset));
+                    OffsetChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
+
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _MaxVerticalOffset;
@@ -185,8 +195,11 @@ namespace MGUI.Core.UI
                 float ClampedValue = Math.Clamp(value, 0, MaxHorizontalOffset);
                 if (_HorizontalOffset != ClampedValue)
                 {
+                    float Previous = HorizontalOffset;
                     _HorizontalOffset = ClampedValue;
                     ParentWindow.InvalidatePressedAndHoveredElements = true;
+                    HorizontalOffsetChanged?.Invoke(this, new(Previous, HorizontalOffset));
+                    OffsetChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }

@@ -166,7 +166,7 @@ namespace MGUI.Core.UI
 
         private void UpdateHoveredDropdownItem()
         {
-            if (IsDropdownOpen && TemplatedItems != null)
+            if (IsDropdownOpen && TemplatedItems != null && DropdownStackPanel.IsHovered)
                 HoveredItem = TemplatedItems.FirstOrDefault(x => x.Element.IsHovered);
             else
                 HoveredItem = null;
@@ -348,14 +348,15 @@ namespace MGUI.Core.UI
         /// <summary>The floating <see cref="MGWindow"/> used to display the content inside of the dropdown when <see cref="IsDropdownOpen"/> is true.<para/>
         /// Warning - be careful when editing properties on this object. Some changes could break the combobox's functionality,<br/>
         /// such as setting <see cref="MGWindow.IsTitleBarVisible"/> and <see cref="MGWindow.IsCloseButtonVisible"/> to true, and then clicking the close button.<para/>
-        /// See also: <see cref="DropdownSV"/>, <see cref="DropdownSP"/></summary>
+        /// See also: <see cref="DropdownScrollViewer"/>, <see cref="DropdownStackPanel"/></summary>
         public MGWindow Dropdown { get; }
         /// <summary>The <see cref="MGScrollViewer"/> that the <see cref="Dropdown"/>'s Content is wrapped in.<para/>
-        /// See also: <see cref="Dropdown"/>, <see cref="DropdownSP"/></summary>
-        public MGScrollViewer DropdownSV { get; }
+        /// See also: <see cref="Dropdown"/>, <see cref="DropdownStackPanel"/></summary>
+        public MGScrollViewer DropdownScrollViewer { get; }
         /// <summary>The <see cref="MGStackPanel"/> that the <see cref="ItemsSource"/>'s rows are added to.<para/>
-        /// See also: <see cref="Dropdown"/>, <see cref="DropdownSV"/></summary>
-        public MGStackPanel DropdownSP { get; }
+        /// See also: <see cref="Dropdown"/>, <see cref="DropdownScrollViewer"/></summary>
+        public MGStackPanel DropdownStackPanel { get; }
+        private MGDockPanel DropdownDockPanel { get; }
 
         private bool IsDropdownContentValid;
         private void DropdownContentChanged()
@@ -367,14 +368,14 @@ namespace MGUI.Core.UI
         {
             IsDropdownContentValid = true;
 
-            using (DropdownSP.AllowChangingContentTemporarily())
+            using (DropdownStackPanel.AllowChangingContentTemporarily())
             {
-                foreach (MGElement Element in DropdownSP.Children.ToList())
-                    DropdownSP.TryRemoveChild(Element);
+                foreach (MGElement Element in DropdownStackPanel.Children.ToList())
+                    DropdownStackPanel.TryRemoveChild(Element);
                 if (TemplatedItems != null)
                 {
                     foreach (TemplatedElement<TItemType, MGButton> UIItem in TemplatedItems)
-                        DropdownSP.TryAddChild(UIItem.Element);
+                        DropdownStackPanel.TryAddChild(UIItem.Element);
                 }
             }
 
@@ -433,6 +434,49 @@ namespace MGUI.Core.UI
             using (AllowChangingContentTemporarily())
             {
                 SetContent(Content);
+            }
+        }
+
+        private MGContentPresenter DropdownHeaderPresenter { get; }
+        private MGContentPresenter DropdownFooterPresenter { get; }
+
+        private MGElement _DropdownHeader;
+        /// <summary>Optional content that is displayed at the top of the <see cref="Dropdown"/> window.<para/>
+        /// Recommended to use a bottom margin or padding to visually separate the <see cref="DropdownHeader"/> from the items list.<para/>
+        /// See also: <see cref="DropdownFooter"/></summary>
+        public MGElement DropdownHeader
+        {
+            get => _DropdownHeader;
+            set
+            {
+                if (_DropdownHeader != value)
+                {
+                    _DropdownHeader = value;
+                    using (DropdownHeaderPresenter.AllowChangingContentTemporarily())
+                    {
+                        DropdownHeaderPresenter.SetContent(DropdownHeader);
+                    }
+                }
+            }
+        }
+
+        private MGElement _DropdownFooter;
+        /// <summary>Optional content that is displayed at the bottom of the <see cref="Dropdown"/> window.<para/>
+        /// Recommended to use a top margin or padding to visually separate the <see cref="DropdownFooter"/> from the items list.<para/>
+        /// See also: <see cref="DropdownHeader"/></summary>
+        public MGElement DropdownFooter
+        {
+            get => _DropdownFooter;
+            set
+            {
+                if (_DropdownFooter != value)
+                {
+                    _DropdownFooter = value;
+                    using (DropdownFooterPresenter.AllowChangingContentTemporarily())
+                    {
+                        DropdownFooterPresenter.SetContent(DropdownFooter);
+                    }
+                }
             }
         }
         #endregion Dropdown
@@ -511,25 +555,40 @@ namespace MGUI.Core.UI
                         }
                     }
                 };
-                Dropdown.WindowMouseHandler.MovedInside += (sender, e) => { UpdateHoveredDropdownItem(); };
-                Dropdown.WindowMouseHandler.Scrolled += (sender, e) => { UpdateHoveredDropdownItem(); };
 
                 Dropdown.BorderThickness = new(1);
                 Dropdown.BorderBrush = MGUniformBorderBrush.Gray;
                 Dropdown.BackgroundBrush = GetTheme().ComboBoxDropdownBackground.GetValue(true);
                 Dropdown.Padding = new(0);
 
-                DropdownSP = new(Dropdown, Orientation.Vertical);
-                DropdownSP.Spacing = 0;
-                DropdownSP.CanChangeContent = false;
-                DropdownSP.ManagedParent = Dropdown;
-                DropdownSV = new(Dropdown, ScrollBarVisibility.Auto, ScrollBarVisibility.Disabled);
-                DropdownSV.Padding = new(0);
-                DropdownSV.SetContent(DropdownSP);
-                DropdownSV.CanChangeContent = false;
-                DropdownSV.ManagedParent = Dropdown;
-                Dropdown.SetContent(DropdownSV);
+                //  Create the placeholders for the Header and Footer
+                DropdownHeaderPresenter = new(Dropdown);
+                DropdownHeaderPresenter.CanChangeContent = false;
+                DropdownFooterPresenter = new(Dropdown);
+                DropdownFooterPresenter.CanChangeContent = false;
+
+                //  Create the StackPanel and ScrollViewer that host the items list
+                DropdownStackPanel = new(Dropdown, Orientation.Vertical);
+                DropdownStackPanel.Spacing = 0;
+                DropdownStackPanel.CanChangeContent = false;
+                DropdownStackPanel.ManagedParent = Dropdown;
+                DropdownScrollViewer = new(Dropdown, ScrollBarVisibility.Auto, ScrollBarVisibility.Disabled);
+                DropdownScrollViewer.Padding = new(0);
+                DropdownScrollViewer.SetContent(DropdownStackPanel);
+                DropdownScrollViewer.CanChangeContent = false;
+                DropdownScrollViewer.ManagedParent = Dropdown;
+
+                //  Set the dropdown's content
+                DropdownDockPanel = new(Dropdown, true);
+                DropdownDockPanel.TryAddChild(DropdownHeaderPresenter, Dock.Top);
+                DropdownDockPanel.TryAddChild(DropdownFooterPresenter, Dock.Bottom);
+                DropdownDockPanel.TryAddChild(DropdownScrollViewer, Dock.Top);
+                DropdownDockPanel.CanChangeContent = false;
+                Dropdown.SetContent(DropdownDockPanel);
                 Dropdown.CanChangeContent = false;
+
+                //Dropdown.WindowMouseHandler.MovedInside += (sender, e) => { UpdateHoveredDropdownItem(); };
+                Dropdown.HoveredElementChanged += (sender, e) => { UpdateHoveredDropdownItem(); };
 
                 DropdownItemTemplate = item =>
                 {
@@ -588,8 +647,13 @@ namespace MGUI.Core.UI
                 MaxDropdownHeight = Settings.MaxDropdownHeight.Value;
 
             Settings.Dropdown?.ApplySettings(Dropdown.Parent, Dropdown, false);
-            Settings.DropdownScrollViewer?.ApplySettings(DropdownSV.Parent, DropdownSV, false);
-            Settings.DropdownStackPanel?.ApplySettings(DropdownSP.Parent, DropdownSP, false);
+            Settings.DropdownScrollViewer?.ApplySettings(DropdownScrollViewer.Parent, DropdownScrollViewer, false);
+            Settings.DropdownStackPanel?.ApplySettings(DropdownStackPanel.Parent, DropdownStackPanel, false);
+
+            if (Settings.DropdownHeader != null)
+                DropdownHeader = Settings.DropdownHeader.ToElement<MGElement>(Dropdown, DropdownHeaderPresenter);
+            if (Settings.DropdownFooter != null)
+                DropdownFooter = Settings.DropdownFooter.ToElement<MGElement>(Dropdown, DropdownFooterPresenter);
 
             if (Settings.Items?.Any() == true)
             {

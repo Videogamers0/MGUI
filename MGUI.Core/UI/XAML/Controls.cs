@@ -358,6 +358,9 @@ namespace MGUI.Core.UI.XAML
         public ScrollViewer DropdownScrollViewer { get; set; } = null;
         public StackPanel DropdownStackPanel { get; set; } = null;
 
+        public Element DropdownHeader { get; set; } = null;
+        public Element DropdownFooter { get; set; } = null;
+
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
             Type GenericType = typeof(MGComboBox<>).MakeGenericType(new Type[] { ItemType });
