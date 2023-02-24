@@ -561,45 +561,24 @@ namespace MGUI.Core.UI
         /// See also:<br/><see cref="MGElement.GetTheme()"/><br/><see cref="MGDesktop.Theme"/></summary>
         public MGTheme Theme { get; set; }
 
+        private MGElement PressedElementAtBeginUpdate { get; set; }
+        private MGElement HoveredElementAtBeginUpdate { get; set; }
+
         /// <summary>The inner-most element of the visual tree that the mouse was hovering at the moment that the left mouse button was pressed.<br/>
         /// Null if the left mouse button is currently released or the mouse wasn't hovering an element when the button was pressed down.<para/>
         /// See also: <see cref="HoveredElement"/>, <see cref="PressedElementChanged"/></summary>
-        private MGElement _PressedElement;
-        public MGElement PressedElement
-        {
-            get => _PressedElement;
-            private set
-            {
-                if (_PressedElement != value)
-                {
-                    MGElement Previous = PressedElement;
-                    _PressedElement = value;
-                    PressedElementChanged?.Invoke(this, new(Previous, PressedElement));
-                }
-            }
-        }
-
-        public event EventHandler<EventArgs<MGElement>> PressedElementChanged;
-
+        public MGElement PressedElement { get; private set; }
         /// <summary>The inner-most element of the visual tree that the mouse is currently hovering, if any.<para/>
         /// If the mouse is hovering several sibling elements (such as children of an <see cref="MGOverlayPanel"/>, or elements placed inside the same cell of an <see cref="MGGrid"/>)<br/>
         /// then this property prioritizes the topmost element.<para/>
         /// See also: <see cref="PressedElement"/>, <see cref="HoveredElementChanged"/></summary>
-        private MGElement _HoveredElement;
-        public MGElement HoveredElement
-        {
-            get => _HoveredElement;
-            private set
-            {
-                if (_HoveredElement != value)
-                {
-                    MGElement Previous = HoveredElement;
-                    _HoveredElement = value;
-                    HoveredElementChanged?.Invoke(this, new(Previous, HoveredElement));
-                }
-            }
-        }
+        public MGElement HoveredElement { get; private set; }
 
+        /// <summary>Invoked after <see cref="PressedElement"/> changes, but is intentionally deferred until the end of the current update tick so that <see cref="MGElement.VisualState"/> 
+        /// values are properly synced with the <see cref="PressedElement"/></summary>
+        public event EventHandler<EventArgs<MGElement>> PressedElementChanged;
+        /// <summary>Invoked after <see cref="HoveredElement"/> changes, but is intentionally deferred until the end of the current update tick so that <see cref="MGElement.VisualState"/> 
+        /// values are properly synced with the <see cref="HoveredElement"/></summary>
         public event EventHandler<EventArgs<MGElement>> HoveredElementChanged;
 
         internal bool InvalidatePressedAndHoveredElements { get; set; } = false;
@@ -760,6 +739,9 @@ namespace MGUI.Core.UI
 
                 OnBeginUpdate += (sender, e) =>
                 {
+                    PressedElementAtBeginUpdate = PressedElement;
+                    HoveredElementAtBeginUpdate = HoveredElement;
+
                     bool ShouldUpdateHoveredElement = MouseHandler.Tracker.MouseMovedRecently || !IsLayoutValid || QueueLayoutRefresh || InvalidatePressedAndHoveredElements;
 
                     ValidateWindowSizeAndPosition();
@@ -777,6 +759,16 @@ namespace MGUI.Core.UI
                         PressedElement = GetTopmostHoveredElement(e.UA);
                     else if (MouseHandler.Tracker.MouseLeftButtonReleasedRecently)
                         PressedElement = null;
+                };
+
+                OnEndUpdate += (sender, e) =>
+                {
+                    //  These 2 events are intentionally deferred because they affect MGElement.VisualState,
+                    //  and subscribing code probably wants to access the most up-to-date MGElement.VisualState values.
+                    if (PressedElementAtBeginUpdate != PressedElement)
+                        PressedElementChanged?.Invoke(this, new(PressedElementAtBeginUpdate, PressedElement));
+                    if (HoveredElementAtBeginUpdate != HoveredElement)
+                        HoveredElementChanged?.Invoke(this, new(HoveredElementAtBeginUpdate, HoveredElement));
                 };
 
                 //  Ensure all mouse events that haven't already been handled by a child element of this window are handled, so that the mouse events won't fall-through to underneath this window

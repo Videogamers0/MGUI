@@ -162,12 +162,27 @@ namespace MGUI.Core.UI
 
         #region Hovered Item
         /// <summary>The item within the dropdown that is currently hovered by the mouse, if any.</summary>
-        public TemplatedElement<TItemType, MGButton> HoveredItem { get; private set; }
+        private TemplatedElement<TItemType, MGButton> _HoveredItem;
+        public TemplatedElement<TItemType, MGButton> HoveredItem
+        {
+            get => _HoveredItem;
+            private set
+            {
+                if (_HoveredItem != value)
+                {
+                    TemplatedElement<TItemType, MGButton> Previous = HoveredItem;
+                    _HoveredItem = value;
+                    HoveredItemChanged?.Invoke(this, new(Previous, HoveredItem));
+                }
+            }
+        }
+
+        public event EventHandler<EventArgs<TemplatedElement<TItemType, MGButton>>> HoveredItemChanged;
 
         private void UpdateHoveredDropdownItem()
         {
             if (IsDropdownOpen && TemplatedItems != null && DropdownStackPanel.IsHovered)
-                HoveredItem = TemplatedItems.FirstOrDefault(x => x.Element.IsHovered);
+                HoveredItem = TemplatedItems.FirstOrDefault(x => x.Element.VisualState.IsHovered);
             else
                 HoveredItem = null;
         }
@@ -587,7 +602,6 @@ namespace MGUI.Core.UI
                 Dropdown.SetContent(DropdownDockPanel);
                 Dropdown.CanChangeContent = false;
 
-                //Dropdown.WindowMouseHandler.MovedInside += (sender, e) => { UpdateHoveredDropdownItem(); };
                 Dropdown.HoveredElementChanged += (sender, e) => { UpdateHoveredDropdownItem(); };
 
                 DropdownItemTemplate = item =>
