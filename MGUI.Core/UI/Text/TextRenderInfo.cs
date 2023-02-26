@@ -55,13 +55,11 @@ namespace MGUI.Core.UI.Text
             Thickness Padding = TextBlockElement.Padding;
             float LinePadding = TextBlockElement.LinePadding;
 
-            SpriteFont SF = TextBlockElement.SF_Regular;
+            SpriteFont SF = TextBlockElement.GetFont(TextBlockElement.IsBold, TextBlockElement.IsItalic, out Dictionary<char, SpriteFont.Glyph> Glyphs);
             Vector2 MeasurementScale = new Vector2(1.0f, TextBlockElement.FontHeight) * TextBlockElement.FontScale;
 
-            Dictionary<char, SpriteFont.Glyph> Glyphs = SF.GetGlyphs();
-
             float CurrentY = LayoutBounds.Top + Padding.Top;
-            if (!TextBlockElement.Lines.Any())
+            if (TextBlockElement.Lines?.Any() != true)
             {
                 LineRenderInfo LineInfo = new(this, null, LineIndex, CurrentY, TextBlockElement.MeasureText("|", false, false, false).Y);
                 _Lines.Add(LineInfo);

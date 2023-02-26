@@ -1,5 +1,5 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="" Padding="10">
+        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="TextBox" Padding="10">
     <Window.Styles>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="10" />
@@ -22,36 +22,248 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
         <StackPanel Orientation="Vertical" Spacing="10">
-            <TextBlock StyleNames="Header1" Text=":" HorizontalAlignment="Center" />
+            <TextBlock StyleNames="Header1" Text="TextBox:" HorizontalAlignment="Center" />
             <Separator/>
-            <TextBlock FontSize="10" Text="[b][/b]" />
+            <TextBlock>
+                TextBoxes are editable TextBlocks that allow the user to input a string value.
+            </TextBlock>
+            <Separator />
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Common Properties" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
+            <TextBox PlaceholderText="[i][Opacity=0.5]This is a TextBox. Enter a value:[/Opacity][/i]" AcceptsReturn="False" AcceptsTab="False" />
+            <Separator />
 
+            <!--<TextBlock Dock="Top">
+                    TextBoxes support a variety of features you'd expect to find in any simple text-entry control, such as: 
+                    Click+Drag\n to select text, Click or use Arrow Keys to move the Caret position, Press INS to toggle between Overwrite or Insert text entry,
+                    double-click to select a single word, triple-click to select a line, 
+                    various keyboard shortcuts like Ctrl+C (Copy), Ctrl+V (Paste), Ctrl+X (Cut), Ctrl+Z (Undo), Ctrl+Y (Redo), Ctrl+A (Select All), Ctrl+D (Duplicate current line),
+                    and supports linebreaks and tabs.
+            </TextBlock>-->
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Use the [c=Turquoise][i]Text[/i][/c] property to get the TextBox's current text value, or 
+                    [c=Turquoise][i]SetText[/c]([c=LightBlue][s=Blue]string[/s][/c])[/i] to set the value.
+                    You can also use [c=Turquoise][i]FormattedText[/i][/c] to get the text value that includes formatting
+                    (such as Foreground/Background colors around the selected text)
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBox AcceptsReturn="False" AcceptsTab="False" Name="TextBox2" Text="Hello World" />
+                    <TextBlock Text="[c=Turquoise][i]Text[/i][/c] current value is:" />
+                    <TextBlock Name="TextBlock2" AllowsInlineFormatting="False" />
+                    <TextBlock Text="[c=Turquoise][i]FormattedText[/i][/c] current value is:" />
+                    <TextBlock Name="TextBlock3" AllowsInlineFormatting="False" />
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Example XAML" />
-                </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
-                    <TextBox Name="Example_TextBox" FontSize="10" />
-                </ScrollViewer>
-            </Expander>
-
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Result" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0" Background="rgb(16,16,64)">
-
+            <DockPanel>
+                <TextBlock Dock="Top">
+                   TextBoxes internally use a TextBlock to render the text. Set [c=Turquoise][i]TextBlock.Foreground[/i][/c] to change the text's color,
+                    or set any other TextBlock properties to control the text's appearance.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="3">
+                    <StackPanel.Styles>
+                        <Style TargetType="TextBox">
+                            <Setter Property="Background" Value="rgb(10,16,68)" />
+                            <Setter Property="AcceptsReturn" Value="False" />
+                            <Setter Property="AcceptsTab" Value="False" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <TextBox Text="This TextBox uses Red text">
+                        <TextBox.TextBlock>
+                            <TextBlock Foreground="Red" />
+                        </TextBox.TextBlock>
+                    </TextBox>
+                    <TextBox Text="This TextBox uses Bold text">
+                        <TextBox.TextBlock>
+                            <TextBlock IsBold="True" />
+                        </TextBox.TextBlock>
+                    </TextBox>
+                    <TextBox Text="This TextBox uses Italics text">
+                        <TextBox.TextBlock>
+                            <TextBlock IsItalic="True" />
+                        </TextBox.TextBlock>
+                    </TextBox>
+                    <TextBox Text="This TextBox uses text with a purple shadow">
+                        <TextBox.TextBlock>
+                            <TextBlock IsShadowed="True" ShadowColor="Purple" />
+                        </TextBox.TextBlock>
+                    </TextBox>
+                    <TextBox Text="This TextBox uses smaller text" MinHeight="0">
+                        <TextBox.TextBlock>
+                            <TextBlock FontSize="8" />
+                        </TextBox.TextBlock>
+                    </TextBox>
+                    <TextBox Text="This TextBox uses larger text">
+                        <TextBox.TextBlock>
+                            <TextBlock FontSize="14" IsBold="True" />
+                        </TextBox.TextBlock>
+                    </TextBox>
+                        
+                    <!-- The Caret positions are buggy if you do this, might fix later... -->
+                    <!--<TextBox Text="This TextBox uses a Horizontally-Centered TextBlock">
+                        <TextBox.TextBlock>
+                            <TextBlock HorizontalAlignment="Center" />
+                        </TextBox.TextBlock>
+                    </TextBox>-->
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Use [c=Turquoise][i]CurrentSelection[/i][/c] to get or set the selected text. 
+                    You can also use these methods: [c=Turquoise][i]SelectAll[/i][/c](), [c=Turquoise][i]TrySelectText[/i][/c](...)
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBox Name="TextBox1" AcceptsReturn="False" AcceptsTab="False" Text="Select some text!" Background="rgb(78,12,18)" BorderBrush="DarkGray" BorderThickness="1" />
+                    <StackPanel Orientation="Horizontal" Spacing="2">
+                        <TextBlock Text="[c=Turquoise][i]CurrentSelection[/i][/c]'s value is:" />
+                        <TextBlock Name="TextBlock1" />
+                    </StackPanel>
+                    <TextBlock IsItalic="True">
+                        (Click+Drag to select text. You can also double-click to select a single word, triple-click to select an entire line, or quadruple-click to select all)
+                    </TextBlock>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+                
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Use [c=Turquoise][i]FocusedSelectionForegroundColor[/i][/c], [c=Turquoise][i]FocusedSelectionBackgroundColor[/i][/c],
+                    [c=Turquoise][i]UnfocusedSelectionForegroundColor[/i][/c], and [c=Turquoise][i]UnfocusedSelectionBackgroundColor[/i][/c]
+                    to control the appearance of selected text.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock Text="This TextBox uses an Orange background around selected text, and a Green foreground:" />
+                    <TextBox Name="SelectionTextBox1" AcceptsReturn="False" AcceptsTab="False" Text="Hello World" 
+                             FocusedSelectionBackgroundColor="Orange" FocusedSelectionForegroundColor="Green"
+                             UnfocusedSelectionBackgroundColor="Orange" UnfocusedSelectionForegroundColor="Green" />
+                    <TextBlock Text="This TextBox uses an Red background around selected text when the TextBox has focus, and a Green background when the TextBox doesn't have focus:" />
+                    <TextBox Name="SelectionTextBox2" AcceptsReturn="False" AcceptsTab="False" Text="Hello World" 
+                             FocusedSelectionBackgroundColor="Red" UnfocusedSelectionBackgroundColor="Green" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]PlaceholderText[/i][/c] to control what text is displayed when the TextBox's [c=Turquoise][i]Text[/i][/c] is empty.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <StackPanel.Styles>
+                        <Style TargetType="TextBox">
+                            <Setter Property="Background">
+                                <Setter.Value>
+                                    <DiagonalGradientFillBrush Color1="rgb(147,112,219)" Color2="rgb(112,90,188)" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="BorderBrush" Value="Purple" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <TextBlock Text="This TextBox uses [c=Turquoise][i]PlaceholderText[/i][/c]=[c=LightBlue][s=Blue]Enter your name:[/s][/c]" />
+                    <TextBox PlaceholderText="Enter your name:" />
+                    <TextBlock AllowsInlineFormatting="False" 
+                               Text="PlaceholderText also supports the same text formatting as TextBlocks. Try setting it to: '[i][Opacity=0.5]Enter your name:[/opacity][/i]'" />
+                    <TextBox PlaceholderText="[i][Opacity=0.5]Enter your name:[/opacity][/i]" />
+                    <TextBlock Text="Or you can modify the TextBox's [c=Turquoise][i]PlaceholderTextComponent[/i][/c] settings however you want." />
+                    <TextBox PlaceholderText="This PlaceholderText is [c=Red]Red[/c] and Horizontally-Centered">
+                        <TextBox.Placeholder>
+                            <TextBlock Foreground="Red" HorizontalAlignment="Center" IsShadowed="True" ShadowColor="Black" />
+                        </TextBox.Placeholder>
+                    </TextBox>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]MinLines[/i][/c] and [c=Turquoise][i]MaxLines[/i][/c] to constrain how many lines of text the TextBox will display.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock Text="This TextBox uses [c=Turquoise][i]MinLines[/i][/c]=[c=LightBlue][s=Blue]3[/s][/c]" />
+                    <TextBox MinLines="3" Text="Even though the text is only 1 line, the TextBox is taller" />
+                    <TextBlock Text="This TextBox uses [c=Turquoise][i]MaxLines[/i][/c]=[c=LightBlue][s=Blue]3[/s][/c]" />
+                    <TextBox MaxLines="3" Text="This text has 6 lines, but is only tall enough to draw 3.\nLine#2\nLine#3\nLine#4\nLine#5\nLine#6" />
+                    <TextBlock Text="Instead of setting MaxLines, you may wish to wrap the TextBox in a [c=Turquoise][i]ScrollViewer[/i][/c] with a [c=Turquoise][i]MaxHeight[/i][/c]" />
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="51">
+                        <TextBox Text="This TextBox is wrapped inside a ScrollViewer than can only display up to 51px of Content.\nLine#2\nLine#3\nLine#4\nLine#5\nLine#6" />
+                    </ScrollViewer>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]AcceptsReturn[/i][/c] and [c=Turquoise][i]AcceptsTab[/i][/c] to allow or disallow line breaks or tabs. Tabs are internally treated as 4 spaces.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <StackPanel.Styles>
+                        <Style TargetType="TextBox">
+                            <Setter Property="Background" Value="LightSeaGreen" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <TextBlock Text="This TextBox sets [c=Turquoise][i]AcceptsReturn[/i][/c]=[c=LightBlue][s=Blue]false[/s][/c]" />
+                    <TextBox AcceptsReturn="False" Text="Pressing Enter will not go to a new line." />
+                    <TextBlock Text="This TextBox sets [c=Turquoise][i]AcceptsReturn[/i][/c]=[c=LightBlue][s=Blue]true[/s][/c]" />
+                    <TextBox AcceptsReturn="True" Text="Pressing Enter will break to a new line." />
+                    <TextBlock Text="This TextBox sets [c=Turquoise][i]AcceptsTab[/i][/c]=[c=LightBlue][s=Blue]false[/s][/c]" />
+                    <TextBox AcceptsTab="False" Text="Pressing Tab does nothing." />
+                    <TextBlock Text="This TextBox sets [c=Turquoise][i]AcceptsTab[/i][/c]=[c=LightBlue][s=Blue]true[/s][/c]" />
+                    <TextBox AcceptsTab="True" Text="Pressing Tab inserts 4 spaces." />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    TextBoxes support several keyboard shortcuts: 
+                    [c=Turquoise][i]Ctrl+C[/i][/c] (Copy), [c=Turquoise][i]Ctrl+V[/i][/c] (Paste), [c=Turquoise][i]Ctrl+X[/i][/c] (Cut), 
+                    [c=Turquoise][i]Ctrl+Z[/i][/c] (Undo), [c=Turquoise][i]Ctrl+Y[/i][/c] (Redo), 
+                    [c=Turquoise][i]Ctrl+A[/i][/c] (Select All), [c=Turquoise][i]Ctrl+D[/i][/c] (Duplicate current line)
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBox PlaceholderText="[i][o=0.5]Try out some keyboard shortcuts[/o][/i]" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]IsReadonly[/i][/c] to [c=LightBlue][s=Blue]true[/s][/c] to prevent the user from manually changing the Text.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock Text="This TextBox sets [c=Turquoise][i]IsReadonly[/i][/c]=[c=LightBlue][s=Blue]false[/s][/c]" />
+                    <TextBox IsReadonly="True" Background="Cyan"
+                             Text="This TextBox is read-only.\nYou cannot change it's text manually (but can still change it programmatically)\nSome keyboard shortcuts like Ctrl+C are still usable.">
+                        <TextBox.TextBlock>
+                            <TextBlock Foreground="Black" />
+                        </TextBox.TextBlock>
+                    </TextBox>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]ShowCharacterCount[/i][/c]=[c=LightBlue][s=Blue]true[/s][/c] to visually display a character counter.
+                    Set [c=Turquoise][i]CharacterLimit[/i][/c] to restrict how many characters can be set to the TextBox's [c=Turquoise][i]Text[/i][/c].
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock Text="This TextBox sets [c=Turquoise][i]CharacterLimit[/i][/c]=[c=LightBlue][s=Blue]8[/s][/c]" />
+                    <TextBox Text="12345678" CharacterLimit="8" />
+                    <TextBlock Text="This TextBox has no character limit, but it displays the current # of characters" />
+                    <TextBox ShowCharacterCount="True" Text="12345678" />
+                    <TextBlock Text="This TextBox also shows the current # of characters, and is limited to [b]8[/b] characters" />
+                    <TextBox Text="12345678" ShowCharacterCount="True" CharacterLimit="8" />
+                    <TextBlock Text="Set [c=Turquoise][i]LimitedCharacterCountFormatString[/i][/c] or [c=Turquoise][i]LimitlessCharacterCountFormatString[/i][/c] to control how the character counts are displayed." />
+                    <TextBox ShowCharacterCount="True" Text="12345678" LimitlessCharacterCountFormatString="Count=[b]{{CharacterCount}}[/b]" />
+                    <TextBox ShowCharacterCount="True" Text="12345678" CharacterLimit="16" 
+                             LimitedCharacterCountFormatString="[b][Color=Turquoise]{{CharacterCount}}[/color][/b] / [b][color=Turquoise]{{CharacterLimit}}[/color][/b] Characters" />
+                </StackPanel>
+            </DockPanel>
+
         </StackPanel>
     </ScrollViewer>
 </Window>

@@ -348,7 +348,8 @@ namespace MGUI.Core.UI.XAML
                         PropertyInfo PropertyInfo = ThisType.GetProperty(PropertyName, BindingFlags.Public | BindingFlags.Instance); // | BindingFlags.IgnoreCase?
                         if (PropertyInfo != null)
                         {
-                            if (ModifiedPropertyNames.Contains(PropertyName) || PropertyInfo.GetValue(this) == default) // Don't allow a style to override a value that was already explicitly set
+                            if (ModifiedPropertyNames.Contains(PropertyName) 
+                                || PropertyInfo.GetValue(this) == default) // Don't allow a style to override a value that was already explicitly set (needs more robust logic since some controls initialize properties to non-null values)
                             {
                                 TypeConverter Converter = TypeDescriptor.GetConverter(PropertyInfo.PropertyType);
                                 foreach (object Value in KVP.Value)

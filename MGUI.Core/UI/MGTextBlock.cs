@@ -47,7 +47,7 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Dictionary<char, SpriteFont.Glyph> SF_BoldItalic_Glyphs { get; set; }
 
-        private SpriteFont GetFont(bool IsBold, bool IsItalic, out Dictionary<char, SpriteFont.Glyph> Glyphs)
+        internal SpriteFont GetFont(bool IsBold, bool IsItalic, out Dictionary<char, SpriteFont.Glyph> Glyphs)
         {
             if (!IsBold && !IsItalic)
             {

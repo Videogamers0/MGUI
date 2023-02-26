@@ -81,6 +81,16 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
+    //'Resources' class? MGDesktop would have 1 reference to this instance.
+    //		Contains things like Dictionary<string, MGTheme> Themes (so you can specify a ThemeId when parsing XAML)
+    //      Dictionary<string, StyleSet> a StyleSet just contains a name/Id and a List<Style>
+    //          so you could have a window opt-in to a set to styles and you wouldnt have to duplicate code like
+    //          <Window><Window.Styles>...</Window.Styles>...</Window> on each of your windows
+    //		refactor the named textures and textureregions to be stored here instead of in MGDesktop
+    //		could also have Dictionary<string, Action> Commands and refactor MGWindow.NamedActions
+    //Remember this fix? https://github.com/Videogamers0/MGUI/commit/45f249ecf48b29e563e4ea552bb7872af673fbcd
+    //      Check if the same problem is affecting scrollable ListBoxes too, especially in this line of code in MGListBox's constructor:
+    //      MGListBoxItem<TItemType> PressedItem = InternalItems?.FirstOrDefault(x => x.ContentPresenter.IsHovered);
     //Maybe make a CompositedBorderBrush, like CompositedFillBrush it's just a wrapper for 0-many border brushes that are drawn in sequence overtop of each other.
     //implement some basic converters for the PropertyBinding markup extension. at least need a BooleanToVisibilityConverter (has a Visibility TrueValue, Visibility FalseValue. Defaults to TrueValue=Visible, False=Collapsed)
     //		this would allow making inverse converters easily. or making one that converts to hidden instead of collapsed

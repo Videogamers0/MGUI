@@ -376,7 +376,7 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool IsDraggingSelection { get; set; } = false;
 
-        private record struct TextSelection(int Index1, int Index2)
+        public record struct TextSelection(int Index1, int Index2)
         {
             public int StartIndex => Math.Min(Index1, Index2);
             public int EndIndex => Math.Max(Index1, Index2);
@@ -389,20 +389,28 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private TextSelection? _CurrentSelection;
-        private TextSelection? CurrentSelection
+        /// <summary>The currently-selected substring.<para/>
+        /// Recommended to use <see cref="TrySelectText(string, bool)"/> or <see cref="SelectAll"/> instead of directly setting this property.<para/>
+        /// See also: <see cref="SelectionChanged"/></summary>
+        public TextSelection? CurrentSelection
         {
             get => _CurrentSelection;
             set
             {
                 if (_CurrentSelection != value)
                 {
+                    TextSelection? Previous = CurrentSelection;
                     _CurrentSelection = value;
                     UpdateFormattedText(true);
                     //if (CurrentSelection.HasValue)
                     //    CurrentCursorPosition = null;
+                    SelectionChanged?.Invoke(this, new(Previous, CurrentSelection));
                 }
             }
         }
+
+        /// <summary>Invoked after <see cref="CurrentSelection"/> changes.</summary>
+        public event EventHandler<EventArgs<TextSelection?>> SelectionChanged;
 
         public void SelectAll()
         {
@@ -1233,15 +1241,18 @@ namespace MGUI.Core.UI
                                     RestorableState UndoState = CreateRestorableState();
                                     int LineStart = CharInfo.Line.FirstCharacter.IndexInOriginalText;
                                     int LineEnd = CharInfo.Line.LastCharacter.IndexInOriginalText + 1;
-                                    string LineText = CurrentText.Substring(LineStart, LineEnd - LineStart);
-                                    string NewValue = CurrentText.Substring(0, LineStart) + LineText + '\n' + LineText + CurrentText.Substring(LineEnd);
-                                    if (SetText(NewValue))
+                                    if (CurrentText.Substring(LineStart).Length >= (LineEnd - LineStart))
                                     {
-                                        AddUndoState(UndoState);
-                                        CurrentSelection = null;
-                                        TextBlockElement.UpdateLines();
-                                        int NumCharactersInserted = LineText.Length + 1; // +1 because of the linebreak character appended to the end of the line
-                                        //_ = Caret.MoveToOriginalCharacterIndexOrRight(CharInfo.IndexInOriginalText + NumCharactersInserted - 1, false);
+                                        string LineText = CurrentText.Substring(LineStart, LineEnd - LineStart);
+                                        string NewValue = CurrentText.Substring(0, LineStart) + LineText + '\n' + LineText + CurrentText.Substring(LineEnd);
+                                        if (SetText(NewValue))
+                                        {
+                                            AddUndoState(UndoState);
+                                            CurrentSelection = null;
+                                            TextBlockElement.UpdateLines();
+                                            int NumCharactersInserted = LineText.Length + 1; // +1 because of the linebreak character appended to the end of the line
+                                                                                             //_ = Caret.MoveToOriginalCharacterIndexOrRight(CharInfo.IndexInOriginalText + NumCharactersInserted - 1, false);
+                                        }
                                     }
                                 }
                                 Handled = true;
