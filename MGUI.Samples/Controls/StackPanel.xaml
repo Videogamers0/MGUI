@@ -30,7 +30,9 @@
             <Separator/>
 
             <TextBlock>
-                Layout containers are elements that can host multiple children for their Content. Each type of layout container (StackPanel, DockPanel, Grid etc) defines its own rules for how it arranges the children.
+                Layout containers are elements that can host multiple children for their Content. 
+                Each type of layout container ([c=Turquoise][i]StackPanel[/i][/c], [c=Turquoise][i]DockPanel[/i][/c], [c=Turquoise][i]Grid[/i][/c] etc) 
+                defines its own rules for how it arranges the children.
             </TextBlock>
             <Separator/>
 

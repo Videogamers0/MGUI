@@ -1,5 +1,5 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="" Padding="10">
+        Left="440" Top="20" MinHeight="0" Width="480" Height="800" TitleText="DockPanel" Padding="10">
     <Window.Styles>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="10" />
@@ -22,36 +22,121 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
         <StackPanel Orientation="Vertical" Spacing="10">
-            <TextBlock StyleNames="Header1" Text=":" HorizontalAlignment="Center" />
+            <TextBlock StyleNames="Header1" Text="DockPanel:" HorizontalAlignment="Center" />
             <Separator/>
-            <TextBlock FontSize="10" Text="[b][/b]" />
+            <TextBlock>
+                DockPanels are a layout container that arranges its children by anchoring them to an edge 
+                ([c=Turquoise][i]Left[/i][/c], [c=Turquoise][i]Top[/i][/c], [c=Turquoise][i]Right[/i][/c], or [c=Turquoise][i]Bottom[/i][/c]) of the DockPanel's bounds.
+            </TextBlock>
+            <Separator/>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Common Properties" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
+            <TextBlock>
+                Layout containers are elements that can host multiple children for their Content. 
+                Each type of layout container ([c=Turquoise][i]StackPanel[/i][/c], [c=Turquoise][i]DockPanel[/i][/c], [c=Turquoise][i]Grid[/i][/c] etc) 
+                defines its own rules for how it arranges the children.
+            </TextBlock>
+            <Separator/>
 
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set the [c=Turquoise][i]Dock[/i][/c] property of the child element to anchor it to an edge.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2" HorizontalAlignment="Left">
+                    <TextBlock Text="This DockPanel docks its 3 children in this order: Left, Right, Top" />
+                    <DockPanel Width="260" Height="100" Background="White * 0.3" HorizontalAlignment="Left" LastChildFill="False" Padding="2">
+                        <Border Dock="Left" Background="Green" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Left[/s][/c]" />
+                        <Border Dock="Right" Background="MediumPurple" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Right[/s][/c]" />
+                        <Border Dock="Top" Background="Purple" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Top[/s][/c]" />
+                    </DockPanel>
+                    <TextBlock Text="The order that you dock the children in matters. This DockPanel docks its children in this order: Left, Top, Right" />
+                    <DockPanel Width="260" Height="100" Background="White * 0.3" HorizontalAlignment="Left" LastChildFill="False" Padding="2">
+                        <Border Dock="Left" Background="Green" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Left[/s][/c]" />
+                        <Border Dock="Top" Background="Purple" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Top[/s][/c]" />
+                        <Border Dock="Right" Background="MediumPurple" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Right[/s][/c]" />
+                    </DockPanel>
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Example XAML" />
-                </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
-                    <TextBox Name="Example_TextBox" FontSize="10" />
-                </ScrollViewer>
-            </Expander>
-
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Result" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0" Background="rgb(16,16,64)">
-
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set the [c=Turquoise][i]LastChildFill[/i][/c] property to override the docking of the last child.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2" HorizontalAlignment="Left">
+                    <TextBlock Text="This DockPanel sets [c=Turquoise][i]LastChildFill[/i][/c]=[c=LightBlue][s=Blue]true[/s][/c] (default value)" />
+                    <DockPanel Width="260" Height="120" Background="White * 0.3" HorizontalAlignment="Left" LastChildFill="True" Padding="2">
+                        <DockPanel.Styles>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Center" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="Margin" Value="2" />
+                            </Style>
+                        </DockPanel.Styles>
+                        <Border Dock="Left" Background="Green" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Left[/s][/c]\n(Child #1)" />
+                        <Border Dock="Right" Background="MediumPurple" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Right[/s][/c]\n(Child #2)" />
+                        <Border Dock="Top" Background="Purple" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Top[/s][/c]\n(Child #3)\nLast child, so fills all leftover space" />
+                    </DockPanel>
+                    <TextBlock Text="This DockPanel sets [c=Turquoise][i]LastChildFill[/i][/c]=[c=LightBlue][s=Blue]false[/s][/c]" />
+                    <DockPanel Width="260" Height="120" Background="White * 0.3" HorizontalAlignment="Left" LastChildFill="False" Padding="2">
+                        <DockPanel.Styles>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Center" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="Margin" Value="2" />
+                            </Style>
+                        </DockPanel.Styles>
+                        <Border Dock="Left" Background="Green" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Left[/s][/c]\n(Child #1)" />
+                        <Border Dock="Right" Background="MediumPurple" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Right[/s][/c]\n(Child #2)" />
+                        <Border Dock="Top" Background="Purple" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Top[/s][/c]\n(Child #3)" />
+                    </DockPanel>
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    You can dock multiple children to the same edge. Space is allocated from the outside inwards 
+                    (so the first child docked to a particular edge will be along the outermost part of the DockPanel's bounds)
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2" HorizontalAlignment="Left">
+                    <TextBlock Text="This DockPanel docks several children to the bottom edge" />
+                    <DockPanel Width="350" Height="140" Background="White * 0.3" HorizontalAlignment="Left" LastChildFill="False" Padding="2">
+                        <DockPanel.Styles>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Center" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="Margin" Value="2" />
+                            </Style>
+                        </DockPanel.Styles>
+                        <Border Dock="Left" Background="Green" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Left[/s][/c]\n(Child #1)" />
+                        <Border Dock="Right" Background="MediumPurple" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Right[/s][/c]\n(Child #2)" />
+                        <Border Dock="Bottom" Background="Purple" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Bottom[/s][/c] (Child #3)" />
+                        <Border Dock="Bottom" Background="Orange" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Bottom[/s][/c] (Child #4)" />
+                        <Border Dock="Bottom" Background="DarkGreen" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Bottom[/s][/c] (Child #5)" />
+                    </DockPanel>
+
+                    <TextBlock Text="This DockPanel also docks several children to the bottom edge, but with a different order" />
+                    <DockPanel Width="350" Height="140" Background="White * 0.3" HorizontalAlignment="Left" LastChildFill="False" Padding="2">
+                        <DockPanel.Styles>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextAlignment" Value="Center" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="Margin" Value="2" />
+                            </Style>
+                        </DockPanel.Styles>
+                        <Border Dock="Left" Background="Green" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Left[/s][/c]\n(Child #1)" />
+                        <Border Dock="Bottom" Background="Purple" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Bottom[/s][/c] (Child #2)" />
+                        <Border Dock="Bottom" Background="Orange" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Bottom[/s][/c] (Child #3)" />
+                        <Border Dock="Right" Background="MediumPurple" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Right[/s][/c]\n(Child #4)" />
+                        <Border Dock="Bottom" Background="DarkGreen" Content="[c=Turquoise][i]Dock[/i][/c]=[c=LightBlue][s=Blue]Bottom[/s][/c] (Child #5)" />
+                    </DockPanel>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
         </StackPanel>
     </ScrollViewer>
 </Window>
