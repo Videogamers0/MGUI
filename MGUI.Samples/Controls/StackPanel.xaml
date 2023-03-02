@@ -1,5 +1,5 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="" Padding="10">
+        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="StackPanel" Padding="10">
     <Window.Styles>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="10" />
@@ -22,36 +22,151 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
         <StackPanel Orientation="Vertical" Spacing="10">
-            <TextBlock StyleNames="Header1" Text=":" HorizontalAlignment="Center" />
+            <TextBlock StyleNames="Header1" Text="StackPanel:" HorizontalAlignment="Center" />
             <Separator/>
-            <TextBlock FontSize="10" Text="[b][/b]" />
+            <TextBlock>
+                StackPanels are one of the simplest layout containers that arranges its children either horizontally (left to right) or vertically (top to bottom)
+            </TextBlock>
+            <Separator/>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Common Properties" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
+            <TextBlock>
+                Layout containers are elements that can host multiple children for their Content. Each type of layout container (StackPanel, DockPanel, Grid etc) defines its own rules for how it arranges the children.
+            </TextBlock>
+            <Separator/>
 
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]Orientation[/i][/c] to control which axis the children are aligned on.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <StackPanel.Styles>
+                        <Style TargetType="Rectangle">
+                            <Setter Property="Width" Value="16" />
+                            <Setter Property="Height" Value="16" />
+                            <Setter Property="Stroke" Value="Black" />
+                            <Setter Property="StrokeThickness" Value="1" />
+                        </Style>
+                    </StackPanel.Styles>
+
+                    <TextBlock>
+                        This StackPanel contains several colored rectangles for its Content, and sets [c=Turquoise][i]Orientation[/i][/c]=[c=LightBlue][s=Blue]Horizontal[/s][/c].
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Background="White * 0.1" Padding="5">
+                        <Rectangle Fill="Red" />
+                        <Rectangle Fill="Orange" />
+                        <Rectangle Fill="MediumPurple" />
+                        <Rectangle Fill="Magenta" />
+                    </StackPanel>
+
+                    <TextBlock>
+                        This StackPanel contains several colored rectangles for its Content, and sets [c=Turquoise][i]Orientation[/i][/c]=[c=LightBlue][s=Blue]Vertical[/s][/c].
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="5">
+                        <Rectangle Fill="Red" />
+                        <Rectangle Fill="Orange" />
+                        <Rectangle Fill="MediumPurple" />
+                        <Rectangle Fill="Magenta" />
+                    </StackPanel>
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Example XAML" />
-                </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
-                    <TextBox Name="Example_TextBox" FontSize="10" />
-                </ScrollViewer>
-            </Expander>
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]Spacing[/i][/c] to apply a uniform  padding between each consecutive child.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <StackPanel.Styles>
+                        <Style TargetType="Rectangle">
+                            <Setter Property="Width" Value="16" />
+                            <Setter Property="Height" Value="16" />
+                            <Setter Property="Stroke" Value="Black" />
+                            <Setter Property="StrokeThickness" Value="1" />
+                        </Style>
+                    </StackPanel.Styles>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Result" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0" Background="rgb(16,16,64)">
-
+                    <TextBlock>
+                        This StackPanel has [c=Turquoise][i]Spacing[/i][/c]=[c=LightBlue][s=Blue]10[/s][/c]. There are 10px of empty space reserved between each child.
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Background="White * 0.1" Spacing="10" Padding="5">
+                        <Rectangle Fill="Red" />
+                        <Rectangle Fill="Orange" />
+                        <Rectangle Fill="MediumPurple" />
+                        <Rectangle Fill="Magenta" />
+                        <Rectangle Fill="Turquoise" />
+                        <Rectangle Fill="OrangeRed" />
+                        <Rectangle Fill="Green" />
+                        <Rectangle Fill="LightGreen" />
+                    </StackPanel>
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    StackPanels can contain children of varying types.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        This StackPanel contains several different kinds of children.
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Background="White * 0.1" Spacing="4" HorizontalAlignment="Left" Padding="5">
+                        <Button Content="Child #1 (Button)" />
+                        <TextBlock Text="Child #2 (TextBlock)" />
+                        <CheckBox Content="Child #3 (CheckBox)" IsChecked="True" />
+                    </StackPanel>
+
+                    <TextBlock>
+                        You can also have nested StackPanels inside of a StackPanel
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Background="White * 0.1" Spacing="4" Padding="5" HorizontalAlignment="Left">
+                        <Button Content="Child #1 of outer StackPanel" />
+                        <StackPanel Orientation="Horizontal" Spacing="2">
+                            <StackPanel.Styles>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Center" />
+                                </Style>
+                            </StackPanel.Styles>
+                            <TextBlock Text="This is a nested StackPanel\nwith [c=Turquoise][i]Orientation[/i][/c]=[c=LightBlue][s=Blue]Horizontal[/s][/c]" />
+                            <Button Content="Child #2 of Nested\nStackPanel" />
+                            <Button Content="Child #3 of Nested\nStackPanel" />
+                        </StackPanel>
+                        <Button Content="Child #3 of outer StackPanel" />
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    StackPanels allocate space first-come-first-serve and do not force their children to consume all available space.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        This StackPanel has a hard-coded width of 230px (after accounting for Padding). 
+                        The 2nd child can only receive 100px because that's all the remaining space after the 1st child consumed 130px.
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Background="White * 0.1" HorizontalAlignment="Left" Padding="5" Width="240" Height="110">
+                        <Border Background="Orange" Padding="2" Width="130">
+                            <TextBlock Text="This content requested 130px Width. Actual Width=130" />
+                        </Border>
+                        <Border Background="MediumPurple" Padding="2" Width="130">
+                            <TextBlock Text="This content requested 130px Width. Actual Width=100" />
+                        </Border>
+                    </StackPanel>
+
+                    <TextBlock>
+                        This StackPanel has a hard-coded width of 230px (after accounting for Padding).
+                        The children do not span all of the StackPanel's available width.
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Background="White * 0.1" HorizontalAlignment="Left" Padding="5" Width="240">
+                        <Border Background="Orange" Padding="4,2" Content="Child 1" />
+                        <Border Background="MediumPurple" Padding="4,2" Content="Child 2" />
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+            
         </StackPanel>
     </ScrollViewer>
 </Window>

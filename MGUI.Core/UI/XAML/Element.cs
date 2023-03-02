@@ -380,7 +380,8 @@ namespace MGUI.Core.UI.XAML
                         PropertyInfo PropertyInfo = ThisType.GetProperty(PropertyName, BindingFlags.Public | BindingFlags.Instance); // | BindingFlags.IgnoreCase?
                         if (PropertyInfo != null)
                         {
-                            if (ModifiedPropertyNames.Contains(PropertyName) || PropertyInfo.GetValue(this) == default) // Don't allow a style to override a value that was already explicitly set
+                            if (ModifiedPropertyNames.Contains(PropertyName) 
+                                || PropertyInfo.GetValue(this) == default) // Don't allow a style to override a value that was already explicitly set
                             {
                                 PropertiesByName.Add(PropertyName, PropertyInfo);
                             }

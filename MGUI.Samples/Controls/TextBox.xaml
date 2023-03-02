@@ -32,14 +32,6 @@
             <TextBox PlaceholderText="[i][Opacity=0.5]This is a TextBox. Enter a value:[/Opacity][/i]" AcceptsReturn="False" AcceptsTab="False" />
             <Separator />
 
-            <!--<TextBlock Dock="Top">
-                    TextBoxes support a variety of features you'd expect to find in any simple text-entry control, such as: 
-                    Click+Drag\n to select text, Click or use Arrow Keys to move the Caret position, Press INS to toggle between Overwrite or Insert text entry,
-                    double-click to select a single word, triple-click to select a line, 
-                    various keyboard shortcuts like Ctrl+C (Copy), Ctrl+V (Paste), Ctrl+X (Cut), Ctrl+Z (Undo), Ctrl+Y (Redo), Ctrl+A (Select All), Ctrl+D (Duplicate current line),
-                    and supports linebreaks and tabs.
-            </TextBlock>-->
-
             <DockPanel>
                 <TextBlock Dock="Top">
                     Use the [c=Turquoise][i]Text[/i][/c] property to get the TextBox's current text value, or 

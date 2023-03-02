@@ -88,6 +88,20 @@ namespace MGUI.Core.UI
     //          <Window><Window.Styles>...</Window.Styles>...</Window> on each of your windows
     //		refactor the named textures and textureregions to be stored here instead of in MGDesktop
     //		could also have Dictionary<string, Action> Commands and refactor MGWindow.NamedActions
+    //      maybe also something like:
+    //          TemplatedElement: string Name/Id, Func<Window, MGElement> Template, bool IsShared (if shared, only 1 instance created? if not, creates an instance everytime its referenced)
+    //          So then you could do things like: <ContentPresenter ContentTemplateId="Foo" /> and it would find the TemplatedElement with Name="Foo", and invoke it's Template method
+    //          to create an instance (assuming its not shared) and set te ContentPresenter's Content to the instance, so it basically allows you to re-use chunks of visual tree content
+    //In Element.ProcessStyles method, we need a better way to detect which properties do or don't have an explicit value in the XAML.
+    //      maybe there's a way to be notified by the XAML processor when it sets a value?
+    //      in XAMLParser.cs we could try using XamlServices.Load(XamlReader) instead of XamlServices.Parse, maybe that somehow lets us detect StartMember xml nodes or something
+    //      so we can keep track of the member names we wrote to the objects.
+    //      Alternatively, could look for any properties in XAML/Controls.cs that are initialized to a new object, such as ProgressBar.ValueTextBlock
+    //          and initialize them to null instead, but if they are null in ApplyDerivedSettings, then initialize them to a new default object. (since ApplyDerivedSettings
+    //          should be invoked after ProcessStyles has been invoked)
+    //Is there a way to specify line break '\n' character inside text content of a XAML TextBlock?
+    //      This works because we can re-encode '\n' as "&#38;#x0a;" which is processed as a '\n' character by System.Xaml.XamlServices.Parse: <TextBlock Text="Hello\nWorld" />
+    //      But what would we do in this case?: <TextBlock>Hello\nWorld</TextBlock> (other than setting xml:space="preserve", which prevents you from leveraging text wrapping in the Xaml designer)
     //Remember this fix? https://github.com/Videogamers0/MGUI/commit/45f249ecf48b29e563e4ea552bb7872af673fbcd
     //      Check if the same problem is affecting scrollable ListBoxes too, especially in this line of code in MGListBox's constructor:
     //      MGListBoxItem<TItemType> PressedItem = InternalItems?.FirstOrDefault(x => x.ContentPresenter.IsHovered);

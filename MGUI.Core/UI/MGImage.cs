@@ -270,7 +270,7 @@ namespace MGUI.Core.UI
                 throw new NotImplementedException($"Unrecognized {nameof(Stretch)}: {Stretch}");
             }
 
-            DA.DT.DrawTextureTo(Texture, SourceRect, Bounds.GetTranslated(DA.Offset), this.TextureColor ?? Color.White * DA.Opacity);
+            DA.DT.DrawTextureTo(Texture, SourceRect, Bounds.GetTranslated(DA.Offset), (this.TextureColor ?? Color.White) * DA.Opacity);
         }
     }
 }
