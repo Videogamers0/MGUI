@@ -148,7 +148,7 @@
                         This StackPanel has a hard-coded width of 230px (after accounting for Padding). 
                         The 2nd child can only receive 100px because that's all the remaining space after the 1st child consumed 130px.
                     </TextBlock>
-                    <StackPanel Orientation="Horizontal" Background="White * 0.1" HorizontalAlignment="Left" Padding="5" Width="240" Height="110">
+                    <StackPanel Orientation="Horizontal" Background="White * 0.1" HorizontalAlignment="Left" Padding="5" Width="240">
                         <Border Background="Orange" Padding="2" Width="130">
                             <TextBlock Text="This content requested 130px Width. Actual Width=130" />
                         </Border>

@@ -1571,9 +1571,14 @@ namespace MGUI.Core.UI
 			}
 
 			AvailableSize = AvailableSize.AsZeroOrGreater();
-			Size RemainingSize = new(Math.Clamp(AvailableSize.Width, 0, MaxSizeIncludingMargin.Width), Math.Clamp(AvailableSize.Height, 0, MaxSizeIncludingMargin.Height)); ;
 
-			if (!TryGetRecentSelfMeasurement(RemainingSize, out SelfSize, out SharedSize, out ContentSize))
+            //  Truncate the available size based on this element's MaxSize and preferred width/height
+			Size RemainingSize = new(
+                Math.Clamp(AvailableSize.Width, 0, Math.Min(ActualPreferredWidth ?? int.MaxValue, MaxSizeIncludingMargin.Width)), 
+                Math.Clamp(AvailableSize.Height, 0, Math.Min(ActualPreferredHeight ?? int.MaxValue, MaxSizeIncludingMargin.Height))
+            );
+
+            if (!TryGetRecentSelfMeasurement(RemainingSize, out SelfSize, out SharedSize, out ContentSize))
 			{
 				SelfSize = MeasureSelf(RemainingSize, out SharedSize);
                 ElementMeasurement SelfMeasurement = new(AvailableSize, SelfSize, SharedSize, ContentSize);
