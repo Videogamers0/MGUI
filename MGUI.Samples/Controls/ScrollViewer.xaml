@@ -1,5 +1,5 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="" Padding="10">
+        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="ScrollViewer" Padding="10">
     <Window.Styles>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="10" />
@@ -18,40 +18,246 @@
             <Setter Property="Padding" Value="4" />
             <Setter Property="Background" Value="White * 0.1" />
         </Style>
+
+        <Style TargetType="Rectangle" Name="ColoredSquare">
+            <Setter Property="Stroke" Value="Black" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
+        </Style>
+        <Style TargetType="ContentPresenter" Name="ColoredRectanglePresenter">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Content">
+                <Setter.Value>
+                    <StackPanel Orientation="Vertical" Spacing="10">
+                        <Rectangle StyleNames="ColoredSquare" Fill="#000000" />
+                        <Rectangle StyleNames="ColoredSquare" Fill="#005500" />
+                        <Rectangle StyleNames="ColoredSquare" Fill="#00aa00" />
+                        <Rectangle StyleNames="ColoredSquare" Fill="#00ff00" />
+                        <Rectangle StyleNames="ColoredSquare" Fill="#0000ff" />
+                        <Rectangle StyleNames="ColoredSquare" Fill="#0055ff" />
+                        <Rectangle StyleNames="ColoredSquare" Fill="#00aaff" />
+                        <Rectangle StyleNames="ColoredSquare" Fill="#00ffff" />
+                    </StackPanel>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Styles>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
         <StackPanel Orientation="Vertical" Spacing="10">
-            <TextBlock StyleNames="Header1" Text=":" HorizontalAlignment="Center" />
+            <TextBlock StyleNames="Header1" Text="ScrollViewer:" HorizontalAlignment="Center" />
             <Separator/>
-            <TextBlock FontSize="10" Text="[b][/b]" />
+            <TextBlock>
+                ScrollViewers can be used to wrap content inside of a scrollable viewport. ScrollBars will appear if the ScrollViewer's size is not large enough to fully display the content.
+            </TextBlock>
+            <Separator/>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Common Properties" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]VerticalScrollBarVisibility[/i][/c] and [c=Turquoise][i]HorizontalScrollBarVisibility[/i][/c] to control which dimensions are scrollable under what conditions.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        This ScrollViewer sets [c=Turquoise][i]VerticalScrollBarVisibility[/i][/c]=[c=LightBlue][s=Blue]Disabled[/s][/c]. 
+                        Even though the Content requests more width/height than the scrollviewer's viewport has, a scroll bar does not appear.
+                        The Content can only take the dimensions of the viewport.
+                    </TextBlock>
+                    <Border Background="White * 0.1" BorderThickness="0" HorizontalAlignment="Left" Padding="5">
+                        <ScrollViewer Width="100" Height="100" VerticalScrollBarVisibility="Disabled">
+                            <Border Height="200" Background="LightGreen|Red">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="This Content requested 200px height" />
+                            </Border>
+                        </ScrollViewer>
+                    </Border>
 
+                    <TextBlock>
+                        These ScrollViewers sets [c=Turquoise][i]VerticalScrollBarVisibility[/i][/c]=[c=LightBlue][s=Blue]Auto[/s][/c]. 
+                        A Vertical ScrollBar will be contextually visible depending on if the Content requests more height than the viewport.
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Left">
+                        <Border Background="White * 0.1" BorderThickness="0" Padding="5">
+                            <ScrollViewer Width="100" Height="100" VerticalScrollBarVisibility="Auto">
+                                <Border Height="200" Background="LightGreen|Red">
+                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="This Content requested 200px height" />
+                                </Border>
+                            </ScrollViewer>
+                        </Border>
+                        <Border Background="White * 0.1" BorderThickness="0" Padding="5">
+                            <ScrollViewer Width="100" Height="100" VerticalScrollBarVisibility="Auto">
+                                <Border Height="80" Background="LightGreen|Red">
+                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="This Content requested 80px height" />
+                                </Border>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+
+                    <TextBlock>
+                        This ScrollViewer sets [c=Turquoise][i]VerticalScrollBarVisibility[/i][/c]=[c=LightBlue][s=Blue]Hidden[/s][/c]. 
+                        A Vertical ScrollBar will never be visible, but will always consume space on the right edge of the viewport.
+                        This option is typically only used if you want to render your own completely custom scroll bar graphics.
+                        Notice that the ScrollViewer is still scrollable (using the Mouse Wheel).
+                    </TextBlock>
+                    <Border Background="White * 0.1" BorderThickness="0" HorizontalAlignment="Left" Padding="5">
+                        <ScrollViewer Width="100" Height="100" VerticalScrollBarVisibility="Hidden">
+                            <Border Height="200" Background="LightGreen|Red">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="This Content requested 200px height" />
+                            </Border>
+                        </ScrollViewer>
+                    </Border>
+
+                    <TextBlock>
+                        These ScrollViewers sets [c=Turquoise][i]VerticalScrollBarVisibility[/i][/c]=[c=LightBlue][s=Blue]Visible[/s][/c]. 
+                        A Vertical ScrollBar will always be visible, even if the Content already fit within the viewport vertically without needing a virtualized space to draw itself completely.
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Left">
+                        <Border Background="White * 0.1" BorderThickness="0" Padding="5">
+                            <ScrollViewer Width="100" Height="100" VerticalScrollBarVisibility="Visible">
+                                <Border Height="200" Background="LightGreen|Red">
+                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="This Content requested 200px height" />
+                                </Border>
+                            </ScrollViewer>
+                        </Border>
+                        <Border Background="White * 0.1" BorderThickness="0" Padding="5">
+                            <ScrollViewer Width="100" Height="100" VerticalScrollBarVisibility="Visible">
+                                <Border Height="80" Background="LightGreen|Red">
+                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="This Content requested 80px height" />
+                                </Border>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+
+                    <TextBlock>
+                        This ScrollViewer sets [c=Turquoise][i]VerticalScrollBarVisibility[/i][/c]=[c=LightBlue][s=Blue]Collapsed[/s][/c]. 
+                        A Vertical ScrollBar will never be visible. Unlike [c=LightBlue][s=Blue]Hidden[/s][/c], a [c=LightBlue][s=Blue]Collapsed[/s][/c] 
+                        ScrollBar and will never reserve space within the viewport, and the ScrollBar is effectively disabled even though the content
+                        was able to consume as much 'virtualized' space as it wanted to.
+                    </TextBlock>
+                    <Border Background="White * 0.1" BorderThickness="0" HorizontalAlignment="Left" Padding="5">
+                        <ScrollViewer Width="100" Height="100" VerticalScrollBarVisibility="Collapsed">
+                            <Border Height="200" Background="LightGreen|Red">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="This Content requested 200px height" />
+                            </Border>
+                        </ScrollViewer>
+                    </Border>
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Example XAML" />
-                </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
-                    <TextBox Name="Example_TextBox" FontSize="10" />
-                </ScrollViewer>
-            </Expander>
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Use [c=Turquoise][i]VerticalOffset[/i][/c] and [c=Turquoise][i]HorizontalOffset[/i][/c] to get or set the scrollbar's position programmatically.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        This ScrollViewer is 130x130 pixels. After accounting for the width/height of its scrollbars, the viewport has about 114x114 leftover space. 
+                        The Content requests 250x200, so the [c=Turquoise][i]VerticalOffset[/i][/c] ranges from 0 to (200-114), and the [c=Turquoise][i]HorizontalOffset[/i][/c]
+                        ranges from 0 to (250-114).
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="20">
+                        <Border Background="White * 0.1" BorderThickness="0" Padding="5" HorizontalAlignment="Left">
+                            <ScrollViewer Name="ScrollViewer1" Width="130" Height="130" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                <Border Width="250" Height="200" Background="LightGreen|Red">
+                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="This Content requested 250x200 pixels." />
+                                </Border>
+                            </ScrollViewer>
+                        </Border>
+                        <Grid VerticalAlignment="Center" RowSpacing="5" ColumnSpacing="5" RowLengths="auto,auto" ColumnLengths="auto,50,auto">
+                            <TextBlock Row="0" Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="[c=Turquoise][i]VerticalOffset[/i][/c]:" />
+                            <TextBox Name="TextBox_SV1VerticalOffset" Row="0" Column="1" Text="0.0" />
+                            <Button Row="0" Column="2" Content="Apply" Padding="4,1" CommandName="ApplyScrollViewer1VerticalOffset" />
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Result" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0" Background="rgb(16,16,64)">
-
+                            <TextBlock Row="1" Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" Text="[c=Turquoise][i]HorizontalOffset[/i][/c]:" />
+                            <TextBox Name="TextBox_SV1HorizontalOffset" Row="1" Column="1" Text="0.0" />
+                            <Button Row="1" Column="2" Content="Apply" Padding="4,1" CommandName="ApplyScrollViewer1HorizontalOffset" />
+                        </Grid>
+                    </StackPanel>
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]ScrollBarOuterBrush[/i][/c] and [c=Turquoise][i]ScrollBarInnerBrush[/i][/c] to change the appearance of the scroll bars. 
+                    (In XAML, use [c=Turquoise][i]ScrollBarUnfocusedOuterBrush[/i][/c], [c=Turquoise][i]ScrollBarFocusedOuterBrush[/i][/c],
+                    [c=Turquoise][i]ScrollBarUnfocusedInnerBrush[/i][/c], and [c=Turquoise][i]ScrollBarFocusedInnerBrush[/i][/c] instead)
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        This ScrollViewer uses a [c=Red]Red[/c] brush to draw the [b]outer[/b] portion of the scroll bar 
+                        when the scroll bar is [b]focused[/b] (is being hovered or dragged).
+                    </TextBlock>
+                    <Border Background="White * 0.1" BorderThickness="0" Padding="5" HorizontalAlignment="Left">
+                        <ScrollViewer Width="240" Height="70" VerticalScrollBarVisibility="Auto" ScrollBarFocusedOuterBrush="Red">
+                            <Border Height="100" Background="LightGreen|Red">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="This Content requested 100px height" />
+                            </Border>
+                        </ScrollViewer>
+                    </Border>
+
+                    <TextBlock>
+                        This ScrollViewer uses a [c=MediumPurple]MediumPurple[/c] brush to draw the [b]outer[/b] portion of the scroll bar 
+                        when the scroll bar is [b]unfocused[/b] (is NOT being hovered or dragged).
+                    </TextBlock>
+                    <Border Background="White * 0.1" BorderThickness="0" Padding="5" HorizontalAlignment="Left">
+                        <ScrollViewer Width="240" Height="70" VerticalScrollBarVisibility="Auto" ScrollBarUnfocusedOuterBrush="MediumPurple">
+                            <Border Height="100" Background="LightGreen|Red">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="This Content requested 100px height" />
+                            </Border>
+                        </ScrollViewer>
+                    </Border>
+
+                    <TextBlock>
+                        This ScrollViewer uses a [c=LightGreen]LightGreen[/c] brush to draw the [b]inner[/b] portion of the scroll bar 
+                        when the scroll bar is [b]focused[/b] (is being hovered or dragged).
+                    </TextBlock>
+                    <Border Background="White * 0.1" BorderThickness="0" Padding="5" HorizontalAlignment="Left">
+                        <ScrollViewer Width="240" Height="70" VerticalScrollBarVisibility="Auto" ScrollBarFocusedInnerBrush="LightGreen">
+                            <Border Height="100" Background="LightGreen|Red">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="This Content requested 100px height" />
+                            </Border>
+                        </ScrollViewer>
+                    </Border>
+
+                    <TextBlock>
+                        This ScrollViewer uses a [c=Cyan]Cyan[/c] brush to draw the [b]inner[/b] portion of the scroll bar 
+                        when the scroll bar is [b]unfocused[/b] (is NOT being hovered or dragged).
+                    </TextBlock>
+                    <Border Background="White * 0.1" BorderThickness="0" Padding="5" HorizontalAlignment="Left">
+                        <ScrollViewer Width="240" Height="70" VerticalScrollBarVisibility="Auto" ScrollBarUnfocusedInnerBrush="Cyan">
+                            <Border Height="100" Background="LightGreen|Red">
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="This Content requested 100px height" />
+                            </Border>
+                        </ScrollViewer>
+                    </Border>
+
+                    <TextBlock>
+                        These ScrollViewers override all 4 properties to modify the scrollbar's appearance.
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="10">
+                        <Border Background="White * 0.1" BorderThickness="0" Padding="5">
+                            <ScrollViewer Width="240" Height="70" VerticalScrollBarVisibility="Auto" 
+                                      ScrollBarFocusedInnerBrush="rgb(0,232,0)" ScrollBarUnfocusedInnerBrush="rgb(0,200,0)"
+                                      ScrollBarFocusedOuterBrush="rgb(0,102,0)|rgb(0,68,0)" ScrollBarUnfocusedOuterBrush="rgb(0,100,0)|rgb(0,66,0)">
+                                <Border Height="100" Background="LightGreen|Red">
+                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="This Content requested 100px height" />
+                                </Border>
+                            </ScrollViewer>
+                        </Border>
+                        <Border Background="White * 0.1" BorderThickness="0" Padding="5">
+                            <ScrollViewer Width="240" Height="70" VerticalScrollBarVisibility="Auto" 
+                                      ScrollBarFocusedInnerBrush="rgb(160,160,160)" ScrollBarUnfocusedInnerBrush="rgb(100,100,100)"
+                                      ScrollBarFocusedOuterBrush="rgb(36,36,36)" ScrollBarUnfocusedOuterBrush="rgb(36,36,36)">
+                                <Border Height="100" Background="LightGreen|Red">
+                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="This Content requested 100px height" />
+                                </Border>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
         </StackPanel>
     </ScrollViewer>
 </Window>

@@ -75,6 +75,8 @@ namespace MGUI.Core.UI
             set => HSBVisibility = value;
         }
 
+        /// <summary>The bounds that this <see cref="MGScrollViewer"/>'s Content can draw itself to, 
+        /// after accounting for <see cref="MGElement.Padding"/> and the width/height that the scrollbars reserved, if any.</summary>
         public Rectangle ContentViewport { get; private set; }
 
         private Rectangle? _VSBBounds;
