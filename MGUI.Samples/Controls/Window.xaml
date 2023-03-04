@@ -1,5 +1,5 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="440" Top="20" MinHeight="0" Width="600" Height="800" TitleText="" Padding="10">
+        Left="440" Top="20" MinHeight="0" Width="500" Height="800" TitleText="Window" Padding="10">
     <Window.Styles>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="10" />
@@ -22,36 +22,25 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
         <StackPanel Orientation="Vertical" Spacing="10">
-            <TextBlock StyleNames="Header1" Text=":" HorizontalAlignment="Center" />
+            <TextBlock StyleNames="Header1" Text="Window:" HorizontalAlignment="Center" />
             <Separator/>
-            <TextBlock FontSize="10" Text="[b][/b]" />
+            <TextBlock>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Common Properties" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
+            </TextBlock>
+            <Separator />
 
+            <DockPanel>
+                <TextBlock Dock="Top">
+
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+
+                    </TextBlock>
                 </StackPanel>
-            </Expander>
+            </DockPanel>
+            <Separator/>
 
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Example XAML" />
-                </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
-                    <TextBox Name="Example_TextBox" FontSize="10" />
-                </ScrollViewer>
-            </Expander>
-
-            <Expander IsExpanded="True">
-                <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="Result" />
-                </Expander.Header>
-                <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0" Background="rgb(16,16,64)">
-
-                </StackPanel>
-            </Expander>
         </StackPanel>
     </ScrollViewer>
 </Window>

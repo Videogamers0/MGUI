@@ -90,7 +90,6 @@ namespace MGUI.Core.UI
                   true, true, false, false, false, false, false,
                   (AvailableBounds, ComponentSize) => MGElement.ApplyAlignment(AvailableBounds, HorizontalAlignment.Right, VerticalAlignment.Bottom, ComponentSize.Size));
 
-
         public Rectangle Arrange(Rectangle Bounds, Thickness ElementSize) => ArrangeMethod(Bounds, ElementSize);
 
         public Thickness Arrange(Thickness Size)

@@ -77,14 +77,19 @@ namespace MGUI.Samples
     public class Compendium : SampleBase
     {
         #region Controls
+        public ButtonSamples ButtonSamples { get; }
+        public CheckBoxSamples CheckBoxSamples { get; }
         public ComboBoxSamples ComboBoxSamples { get; }
         public ContextMenuSamples ContextMenuSamples { get; }
         public ContextualContentPresenterSamples ContextualContentPresenterSamples { get; }
         public DockPanelSamples DockPanelSamples { get; }
         public ExpanderSamples ExpanderSamples { get; }
         public GridSamples GridSamples { get; }
+        public GroupBoxSamples GroupBoxSamples { get; }
+        public ImageSamples ImageSamples { get; }
         public ListBoxSamples ListBoxSamples { get; }
         public ListViewSamples ListViewSamples { get; }
+        public PasswordBoxSamples PasswordBoxSamples { get; }
         public ProgressBarSamples ProgressBarSamples { get; }
         public RadioButtonSamples RadioButtonSamples { get; }
         public ScrollViewerSamples ScrollViewerSamples { get; }
@@ -94,6 +99,7 @@ namespace MGUI.Samples
         public TextBlockSamples TextBlockSamples { get; }
         public TextBoxSamples TextBoxSamples { get; }
         public ToolTipSamples ToolTipSamples { get; }
+        public UniformGridSamples UniformGridSamples { get; }
         public WindowSamples WindowSamples { get; }
         #endregion Controls
 
@@ -116,6 +122,10 @@ namespace MGUI.Samples
             Window.IsCloseButtonVisible = false;
 
             #region Controls
+            ButtonSamples = new(Content, Desktop);
+            BindVisibility(ButtonSamples, "Button_Toggle");
+            CheckBoxSamples = new(Content, Desktop);
+            BindVisibility(CheckBoxSamples, "CheckBox_Toggle");
             ComboBoxSamples = new(Content, Desktop);
             BindVisibility(ComboBoxSamples, "ComboBox_Toggle");
             ContextMenuSamples = new(Content, Desktop);
@@ -128,10 +138,16 @@ namespace MGUI.Samples
             BindVisibility(ExpanderSamples, "Expander_Toggle");
             GridSamples = new(Content, Desktop);
             BindVisibility(GridSamples, "Grid_Toggle");
+            GroupBoxSamples = new(Content, Desktop);
+            BindVisibility(GroupBoxSamples, "GroupBox_Toggle");
+            ImageSamples = new(Content, Desktop);
+            BindVisibility(ImageSamples, "Image_Toggle");
             ListBoxSamples = new(Content, Desktop);
             BindVisibility(ListBoxSamples, "ListBox_Toggle");
             ListViewSamples = new(Content, Desktop);
             BindVisibility(ListViewSamples, "ListView_Toggle");
+            PasswordBoxSamples = new(Content, Desktop);
+            BindVisibility(PasswordBoxSamples, "PasswordBox_Toggle");
             ProgressBarSamples = new(Content, Desktop);
             BindVisibility(ProgressBarSamples, "ProgressBar_Toggle");
             RadioButtonSamples = new(Content, Desktop);
@@ -150,6 +166,8 @@ namespace MGUI.Samples
             BindVisibility(TextBoxSamples, "TextBox_Toggle");
             ToolTipSamples = new(Content, Desktop);
             BindVisibility(ToolTipSamples, "ToolTip_Toggle");
+            UniformGridSamples = new(Content, Desktop);
+            BindVisibility(UniformGridSamples, "UniformGrid_Toggle");
             WindowSamples = new(Content, Desktop);
             BindVisibility(WindowSamples, "Window_Toggle");
             #endregion Controls

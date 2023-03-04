@@ -217,6 +217,7 @@ namespace MGUI.Core.UI.XAML
         public int? Rows { get; set; }
         [Category("Layout")]
         public int? Columns { get; set; }
+
         [Category("Layout")]
         public Size? CellSize { get; set; }
         [Category("Layout")]
@@ -251,6 +252,13 @@ namespace MGUI.Core.UI.XAML
 
         [Category("Appearance")]
         public FillBrush CellBackground { get; set; }
+
+        /// <summary>If true, the Row and Column values of each child element will be automatically assigned in order.<para/>
+        /// For example, if there are 2 columns, 3 rows:<br/>
+        /// 1st child will be placed in Row=0,Column=0. 2nd child will be placed in Row=0,Column=1. 3rd child will be placed in Row=1,Column=0 etc.<para/>
+        /// Explicitly setting the child element's row or column to a non-zero value will override this behavior.</summary>
+        [Category("Behavior")]
+        public bool? AutoAssignCells { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGUniformGrid(Window, Rows ?? 0, Columns ?? 0, CellSize?.ToSize() ?? MonoGame.Extended.Size.Empty);
 
@@ -301,10 +309,37 @@ namespace MGUI.Core.UI.XAML
 
             if (IncludeContent)
             {
+                //  Try to calculate the length of the other dimension if only the Rows or only the Columns are specified
+                int NumChildren = Children.Count;
+                if (Rows.HasValue && !Columns.HasValue)
+                {
+                    Columns = (int)Math.Ceiling(NumChildren / (double)Rows.Value);
+                    Grid.Columns = Columns.Value;
+                }
+                else if (Columns.HasValue && !Rows.HasValue)
+                {
+                    Rows = (int)Math.Ceiling(NumChildren / (double)Columns.Value);
+                    Grid.Rows = Rows.Value;
+                }
+
+                //  Add each child to the grid
+                int Counter = 0;
                 foreach (Element Child in Children)
                 {
                     MGElement ChildElement = Child.ToElement<MGElement>(Grid.SelfOrParentWindow, Grid);
-                    Grid.TryAddChild(Child.GridRow, Child.GridColumn, ChildElement);
+
+                    int Row = Child.GridRow;
+                    int Column = Child.GridColumn;
+                    if (AutoAssignCells.HasValue && AutoAssignCells.Value)
+                    {
+                        if (Row == 0)
+                            Row = Counter / Grid.Columns;
+                        if (Column == 0)
+                            Column = Counter % Grid.Columns;
+                    }
+
+                    Grid.TryAddChild(Row, Column, ChildElement);
+                    Counter++;
                 }
             }
         }

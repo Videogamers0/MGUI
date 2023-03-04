@@ -18,6 +18,8 @@
     <NoWarn>1701;1702</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Controls\Button.xaml" />
+    <None Remove="Controls\CheckBox.xaml" />
     <None Remove="Controls\ComboBox.xaml" />
     <None Remove="Controls\Compendium.xaml" />
     <None Remove="Controls\ContextMenu.xaml" />
@@ -25,8 +27,11 @@
     <None Remove="Controls\DockPanel.xaml" />
     <None Remove="Controls\Expander.xaml" />
     <None Remove="Controls\Grid.xaml" />
+    <None Remove="Controls\GroupBox.xaml" />
+    <None Remove="Controls\Image.xaml" />
     <None Remove="Controls\ListBox.xaml" />
     <None Remove="Controls\ListView.xaml" />
+    <None Remove="Controls\PasswordBox.xaml" />
     <None Remove="Controls\ProgressBar.xaml" />
     <None Remove="Controls\RadioButton.xaml" />
     <None Remove="Controls\ScrollViewer.xaml" />
@@ -36,6 +41,7 @@
     <None Remove="Controls\TextBlock.xaml" />
     <None Remove="Controls\TextBox.xaml" />
     <None Remove="Controls\ToolTip.xaml" />
+    <None Remove="Controls\UniformGrid.xaml" />
     <None Remove="Controls\Window.xaml" />
     <None Remove="Dialogs\Debugging\Debug1.xaml" />
     <None Remove="Dialogs\Debugging\Debug2.xaml" />
@@ -49,6 +55,8 @@
     <EmbeddedResource Include="Compendium.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Button.xaml" />
+    <EmbeddedResource Include="Controls\CheckBox.xaml" />
     <EmbeddedResource Include="Controls\ComboBox.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
@@ -67,12 +75,15 @@
     <EmbeddedResource Include="Controls\Grid.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\GroupBox.xaml" />
+    <EmbeddedResource Include="Controls\Image.xaml" />
     <EmbeddedResource Include="Controls\ListBox.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ListView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\PasswordBox.xaml" />
     <EmbeddedResource Include="Controls\ProgressBar.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
@@ -100,6 +111,7 @@
     <EmbeddedResource Include="Controls\ToolTip.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\UniformGrid.xaml" />
     <EmbeddedResource Include="Controls\Window.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>

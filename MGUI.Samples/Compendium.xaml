@@ -34,30 +34,36 @@
                 </Expander.Header>
                 <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
                     <TextBlock FontSize="10" Text="These samples demonstrate usage of some common elements (controls):" />
-                    <UniformGrid Rows="6" Columns="3">
+                    <UniformGrid Columns="3" AutoAssignCells="True">
                         <UniformGrid.Styles>
                             <Style TargetType="TextBlock">
                                 <Setter Property="FontSize" Value="10" />
                             </Style>
                         </UniformGrid.Styles>
-                        <ToggleButton Row="0" Column="0" Content="ComboBox" Name="ComboBox_Toggle" />
-                        <ToggleButton Row="0" Column="1" Content="ContextMenu" Name="ContextMenu_Toggle" />
-                        <ToggleButton Row="0" Column="2" Content="ContextualContentPresenter" Name="ContextualContentPresenter_Toggle" ToolTip="ContextualContentPresenter" />
-                        <ToggleButton Row="1" Column="0" Content="DockPanel" Name="DockPanel_Toggle" />
-                        <ToggleButton Row="1" Column="1" Content="Expander" Name="Expander_Toggle" />
-                        <ToggleButton Row="1" Column="2" Content="Grid" Name="Grid_Toggle" Opacity="0.25" />
-                        <ToggleButton Row="2" Column="0" Content="ListBox" Name="ListBox_Toggle" Opacity="0.25" />
-                        <ToggleButton Row="2" Column="1" Content="ListView" Name="ListView_Toggle" />
-                        <ToggleButton Row="2" Column="2" Content="ProgressBar" Name="ProgressBar_Toggle" />
-                        <ToggleButton Row="3" Column="0" Content="RadioButton" Name="RadioButton_Toggle" />
-                        <ToggleButton Row="3" Column="1" Content="ScrollViewer" Name="ScrollViewer_Toggle" />
-                        <ToggleButton Row="3" Column="2" Content="Slider" Name="Slider_Toggle" />
-                        <ToggleButton Row="4" Column="0" Content="StackPanel" Name="StackPanel_Toggle" />
-                        <ToggleButton Row="4" Column="1" Content="TabControl" Name="TabControl_Toggle" />
-                        <ToggleButton Row="4" Column="2" Content="TextBlock" Name="TextBlock_Toggle" />
-                        <ToggleButton Row="5" Column="0" Content="TextBox" Name="TextBox_Toggle" />
-                        <ToggleButton Row="5" Column="1" Content="ToolTip" Name="ToolTip_Toggle" Opacity="0.25" />
-                        <ToggleButton Row="5" Column="2" Content="Window" Name="Window_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="Button" Name="Button_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="CheckBox" Name="CheckBox_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="ComboBox" Name="ComboBox_Toggle" />
+                        <ToggleButton Content="ContextMenu" Name="ContextMenu_Toggle" />
+                        <ToggleButton Content="ContextualContentPresenter" Name="ContextualContentPresenter_Toggle" ToolTip="ContextualContentPresenter" />
+                        <ToggleButton Content="DockPanel" Name="DockPanel_Toggle" />
+                        <ToggleButton Content="Expander" Name="Expander_Toggle" />
+                        <ToggleButton Content="Grid" Name="Grid_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="GroupBox" Name="GroupBox_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="Image" Name="Image_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="ListBox" Name="ListBox_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="ListView" Name="ListView_Toggle" />
+                        <ToggleButton Content="PasswordBox" Name="PasswordBox_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="ProgressBar" Name="ProgressBar_Toggle" />
+                        <ToggleButton Content="RadioButton" Name="RadioButton_Toggle" />
+                        <ToggleButton Content="ScrollViewer" Name="ScrollViewer_Toggle" />
+                        <ToggleButton Content="Slider" Name="Slider_Toggle" />
+                        <ToggleButton Content="StackPanel" Name="StackPanel_Toggle" />
+                        <ToggleButton Content="TabControl" Name="TabControl_Toggle" />
+                        <ToggleButton Content="TextBlock" Name="TextBlock_Toggle" />
+                        <ToggleButton Content="TextBox" Name="TextBox_Toggle" />
+                        <ToggleButton Content="ToolTip" Name="ToolTip_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="UniformGrid" Name="UniformGrid_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="Window" Name="Window_Toggle" Opacity="0.25" />
                     </UniformGrid>
                 </StackPanel>
             </Expander>
@@ -69,19 +75,19 @@
                 </Expander.Header>
                 <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
                     <TextBlock FontSize="10" Text="These samples describe some of the common features that [i]MGUI[/i] supports:" />
-                    <UniformGrid Rows="3" Columns="3">
+                    <UniformGrid Columns="3" AutoAssignCells="True">
                         <UniformGrid.Styles>
                             <Style TargetType="TextBlock">
                                 <Setter Property="FontSize" Value="10" />
                             </Style>
                         </UniformGrid.Styles>
-                        <ToggleButton Row="0" Column="0" Content="XAML" Name="XAML_Toggle" Opacity="0.25" />
-                        <ToggleButton Row="0" Column="1" Content="Styles" Name="Styles_Toggle" />
-                        <ToggleButton Row="0" Column="2" Content="Bindings" Name="Bindings_Toggle" Opacity="0.25" />
-                        <ToggleButton Row="1" Column="0" Content="Theme" Name="Theme_Toggle" Opacity="0.25" />
-                        <ToggleButton Row="1" Column="1" Content="VisualState" Name="VisualState_Toggle" Opacity="0.25" />
-                        <ToggleButton Row="1" Column="2" Content="BorderBrush" Name="BorderBrush_Toggle" Opacity="0.25" />
-                        <ToggleButton Row="2" Column="0" Content="FillBrush" Name="FillBrush_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="XAML" Name="XAML_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="Styles" Name="Styles_Toggle" />
+                        <ToggleButton Content="Bindings" Name="Bindings_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="Theme" Name="Theme_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="VisualState" Name="VisualState_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="BorderBrush" Name="BorderBrush_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="FillBrush" Name="FillBrush_Toggle" Opacity="0.25" />
                     </UniformGrid>
                 </StackPanel>
             </Expander>
@@ -93,18 +99,18 @@
                 </Expander.Header>
                 <StackPanel Orientation="Vertical" Spacing="4" Margin="20,0,0,0">
                     <TextBlock FontSize="10" Text="These samples showcase dialogs created with [i]MGUI[/i]:" />
-                    <UniformGrid Rows="2" Columns="3">
+                    <UniformGrid Columns="3" AutoAssignCells="True">
                         <UniformGrid.Styles>
                             <Style TargetType="TextBlock">
                                 <Setter Property="FontSize" Value="10" />
                             </Style>
                         </UniformGrid.Styles>
-                        <ToggleButton Row="0" Column="0" Content="FF7 Inventory" Name="FF7Inventory_Toggle" />
-                        <ToggleButton Row="0" Column="1" Content="Stardew Valley" Name="SDVInventory_Toggle" />
-                        <ToggleButton Row="0" Column="2" Content="Registration" Name="Registration_Toggle" />
-                        <ToggleButton Row="1" Column="0" Content="XAML Designer" Name="XAMLDesigner_Toggle" />
-                        <ToggleButton Row="1" Column="1" Content="Debug1" Name="Debug1_Toggle" TextForeground="Yellow" Opacity="0.7" />
-                        <ToggleButton Row="1" Column="2" Content="Debug2" Name="Debug2_Toggle" TextForeground="Yellow" Opacity="0.7" />
+                        <ToggleButton Content="FF7 Inventory" Name="FF7Inventory_Toggle" />
+                        <ToggleButton Content="Stardew Valley" Name="SDVInventory_Toggle" />
+                        <ToggleButton Content="Registration" Name="Registration_Toggle" />
+                        <ToggleButton Content="XAML Designer" Name="XAMLDesigner_Toggle" />
+                        <ToggleButton Content="Debug1" Name="Debug1_Toggle" TextForeground="Yellow" Opacity="0.7" />
+                        <ToggleButton Content="Debug2" Name="Debug2_Toggle" TextForeground="Yellow" Opacity="0.7" />
                     </UniformGrid>
                 </StackPanel>
             </Expander>
