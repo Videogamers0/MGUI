@@ -252,6 +252,8 @@ namespace MGUI.Core.UI.XAML
 
         [Category("Appearance")]
         public FillBrush CellBackground { get; set; }
+        [Category("Behavior")]
+        public bool? DrawEmptyCells { get; set; }
 
         /// <summary>If true, the Row and Column values of each child element will be automatically assigned in order.<para/>
         /// For example, if there are 2 columns, 3 rows:<br/>
@@ -306,6 +308,8 @@ namespace MGUI.Core.UI.XAML
 
             if (CellBackground != null)
                 Grid.CellBackground.NormalValue = CellBackground.ToFillBrush(Desktop);
+            if (DrawEmptyCells.HasValue)
+                Grid.DrawEmptyCells = DrawEmptyCells.Value;
 
             if (IncludeContent)
             {

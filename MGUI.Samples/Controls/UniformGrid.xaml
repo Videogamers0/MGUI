@@ -25,18 +25,294 @@
             <TextBlock StyleNames="Header1" Text="UniformGrid:" HorizontalAlignment="Center" />
             <Separator/>
             <TextBlock>
-
+                UniformGrids are a layout container that arranges its children according to the Cell (Row+Column) they're assigned to. 
+                They are a specialized type of [c=Turquoise][i]Grid[/i][/c]. Unlike [c=Turquoise][i]Grids[/i][/c], [c=Turquoise][i]UniformGrids[/i][/c]
+                allocate the same dimensions to each cell.
             </TextBlock>
             <Separator />
 
+            <TextBlock>
+                Layout containers are elements that can host multiple children for their Content. 
+                Each type of layout container ([c=Turquoise][i]StackPanel[/i][/c], [c=Turquoise][i]DockPanel[/i][/c], [c=Turquoise][i]Grid[/i][/c] etc) 
+                defines its own rules for how it arranges the children.
+            </TextBlock>
+            <Separator/>
+
             <DockPanel>
                 <TextBlock Dock="Top">
-
+                    Set [c=Turquoise][i]Rows[/i][/c] and [c=Turquoise][i]Columns[/i][/c] to determine how many cells the UniformGrid should have.
                 </TextBlock>
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
-
+                        This UniformGrid has 2 Rows and 3 Columns
                     </TextBlock>
+                    <UniformGrid Rows="2" Columns="3" AutoAssignCells="True" CellSize="80,35">
+                        <UniformGrid.Styles>
+                            <Style TargetType="Border">
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                            </Style>
+                        </UniformGrid.Styles>
+                        <Border Background="Green" Content="Cell={0,0}" />
+                        <Border Background="MediumPurple" Content="Cell={0,1}" />
+                        <Border Background="Orange" Content="Cell={0,2}" />
+                        <Border Background="LightBlue" Content="Cell={1,0}" />
+                        <Border Background="Magenta" Content="Cell={1,1}" />
+                        <Border Background="Purple" Content="Cell={1,2}" />
+                    </UniformGrid>
+                    <Spacer Height="2" />
+                    <TextBlock>
+                        If you specify 1 dimension but not the other, the other dimension will be dynamically assigned based on how many child elements the UniformGrid has. 
+                        This UniformGrid explicitly sets [c=Turquoise][i]Rows[/i][/c]=[c=LightBlue][s=Blue]2[/s][/c] and has [b]7[/b] child elements.
+                        [c=Turquoise][i]Columns[/i][/c] is automatically set to [c=LightBlue][s=Blue]4[/s][/c] as that's the minimal amount needed to display all 7 children.
+                    </TextBlock>
+                    <UniformGrid Rows="2" AutoAssignCells="True" CellSize="80,35">
+                        <UniformGrid.Styles>
+                            <Style TargetType="Border">
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                            </Style>
+                        </UniformGrid.Styles>
+                        <Border Background="Green" Content="Cell={0,0}" />
+                        <Border Background="MediumPurple" Content="Cell={0,1}" />
+                        <Border Background="Orange" Content="Cell={0,2}" />
+                        <Border Background="LightBlue" Content="Cell={0,3}" />
+                        <Border Background="Magenta" Content="Cell={1,0}" />
+                        <Border Background="Purple" Content="Cell={1,1}" />
+                        <Border Background="OrangeRed" Content="Cell={1,2}" />
+                    </UniformGrid>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]Row[/i][/c] and [c=Turquoise][i]Column[/i][/c] of each child element to
+                    specify which cell the child belongs to.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <UniformGrid Rows="2" Columns="2" CellSize="182,44">
+                        <UniformGrid.Styles>
+                            <Style TargetType="Border">
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                            </Style>
+                        </UniformGrid.Styles>
+                        <Border Background="Green" Row="0" Column="0" Content="This Content is set to Row=0, Column=0" />
+                        <Border Background="MediumPurple" Row="0" Column="1" Content="This Content is set to Row=0, Column=1" />
+                        <Border Background="Orange" Row="1" Column="0" Content="This Content is set to Row=1, Column=0" />
+                        <Border Background="Magenta" Row="1" Column="1" Content="This Content is set to Row=1, Column=1" />
+                    </UniformGrid>
+                    <Spacer Height="2" />
+                    <TextBlock>
+                        Alternatively, in XAML you can set [c=Turquoise][i]AutoAssignCells[/i][/c]=[c=LightBlue][s=Blue]true[/s][/c] to
+                        let the UniformGrid automatically assign each child to a cell (assigns in order, from left to right, top to bottom. 1 child per cell)
+                    </TextBlock>
+                    <UniformGrid Rows="2" Columns="2" CellSize="182,44" AutoAssignCells="True">
+                        <UniformGrid.Styles>
+                            <Style TargetType="Border">
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                            </Style>
+                        </UniformGrid.Styles>
+                        <Border Background="Green" Content="1st child, auto-assigned to Row=0, Column=0" />
+                        <Border Background="MediumPurple" Content="2nd child, auto-assigned to Row=0, Column=1"/>
+                        <Border Background="Orange" Content="3rd child, auto-assigned to Row=1, Column=0"/>
+                        <Border Background="Magenta" Content="4th child, auto-assigned to Row=1, Column=1" />
+                    </UniformGrid>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]CellSize[/i][/c], [c=Turquoise][i]HeaderRowHeight[/i][/c], and [c=Turquoise][i]HeaderColumnWidth[/i][/c]
+                    to control the dimensions of each cell.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        This UniformGrid sets [c=Turquoise][i]CellSize[/i][/c]=[c=LightBlue][s=Blue]70,30[/s][/c].
+                    </TextBlock>
+                    <UniformGrid Columns="3" CellSize="70,30" AutoAssignCells="True">
+                        <UniformGrid.Styles>
+                            <Style TargetType="Border">
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                            </Style>
+                        </UniformGrid.Styles>
+                        <Border Background="Green" Content="Cell={0,0}" />
+                        <Border Background="MediumPurple" Content="Cell={0,1}" />
+                        <Border Background="Orange" Content="Cell={0,2}" />
+                        <Border Background="Magenta" Content="Cell={1,0}" />
+                        <Border Background="Purple" Content="Cell={1,1}" />
+                    </UniformGrid>
+                    <TextBlock>
+                        This UniformGrid sets [c=Turquoise][i]HeaderRowHeight[/i][/c]=[c=LightBlue][s=Blue]45[/s][/c] so the 1st row is slightly taller.
+                    </TextBlock>
+                    <UniformGrid Columns="3" CellSize="70,30" AutoAssignCells="True" HeaderRowHeight="45">
+                        <UniformGrid.Styles>
+                            <Style TargetType="Border">
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                            </Style>
+                        </UniformGrid.Styles>
+                        <Border Background="Green" Content="Cell={0,0}" />
+                        <Border Background="MediumPurple" Content="Cell={0,1}" />
+                        <Border Background="Orange" Content="Cell={0,2}" />
+                        <Border Background="Magenta" Content="Cell={1,0}" />
+                        <Border Background="Purple" Content="Cell={1,1}" />
+                    </UniformGrid>
+                    <TextBlock>
+                        This UniformGrid sets [c=Turquoise][i]HeaderColumnWidth[/i][/c]=[c=LightBlue][s=Blue]100[/s][/c] so the 1st column is slightly wider.
+                    </TextBlock>
+                    <UniformGrid Columns="3" CellSize="70,30" AutoAssignCells="True" HeaderColumnWidth="100">
+                        <UniformGrid.Styles>
+                            <Style TargetType="Border">
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                            </Style>
+                        </UniformGrid.Styles>
+                        <Border Background="Green" Content="Cell={0,0}" />
+                        <Border Background="MediumPurple" Content="Cell={0,1}" />
+                        <Border Background="Orange" Content="Cell={0,2}" />
+                        <Border Background="Magenta" Content="Cell={1,0}" />
+                        <Border Background="Purple" Content="Cell={1,1}" />
+                    </UniformGrid>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]RowSpacing[/i][/c] and [c=Turquoise][i]ColumnSpacing[/i][/c] to apply a uniform padding between consecutive rows or columns.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        This UniformGrid sets [c=Turquoise][i]RowSpacing[/i][/c]=[c=LightBlue][s=Blue]12[/s][/c].
+                    </TextBlock>
+                    <UniformGrid Columns="2" CellSize="70,30" AutoAssignCells="True" RowSpacing="12">
+                        <UniformGrid.Styles>
+                            <Style TargetType="Border">
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                            </Style>
+                        </UniformGrid.Styles>
+                        <Border Background="Green" Content="Cell={0,0}" />
+                        <Border Background="MediumPurple" Content="Cell={0,1}" />
+                        <Border Background="Orange" Content="Cell={1,0}" />
+                        <Border Background="Magenta" Content="Cell={1,1}" />
+                        <Border Background="Purple" Content="Cell={2,0}" />
+                    </UniformGrid>
+
+                    <TextBlock>
+                        This UniformGrid sets [c=Turquoise][i]ColumnSpacing[/i][/c]=[c=LightBlue][s=Blue]6[/s][/c].
+                    </TextBlock>
+                    <UniformGrid Rows="2" CellSize="70,30" AutoAssignCells="True" ColumnSpacing="6">
+                        <UniformGrid.Styles>
+                            <Style TargetType="Border">
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                            </Style>
+                        </UniformGrid.Styles>
+                        <Border Background="Green" Content="Cell={0,0}" />
+                        <Border Background="MediumPurple" Content="Cell={0,1}" />
+                        <Border Background="Orange" Content="Cell={0,2}" />
+                        <Border Background="Magenta" Content="Cell={1,0}" />
+                        <Border Background="Purple" Content="Cell={1,1}" />
+                    </UniformGrid>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]CellBackground[/i][/c] to apply a brush to each cell's background.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        This UniformGrid sets [c=Turquoise][i]CellBackground[/i][/c] to a [c=Turquoise][i]BorderedFillBrush[/i][/c].
+                    </TextBlock>
+                    <UniformGrid Columns="2" CellSize="88,38" AutoAssignCells="True" RowSpacing="2" ColumnSpacing="2">
+                        <UniformGrid.Styles>
+                            <Style TargetType="Border">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                <Setter Property="Padding" Value="3,2" />
+                            </Style>
+                        </UniformGrid.Styles>
+                        <UniformGrid.CellBackground>
+                            <BorderedFillBrush BorderThickness="3" PadFillBoundsByBorderThickness="True" FillBrush="rgb(255,195,118)">
+                                <BorderedFillBrush.BorderBrush>
+                                    <DockedBorderBrush Left="rgb(255,228,161)" Top="rgb(214,143,84)" Right="rgb(214,143,84)" Bottom="rgb(255,228,161)" />
+                                </BorderedFillBrush.BorderBrush>
+                            </BorderedFillBrush>
+                        </UniformGrid.CellBackground>
+                        <Border Background="Green" Content="Cell={0,0}" />
+                        <Border Background="MediumPurple" Content="Cell={0,1}" />
+                        <Border Background="Orange" Content="Cell={1,0}" />
+                        <Border Background="Magenta" Content="Cell={1,1}" />
+                        <Border Background="Purple" Content="Cell={2,0}" />
+                    </UniformGrid>
+                    <Spacer Height="2" />
+                    <TextBlock>
+                        This UniformGrid also sets [c=Turquoise][i]CellBackground[/i][/c] to a [c=Turquoise][i]BorderedFillBrush[/i][/c],
+                        but you can't see the [c=Turquoise][i]CellBackground[/i][/c] on most cells because their Content spans the entire Cell's bounds.
+                    </TextBlock>
+                    <UniformGrid Columns="2" CellSize="156,38" AutoAssignCells="True" RowSpacing="2" ColumnSpacing="2">
+                        <UniformGrid.Styles>
+                            <Style TargetType="Border">
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                <Setter Property="Padding" Value="3,2" />
+                            </Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontSize" Value="8" />
+                                <Setter Property="TextAlignment" Value="Center" />
+                            </Style>
+                        </UniformGrid.Styles>
+                        <UniformGrid.CellBackground>
+                            <BorderedFillBrush BorderThickness="3" PadFillBoundsByBorderThickness="True" FillBrush="rgb(255,195,118)">
+                                <BorderedFillBrush.BorderBrush>
+                                    <DockedBorderBrush Left="rgb(255,228,161)" Top="rgb(214,143,84)" Right="rgb(214,143,84)" Bottom="rgb(255,228,161)" />
+                                </BorderedFillBrush.BorderBrush>
+                            </BorderedFillBrush>
+                        </UniformGrid.CellBackground>
+                        <Border Background="Green" Content="Cell={0,0}" />
+                        <Border Background="MediumPurple" Content="Cell={0,1}" />
+                        <Border Background="Transparent" Content="Cell={1,0}\n(Transparent Background)" />
+                        <Border Background="Magenta" Content="Cell={1,1}" />
+                        <Border Background="Purple" Content="Cell={2,0}" />
+                    </UniformGrid>
+                    <Spacer Height="2" />
+                    <TextBlock>
+                        You can also set [c=Turquoise][i]DrawEmptyCells[/i][/c]=[c=LightBlue][s=Blue]false[/s][/c] to avoid drawing the 
+                        [c=Turquoise][i]CellBackground[/i][/c] to cells without any Content.
+                    </TextBlock>
+                    <UniformGrid Columns="2" CellSize="88,38" AutoAssignCells="True" RowSpacing="2" ColumnSpacing="2" DrawEmptyCells="False">
+                        <UniformGrid.Styles>
+                            <Style TargetType="Border">
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                <Setter Property="Padding" Value="3,2" />
+                            </Style>
+                        </UniformGrid.Styles>
+                        <UniformGrid.CellBackground>
+                            <BorderedFillBrush BorderThickness="3" PadFillBoundsByBorderThickness="True" FillBrush="rgb(255,195,118)">
+                                <BorderedFillBrush.BorderBrush>
+                                    <DockedBorderBrush Left="rgb(255,228,161)" Top="rgb(214,143,84)" Right="rgb(214,143,84)" Bottom="rgb(255,228,161)" />
+                                </BorderedFillBrush.BorderBrush>
+                            </BorderedFillBrush>
+                        </UniformGrid.CellBackground>
+                        <Border Background="Green" Content="Cell={0,0}" />
+                        <Border Background="MediumPurple" Content="Cell={0,1}" />
+                        <Border Background="Orange" Content="Cell={1,0}" />
+                        <Border Background="Magenta" Content="Cell={1,1}" />
+                        <Border Background="Purple" Content="Cell={2,0}" />
+                    </UniformGrid>
                 </StackPanel>
             </DockPanel>
             <Separator/>

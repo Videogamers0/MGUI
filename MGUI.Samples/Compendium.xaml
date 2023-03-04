@@ -62,7 +62,7 @@
                         <ToggleButton Content="TextBlock" Name="TextBlock_Toggle" />
                         <ToggleButton Content="TextBox" Name="TextBox_Toggle" />
                         <ToggleButton Content="ToolTip" Name="ToolTip_Toggle" Opacity="0.25" />
-                        <ToggleButton Content="UniformGrid" Name="UniformGrid_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="UniformGrid" Name="UniformGrid_Toggle" />
                         <ToggleButton Content="Window" Name="Window_Toggle" Opacity="0.25" />
                     </UniformGrid>
                 </StackPanel>

@@ -16,7 +16,7 @@ namespace MGUI.Core.UI.Containers.Grids
     public readonly record struct GridCellIndex(int Row, int Column);
 
     public readonly record struct StaticGridSelection(MGUniformGrid Grid, GridCellIndex Cell, GridSelectionMode SelectionMode)
-    : IEnumerable<GridCellIndex>
+        : IEnumerable<GridCellIndex>
     {
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         public IEnumerator<GridCellIndex> GetEnumerator() => GetCells().GetEnumerator();
@@ -520,9 +520,28 @@ namespace MGUI.Core.UI.Containers.Grids
         }
 
         public VisualStateFillBrush CellBackground { get; set; }
+        /// <summary>If true, the <see cref="CellBackground"/> will be drawn on cells which do not contain any child content.<para/>
+        /// Default value: true.</summary>
+        public bool DrawEmptyCells { get; set; }
 
-        /// <summary>An action to invoke on each cell whenever the cell is being drawn</summary>
-        public Action<ElementDrawArgs, GridCellIndex, Rectangle> RenderCell { get; set; }
+        public class RenderCellArgs : EventArgs
+        {
+            public ElementDrawArgs DrawArgs { get; }
+            public GridCellIndex CellIndex { get; }
+            public Rectangle CellBounds { get; }
+
+            public RenderCellArgs(ElementDrawArgs DrawArgs, GridCellIndex CellIndex, Rectangle CellBounds)
+                : base()
+            {
+                this.DrawArgs = DrawArgs;
+                this.CellIndex = CellIndex;
+                this.CellBounds = CellBounds;
+            }
+        }
+        /// <summary>Invoked on each cell whenever the cell is being drawn..<para/>
+        /// This event is invoked even on cells that have no content.<br/>
+        /// You may wish to check if <see cref="GetCellContent(GridCellIndex)"/> is an empty list to skip custom rendering to empty cells.</summary>
+        public event EventHandler<RenderCellArgs> OnRenderCell;
 
         public MGUniformGrid(MGWindow Window, int Rows, int Columns, Size CellSize)
             : base(Window, MGElementType.UniformGrid)
@@ -585,6 +604,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 OnLayoutBoundsChanged += (sender, e) => { _CellBounds = GetCellBounds(e.NewValue, true); };
 
                 this.CellBackground = new(null);
+                this.DrawEmptyCells = true;
             }
         }
 
@@ -692,10 +712,13 @@ namespace MGUI.Core.UI.Containers.Grids
                     GridCellIndex Index = new(R, C);
                     Rectangle Bounds = _CellBounds[Index];
 
-                    CellBackground.GetUnderlay(VisualState.Primary)?.Draw(DA, this, Bounds);
-                    CellBackground.GetFillOverlay(VisualState.Secondary)?.Draw(DA, this, Bounds);
+                    if (DrawEmptyCells || GetCellContent(Index).Count > 0)
+                    {
+                        CellBackground.GetUnderlay(VisualState.Primary)?.Draw(DA, this, Bounds);
+                        CellBackground.GetFillOverlay(VisualState.Secondary)?.Draw(DA, this, Bounds);
+                    }
 
-                    RenderCell?.Invoke(DA, Index, Bounds);
+                    OnRenderCell?.Invoke(this, new RenderCellArgs(DA, Index, Bounds));
                 }
             }
 
