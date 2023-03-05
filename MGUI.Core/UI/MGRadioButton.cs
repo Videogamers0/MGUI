@@ -232,7 +232,9 @@ namespace MGUI.Core.UI
             int BubbleRadius = BubblePartBounds.Width / 2;
 
             Color BubbleComponentFillColor = BubbleComponentBackground.GetUnderlay(VisualState.Primary);
-            DT.StrokeAndFillCircle(BubbleCenter.ToVector2(), BubbleComponentBorderColor * Opacity, BubbleComponentFillColor * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
+            DT.FillCircle(BubbleCenter.ToVector2(), BubbleComponentFillColor * Opacity, BubbleRadius - BubbleComponentBorderThickness / 2, CircleDetailLevel);
+            DT.StrokeCircle(BubbleCenter.ToVector2(), BubbleComponentBorderColor * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
+            //DT.StrokeAndFillCircle(BubbleCenter.ToVector2(), BubbleComponentBorderColor * Opacity, BubbleComponentFillColor * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
 
             if (!ParentWindow.HasModalWindow)
             {
@@ -251,7 +253,9 @@ namespace MGUI.Core.UI
                 Color? Overlay = BubbleComponentBackground.GetColorOverlay(IsBubblePartPressed ? SecondaryVisualState.Pressed : IsBubblePartHovered ? SecondaryVisualState.Hovered : SecondaryVisualState.None);
                 if (Overlay.HasValue)
                 {
-                    DT.StrokeAndFillCircle(BubbleCenter.ToVector2(), Overlay.Value * Opacity, Overlay.Value * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
+                    DT.FillCircle(BubbleCenter.ToVector2(), Overlay.Value * Opacity, BubbleRadius - BubbleComponentBorderThickness / 2, CircleDetailLevel);
+                    DT.StrokeCircle(BubbleCenter.ToVector2(), Overlay.Value * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
+                    //DT.StrokeAndFillCircle(BubbleCenter.ToVector2(), Overlay.Value * Opacity, Overlay.Value * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
                 }
             }
 
