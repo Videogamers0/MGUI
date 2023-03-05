@@ -1,4 +1,5 @@
 <Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Left="440" Top="20" MinHeight="0" Width="500" Height="800" TitleText="CheckBox" Padding="10">
     <Window.Styles>
         <Style TargetType="TextBlock">
@@ -25,22 +26,159 @@
             <TextBlock StyleNames="Header1" Text="CheckBox:" HorizontalAlignment="Center" />
             <Separator/>
             <TextBlock>
-
+                CheckBoxes are 2-state buttons that alternate between Checked and Unchecked. Unlike [c=Turquoise][i]ToggleButtons[/i][/c], 
+                [c=Turquoise][i]CheckBoxes[/i][/c] display their Content outside of the clickable button portion.
             </TextBlock>
+            <Separator />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="6">
+                <TextBlock Text="This is a [c=Turquoise][i]CheckBox[/i][/c]:" />
+                <CheckBox IsChecked="True">
+                    <TextBlock Foreground="White" IsShadowed="True" ShadowColor="Red * 0.5">
+                    {CheckBox's Content}
+                    </TextBlock>
+                </CheckBox>
+            </StackPanel>
             <Separator />
 
             <DockPanel>
                 <TextBlock Dock="Top">
-
+                    Use [c=Turquoise][i]IsChecked[/i][/c] to get or set the current check-state. You can also subscribe to these events:
+                    [c=Turquoise][i]OnChecked[/i][/c], [c=Turquoise][i]OnUnchecked[/i][/c], [c=Turquoise][i]OnCheckStateChanged[/i][/c].
                 </TextBlock>
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <CheckBox Name="CheckBox1" IsChecked="True">
+                        <TextBlock Name="TextBlock1" VerticalAlignment="Center" />
+                    </CheckBox>
+                    <Spacer Height="4" />
                     <TextBlock>
-
+                        [c=Turquoise][i]IsChecked[/i][/c] is a nullable boolean. Usually it can only be [c=LightBlue][s=Blue]true[/s][/c] or [c=LightBlue][s=Blue]false[/s][/c],
+                        but if you set [c=Turquoise][i]IsThreeState[/i][/c]=[c=LightBlue][s=Blue]true[/s][/c], it will alternate between 
+                        [c=LightBlue][s=Blue]true[/s][/c], [c=LightBlue][s=Blue]null[/s][/c], and [c=LightBlue][s=Blue]false[/s][/c].
                     </TextBlock>
+                    <Spacer Height="2" />
+                    <CheckBox Name="CheckBox2" IsChecked="True" IsThreeState="True">
+                        <TextBlock Name="TextBlock2" VerticalAlignment="Center" />
+                    </CheckBox>
                 </StackPanel>
             </DockPanel>
             <Separator/>
 
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]IsReadonly[/i][/c] to [c=LightBlue][s=Blue]true[/s][/c] to prevent the user from manually changing the check-state.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <CheckBox IsChecked="True" IsReadonly="True" Content="This CheckBox is readonly. It's always checked unless changed programmatically." />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]CheckMarkColor[/i][/c] to change the appearance of the check mark graphics within the clickable button part of the CheckBox.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <CheckBox IsReadonly="True" IsChecked="True" CheckMarkColor="Orange" 
+                              Content="This CheckBox uses [c=Turquoise][i]CheckMarkColor[/i][/c]=[c=Orange][s=Black]Orange[/s][/c]" />
+                    <CheckBox IsReadonly="True" IsChecked="{x:Null}" IsThreeState="True" CheckMarkColor="MediumSeaGreen" 
+                              Content="This CheckBox uses [c=Turquoise][i]CheckMarkColor[/i][/c]=[c=MediumSeaGreen][s=Black]MediumSeaGreen[/s][/c]" />
+                    <Spacer Height="4" />
+                    <TextBlock>
+                        You can also set [c=Turquoise][i]IsCheckMarkShadowed[/i][/c] to apply a drop-shadow.
+                        Set [c=Turquoise][i]CheckMarkShadowColor[/i][/c], and [c=Turquoise][i]CheckMarkShadowOffset[/i][/c] to control the shadow's appearance.
+                    </TextBlock>
+                    <CheckBox IsReadonly="True" IsChecked="{x:Null}" IsThreeState="True" CheckMarkColor="MediumSeaGreen" IsCheckMarkShadowed="True" CheckMarkShadowColor="Black" CheckMarkShadowOffset="1,1"
+                              Content="This CheckBox uses [c=Turquoise][i]CheckMarkColor[/i][/c]=[c=MediumSeaGreen][s=Black]MediumSeaGreen[/s][/c] with a [c=Black][s=#404040]Black[/s][/c] shadow" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]CheckBoxComponentSize[/i][/c] to control the size of the checkable button part of the CheckBox.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <StackPanel.Styles>
+                        <Style TargetType="CheckBox">
+                            <Setter Property="IsReadonly" Value="True" />
+                            <Setter Property="IsChecked" Value="True" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <CheckBox CheckBoxComponentSize="24" Content="[c=Turquoise][i]CheckBoxComponentSize[/i][/c]=[c=LightBlue][s=Blue]24[/s][/c]" />
+                    <CheckBox CheckBoxComponentSize="20" Content="[c=Turquoise][i]CheckBoxComponentSize[/i][/c]=[c=LightBlue][s=Blue]20[/s][/c]" />
+                    <CheckBox CheckBoxComponentSize="16" Content="[c=Turquoise][i]CheckBoxComponentSize[/i][/c]=[c=LightBlue][s=Blue]16[/s][/c]" />
+                    <CheckBox CheckBoxComponentSize="12" Content="[c=Turquoise][i]CheckBoxComponentSize[/i][/c]=[c=LightBlue][s=Blue]12[/s][/c]" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    You can customize the clickable Button portion of the CheckBox by changing [c=Turquoise][i]CheckBox.Button[/i][/c] (in Xaml) or 
+                    [c=Turquoise][i]CheckBox.ButtonElement[/i][/c] (in c# code)
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <StackPanel.Styles>
+                        <Style TargetType="CheckBox">
+                            <Setter Property="CheckBoxComponentSize" Value="20" />
+                            <Setter Property="IsThreeState" Value="True" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <CheckBox IsChecked="True" CheckMarkColor="rgb(166,166,166)"
+                              Content="This CheckBox's Button has a [c=Black][s=#404040]Black[/s][/c] Background.">
+                        <CheckBox.Button>
+                            <Button Background="rgb(36,36,36)" />
+                        </CheckBox.Button>
+                    </CheckBox>
+                    <CheckBox IsChecked="True" Content="This CheckBox's Button has a 2px [c=Cyan]Cyan[/c] Border.">
+                        <CheckBox.Button>
+                            <Button BorderBrush="Cyan" BorderThickness="2" />
+                        </CheckBox.Button>
+                    </CheckBox>
+                    <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Spacing="2" HorizontalAlignment="Left">
+                        <CheckBox IsThreeState="True" IsChecked="{x:Null}" Content="This CheckBox's Button has additional Padding">
+                            <CheckBox.Button>
+                                <Button Padding="2" />
+                            </CheckBox.Button>
+                        </CheckBox>
+                        <CheckBox IsThreeState="True" IsChecked="{x:Null}" Content="This one doesn't" />
+                    </StackPanel>
+                    <Spacer Height="4" />
+                    <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                        <TextBlock>
+                            You can use your own icon for the Check Mark graphics by manually populating the Button's Content with an Image and setting 
+                            [c=Turquoise][i]CheckMarkColor[/i][/c]=[c=LightBlue][s=Blue]Transparent[/s][/c] to hide the default graphics.
+                        </TextBlock>
+                        <CheckBox Name="CheckBox3" IsChecked="True" IsThreeState="False" CheckMarkColor="Transparent" CheckBoxComponentSize="16" Content="Custom Check Mark icon">
+                            <CheckBox.Button>
+                                <Button Background="rgb(80,80,80)">
+                                    <ContextualContentPresenter Name="CCP1" Value="True" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- This image will only be visible if CheckBox3.IsChecked is true. The c# code updates 
+                                        ContextualContentPresenter.Value whenever the CheckBox's IsChecked state changes. -->
+                                        <ContextualContentPresenter.TrueContent>
+                                            <Image Width="12" Height="12" RegionName="CheckMarkGreen_12x12" />
+                                        </ContextualContentPresenter.TrueContent>
+                                    </ContextualContentPresenter>
+                                </Button>
+                            </CheckBox.Button>
+                        </CheckBox>
+                        <CheckBox Name="CheckBox4" IsChecked="True" IsThreeState="False" CheckMarkColor="Transparent" Content="Custom Check Mark icon #2">
+                            <CheckBox.Button>
+                                <Button Background="rgb(80,80,80)">
+                                    <ContextualContentPresenter Name="CCP2" Value="True" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <ContextualContentPresenter.TrueContent>
+                                            <Image Width="16" Height="16" RegionName="CheckMarkGreen" />
+                                        </ContextualContentPresenter.TrueContent>
+                                    </ContextualContentPresenter>
+                                </Button>
+                            </CheckBox.Button>
+                        </CheckBox>
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
         </StackPanel>
     </ScrollViewer>
 </Window>

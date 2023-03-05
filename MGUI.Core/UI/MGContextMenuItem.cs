@@ -389,7 +389,7 @@ namespace MGUI.Core.UI
                 if (this.IsChecked)
                 {
                     e.DA.DT.FillRectangle(e.DA.Offset.ToVector2(), HeaderPresenter.LayoutBounds, Color.White * 0.3f * e.DA.Opacity);
-                    MGCheckBox.DrawCheckMark(HeaderPresenter.LayoutBounds, e.DA.DT, e.DA.Opacity, e.DA.Offset, Color.Black);
+                    MGCheckBox.DrawCheckMark(GetDesktop(), HeaderPresenter.LayoutBounds, e.DA.DT, e.DA.Opacity, e.DA.Offset, Color.Black);
                 }
             };
 

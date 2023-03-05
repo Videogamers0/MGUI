@@ -20,10 +20,11 @@ namespace MGUI.Core.UI
         /// <summary>The default empty width between the checkable part of an <see cref="MGCheckBox"/> and its <see cref="MGSingleContentHost.Content"/></summary>
         public const int DefaultCheckBoxSpacingWidth = 5;
 
-        /// <summary>Provides direct access to the button component that appears to the left of this checkbox's content.</summary>
+        /// <summary>Provides direct access to the button component that appears to the left of this checkbox's content.<para/>
+        /// See also: <see cref="ButtonElement"/></summary>
         public MGComponent<MGButton> ButtonComponent { get; }
         /// <summary>The checkable button portion of this <see cref="MGCheckBox"/></summary>
-        private MGButton ButtonElement { get; }
+        public MGButton ButtonElement { get; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _CheckBoxComponentSize;
@@ -58,6 +59,13 @@ namespace MGUI.Core.UI
         /// Default value: <see cref="MGTheme.CheckMarkColor"/><para/>
         /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/></summary>
         public Color CheckMarkColor { get; set; }
+
+        /// <summary>If true, the graphics of the <see cref="ButtonElement"/> will be drawn an extra time
+        /// with Color=<see cref="CheckMarkShadowColor"/> and using Offset=<see cref="CheckMarkShadowOffset"/><para/>
+        /// Default value: false</summary>
+        public bool IsCheckMarkShadowed { get; set; }
+        public Color CheckMarkShadowColor { get; set; }
+        public Point CheckMarkShadowOffset { get; set; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsThreeState;
@@ -105,6 +113,10 @@ namespace MGUI.Core.UI
             }
         }
 
+        /// <summary>If true, the user will be unable to modify <see cref="IsChecked"/> by manually clicking the <see cref="ButtonElement"/>.<para/>
+        /// Default value: false</summary>
+        public bool IsReadonly { get; set; }
+
         /// <summary>Note: This event is invoked before <see cref="OnChecked"/> / <see cref="OnUnchecked"/></summary>
         public event EventHandler<EventArgs<bool?>> OnCheckStateChanged;
         public event EventHandler<EventArgs> OnChecked;
@@ -117,22 +129,43 @@ namespace MGUI.Core.UI
             {
                 this.ButtonElement = new(Window, new(1), MGUniformBorderBrush.Black, x =>
                 {
-                    if (IsThreeState)
+                    if (!IsReadonly)
                     {
-                        this.IsChecked = this.IsChecked.HasValue && this.IsChecked.Value ? null : !this.IsChecked.HasValue ? false : true;
-                    }
-                    else
-                    {
-                        this.IsChecked = !this.IsChecked.HasValue || this.IsChecked.Value ? false : true;
+                        if (IsThreeState)
+                        {
+                            this.IsChecked = this.IsChecked.HasValue && this.IsChecked.Value ? null : !this.IsChecked.HasValue ? false : true;
+                        }
+                        else
+                        {
+                            this.IsChecked = !this.IsChecked.HasValue || this.IsChecked.Value ? false : true;
+                        }
                     }
                 });
+                ButtonElement.MinWidth = 12;
+                ButtonElement.MinHeight = 12;
+                ButtonElement.Padding = new(0);
 
                 ButtonElement.OnEndingDraw += (sender, e) =>
                 {
                     if (!this.IsChecked.HasValue)
-                        e.DA.DT.FillRectangle(e.DA.Offset.ToVector2(), ButtonElement.LayoutBounds.GetScaledFromCenter(0.60f), CheckMarkColor * e.DA.Opacity);
+                    {
+                        Rectangle TargetBounds = ButtonElement.LayoutBounds.GetCompressed(ButtonElement.Padding).GetScaledFromCenter(0.60f);
+                        //  Force the bounds to be an even width/height
+                        if (TargetBounds.Width % 2 != 0 || TargetBounds.Height % 2 != 0)
+                            TargetBounds = new(TargetBounds.Left, TargetBounds.Top, TargetBounds.Width / 2 * 2, TargetBounds.Height / 2 * 2);
+
+                        if (IsCheckMarkShadowed)
+                            e.DA.DT.FillRectangle(e.DA.Offset.ToVector2(), TargetBounds.GetTranslated(CheckMarkShadowOffset), CheckMarkShadowColor * e.DA.Opacity);
+                        e.DA.DT.FillRectangle(e.DA.Offset.ToVector2(), TargetBounds, CheckMarkColor * e.DA.Opacity);
+
+                    }
                     else if (this.IsChecked.Value)
-                        DrawCheckMark(ButtonElement.LayoutBounds, e.DA.DT, e.DA.Opacity, e.DA.Offset, CheckMarkColor);
+                    {
+                        Rectangle TargetBounds = ButtonElement.LayoutBounds.GetCompressed(ButtonElement.Padding);
+                        if (IsCheckMarkShadowed)
+                            DrawCheckMark(GetDesktop(), TargetBounds, e.DA.DT, e.DA.Opacity, e.DA.Offset + CheckMarkShadowOffset, CheckMarkShadowColor);
+                        DrawCheckMark(GetDesktop(), TargetBounds, e.DA.DT, e.DA.Opacity, e.DA.Offset, CheckMarkColor);
+                    }
                 };
 
                 this.ButtonComponent = new(ButtonElement, false, true, true, true, false, false, false,
@@ -143,14 +176,19 @@ namespace MGUI.Core.UI
                 this.CheckBoxComponentSize = DefaultCheckBoxSize;
                 this.SpacingWidth = DefaultCheckBoxSpacingWidth;
                 this.CheckMarkColor = GetTheme().CheckMarkColor;
+                this.IsCheckMarkShadowed = false;
+                this.CheckMarkShadowColor = Color.Black;
+                this.CheckMarkShadowOffset = new(0, 1);
 
                 this.IsThreeState = !IsChecked.HasValue;
                 this.IsChecked = IsChecked;
+                this.IsReadonly = false;
             }
         }
 
-        public static void DrawCheckMark(Rectangle Bounds, DrawTransaction DT, float Opacity, Point Offset, Color Color)
+        public static void DrawCheckMark(MGDesktop Desktop, Rectangle Bounds, DrawTransaction DT, float Opacity, Point Offset, Color Color)
         {
+#if true
             Vector2 TopLeft = Bounds.TopLeft().ToVector2();
             List<Vector2> CheckMarkVertices = new()
             {
@@ -163,6 +201,11 @@ namespace MGUI.Core.UI
             {
                 DT.StrokeLineSegment(Offset.ToVector2(), v0, v1, Color * Opacity, 2);
             }
+#else
+            Rectangle CheckMarkBounds = Bounds.GetScaledFromCenter(0.75f).GetTranslated(Offset);
+            //Desktop.TryDrawNamedRegion(DT, "CheckMarkGreen_12x12", CheckMarkBounds, Opacity, Color);
+            DT.DrawTextureTo(Desktop.NamedTextures["CheckMark_64x64"], null, CheckMarkBounds, Color);
+#endif
         }
 
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)

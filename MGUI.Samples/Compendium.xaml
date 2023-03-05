@@ -41,7 +41,7 @@
                             </Style>
                         </UniformGrid.Styles>
                         <ToggleButton Content="Button" Name="Button_Toggle" Opacity="0.25" />
-                        <ToggleButton Content="CheckBox" Name="CheckBox_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="CheckBox" Name="CheckBox_Toggle" />
                         <ToggleButton Content="ComboBox" Name="ComboBox_Toggle" />
                         <ToggleButton Content="ContextMenu" Name="ContextMenu_Toggle" />
                         <ToggleButton Content="ContextualContentPresenter" Name="ContextualContentPresenter_Toggle" ToolTip="ContextualContentPresenter" />

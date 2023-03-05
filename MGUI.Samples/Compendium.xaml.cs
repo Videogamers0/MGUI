@@ -193,7 +193,7 @@ namespace MGUI.Samples
             #endregion Dialogs
 
 #if DEBUG
-            //UniformGridSamples.Show();
+            //CheckBoxSamples.Show();
 #endif
         }
 

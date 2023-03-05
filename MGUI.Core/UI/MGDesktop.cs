@@ -338,7 +338,9 @@ namespace MGUI.Core.UI
                 return (null, null);
         }
 
-        public bool TryDrawNamedRegion(DrawTransaction DT, string RegionName, Point Position, int? Width, int? Height, float Opacity = 1.0f)
+        public bool TryDrawNamedRegion(DrawTransaction DT, string RegionName, Rectangle TargetBounds, float Opacity = 1.0f, Color? Color = null)
+            => TryDrawNamedRegion(DT, RegionName, TargetBounds.TopLeft(), TargetBounds.Width, TargetBounds.Height, Opacity, Color);
+        public bool TryDrawNamedRegion(DrawTransaction DT, string RegionName, Point Position, int? Width, int? Height, float Opacity = 1.0f, Color? Color = null)
         {
             if (_NamedRegions.TryGetValue(RegionName, out NamedTextureRegion Region) && _NamedTextures.TryGetValue(Region.TextureName, out Texture2D Texture))
             {
@@ -346,7 +348,7 @@ namespace MGUI.Core.UI
                 int ActualHeight = Height ?? Texture.Height;
                 Rectangle Destination = new(Position.X, Position.Y, ActualWidth, ActualHeight);
 
-                DT.DrawTextureTo(Texture, Region.SourceRect, Destination, (Region.Color ?? Color.White) * Opacity);
+                DT.DrawTextureTo(Texture, Region.SourceRect, Destination, (Color ?? Region.Color ?? Microsoft.Xna.Framework.Color.White) * Opacity);
 
                 return true;
             }
@@ -365,6 +367,9 @@ namespace MGUI.Core.UI
             this._NamedRegions = new();
 
             #region Sample Icons
+            Texture2D CheckMark_64x64 = Renderer.Content.Load<Texture2D>(Path.Combine("Icons", "CheckMark_64x64"));
+            _NamedTextures.Add("CheckMark_64x64", CheckMark_64x64);
+
             Texture2D AngryMeteor_MilitaryIconsSet = Renderer.Content.Load<Texture2D>(Path.Combine("Icons", "AngryMeteor_MilitaryIconsSet"));
             _NamedTextures.Add("AngryMeteor", AngryMeteor_MilitaryIconsSet);
 
@@ -406,6 +411,18 @@ namespace MGUI.Core.UI
                 ("Save", 4, 11),
 
                 ("SteelFloor", 2, 2)
+            };
+            foreach (var (Name, Row, Column) in Icons)
+            {
+                Rectangle SourceRect = new(Column * (TextureIconSize + TextureSpacing), TextureTopMargin + Row * (TextureIconSize + TextureSpacing), TextureIconSize, TextureIconSize);
+                AddNamedRegion(new("AngryMeteor", Name, SourceRect, null));
+            }
+
+            TextureTopMargin = 166;
+            TextureIconSize = 12;
+            Icons = new List<(string Name, int Row, int Column)>()
+            {
+                ("CheckMarkGreen_12x12", 1, 2)
             };
             foreach (var (Name, Row, Column) in Icons)
             {

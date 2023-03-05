@@ -259,13 +259,22 @@ namespace MGUI.Core.UI.XAML
         public int? CheckBoxComponentSize { get; set; }
         [Category("Layout")]
         public int? SpacingWidth { get; set; }
+
         [Category("Appearance")]
         public XAMLColor? CheckMarkColor { get; set; }
+        [Category("Appearance")]
+        public bool? IsCheckMarkShadowed { get; set; }
+        [Category("Appearance")]
+        public XAMLColor? CheckMarkShadowColor { get; set; }
+        [Category("Appearance")]
+        public Size? CheckMarkShadowOffset { get; set; }
 
         [Category("Behavior")]
         public bool? IsThreeState { get; set; }
         [Category("Behavior")]
         public bool? IsChecked { get; set; }
+        [Category("Behavior")]
+        public bool? IsReadonly { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGCheckBox(Window);
 
@@ -278,12 +287,22 @@ namespace MGUI.Core.UI.XAML
                 CheckBox.CheckBoxComponentSize = CheckBoxComponentSize.Value;
             if (SpacingWidth.HasValue)
                 CheckBox.SpacingWidth = SpacingWidth.Value;
+
             if (CheckMarkColor.HasValue)
                 CheckBox.CheckMarkColor = CheckMarkColor.Value.ToXNAColor();
+            if (IsCheckMarkShadowed.HasValue)
+                CheckBox.IsCheckMarkShadowed = IsCheckMarkShadowed.Value;
+            if (CheckMarkShadowColor.HasValue)
+                CheckBox.CheckMarkShadowColor = CheckMarkShadowColor.Value.ToXNAColor();
+            if (CheckMarkShadowOffset.HasValue)
+                CheckBox.CheckMarkShadowOffset = new Point(CheckMarkShadowOffset.Value.Width, CheckMarkShadowOffset.Value.Height);
+
             if (IsThreeState.HasValue)
                 CheckBox.IsThreeState = IsThreeState.Value;
-            if (IsChecked.HasValue)
-                CheckBox.IsChecked = IsChecked.Value;
+            if (IsChecked.HasValue || IsThreeState.HasValue)
+                CheckBox.IsChecked = IsChecked;
+            if (IsReadonly.HasValue)
+                CheckBox.IsReadonly = IsReadonly.Value;
 
             base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
