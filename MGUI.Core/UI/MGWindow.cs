@@ -589,6 +589,30 @@ namespace MGUI.Core.UI
         private static readonly Thickness DefaultWindowPadding = new(5);
         private static readonly Thickness DefaultWindowBorderThickness = new(2);
 
+        private object _WindowDataContext;
+        /// <summary>The default <see cref="MGElement.DataContext"/> for all elements that do not explicitly define a <see cref="MGElement.DataContextOverride"/></summary>
+        public object WindowDataContext
+        {
+            get => _WindowDataContext;
+            set
+            {
+                if (_WindowDataContext != value)
+                {
+                    _WindowDataContext = value;
+                    NPC(nameof(WindowDataContext));
+                    WindowDataContextChanged?.Invoke(this, WindowDataContext);
+                }
+            }
+        }
+
+        public override object DataContextOverride
+        { 
+            get => WindowDataContext;
+            set => WindowDataContext = value;
+        }
+
+        public event EventHandler<object> WindowDataContextChanged;
+
         #region Constructors
         /// <summary>Initializes a root-level window.</summary>
         public MGWindow(MGDesktop Desktop, int Left, int Top, int Width, int Height, MGTheme Theme = null)

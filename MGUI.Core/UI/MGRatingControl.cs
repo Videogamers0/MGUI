@@ -429,7 +429,9 @@ namespace MGUI.Core.UI
 
                     if (IsCompletelyFilled)
                     {
-                        DA.DT.StrokeAndFillCircle(Center, StrokeColor, FillColor, Radius, StrokeThickness);
+                        DA.DT.FillCircle(Center, FillColor, Radius - StrokeThickness);
+                        DA.DT.StrokeCircle(Center, StrokeColor, Radius, StrokeThickness);
+                        //DA.DT.StrokeAndFillCircle(Center, StrokeColor, FillColor, Radius, StrokeThickness);
                     }
                     else if (IsPartiallyFilled)
                     {
@@ -441,7 +443,9 @@ namespace MGUI.Core.UI
                         Rectangle ClipTarget = ConvertCoordinateSpace(CoordinateSpace.UnscaledScreen, CoordinateSpace.Screen, UnscaledClipTarget);
                         using (DA.DT.SetClipTargetTemporary(ClipTarget, true))
                         {
-                            DA.DT.StrokeAndFillCircle(Center, StrokeColor, FillColor, Radius, StrokeThickness);
+                            DA.DT.FillCircle(Center, FillColor, Radius - StrokeThickness);
+                            DA.DT.StrokeCircle(Center, StrokeColor, Radius, StrokeThickness);
+                            //DA.DT.StrokeAndFillCircle(Center, StrokeColor, FillColor, Radius, StrokeThickness);
                         }
                     }
                     break;

@@ -16,6 +16,8 @@ using MGUI.Shared.Input;
 using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Containers.Grids;
 using PropertyBinding = MGUI.Core.UI.XAML.PropertyBinding;
+using MGUI.Core.UI.Text;
+using System.Threading.Channels;
 
 namespace MGUI.Core.UI
 {
@@ -141,7 +143,7 @@ namespace MGUI.Core.UI
     //		The Visual Tree traversal logic should have an additional parameter, IncludeAttached
 
     /// <summary>Base class for all UI elements.</summary>
-    public abstract class MGElement : IMouseHandlerHost, IKeyboardHandlerHost
+    public abstract class MGElement : ViewModelBase, IMouseHandlerHost, IKeyboardHandlerHost, IObservableDataContext
     {
         public string UniqueId { get; }
 
@@ -155,7 +157,32 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public MGWindow SelfOrParentWindow => IsWindow ? this as MGWindow : ParentWindow;
 
-		public static readonly ReadOnlyCollection<MGElementType> WindowElementTypes = new List<MGElementType>() { MGElementType.Window, MGElementType.ToolTip, MGElementType.ContextMenu }.AsReadOnly();
+        private object _DataContextOverride;
+        /// <summary>If null, this element's <see cref="DataContext"/> is defaulted to the window's <see cref="MGWindow.WindowDataContext"/>.<para/>
+        /// Note: <see cref="MGWindow"/> instances cannot have an override and will always use their <see cref="MGWindow.WindowDataContext"/> instead.<br/>
+        /// For <see cref="MGWindow"/>, this property is overridden to set <see cref="MGWindow.WindowDataContext"/></summary>
+        public virtual object DataContextOverride
+        {
+            get => _DataContextOverride;
+            set
+            {
+                if (_DataContextOverride != value)
+                {
+                    _DataContextOverride = value;
+                    NPC(nameof(DataContextOverride));
+                    NPC(nameof(DataContext));
+                    DataContextChanged?.Invoke(this, DataContext);
+                }
+            }
+        }
+
+        /// <summary>The source object that data bindings are resolved from.<para/>
+        /// This value prioritizes <see cref="DataContextOverride"/>, but falls back on <see cref="MGWindow.WindowDataContext"/> if there is no explicit override.</summary>
+        public object DataContext => DataContextOverride ?? SelfOrParentWindow.WindowDataContext;
+        /// <summary>Invoked after <see cref="DataContext"/> is changed.</summary>
+        public event EventHandler<object> DataContextChanged;
+
+        public static readonly ReadOnlyCollection<MGElementType> WindowElementTypes = new List<MGElementType>() { MGElementType.Window, MGElementType.ToolTip, MGElementType.ContextMenu }.AsReadOnly();
         public MGElementType ElementType { get; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool IsWindow => WindowElementTypes.Contains(ElementType);
@@ -823,6 +850,15 @@ namespace MGUI.Core.UI
 				this.UniqueId = Guid.NewGuid().ToString();
                 this.ParentWindow = ParentWindow;
                 this.ElementType = ElementType;
+
+                SelfOrParentWindow.WindowDataContextChanged += (sender, e) =>
+                {
+                    if (DataContextOverride == null)
+                    {
+                        NPC(nameof(DataContext));
+                        DataContextChanged?.Invoke(this, DataContext);
+                    }
+                };
 
                 MGTheme ActualTheme = Theme ?? ParentWindow?.Theme ?? Desktop.Theme;
 
