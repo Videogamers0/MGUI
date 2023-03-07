@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -71,6 +72,33 @@ namespace MGUI.Samples
                 FileName = URL,
                 UseShellExecute = true
             });
+        }
+    }
+
+    public class DataContextTest : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+        public virtual void NotifyPropertyChanged(string PropertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
+        /// <summary>Notify Property Changed for the given <paramref name="PropertyName"/></summary>
+        public void NPC(string PropertyName) => NotifyPropertyChanged(PropertyName);
+
+        private string _TestString;
+        public string TestString
+        {
+            get => _TestString;
+            set
+            {
+                if (_TestString != value)
+                {
+                    _TestString = value;
+                    NPC(nameof(TestString));
+                }
+            }
+        }
+
+        public DataContextTest()
+        {
+            this.TestString = "Hello World";
         }
     }
 
@@ -194,6 +222,12 @@ namespace MGUI.Samples
 
 #if DEBUG
             //CheckBoxSamples.Show();
+
+            //  DataContext and simple data bindings
+            Debug2.Show();
+            DataContextTest DC = new();
+            Debug2.Window.WindowDataContext = DC;
+            Debug2.Window.AddNamedAction("Test1", x => { DC.TestString = "Clicked"; });
 #endif
         }
 

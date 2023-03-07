@@ -32,7 +32,7 @@ namespace MGUI.Core.UI.XAML
 
             Element ContentCopy = Content.Copy();
             PreProcessBindings(ContentCopy, DataContext);
-            MGElement Item = ContentCopy.ToElement<MGElement>(Window, Parent, ApplyBaseSettings);
+            MGElement Item = ContentCopy.ToElement(Window, Parent, ApplyBaseSettings);
             if (DataContext is INotifyPropertyChanged NPC)
                 PostProcessBindings(Item, NPC);
 
@@ -50,7 +50,7 @@ namespace MGUI.Core.UI.XAML
                 return;
 
             //  Evaluate each binding
-            foreach (PropertyBinding Binding in Element.Bindings)
+            foreach (PropertyBinding Binding in Element.PropertyBindings)
             {
                 PropertyInfo TargetProperty = Element.GetType().GetProperty(Binding.TargetPropertyName);
                 if (TargetProperty != null && TryGetPropertyValue(DataContext, Binding.Path, out object Value))
@@ -73,11 +73,11 @@ namespace MGUI.Core.UI.XAML
 
             foreach (MGElement Element in RootElement.TraverseVisualTree(true, true, MGElement.TreeTraversalMode.Preorder))
             {
-                if (Element.OneWayBindings.Any())
+                if (Element.OneWayPropertyBindings.Any())
                 {
                     DataContext.PropertyChanged += (sender, e) =>
                     {
-                        foreach (PropertyBinding Binding in Element.OneWayBindings)
+                        foreach (PropertyBinding Binding in Element.OneWayPropertyBindings)
                         {
                             if (e.PropertyName == Binding.Path)
                             {
@@ -179,7 +179,7 @@ namespace MGUI.Core.UI.XAML
             if (ProvideValueTarget.TargetProperty is PropertyInfo TargetProperty && ProvideValueTarget.TargetObject is Element TargetObject)
             {
                 //  Save the binding info onto the target object so it can be evaluated later on (once we have a source DataContext to retrieve the data from)
-                TargetObject.Bindings.Add(new(Path, Mode, FallbackValue, TargetProperty.Name));
+                TargetObject.PropertyBindings.Add(new(Path, Mode, FallbackValue, TargetProperty.Name));
 
                 //  Return the fallbackvalue or default for now. The actual value will be evaluated later
                 if (FallbackValue != null && FallbackValue.GetType().IsAssignableTo(TargetProperty.PropertyType))

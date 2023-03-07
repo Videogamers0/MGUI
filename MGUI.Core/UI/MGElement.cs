@@ -16,8 +16,7 @@ using MGUI.Shared.Input;
 using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Containers.Grids;
 using PropertyBinding = MGUI.Core.UI.XAML.PropertyBinding;
-using MGUI.Core.UI.Text;
-using System.Threading.Channels;
+using IObservableDataContext = MGUI.Core.UI.XAML.IObservableDataContext;
 
 namespace MGUI.Core.UI
 {
@@ -737,7 +736,7 @@ namespace MGUI.Core.UI
         /// <summary>General-purpose object to attach your own data to this <see cref="MGElement"/></summary>
         public object Tag { get; set; }
 
-        internal List<PropertyBinding> OneWayBindings { get; } = new();
+        internal List<PropertyBinding> OneWayPropertyBindings { get; } = new();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private DeferEventsManager InitializationManager { get; }

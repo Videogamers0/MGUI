@@ -286,6 +286,7 @@ namespace MGUI.Core.UI
                     InvokeLayoutChanged();
                 else
                     UpdateLines();
+                NPC(nameof(Text));
             }
         }
 

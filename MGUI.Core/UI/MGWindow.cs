@@ -68,6 +68,7 @@ namespace MGUI.Core.UI
                     _WindowWidth = ActualValue;
                     LayoutChanged(this, true);
                     UpdateScaleTransforms();
+                    RecentSizeToContentSettings = null;
                 }
             }
         }
@@ -85,6 +86,7 @@ namespace MGUI.Core.UI
                     _WindowHeight = ActualValue;
                     LayoutChanged(this, true);
                     UpdateScaleTransforms();
+                    RecentSizeToContentSettings = null;
                 }
             }
         }
@@ -151,6 +153,9 @@ namespace MGUI.Core.UI
             return Size;
         }
 
+        private readonly record struct SizeToContentSettings(SizeToContent Type, int MinWidth, int MinHeight, int? MaxWidth, int? MaxHeight);
+        private SizeToContentSettings? RecentSizeToContentSettings = null;
+
         /// <summary>Resizes this <see cref="MGWindow"/> to satisfy the given constraints.</summary>
         /// <param name="UpdateLayoutImmediately">If true, the layout of child content is refreshed immediately rather than waiting until the next update tick.</param>
         /// <returns>The computed size that this <see cref="MGWindow"/> will be changed to.</returns>
@@ -170,6 +175,8 @@ namespace MGUI.Core.UI
                 ValidateWindowSizeAndPosition();
                 UpdateLayout(new Rectangle(Left, Top, WindowWidth, WindowHeight));
             }
+
+            RecentSizeToContentSettings = new(Value, MinWidth, MinHeight, MaxWidth, MaxHeight);
 
             return Size;
         }
@@ -601,6 +608,13 @@ namespace MGUI.Core.UI
                     _WindowDataContext = value;
                     NPC(nameof(WindowDataContext));
                     WindowDataContextChanged?.Invoke(this, WindowDataContext);
+
+                    //  Changing the DataContext may have changed the sizes of elements on this window, so attempt to resize the window to its contents
+                    if (RecentSizeToContentSettings.HasValue)
+                    {
+                        ApplySizeToContent(RecentSizeToContentSettings.Value.Type, RecentSizeToContentSettings.Value.MinWidth, RecentSizeToContentSettings.Value.MinHeight, 
+                            RecentSizeToContentSettings.Value.MaxWidth, RecentSizeToContentSettings.Value.MaxHeight, false);
+                    }
                 }
             }
         }

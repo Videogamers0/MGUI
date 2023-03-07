@@ -167,7 +167,8 @@ namespace MGUI.Core.UI.XAML
         [Category("Attached")]
         public object Tag { get; set; }
 
-        protected internal List<PropertyBinding> Bindings { get; } = new();
+        protected internal List<PropertyBinding> PropertyBindings { get; } = new();
+        protected internal List<MGBinding> Bindings { get; } = new();
 
         /// <param name="ApplyBaseSettings">If not null, this action will be invoked before <see cref="ApplySettings(MGElement, MGElement, bool)"/> executes.</param>
         public T ToElement<T>(MGWindow Window, MGElement Parent, Action<T> ApplyBaseSettings = null) 
@@ -265,8 +266,13 @@ namespace MGUI.Core.UI.XAML
 
                 if (IncludeBindings)
                 {
-                    foreach (PropertyBinding Binding in this.Bindings.Where(x => x.Mode == BindingMode.OneWay))
-                        Element.OneWayBindings.Add(Binding);
+                    foreach (PropertyBinding Binding in this.PropertyBindings.Where(x => x.Mode == BindingMode.OneWay))
+                        Element.OneWayPropertyBindings.Add(Binding);
+
+                    //  These bindings are initialized in Window.ToElement(Desktop, Theme)
+                    //  Because ElementName references cannot be resolved until named elements have been processed and added to the MGWindow instance
+                    if (Bindings.Any())
+                        Element.Metadata["TmpBindings"] = this.Bindings;
                 }
             }
         }
