@@ -1982,18 +1982,7 @@ namespace MGUI.Core.UI.XAML
             int WindowHeight = Math.Clamp(Height ?? 0, MinHeight ?? 0, MaxHeight ?? int.MaxValue);
             MGWindow Window = new(Desktop, Left ?? 0, Top ?? 0, WindowWidth, WindowHeight, Theme);
             ApplySettings(null, Window, true);
-
-            //  Resolve pending data bindings
-            foreach (MGElement Element in Window.TraverseVisualTree(true, true, MGElement.TreeTraversalMode.Preorder))
-            {
-                if (Element.Metadata.TryGetValue("TmpBindings", out object Value) && Value is List<MGBinding> Bindings)
-                {
-                    foreach (MGBinding Binding in Bindings)
-                        DataBindingManager.AddBinding(Binding, Element);
-                    Element.Metadata.Remove("TmpBindings");
-                }
-            }
-
+            ProcessBindings(Window, true, null);
             return Window;
         }
 

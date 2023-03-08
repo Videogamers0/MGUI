@@ -209,7 +209,7 @@ namespace MGUI.Core.UI.XAML
                 if (_SourceRoot != value)
                 {
                     _SourceRoot = value;
-                    if (Config.SourcePaths.Count == 0)
+                    if (Config.SourcePaths.Count <= 1)
                         SourceObject = SourceRoot;
                     else
                         SourceObject = ResolvePath(SourceRoot, Config.SourcePaths, true);
@@ -239,9 +239,14 @@ namespace MGUI.Core.UI.XAML
                     SourceProperty = GetPublicProperty(SourceObject, SourcePropertyName);
 
                     //  Update the target object's property value if the binding is directly on the source object (instead of a property on the source object)
-                    if (SourcePropertyName == null && Config.BindingMode is DataBindingMode.OneTime or DataBindingMode.OneWay)
+                    if (string.IsNullOrEmpty(SourcePropertyName) && Config.BindingMode is DataBindingMode.OneTime or DataBindingMode.OneWay)
                     {
                         TrySetPropertyValue(SourceObject, TargetObject, TargetProperty, TargetPropertyType);
+                    }
+
+                    if (Config.BindingMode is DataBindingMode.OneTime)
+                    {
+                        TrySetPropertyValue(SourceObject, SourceProperty, SourcePropertyType, TargetObject, TargetProperty, TargetPropertyType);
                     }
 
                     //  Listen for changes to the source object's property value
@@ -295,7 +300,7 @@ namespace MGUI.Core.UI.XAML
         private static readonly Dictionary<object, Dictionary<string, PropertyInfo>> CachedProperties = new();
         private static PropertyInfo GetPublicProperty(object Parent, string PropertyName)
         {
-            if (Parent == null)
+            if (Parent == null || string.IsNullOrEmpty(PropertyName))
                 return null;
 
             if (!CachedProperties.TryGetValue(Parent, out Dictionary<string, PropertyInfo> PropertiesByName))
@@ -317,6 +322,15 @@ namespace MGUI.Core.UI.XAML
         /// but prioritizes the underlying type if the type is wrapped in a Nullable&lt;T&gt;</summary>
         private static Type GetUnderlyingType(PropertyInfo PropInfo) =>
             PropInfo == null ? null : Nullable.GetUnderlyingType(PropInfo.PropertyType) ?? PropInfo.PropertyType;
+
+        //TODO:
+        //Call NotifyPropertyChanged when properties in MGElement subclasses change, such as ProgressBar.Minimum, CheckBox.IsChecked, Element.VerticalAlignment etc
+        //figure out how to use the new MGBinding markup extension for things like MGImage.Texture which uses its own special 'SetTexture' method to change the value
+        //      or for things like IFillBrushes where the XAML value is a slightly different type
+        //Test 2-way bindings
+        //In classes that use Template.GetContent, should implement logic that disposes of old bindings when the old item is removed
+        //      such as in MGComboBox.ItemsSource's CollectionChanged, the removed items should be removed from DataBindingManager
+        //      to unsubscribe from any propertychanged subscriptions
 
         internal DataBinding(MGBinding Config, object TargetObject)
         {
@@ -411,11 +425,12 @@ namespace MGUI.Core.UI.XAML
         {
             if (TargetObject != null && TargetProperty != null)
             {
+                Type SourceType = Value?.GetType();
                 TargetPropertyType ??= GetUnderlyingType(TargetProperty);
 
-                if (Value == null && !TargetPropertyType.IsValueType || Value != null && Value.GetType().IsAssignableTo(TargetPropertyType))
+                if ((Value == null && !TargetPropertyType.IsValueType) || (Value != null && TypeDescriptor.GetConverter(SourceType).CanConvertTo(TargetPropertyType)))
                 {
-                    object ActualValue = Value == null ? null : Convert.ChangeType(Value, TargetPropertyType);
+                    object ActualValue = Value == null ? null : SourceType.IsAssignableTo(TargetPropertyType) ? Value : Convert.ChangeType(Value, TargetPropertyType);
                     TargetProperty.SetValue(TargetObject, ActualValue);
                     return true;
                 }
@@ -436,10 +451,10 @@ namespace MGUI.Core.UI.XAML
                 SourcePropertyType ??= GetUnderlyingType(SourceProperty);
                 TargetPropertyType ??= GetUnderlyingType(TargetProperty);
 
-                if (SourcePropertyType.IsAssignableTo(TargetPropertyType))
+                if (TypeDescriptor.GetConverter(SourcePropertyType).CanConvertTo(TargetPropertyType))
                 {
                     object Value = SourceProperty.GetValue(SourceObject);
-                    object ActualValue = Value == null ? null : Convert.ChangeType(Value, TargetPropertyType);
+                    object ActualValue = Value == null ? null : SourcePropertyType.IsAssignableTo(TargetPropertyType) ? Value : Convert.ChangeType(Value, TargetPropertyType);
                     TargetProperty.SetValue(TargetObject, ActualValue);
                     return true;
                 }
@@ -447,7 +462,7 @@ namespace MGUI.Core.UI.XAML
 
             return false;
         }
-        #endregion Set Property Value
+#endregion Set Property Value
 
         /// <summary>True if this binding subscribed to the <see cref="SourceObject"/>'s PropertyChanged event the last time <see cref="SourceObject"/> was set.<para/>
         /// If true, the event must be unsubscribed from when changing <see cref="SourceObject"/> or when disposing this <see cref="DataBinding"/></summary>

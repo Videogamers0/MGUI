@@ -30,11 +30,24 @@ namespace MGUI.Core.UI.XAML
             if (Content == null)
                 return null;
 
+#if NEVER // Old code for the 'PropertyBinding markup extension
             Element ContentCopy = Content.Copy();
             PreProcessBindings(ContentCopy, DataContext);
             MGElement Item = ContentCopy.ToElement(Window, Parent, ApplyBaseSettings);
             if (DataContext is INotifyPropertyChanged NPC)
                 PostProcessBindings(Item, NPC);
+#elif true
+            Element ContentCopy = Content.Copy();
+            PreProcessBindings(ContentCopy, DataContext);
+            MGElement Item = ContentCopy.ToElement(Window, Parent, ApplyBaseSettings);
+            if (DataContext is INotifyPropertyChanged NPC)
+                PostProcessBindings(Item, NPC);
+            Element.ProcessBindings(Item, true, DataContext);
+#else
+            Element ContentCopy = Content.Copy();
+            MGElement Item = ContentCopy.ToElement(Window, Parent, ApplyBaseSettings);
+            Element.ProcessBindings(Item, true, DataContext);
+#endif
 
             return Item;
         }

@@ -67,12 +67,12 @@
 
                                     <StackPanel Margin="8,0,0,0" VerticalAlignment="Center" Orientation="Vertical">
                                         <!-- Character Name -->
-                                        <TextBlock Text="{PropertyBinding Path=Name, Mode=OneTime, FallbackValue='&lt;Name&gt;'}" />
+                                        <TextBlock Text="{MGBinding Path=Name, Mode=OneTime, FallbackValue='&lt;Name&gt;'}" />
 
                                         <!-- Character Level -->
                                         <DockPanel>
                                             <TextBlock StyleNames="HeaderLabel" Dock="Left" Text="LV" />
-                                            <TextBlock Foreground="White" IsBold="True" Text="{PropertyBinding Path=Level, Mode=OneWay}" />
+                                            <TextBlock Foreground="White" IsBold="True" Text="{MGBinding Path=Level, Mode=OneWay}" />
                                         </DockPanel>
 
                                         <!-- Character HP -->
@@ -81,13 +81,13 @@
                                             <DockPanel VerticalAlignment="Center">
                                                 <!-- Tip: If you specify 4 colors, delimited by a '|', it will create an MGGradientBrush using those colors as the 4 corners of the gradient -->
                                                 <ProgressBar Dock="Bottom" Height="4" BorderThickness="0,0,0,1" BorderBrush="Black"
-                                                         Minimum="0" Maximum="{PropertyBinding Path=MaxHP, Mode=OneWay}" Value="{PropertyBinding Path=CurrentHP, Mode=OneWay}"
+                                                         Minimum="0" Maximum="{MGBinding Path=MaxHP, Mode=OneWay}" Value="{MGBinding Path=CurrentHP, Mode=OneWay}"
                                                          CompletedBrush="rgb(56,114,217)|rgb(155,178,220)|rgb(155,178,220)|rgb(56,114,217)" 
                                                          IncompleteBrush="rgb(60,0,0)" />
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{PropertyBinding Path=CurrentHP, Mode=OneWay}" />
+                                                    <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{MGBinding Path=CurrentHP, Mode=OneWay}" />
                                                     <TextBlock Margin="3,0" Text="/" FontSize="12" />
-                                                    <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{PropertyBinding Path=MaxHP, Mode=OneWay}" />
+                                                    <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{MGBinding Path=MaxHP, Mode=OneWay}" />
                                                 </StackPanel>
                                             </DockPanel>
                                         </DockPanel>
@@ -97,13 +97,13 @@
                                             <TextBlock StyleNames="HeaderLabel" Dock="Left" Text="MP" />
                                             <DockPanel VerticalAlignment="Center">
                                                 <ProgressBar Dock="Bottom" Height="4" BorderThickness="0,0,0,1" BorderBrush="Black"
-                                                         Minimum="0" Maximum="{PropertyBinding Path=MaxMP, Mode=OneWay}" Value="{PropertyBinding Path=CurrentMP, Mode=OneWay}"
+                                                         Minimum="0" Maximum="{MGBinding Path=MaxMP, Mode=OneWay}" Value="{MGBinding Path=CurrentMP, Mode=OneWay}"
                                                          CompletedBrush="rgb(65,217,152)|rgb(170,205,196)|rgb(170,205,196)|rgb(65,217,152)" 
                                                          IncompleteBrush="rgb(60,0,0)" />
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{PropertyBinding Path=CurrentMP, Mode=OneWay}" />
+                                                    <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{MGBinding Path=CurrentMP, Mode=OneWay}" />
                                                     <TextBlock Margin="3,0" Text="/" FontSize="12" />
-                                                    <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{PropertyBinding Path=MaxMP, Mode=OneWay}" />
+                                                    <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{MGBinding Path=MaxMP, Mode=OneWay}" />
                                                 </StackPanel>
                                             </DockPanel>
                                         </DockPanel>
@@ -124,13 +124,13 @@
                                     <!-- Name and icon -->
                                     <StackPanel Orientation="Horizontal" Dock="Left" Spacing="5">
                                         <Image VerticalAlignment="Center" TextureName="FF7ItemIcon" Width="24" Height="22" />
-                                        <TextBlock VerticalAlignment="Center" Text="{PropertyBinding Path=Name, Mode=OneTime}" />
+                                        <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Name, Mode=OneTime}" />
                                     </StackPanel>
 
                                     <!-- Quantity -->
                                     <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Right">
                                         <TextBlock VerticalAlignment="Center" Text=":" IsBold="True" />
-                                        <TextBlock VerticalAlignment="Center" Text="{PropertyBinding Path=Quantity, Mode=OneWay}" 
+                                        <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Quantity, Mode=OneWay}" 
                                                MinWidth="24" TextAlignment="Right" IsBold="True" />
                                     </StackPanel>
                                 </DockPanel>

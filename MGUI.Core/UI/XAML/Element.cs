@@ -272,7 +272,35 @@ namespace MGUI.Core.UI.XAML
                     //  These bindings are initialized in Window.ToElement(Desktop, Theme)
                     //  Because ElementName references cannot be resolved until named elements have been processed and added to the MGWindow instance
                     if (Bindings.Any())
-                        Element.Metadata["TmpBindings"] = this.Bindings;
+                        Element.Metadata[BindingsMetadataKey] = this.Bindings;
+                }
+            }
+        }
+
+        private const string BindingsMetadataKey = "TmpBindings";
+
+        /// <summary>Resolves any pending <see cref="MGBinding"/>s by converting them into <see cref="DataBinding"/>s</summary>
+        /// <param name="DataContextOverride">If not null, this value will be applied to the <see cref="MGElement.DataContextOverride"/> value of every element that is processed.<para/>
+        /// If <paramref name="RecurseChildren"/> is false, this is only applied to <paramref name="Element"/>. Else it's applied to <paramref name="Element"/> and all its nested children.</param>
+        internal static void ProcessBindings(MGElement Element, bool RecurseChildren, object DataContextOverride)
+        {
+            if (RecurseChildren)
+            {
+                foreach (MGElement Child in Element.TraverseVisualTree(true, true, MGElement.TreeTraversalMode.Preorder))
+                {
+                    ProcessBindings(Child, false, DataContextOverride);
+                }
+            }
+            else
+            {
+                if (DataContextOverride != null)
+                    Element.DataContextOverride = DataContextOverride;
+
+                if (Element.Metadata.TryGetValue(BindingsMetadataKey, out object Value) && Value is List<MGBinding> Bindings)
+                {
+                    foreach (MGBinding Binding in Bindings)
+                        DataBindingManager.AddBinding(Binding, Element);
+                    Element.Metadata.Remove(BindingsMetadataKey);
                 }
             }
         }
