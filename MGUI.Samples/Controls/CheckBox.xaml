@@ -47,7 +47,11 @@
                 </TextBlock>
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <CheckBox Name="CheckBox1" IsChecked="True">
-                        <TextBlock Name="TextBlock1" VerticalAlignment="Center" />
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="This CheckBox's [c=Turquoise][i]IsChecked[/i][/c]=" />
+                            <TextBlock Foreground="LightBlue" IsShadowed="True" ShadowColor="Blue" 
+                                       Text="{MGBinding ElementName=CheckBox1, Path=IsChecked, DataContextResolver=Self, Mode=OneWay}" />
+                        </StackPanel>
                     </CheckBox>
                     <Spacer Height="4" />
                     <TextBlock>
@@ -57,7 +61,12 @@
                     </TextBlock>
                     <Spacer Height="2" />
                     <CheckBox Name="CheckBox2" IsChecked="True" IsThreeState="True">
-                        <TextBlock Name="TextBlock2" VerticalAlignment="Center" />
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="This 3-State CheckBox's [c=Turquoise][i]IsChecked[/i][/c]=" />
+                            <TextBlock Foreground="LightBlue" IsShadowed="True" ShadowColor="Blue" 
+                                       Text="{MGBinding ElementName=CheckBox2, Path=IsChecked, DataContextResolver=Self, Mode=OneWay}" />
+                            <TextBlock Margin="5,0,0,0" FontSize="9" Text="(empty value indicates [c=LightBlue][s=Blue]null[/s][/c])" />
+                        </StackPanel>
                     </CheckBox>
                 </StackPanel>
             </DockPanel>
@@ -154,9 +163,9 @@
                         <CheckBox Name="CheckBox3" IsChecked="True" IsThreeState="False" CheckMarkColor="Transparent" CheckBoxComponentSize="16" Content="Custom Check Mark icon">
                             <CheckBox.Button>
                                 <Button Background="rgb(80,80,80)">
-                                    <ContextualContentPresenter Name="CCP1" Value="True" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <!-- This image will only be visible if CheckBox3.IsChecked is true. The c# code updates 
-                                        ContextualContentPresenter.Value whenever the CheckBox's IsChecked state changes. -->
+                                    <ContextualContentPresenter Value="{MGBinding ElementName=CheckBox3, DataContextResolver=Self, Path=IsChecked, Mode=OneWay}" 
+                                                                HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <!-- This image will only be visible if CheckBox3.IsChecked is true -->
                                         <ContextualContentPresenter.TrueContent>
                                             <Image Width="12" Height="12" RegionName="CheckMarkGreen_12x12" />
                                         </ContextualContentPresenter.TrueContent>
@@ -167,7 +176,8 @@
                         <CheckBox Name="CheckBox4" IsChecked="True" IsThreeState="False" CheckMarkColor="Transparent" Content="Custom Check Mark icon #2">
                             <CheckBox.Button>
                                 <Button Background="rgb(80,80,80)">
-                                    <ContextualContentPresenter Name="CCP2" Value="True" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <ContextualContentPresenter Value="{MGBinding ElementName=CheckBox4, DataContextResolver=Self, Path=IsChecked, Mode=OneWay}"
+                                                                HorizontalAlignment="Center" VerticalAlignment="Center">
                                         <ContextualContentPresenter.TrueContent>
                                             <Image Width="16" Height="16" RegionName="CheckMarkGreen" />
                                         </ContextualContentPresenter.TrueContent>

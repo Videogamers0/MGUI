@@ -100,6 +100,7 @@ namespace MGUI.Core.UI
 
                     bool? Previous = IsChecked;
                     _IsChecked = value;
+                    NPC(nameof(IsChecked));
                     OnCheckStateChanged?.Invoke(this, new(Previous, IsChecked));
 
                     if (IsChecked.HasValue)
