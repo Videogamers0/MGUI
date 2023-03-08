@@ -299,7 +299,19 @@ namespace MGUI.Core.UI.XAML
                 if (Element.Metadata.TryGetValue(BindingsMetadataKey, out object Value) && Value is List<MGBinding> Bindings)
                 {
                     foreach (MGBinding Binding in Bindings)
-                        DataBindingManager.AddBinding(Binding, Element);
+                    {
+                        object TargetObject = Element;
+                        MGBinding PostProcessedBinding = Binding;
+
+                        //  Handle some special-cases where the name of the XAML property isn't the same as the corresponding property on the c# object
+                        if (Binding.TargetPropertyName == nameof(Background))
+                        {
+                            //TODO maybe the DataBinding should have 2 objects, the primary target and the path to the property instead of just property name
+                            //PostProcessedBinding = Binding with { TargetPropertyName = nameof(VisualStateFillBrush.NormalValue) };
+                        }
+
+                        DataBindingManager.AddBinding(PostProcessedBinding, TargetObject);
+                    }
                     Element.Metadata.Remove(BindingsMetadataKey);
                 }
             }

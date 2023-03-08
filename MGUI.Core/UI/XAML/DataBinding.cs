@@ -1,10 +1,12 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using MGUI.Core.UI.Brushes.Fill_Brushes;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
@@ -333,11 +335,15 @@ namespace MGUI.Core.UI.XAML
         //      to unsubscribe from any propertychanged subscriptions
         //Implement TypeConverters and FallbackValues
         //      Will definitely want some built in converters like BoolToVisibility which takes in a couple params: TrueVisibility FalseVisibility
-        //      and InverseBool, StringToNumeric, StringToFillBrush etc.
+        //      and InverseBool, StringToNumeric, StringToFillBrush, NullToBool (Null=True, Non-null=false?) etc.
         //Also implement some form of StringFormat
         //      when setting the value of a String property, instead of calling .ToString on the source value, use the StringFormat if available
         //      On the CheckBox.xaml samples, test the ThreeState CheckBox so that null value is converted to "null" string instead of string.empty.
+        //Some XAML properties dont exactly match up with the c# class properties. In Element.ProcessBindings, map the property names correctly
+        //      such as Background maps to BackgroundBrush.NormalValue
 
+        //TODO probably want to pass in a TargetObject and TargetPath?
+        //so source object can be resolved starting from TargetObject, but the actual targetobject is resolved from a path as well.
         internal DataBinding(MGBinding Config, object TargetObject)
         {
             this.Config = Config;
@@ -437,7 +443,7 @@ namespace MGUI.Core.UI.XAML
                 if ((Value == null && !TargetPropertyType.IsValueType) || 
                     (Value != null && IsAssignableOrConvertible(SourceType, TargetPropertyType)))
                 {
-                    object ActualValue = Value == null ? null : IsAssignable(SourceType, TargetPropertyType) ? Value : Convert.ChangeType(Value, TargetPropertyType);
+                    object ActualValue = ConvertValue(SourceType, TargetPropertyType, Value, null);
                     TargetProperty.SetValue(TargetObject, ActualValue);
                     return true;
                 }
@@ -463,7 +469,7 @@ namespace MGUI.Core.UI.XAML
                 if (CanAssign || CanConvert)
                 {
                     object Value = SourceProperty.GetValue(SourceObject);
-                    object ActualValue = Value == null ? null : CanAssign ? Value : Convert.ChangeType(Value, TargetPropertyType);
+                    object ActualValue = ConvertValue(SourcePropertyType, TargetPropertyType, Value, CanAssign);
                     TargetProperty.SetValue(TargetObject, ActualValue);
                     return true;
                 }
@@ -472,10 +478,166 @@ namespace MGUI.Core.UI.XAML
             return false;
         }
 
-        private static bool IsAssignable(Type From, Type To) => From.IsAssignableTo(To);
-        private static bool IsConvertible(Type From, Type To) => TypeDescriptor.GetConverter(From).CanConvertTo(To);
+        /// <param name="CanAssign">If null, will be computed via <see cref="IsAssignable(Type, Type)"/></param>
+        private static object ConvertValue(Type SourceType, Type TargetType, object Value, bool? CanAssign)
+        {
+            //TODO improve this logic, such as by passing in Converter as parameter.
+            //If Converter not null, call the ConvertTo or ConvertFrom method on the value before attempting to resolve it
+            //Also need to handle TypeConverters like WPF does? Or maybe that's same as the Converter parameter
+            if (Value == null)
+                return null;
+            else if (CanAssign == true || (!CanAssign.HasValue && IsAssignable(SourceType, TargetType)))
+                return Value;
+            else if (TryConvertWithTypeConverter(SourceType, TargetType, Value, out object TypeConvertedValue))
+                return TypeConvertedValue;
+            else if (Value is IConvertible)
+                return Convert.ChangeType(Value, TargetType);
+            else if (TargetType == typeof(string))
+                return Value.ToString();
+            else
+                throw new NotImplementedException($"Could not convert value from type='{SourceType.FullName}' to type='{TargetType.FullName}'.");
+        }
+
+        private static bool TryConvertWithTypeConverter(Type SourceType, Type TargetType, object Value, out object Result)
+        {
+            if (TryConvertFromWithTypeConverter(SourceType, TargetType, Value, out Result))
+                return true;
+            else if (TryConvertToWithTypeConverter(SourceType, TargetType, Value, out Result))
+                return true;
+            else
+                return false;
+        }
+
+        private static bool TryConvertFromWithTypeConverter(Type SourceType, Type TargetType, object Value, out object Result)
+        {
+            TypeConverter Converter = GetConverter(TargetType);
+            if (Converter.CanConvertFrom(SourceType))
+            {
+                Result = Converter.ConvertFrom(Value);
+                return true;
+            }
+            else
+            {
+                Result = null;
+                return false;
+            }
+        }
+
+        private static bool TryConvertToWithTypeConverter(Type SourceType, Type TargetType, object Value, out object Result)
+        {
+            TypeConverter Converter = GetConverter(SourceType);
+            if (Converter.CanConvertTo(TargetType))
+            {
+                Result = Converter.ConvertTo(Value, TargetType);
+                return true;
+            }
+            else
+            {
+                Result = null;
+                return false;
+            }
+        }
+
+        private static readonly Dictionary<Type, Dictionary<Type, bool>> CachedIsAssignable = new();
+        private static bool IsAssignable(Type From, Type To)
+        {
+            if (From == null || To == null)
+                return false;
+
+            if (!CachedIsAssignable.TryGetValue(From, out Dictionary<Type, bool> CanAssignByType))
+            {
+                CanAssignByType = new();
+                CachedIsAssignable.Add(From, CanAssignByType);
+            }
+
+            if (!CanAssignByType.TryGetValue(To, out bool CanAssign))
+            {
+                CanAssign = From.IsAssignableTo(To);
+                CanAssignByType.Add(To, CanAssign);
+            }
+
+            return CanAssign;
+        }
+
+        static DataBinding()
+        {
+            Dictionary<Type, Type> BuiltInTypeConverters = new()
+            {
+                { typeof(Microsoft.Xna.Framework.Color), typeof(XNAColorStringConverter) }
+            };
+
+            //  Apply some default TypeConverters such as being able to convert a string to a Microsoft.Xna.Framework.Color
+            foreach (KeyValuePair<Type, Type> KVP in BuiltInTypeConverters)
+            {
+                TypeDescriptor.AddAttributes(KVP.Key, new TypeConverterAttribute(KVP.Value));
+            }
+        }
+
+        private static readonly Dictionary<Type, TypeConverter> CachedConverters = new();
+        private static TypeConverter GetConverter(Type Type)
+        {
+            if (Type == null)
+                return null;
+
+            if (!CachedConverters.TryGetValue(Type, out TypeConverter Converter))
+            {
+                Converter = TypeDescriptor.GetConverter(Type);
+                CachedConverters.Add(Type, Converter);
+            }
+
+            return Converter;
+        }
+
+        private static readonly Dictionary<TypeConverter, Dictionary<Type, bool>> CachedCanConvertFrom = new();
+        private static readonly Dictionary<TypeConverter, Dictionary<Type, bool>> CachedCanConvertTo = new();
+        private static bool IsConvertible(Type From, Type To) => IsConvertibleFrom(From, To) || IsConvertibleTo(From, To);
+
+        private static bool IsConvertibleFrom(Type From, Type To)
+        {
+            if (From == null || To == null)
+                return false;
+
+            TypeConverter Converter = GetConverter(To);
+
+            if (!CachedCanConvertFrom.TryGetValue(Converter, out Dictionary<Type, bool> CanConvertByType))
+            {
+                CanConvertByType = new();
+                CachedCanConvertFrom.Add(Converter, CanConvertByType);
+            }
+
+            if (!CanConvertByType.TryGetValue(To, out bool CanConvert))
+            {
+                CanConvert = Converter.CanConvertFrom(From);
+                CanConvertByType.Add(To, CanConvert);
+            }
+
+            return CanConvert;
+        }
+
+        private static bool IsConvertibleTo(Type From, Type To)
+        {
+            if (From == null || To == null)
+                return false;
+
+            TypeConverter Converter = GetConverter(From);
+
+            if (!CachedCanConvertTo.TryGetValue(Converter, out Dictionary<Type, bool> CanConvertByType))
+            {
+                CanConvertByType = new();
+                CachedCanConvertTo.Add(Converter, CanConvertByType);
+            }
+
+            if (!CanConvertByType.TryGetValue(To, out bool CanConvert))
+            {
+                CanConvert = Converter.CanConvertTo(To);
+                CanConvertByType.Add(To, CanConvert);
+            }
+
+            return CanConvert;
+        }
+
         private static bool IsAssignableOrConvertible(Type From, Type To) => IsAssignable(From, To) || IsConvertible(From, To);
-#endregion Set Property Value
+        #endregion Set Property Value
 
         /// <summary>True if this binding subscribed to the <see cref="SourceObject"/>'s PropertyChanged event the last time <see cref="SourceObject"/> was set.<para/>
         /// If true, the event must be unsubscribed from when changing <see cref="SourceObject"/> or when disposing this <see cref="DataBinding"/></summary>

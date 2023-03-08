@@ -71,7 +71,7 @@
                             <ContentTemplate>
                                 <StackPanel Orientation="Horizontal" Spacing="5">
                                     <Rectangle Stroke="Black" StrokeThickness="1" Width="16" Height="16" VerticalAlignment="Center" 
-                                               Fill="{PropertyBinding Path=FillBrush, Mode=OneTime}" />
+                                               Fill="{MGBinding Path=FillBrush, Mode=OneTime}" />
                                     <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Name, Mode=OneTime}" />
                                 </StackPanel>
                             </ContentTemplate>
@@ -84,7 +84,7 @@
                             <ContentTemplate>
                                 <StackPanel Orientation="Horizontal" Spacing="5">
                                     <Rectangle Stroke="Black" StrokeThickness="1" Width="16" Height="16" VerticalAlignment="Center" 
-                                               Fill="{PropertyBinding Path=FillBrush, Mode=OneTime}" />
+                                               Fill="{MGBinding Path=FillBrush, Mode=OneTime}" />
                                     <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Name, Mode=OneTime}" />
                                 </StackPanel>
                             </ContentTemplate>
@@ -93,7 +93,7 @@
                             <ContentTemplate>
                                 <Border BorderBrush="Black * 0.3" BorderThickness="1" Margin="4,2" Padding="4,2" 
                                         VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                                        Background="{PropertyBinding Path=FillBrush, Mode=OneTime}">
+                                        Background="{MGBinding Path=FillBrush, Mode=OneTime}">
                                     <TextBlock Text="{MGBinding Path=Name, Mode=OneTime}" IsBold="True" IsShadowed="True" ShadowColor="Black" Foreground="rgb(240,232,240)" />
                                 </Border>
                             </ContentTemplate>
@@ -112,7 +112,7 @@
                                         BorderBrush="Gray" BorderThickness="1" Margin="0,4,0,0">
                                     <StackPanel Orientation="Horizontal" Spacing="5">
                                         <Rectangle Stroke="Black" StrokeThickness="1" Width="16" Height="16" VerticalAlignment="Center" 
-                                               Fill="{PropertyBinding Path=FillBrush, Mode=OneTime}" />
+                                               Fill="{MGBinding Path=FillBrush, Mode=OneTime}" />
                                         <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Name, Mode=OneTime}" />
                                     </StackPanel>
                                 </Button>
@@ -122,7 +122,7 @@
                             <ContentTemplate>
                                 <StackPanel Orientation="Horizontal" Spacing="5">
                                     <Rectangle Stroke="Black" StrokeThickness="1" Width="16" Height="16" VerticalAlignment="Center" 
-                                               Fill="{PropertyBinding Path=FillBrush, Mode=OneTime}" />
+                                               Fill="{MGBinding Path=FillBrush, Mode=OneTime}" />
                                     <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Name, Mode=OneTime}" />
                                 </StackPanel>
                             </ContentTemplate>

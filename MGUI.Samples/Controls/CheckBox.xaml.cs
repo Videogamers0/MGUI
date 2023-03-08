@@ -13,7 +13,7 @@ namespace MGUI.Samples.Controls
         public CheckBoxSamples(ContentManager Content, MGDesktop Desktop)
             : base(Content, Desktop, $"{nameof(Controls)}", "CheckBox.xaml")
         {
-
+            Window.WindowDataContext = this;
         }
     }
 }

@@ -11,12 +11,13 @@ using System.Threading.Tasks;
 using KnownColor = System.Drawing.KnownColor;
 using DrawingColor = System.Drawing.Color;
 using System.Reflection;
+using MGUI.Core.UI.Brushes.Fill_Brushes;
 
 namespace MGUI.Samples.Controls
 {
     public readonly record struct NamedColor(string Name, Color Color)
     {
-        public FillBrush FillBrush { get; } = new SolidFillBrush(new XAMLColor(Color.R, Color.G, Color.B, Color.A));
+        public IFillBrush FillBrush { get; } = new MGSolidFillBrush(Color);
     }
 
     internal static class ColorUtils
