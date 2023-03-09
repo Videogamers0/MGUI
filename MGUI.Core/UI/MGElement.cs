@@ -107,9 +107,6 @@ namespace MGUI.Core.UI
     //      Check if the same problem is affecting scrollable ListBoxes too, especially in this line of code in MGListBox's constructor:
     //      MGListBoxItem<TItemType> PressedItem = InternalItems?.FirstOrDefault(x => x.ContentPresenter.IsHovered);
     //Maybe make a CompositedBorderBrush, like CompositedFillBrush it's just a wrapper for 0-many border brushes that are drawn in sequence overtop of each other.
-    //implement some basic converters for the PropertyBinding markup extension. at least need a BooleanToVisibilityConverter (has a Visibility TrueValue, Visibility FalseValue. Defaults to TrueValue=Visible, False=Collapsed)
-    //		this would allow making inverse converters easily. or making one that converts to hidden instead of collapsed
-    //		also make an InverseBooleanConverter.
     //something for mouse cursors?
     //		maybe an enum MouseCursorType
     //		and MGElement would have MouseCursorType Cursor property

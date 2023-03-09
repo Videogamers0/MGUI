@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using XNAColor = Microsoft.Xna.Framework.Color;
 
 namespace MGUI.Core.UI.XAML
 {
@@ -279,6 +280,19 @@ namespace MGUI.Core.UI.XAML
 
         private const string BindingsMetadataKey = "TmpBindings";
 
+        //  DataBindings are defined in XAML (so they are applied to the properties of the XAML types)
+        //  but are bound to the properties of the actual type (such as MGUI.Core.UI.MGButton instead of MGUI.Core.UI.XAML.Button).
+        //  This dictionary is intended to handle cases where a property on the XAML type isn't the same name/path as the actual property of the binding
+        private static readonly Dictionary<string, string> BindingPathMappings = new()
+        {
+            { nameof(Background), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.NormalValue)}" },
+            { nameof(SelectedBackground), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.SelectedValue)}" },
+            { nameof(DisabledBackground), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.DisabledValue)}" },
+            { nameof(TextForeground), $"{nameof(MGElement.DefaultTextForeground)}.{nameof(VisualStateSetting<XNAColor>.NormalValue)}" },
+            { nameof(SelectedTextForeground), $"{nameof(MGElement.DefaultTextForeground)}.{nameof(VisualStateSetting<XNAColor>.SelectedValue)}" },
+            { nameof(DisabledTextForeground), $"{nameof(MGElement.DefaultTextForeground)}.{nameof(VisualStateSetting<XNAColor>.DisabledValue)}" }
+        };
+
         /// <summary>Resolves any pending <see cref="MGBinding"/>s by converting them into <see cref="DataBinding"/>s</summary>
         /// <param name="DataContextOverride">If not null, this value will be applied to the <see cref="MGElement.DataContextOverride"/> value of every element that is processed.<para/>
         /// If <paramref name="RecurseChildren"/> is false, this is only applied to <paramref name="Element"/>. Else it's applied to <paramref name="Element"/> and all its nested children.</param>
@@ -304,10 +318,9 @@ namespace MGUI.Core.UI.XAML
                         MGBinding PostProcessedBinding = Binding;
 
                         //  Handle some special-cases where the name of the XAML property isn't the same as the corresponding property on the c# object
-                        if (Binding.TargetPropertyName == nameof(Background))
+                        if (BindingPathMappings.TryGetValue(Binding.TargetPath, out string ActualPath))
                         {
-                            //TODO maybe the DataBinding should have 2 objects, the primary target and the path to the property instead of just property name
-                            //PostProcessedBinding = Binding with { TargetPropertyName = nameof(VisualStateFillBrush.NormalValue) };
+                            PostProcessedBinding = Binding with { TargetPath = ActualPath };
                         }
 
                         DataBindingManager.AddBinding(PostProcessedBinding, TargetObject);

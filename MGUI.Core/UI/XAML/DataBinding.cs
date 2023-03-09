@@ -6,7 +6,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
@@ -170,14 +169,37 @@ namespace MGUI.Core.UI.XAML
     //		or could call it SourceObjectResolverStaticResource
     #endregion Resolvers
 
-    public readonly record struct MGBinding(string TargetPropertyName, string SourcePath, DataBindingMode BindingMode = DataBindingMode.OneWay,
+    public readonly record struct MGBinding(string targetPath, string sourcePath, DataBindingMode BindingMode = DataBindingMode.OneWay,
         ISourceObjectResolver SourceResolver = null, DataContextResolver DataContextResolver = DataContextResolver.DataContext)
     {
-        public string TargetPropertyName { get; init; } = TargetPropertyName ?? throw new ArgumentNullException(nameof(TargetPropertyName));
-        public string SourcePath { get; init; } = SourcePath ?? throw new ArgumentNullException(nameof(SourcePath));
-        public ReadOnlyCollection<string> SourcePaths { get; } =
-            SourcePath == string.Empty ? new List<string>() { "" }.AsReadOnly() :
-            SourcePath.Split('.', StringSplitOptions.RemoveEmptyEntries).ToList().AsReadOnly();
+        private readonly string targetPath = targetPath ?? throw new ArgumentNullException(nameof(targetPath));
+        public string TargetPath
+        {
+            get => targetPath;
+            init
+            {
+                targetPath = value;
+                TargetPaths = GetPaths(TargetPath);
+            }
+        }
+        public readonly ReadOnlyCollection<string> TargetPaths = GetPaths(targetPath);
+
+        private readonly string sourcePath = sourcePath ?? throw new ArgumentNullException(nameof(sourcePath));
+        public string SourcePath
+        {
+            get => sourcePath;
+            init
+            {
+                sourcePath = value;
+                SourcePaths = GetPaths(SourcePath);
+            }
+        }
+
+        public readonly ReadOnlyCollection<string> SourcePaths = GetPaths(sourcePath);
+
+        private static ReadOnlyCollection<string> GetPaths(string Path)
+            => Path == string.Empty ? new List<string>() { "" }.AsReadOnly() : Path.Split('.', StringSplitOptions.RemoveEmptyEntries).ToList().AsReadOnly();
+
         public ISourceObjectResolver SourceResolver { get; init; } = SourceResolver ?? ISourceObjectResolver.FromSelf();
     }
 
@@ -336,20 +358,20 @@ namespace MGUI.Core.UI.XAML
         //Implement TypeConverters and FallbackValues
         //      Will definitely want some built in converters like BoolToVisibility which takes in a couple params: TrueVisibility FalseVisibility
         //      and InverseBool, StringToNumeric, StringToFillBrush, NullToBool (Null=True, Non-null=false?) etc.
+        //      EX: Text="{MGBinding Path=Foo, Converter={x:Type local:MyConverter}"
         //Also implement some form of StringFormat
         //      when setting the value of a String property, instead of calling .ToString on the source value, use the StringFormat if available
         //      On the CheckBox.xaml samples, test the ThreeState CheckBox so that null value is converted to "null" string instead of string.empty.
-        //Some XAML properties dont exactly match up with the c# class properties. In Element.ProcessBindings, map the property names correctly
-        //      such as Background maps to BackgroundBrush.NormalValue
+        //nested windows should probably inherit their WindowDataContext from their parent window
+        //
 
-        //TODO probably want to pass in a TargetObject and TargetPath?
-        //so source object can be resolved starting from TargetObject, but the actual targetobject is resolved from a path as well.
-        internal DataBinding(MGBinding Config, object TargetObject)
+        /// <param name="Object">The object which the property paths (<see cref="MGBinding.TargetPath"/>, <see cref="MGBinding.SourcePath"/>) should be retrieved from.</param>
+        internal DataBinding(MGBinding Config, object Object)
         {
             this.Config = Config;
-            this.TargetObject = TargetObject;
-            TargetPropertyName = Config.TargetPropertyName;
-            TargetProperty = GetPublicProperty(TargetObject, Config.TargetPropertyName);
+            this.TargetObject = ResolvePath(Object, Config.TargetPaths, true);
+            TargetPropertyName = Config.TargetPaths[^1];
+            TargetProperty = GetPublicProperty(TargetObject, TargetPropertyName);
             TargetPropertyType = GetUnderlyingType(TargetProperty);
             SourcePropertyName = Config.SourcePaths.Count > 0 ? Config.SourcePaths[^1] : null;
 
@@ -365,7 +387,7 @@ namespace MGUI.Core.UI.XAML
             //				Then from that property's value, look for a property named "B" and take it's value.
             //				since we only want the parent property of the innermost source property, we would stop at object "B".
 
-            object InitialSourceRoot = Config.SourceResolver.ResolveSourceObject(TargetObject);
+            object InitialSourceRoot = Config.SourceResolver.ResolveSourceObject(Object);
             switch (Config.DataContextResolver)
             {
                 case DataContextResolver.DataContext:
@@ -592,6 +614,9 @@ namespace MGUI.Core.UI.XAML
         private static readonly Dictionary<TypeConverter, Dictionary<Type, bool>> CachedCanConvertTo = new();
         private static bool IsConvertible(Type From, Type To) => IsConvertibleFrom(From, To) || IsConvertibleTo(From, To);
 
+        //TODO TypeConverters don't necessarily return the same value for the same input types.
+        //CanConvertFrom/CanConvertTo might return different values depending on the ITypeDescriptorContext
+        //so we can't actually cache these results... and we should be passing in the context...
         private static bool IsConvertibleFrom(Type From, Type To)
         {
             if (From == null || To == null)
@@ -655,7 +680,7 @@ namespace MGUI.Core.UI.XAML
 
         private void ObservableTargetObject_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == Config.TargetPropertyName)
+            if (e.PropertyName == TargetPropertyName)
                 TargetPropertyValueChanged();
         }
 
@@ -721,9 +746,9 @@ namespace MGUI.Core.UI.XAML
             {
                 //  Validate that there isn't already a binding for this TargetObject/TargetProperty tuple
                 //  (TODO: I guess we could instead remove the existing binding to replace it with the new one)
-                if (ObjectBindings.Any(x => x.TargetPropertyName == Config.TargetPropertyName))
+                if (ObjectBindings.Any(x => x.Config.TargetPath == Config.TargetPath))
                 {
-                    throw new InvalidOperationException($"Unable to bind to target property '{Config.TargetPropertyName}' of target object '{TargetObject}' " +
+                    throw new InvalidOperationException($"Unable to bind to target property '{Config.TargetPath}' of target object '{TargetObject}' " +
                         $"because a binding was already created for this target.");
                 }
             }
