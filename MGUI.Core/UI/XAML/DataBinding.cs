@@ -4,10 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using System.Windows.Markup;
 
 namespace MGUI.Core.UI.XAML
@@ -169,33 +171,34 @@ namespace MGUI.Core.UI.XAML
     //		or could call it SourceObjectResolverStaticResource
     #endregion Resolvers
 
-    public readonly record struct MGBinding(string targetPath, string sourcePath, DataBindingMode BindingMode = DataBindingMode.OneWay,
-        ISourceObjectResolver SourceResolver = null, DataContextResolver DataContextResolver = DataContextResolver.DataContext)
+    public readonly record struct MGBinding(string _TargetPath, string _SourcePath, DataBindingMode BindingMode = DataBindingMode.OneWay,
+        ISourceObjectResolver SourceResolver = null, DataContextResolver DataContextResolver = DataContextResolver.DataContext,
+        IValueConverter Converter = null, object ConverterParameter = null, object FallbackValue = null)
     {
-        private readonly string targetPath = targetPath ?? throw new ArgumentNullException(nameof(targetPath));
+        private readonly string _TargetPath = _TargetPath ?? throw new ArgumentNullException(nameof(_TargetPath));
         public string TargetPath
         {
-            get => targetPath;
+            get => _TargetPath;
             init
             {
-                targetPath = value;
+                _TargetPath = value;
                 TargetPaths = GetPaths(TargetPath);
             }
         }
-        public readonly ReadOnlyCollection<string> TargetPaths = GetPaths(targetPath);
+        public readonly ReadOnlyCollection<string> TargetPaths = GetPaths(_TargetPath);
 
-        private readonly string sourcePath = sourcePath ?? throw new ArgumentNullException(nameof(sourcePath));
+        private readonly string _SourcePath = _SourcePath ?? throw new ArgumentNullException(nameof(_SourcePath));
         public string SourcePath
         {
-            get => sourcePath;
+            get => _SourcePath;
             init
             {
-                sourcePath = value;
+                _SourcePath = value;
                 SourcePaths = GetPaths(SourcePath);
             }
         }
 
-        public readonly ReadOnlyCollection<string> SourcePaths = GetPaths(sourcePath);
+        public readonly ReadOnlyCollection<string> SourcePaths = GetPaths(_SourcePath);
 
         private static ReadOnlyCollection<string> GetPaths(string Path)
             => Path == string.Empty ? new List<string>() { "" }.AsReadOnly() : Path.Split('.', StringSplitOptions.RemoveEmptyEntries).ToList().AsReadOnly();
@@ -211,7 +214,7 @@ namespace MGUI.Core.UI.XAML
     }
 
     /// <summary>To instantiate a binding, use <see cref="DataBindingManager.AddBinding"/></summary>
-    public sealed class DataBinding : IDisposable
+    public sealed class DataBinding : IDisposable, ITypeDescriptorContext
     {
         public readonly MGBinding Config;
 
@@ -219,6 +222,15 @@ namespace MGUI.Core.UI.XAML
         public readonly string TargetPropertyName;
         public readonly PropertyInfo TargetProperty;
         public readonly Type TargetPropertyType;
+
+        private readonly record struct ConverterConfig(IValueConverter Converter, object Parameter, bool IsConvertingBack)
+        {
+            public object Apply(object Value, Type TargetType) => IsConvertingBack ?
+                Converter.ConvertBack(Value, TargetType, Parameter, System.Globalization.CultureInfo.CurrentCulture) :
+                Converter.Convert(Value, TargetType, Parameter, System.Globalization.CultureInfo.CurrentCulture);
+        }
+        private readonly ConverterConfig? ConvertSettings;
+        private readonly ConverterConfig? ConvertBackSettings;
 
         private object _SourceRoot;
         /// <summary>The root of the source object, as determined by <see cref="MGBinding.SourceResolver"/> and <see cref="MGBinding.DataContextResolver"/>.<para/>
@@ -262,15 +274,22 @@ namespace MGUI.Core.UI.XAML
                     _SourceObject = value;
                     SourceProperty = GetPublicProperty(SourceObject, SourcePropertyName);
 
+                    //  Apply the FallbackValue if we couldn't find a valid property to bind to
+                    if (SourceProperty == null && Config.FallbackValue != null && !IsSettingValue &&
+                        Config.BindingMode is DataBindingMode.OneTime or DataBindingMode.OneWay or DataBindingMode.TwoWay)
+                    {
+                        TrySetPropertyValue(Config.FallbackValue, TargetObject, TargetProperty, TargetPropertyType, ConvertSettings);
+                    }
+
                     //  Update the target object's property value if the binding is directly on the source object (instead of a property on the source object)
                     if (string.IsNullOrEmpty(SourcePropertyName) && Config.BindingMode is DataBindingMode.OneTime or DataBindingMode.OneWay)
                     {
-                        TrySetPropertyValue(SourceObject, TargetObject, TargetProperty, TargetPropertyType);
+                        TrySetPropertyValue(SourceObject, TargetObject, TargetProperty, TargetPropertyType, ConvertSettings);
                     }
-
-                    if (Config.BindingMode is DataBindingMode.OneTime)
+                    //  Apply OneTime bindings
+                    else if (Config.BindingMode is DataBindingMode.OneTime)
                     {
-                        TrySetPropertyValue(SourceObject, SourceProperty, SourcePropertyType, TargetObject, TargetProperty, TargetPropertyType);
+                        TrySetPropertyValue(SourceObject, SourceProperty, SourcePropertyType, TargetObject, TargetProperty, TargetPropertyType, ConvertSettings);
                     }
 
                     //  Listen for changes to the source object's property value
@@ -350,13 +369,11 @@ namespace MGUI.Core.UI.XAML
         //TODO:
         //Call NotifyPropertyChanged when properties in MGElement subclasses change, such as ProgressBar.Minimum, CheckBox.IsChecked, Element.VerticalAlignment etc
         //figure out how to use the new MGBinding markup extension for things like MGImage.Texture which uses its own special 'SetTexture' method to change the value
-        //      or for things like IFillBrushes where the XAML value is a slightly different type (Thickness, FillBrush etc)
-        //Test 2-way bindings
         //In classes that use Template.GetContent, should implement logic that disposes of old bindings when the old item is removed
         //      such as in MGComboBox.ItemsSource's CollectionChanged, the removed items should be removed from DataBindingManager
         //      to unsubscribe from any propertychanged subscriptions
         //Implement TypeConverters and FallbackValues
-        //      Will definitely want some built in converters like BoolToVisibility which takes in a couple params: TrueVisibility FalseVisibility
+        //      built in converters like BoolToVisibility which takes in a couple params: TrueVisibility FalseVisibility
         //      and InverseBool, StringToNumeric, StringToFillBrush, NullToBool (Null=True, Non-null=false?) etc.
         //      EX: Text="{MGBinding Path=Foo, Converter={x:Type local:MyConverter}"
         //Also implement some form of StringFormat
@@ -369,6 +386,9 @@ namespace MGUI.Core.UI.XAML
         internal DataBinding(MGBinding Config, object Object)
         {
             this.Config = Config;
+            ConvertSettings = Config.Converter == null ? null : new(Config.Converter, Config.ConverterParameter, false);
+            ConvertBackSettings = Config.Converter == null ? null : new(Config.Converter, Config.ConverterParameter, true);
+
             this.TargetObject = ResolvePath(Object, Config.TargetPaths, true);
             TargetPropertyName = Config.TargetPaths[^1];
             TargetProperty = GetPublicProperty(TargetObject, TargetPropertyName);
@@ -426,7 +446,7 @@ namespace MGUI.Core.UI.XAML
         #region Set Property Value
         private bool IsSettingValue = false;
 
-        private bool TrySetPropertyValue(object Value, object TargetObject, PropertyInfo TargetProperty, Type TargetPropertyType)
+        private bool TrySetPropertyValue(object Value, object TargetObject, PropertyInfo TargetProperty, Type TargetPropertyType, ConverterConfig? ConverterSettings)
         {
             if (IsSettingValue)
                 return false;
@@ -434,13 +454,13 @@ namespace MGUI.Core.UI.XAML
             try
             {
                 IsSettingValue = true;
-                return TrySetValue(Value, TargetObject, TargetProperty, TargetPropertyType);
+                return TrySetValue(Value, TargetObject, TargetProperty, TargetPropertyType, ConverterSettings);
             }
             finally { IsSettingValue = false; }
         }
 
         private bool TrySetPropertyValue(object SourceObject, PropertyInfo SourceProperty, Type SourcePropertyType,
-            object TargetObject, PropertyInfo TargetProperty, Type TargetPropertyType)
+            object TargetObject, PropertyInfo TargetProperty, Type TargetPropertyType, ConverterConfig? ConverterSettings)
         {
             if (IsSettingValue)
                 return false;
@@ -448,25 +468,33 @@ namespace MGUI.Core.UI.XAML
             try
             {
                 IsSettingValue = true;
-                return TrySetValue(SourceObject, SourceProperty, SourcePropertyType, TargetObject, TargetProperty, TargetPropertyType);
+                return TrySetValue(SourceObject, SourceProperty, SourcePropertyType, TargetObject, TargetProperty, TargetPropertyType, ConverterSettings);
             }
             finally { IsSettingValue = false; }
         }
 
         /// <summary>Attempts to copy the given <paramref name="Value"/> into the <paramref name="TargetObject"/>'s <paramref name="TargetProperty"/>.</summary>
         /// <param name="TargetPropertyType">If null, will be retrieved via <see cref="GetUnderlyingType(PropertyInfo)"/></param>
-        private static bool TrySetValue(object Value, object TargetObject, PropertyInfo TargetProperty, Type TargetPropertyType)
+        private static bool TrySetValue(object Value, object TargetObject, PropertyInfo TargetProperty, Type TargetPropertyType, ConverterConfig? ConverterSettings)
         {
             if (TargetObject != null && TargetProperty != null)
             {
                 Type SourceType = Value?.GetType();
                 TargetPropertyType ??= GetUnderlyingType(TargetProperty);
 
-                if ((Value == null && !TargetPropertyType.IsValueType) || 
+                if (ConverterSettings.HasValue)
+                {
+                    object ActualValue = ConverterSettings.Value.Apply(Value, TargetPropertyType);
+                    try { TargetProperty.SetValue(TargetObject, ActualValue); }
+                    catch (Exception ex) { Debug.WriteLine(ex); }
+                    return true;
+                }
+                else if ((Value == null && !TargetPropertyType.IsValueType) || 
                     (Value != null && IsAssignableOrConvertible(SourceType, TargetPropertyType)))
                 {
                     object ActualValue = ConvertValue(SourceType, TargetPropertyType, Value, null);
-                    TargetProperty.SetValue(TargetObject, ActualValue);
+                    try { TargetProperty.SetValue(TargetObject, ActualValue); }
+                    catch (Exception ex) { Debug.WriteLine(ex); }
                     return true;
                 }
             }
@@ -479,21 +507,33 @@ namespace MGUI.Core.UI.XAML
         /// <param name="SourcePropertyType">If null, will be retrieved via <see cref="GetUnderlyingType(PropertyInfo)"/></param>
         /// <param name="TargetPropertyType">If null, will be retrieved via <see cref="GetUnderlyingType(PropertyInfo)"/></param>
         private static bool TrySetValue(object SourceObject, PropertyInfo SourceProperty, Type SourcePropertyType,
-            object TargetObject, PropertyInfo TargetProperty, Type TargetPropertyType)
+            object TargetObject, PropertyInfo TargetProperty, Type TargetPropertyType, ConverterConfig? ConverterSettings)
         {
             if (SourceObject != null && SourceProperty != null && TargetObject != null && TargetProperty != null)
             {
                 SourcePropertyType ??= GetUnderlyingType(SourceProperty);
                 TargetPropertyType ??= GetUnderlyingType(TargetProperty);
 
-                bool CanAssign = IsAssignable(SourcePropertyType, TargetPropertyType);
-                bool CanConvert = IsConvertible(SourcePropertyType, TargetPropertyType);
-                if (CanAssign || CanConvert)
+                if (ConverterSettings.HasValue)
                 {
                     object Value = SourceProperty.GetValue(SourceObject);
-                    object ActualValue = ConvertValue(SourcePropertyType, TargetPropertyType, Value, CanAssign);
-                    TargetProperty.SetValue(TargetObject, ActualValue);
+                    object ActualValue = ConverterSettings.Value.Apply(Value, TargetPropertyType);
+                    try { TargetProperty.SetValue(TargetObject, ActualValue); }
+                    catch (Exception ex) { Debug.WriteLine(ex); }
                     return true;
+                }
+                else
+                {
+                    bool CanAssign = IsAssignable(SourcePropertyType, TargetPropertyType);
+                    bool CanConvert = IsConvertible(SourcePropertyType, TargetPropertyType);
+                    if (ConverterSettings.HasValue || CanAssign || CanConvert)
+                    {
+                        object Value = SourceProperty.GetValue(SourceObject);
+                        object ActualValue = ConvertValue(SourcePropertyType, TargetPropertyType, Value, CanAssign);
+                        try { TargetProperty.SetValue(TargetObject, ActualValue); }
+                        catch (Exception ex) { Debug.WriteLine(ex); }
+                        return true;
+                    }
                 }
             }
 
@@ -503,9 +543,6 @@ namespace MGUI.Core.UI.XAML
         /// <param name="CanAssign">If null, will be computed via <see cref="IsAssignable(Type, Type)"/></param>
         private static object ConvertValue(Type SourceType, Type TargetType, object Value, bool? CanAssign)
         {
-            //TODO improve this logic, such as by passing in Converter as parameter.
-            //If Converter not null, call the ConvertTo or ConvertFrom method on the value before attempting to resolve it
-            //Also need to handle TypeConverters like WPF does? Or maybe that's same as the Converter parameter
             if (Value == null)
                 return null;
             else if (CanAssign == true || (!CanAssign.HasValue && IsAssignable(SourceType, TargetType)))
@@ -617,6 +654,8 @@ namespace MGUI.Core.UI.XAML
         //TODO TypeConverters don't necessarily return the same value for the same input types.
         //CanConvertFrom/CanConvertTo might return different values depending on the ITypeDescriptorContext
         //so we can't actually cache these results... and we should be passing in the context...
+        //I don't care to fix this right now since it's pretty rare that a TypeConverter's implementation
+        //needs to access the ITypeDescriptorContext to determine if it can/cannot convert to/from.
         private static bool IsConvertibleFrom(Type From, Type To)
         {
             if (From == null || To == null)
@@ -686,22 +725,19 @@ namespace MGUI.Core.UI.XAML
 
         private void SourcePropertyValueChanged()
         {
-            //TODO Converters? Instead of just IsAssignableTo, need to invoke the Converter on the Value first
-
+            //  Propagate the new value to the TargetProperty
             if (!IsSettingValue && Config.BindingMode is DataBindingMode.OneWay or DataBindingMode.TwoWay)
             {
-                TrySetPropertyValue(SourceObject, SourceProperty, SourcePropertyType, TargetObject, TargetProperty, TargetPropertyType);
+                TrySetPropertyValue(SourceObject, SourceProperty, SourcePropertyType, TargetObject, TargetProperty, TargetPropertyType, ConvertSettings);
             }
         }
 
         private void TargetPropertyValueChanged()
         {
-            //TODO Converters? Instead of just IsAssignableTo, need to invoke the Converter on the Value first
-
             //  Propagate the new value to the SourceProperty
             if (!IsSettingValue && Config.BindingMode is DataBindingMode.OneWayToSource or DataBindingMode.TwoWay)
             {
-                TrySetPropertyValue(TargetObject, TargetProperty, TargetPropertyType, SourceObject, SourceProperty, SourcePropertyType);
+                TrySetPropertyValue(TargetObject, TargetProperty, TargetPropertyType, SourceObject, SourceProperty, SourcePropertyType, ConvertBackSettings);
             }
         }
 
@@ -724,6 +760,15 @@ namespace MGUI.Core.UI.XAML
                 }
             }
         }
+
+        public object Instance => TargetObject;
+
+        public PropertyDescriptor PropertyDescriptor => null;
+
+        public IContainer Container => null;
+        public object GetService(Type serviceType) => null;
+        public void OnComponentChanged() { }
+        public bool OnComponentChanging() => true;
     }
 
     /// <summary>Static class that keeps track of all <see cref="DataBinding"/>s for all objects.</summary>
@@ -802,19 +847,45 @@ namespace MGUI.Core.UI.XAML
 #if UseWPF
     public class MGBindingExtension : MarkupExtension
     {
+        /// <summary>The path to the source property. Separate nested object properties with a '.'.<para/>
+        /// EX: "Location.City" retrieve the value of the "Location" property. Then look for the value of the "City" property on that inner object.</summary>
         public string Path { get; set; } = "";
+        /// <summary>If specified, the binding will use <see cref="SourceObjectResolverElementName"/> to find the source object.<para/>
+        /// If not specified, the binding will use <see cref="SourceObjectResolverSelf"/>.</summary>
         public string ElementName { get; set; } = null;
         public DataBindingMode Mode { get; set; } = DataBindingMode.OneWay;
-        public DataContextResolver DataContextResolver { get; set; } = DataContextResolver.DataContext;
-        public object FallbackValue { get; set; }
+        /// <summary>If not specified, defaults to <see cref="DataContextResolver.Self"/> when binding using <see cref="ElementName"/>,<br/>
+        /// uses <see cref="DataContextResolver.DataContext"/> in all other cases.</summary>
+        public DataContextResolver? DataContextResolver { get; set; } = null;
+
+        /// <summary>Optional. Converts values of the source or target property before setting them to the other property.<para/>
+        /// If <see cref="Mode"/> is <see cref="DataBindingMode.OneTime"/>, <see cref="DataBindingMode.OneWay"/>, or <see cref="DataBindingMode.TwoWay"/>,
+        /// this converter must implement <see cref="IValueConverter.Convert(object, Type, object, System.Globalization.CultureInfo)"/>.<para/>
+        /// If <see cref="Mode"/> is <see cref="DataBindingMode.OneWayToSource"/> or <see cref="DataBindingMode.TwoWay"/>,
+        /// this converter must implement <see cref="IValueConverter.ConvertBack(object, Type, object, System.Globalization.CultureInfo)"/></summary>
+        public IValueConverter Converter { get; set; } = null;
+        /// <summary>Optional. A parameter to pass in when converting values via the given <see cref="Converter"/></summary>
+        public object ConverterParameter { get; set; } = null;
+
+        /// <summary>Optional. A default value to set the target property to if the source property of the binding could not be resolved.</summary>
+        public object FallbackValue { get; set; } = null;
+
+        /// <summary>This value is automatically determined by the name of the property that the binding is attached to.<para/>
+        /// However, some properties on <see cref="XAML"/> objects (such as <see cref="Button"/>) don't have the same name as their corresponding property on the
+        /// <see cref="UI"/> objects (such as <see cref="MGButton"/>), so you can override the TargetPropertyName if needed.</summary>
+        public string TargetPropertyNameOverride { get; set; } = null;
 
         public ISourceObjectResolver SourceObjectResolver =>
             string.IsNullOrEmpty(ElementName) ? ISourceObjectResolver.FromSelf() : ISourceObjectResolver.FromElementName(ElementName);
 
         public MGBindingExtension() { }
 
-        private MGBinding ToBinding(string TargetPropertyName, object FallbackValue)
-            => new(TargetPropertyName, Path, Mode, SourceObjectResolver, DataContextResolver);//, FallbackValue);
+        //  If binding using ElementName, user probably wants to bind directly to that object instead of to it's DataContext.
+        private DataContextResolver ActualDataContextResolver =>
+            DataContextResolver ?? (!string.IsNullOrEmpty(ElementName) ? XAML.DataContextResolver.Self : XAML.DataContextResolver.DataContext);
+
+        private MGBinding ToBinding(string TargetPropertyName)
+            => new(TargetPropertyName, Path, Mode, SourceObjectResolver, ActualDataContextResolver, Converter, ConverterParameter, FallbackValue);
 
         public override object ProvideValue(IServiceProvider Provider)
         {
@@ -822,7 +893,7 @@ namespace MGUI.Core.UI.XAML
             if (ProvideValueTarget.TargetProperty is PropertyInfo TargetProperty && ProvideValueTarget.TargetObject is Element TargetObject)
             {
                 //  Save the binding info onto the target object so it can be evaluated later on (once we've instantiated the MGElement instance from the Element object)
-                TargetObject.Bindings.Add(ToBinding(TargetProperty.Name, FallbackValue));
+                TargetObject.Bindings.Add(ToBinding(TargetPropertyNameOverride ?? TargetProperty.Name));
 
                 //  Return the fallbackvalue or default for now. The actual value will be evaluated later
                 if (FallbackValue != null && FallbackValue.GetType().IsAssignableTo(TargetProperty.PropertyType))

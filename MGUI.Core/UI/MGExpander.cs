@@ -151,6 +151,8 @@ namespace MGUI.Core.UI
 
                     _IsExpanded = value;
                     ExpanderToggleButton.IsChecked = IsExpanded;
+                    NPC(nameof(IsExpanded));
+                    NPC(nameof(IsCollapsed));
 
                     foreach (MGElement Item in BoundItems)
                         Item.Visibility = IsExpanded ? ExpandedVisibility : CollapsedVisibility;

@@ -35,7 +35,10 @@
                     <TextBlock TextAlignment="Center" Text="This is the content of an expander.\nClick the expander button to show/hide this content." />
                 </Border>
             </Expander>
-            <TextBlock Name="TextBlock1" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock>The above expander's [c=Turquoise][i]IsExpanded[/i][/c] state is:</TextBlock>
+                <TextBlock Foreground="LightBlue" IsShadowed="True" ShadowColor="Blue" Text="{MGBinding ElementName=Expander1, DataContextResolver=Self, Path=IsExpanded, Mode=OneWay}" />
+            </StackPanel>
             <Separator/>
 
             <TextBlock>
@@ -59,7 +62,21 @@
             <TextBlock>
                 To use your own icon, set the color to Transparent and either subscribe to [c=Turquoise][i]ExpanderToggleButton.OnEndDraw[/i][/c] or micro-manage [c=Turquoise][i]ExpanderToggleButton.Content[/i][/c].
             </TextBlock>
-            <Expander Name="CustomIconExpander" IsExpanded="False" ExpanderDropdownArrowColor="Transparent" Header="Expander with custom drawing inside its toggle button" />
+            <Expander Name="CustomIconExpander" IsExpanded="False" ExpanderDropdownArrowColor="Transparent" Header="Expander with custom drawing inside its toggle button">
+                <Expander.ExpanderToggleButton>
+                    <ToggleButton Padding="0">
+                        <ContextualContentPresenter Value="{MGBinding ElementName=CustomIconExpander, DataContextResolver=Self, Path=IsExpanded, Mode=OneWay}"
+                                                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <ContextualContentPresenter.TrueContent>
+                                <Image Width="16" Height="16" RegionName="ArrowUpGreen" />
+                            </ContextualContentPresenter.TrueContent>
+                            <ContextualContentPresenter.FalseContent>
+                                <Image Width="16" Height="16" RegionName="ArrowDownGreen" />
+                            </ContextualContentPresenter.FalseContent>
+                        </ContextualContentPresenter>
+                    </ToggleButton>
+                </Expander.ExpanderToggleButton>
+            </Expander>
             <Separator/>
 
             <TextBlock>
