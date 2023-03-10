@@ -39,7 +39,7 @@ namespace MGUI.Core.UI
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Texture2D _Texture;
-        public Texture2D Texture { get => _Texture; }
+        public Texture2D Texture { get => _Texture; set => SetTexture(value, SourceRect); }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Rectangle? _SourceRect;
@@ -61,6 +61,8 @@ namespace MGUI.Core.UI
 
                 _Texture = Texture;
                 _SourceRect = SourceRect;
+                NPC(nameof(Texture));
+                NPC(nameof(SourceRect));
 
                 if (PreviousWidth != UnstretchedWidth || PreviousHeight != UnstretchedHeight)
                     LayoutChanged(this, true);
@@ -77,6 +79,7 @@ namespace MGUI.Core.UI
                 if (_Stretch != value)
                 {
                     _Stretch = value;
+                    NPC(nameof(Stretch));
                     LayoutChanged(this, true);
                 }
             }
@@ -93,6 +96,7 @@ namespace MGUI.Core.UI
                 if (_StretchDirection != value)
                 {
                     _StretchDirection = value;
+                    NPC(nameof(StretchDirection));
                     LayoutChanged(this, true);
                 }
             }

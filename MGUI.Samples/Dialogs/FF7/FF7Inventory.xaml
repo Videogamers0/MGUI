@@ -62,7 +62,7 @@
 
                                     <!-- Character Portrait -->
                                     <Border BorderBrush="Black" BorderThickness="2" Dock="Left" Margin="0,0,6,0" VerticalAlignment="Center">
-                                        <Image Stretch="None" Texture="{PropertyBinding Path=Portrait, Mode=OneTime}" />
+                                        <Image Stretch="None" Texture="{MGBinding Path=Portrait, Mode=OneTime}" />
                                     </Border>
 
                                     <StackPanel Margin="8,0,0,0" VerticalAlignment="Center" Orientation="Vertical">

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -15,6 +16,7 @@ namespace MGUI.Core.UI.Data_Binding
         ISourceObjectResolver SourceResolver = null, DataContextResolver DataContextResolver = DataContextResolver.DataContext,
         IValueConverter Converter = null, object ConverterParameter = null, object FallbackValue = null, string StringFormat = null)
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly string _TargetPath = _TargetPath ?? throw new ArgumentNullException(nameof(_TargetPath));
         public string TargetPath
         {
@@ -27,6 +29,7 @@ namespace MGUI.Core.UI.Data_Binding
         }
         public readonly ReadOnlyCollection<string> TargetPaths = GetPaths(_TargetPath);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly string _SourcePath = _SourcePath ?? throw new ArgumentNullException(nameof(_SourcePath));
         public string SourcePath
         {

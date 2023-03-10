@@ -203,13 +203,9 @@ namespace MGUI.Core.UI.Data_Binding
 
         //TODO:
         //Call NotifyPropertyChanged when properties in MGElement subclasses change, such as ProgressBar.Minimum, CheckBox.IsChecked, Element.VerticalAlignment etc
-        //figure out how to use the new MGBinding markup extension for things like MGImage.Texture which uses its own special 'SetTexture' method to change the value
         //In classes that use Template.GetContent, should implement logic that disposes of old bindings when the old item is removed
         //      such as in MGComboBox.ItemsSource's CollectionChanged, the removed items should be removed from DataBindingManager
         //      to unsubscribe from any propertychanged subscriptions
-        //implement some form of StringFormat
-        //      when setting the value of a String property, instead of calling .ToString on the source value, use the StringFormat if available
-        //      On the CheckBox.xaml samples, test the ThreeState CheckBox so that null value is converted to "null" string instead of string.empty.
         //nested windows should probably inherit their WindowDataContext from their parent window
         //
 

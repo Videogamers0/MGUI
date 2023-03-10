@@ -16,7 +16,6 @@ using MGUI.Shared.Input;
 using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Containers.Grids;
 using MGUI.Core.UI.Data_Binding;
-using PropertyBinding = MGUI.Core.UI.XAML.PropertyBinding;
 
 namespace MGUI.Core.UI
 {
@@ -732,8 +731,6 @@ namespace MGUI.Core.UI
         public Dictionary<string, object> Metadata { get; } = new();
         /// <summary>General-purpose object to attach your own data to this <see cref="MGElement"/></summary>
         public object Tag { get; set; }
-
-        internal List<PropertyBinding> OneWayPropertyBindings { get; } = new();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private DeferEventsManager InitializationManager { get; }
