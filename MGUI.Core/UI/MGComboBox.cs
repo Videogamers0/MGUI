@@ -18,6 +18,7 @@ using System.Diagnostics;
 using Thickness = MonoGame.Extended.Thickness;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using Size = MonoGame.Extended.Size;
+using MGUI.Core.UI.Data_Binding;
 
 namespace MGUI.Core.UI
 {
@@ -92,7 +93,10 @@ namespace MGUI.Core.UI
                 if (_TemplatedItems != value)
                 {
                     if (TemplatedItems != null)
+                    {
+                        HandleItemsRemoved(TemplatedItems);
                         TemplatedItems.CollectionChanged -= TemplatedItems_CollectionChanged;
+                    }
                     _TemplatedItems = value;
                     if (TemplatedItems != null)
                         TemplatedItems.CollectionChanged += TemplatedItems_CollectionChanged;
@@ -103,9 +107,26 @@ namespace MGUI.Core.UI
             }
         }
 
+        private void HandleItemsRemoved(IEnumerable<TemplatedElement<TItemType, MGButton>> Items)
+        {
+            foreach (var Item in Items)
+                Item.Element.RemoveAllBindings(true);
+        }
+
         private void TemplatedItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             DropdownContentChanged();
+
+            if (e.Action is NotifyCollectionChangedAction.Remove or NotifyCollectionChangedAction.Replace && e.OldItems != null)
+            {
+                HandleItemsRemoved(e.OldItems.Cast<TemplatedElement<TItemType, MGButton>>());
+            }
+            else if (e.Action is NotifyCollectionChangedAction.Reset)
+            {
+                //  Needs to call HandleItemsRemoved on everything that was deleted from the ObservableCollection
+                //  But e.OldItems would be empty when action is Reset
+                throw new NotImplementedException();
+            }
         }
 
         #region Selected Item
@@ -155,6 +176,7 @@ namespace MGUI.Core.UI
 
         private void UpdateSelectedContent()
         {
+            Content?.RemoveAllBindings(true);
             MGElement SelectedContent = SelectedTemplatedItem == null || SelectedItemTemplate == null ? null : SelectedItemTemplate(SelectedTemplatedItem.SourceData);
             ManagedSetContent(SelectedContent);
         }

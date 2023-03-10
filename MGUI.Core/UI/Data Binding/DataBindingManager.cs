@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -71,7 +72,8 @@ namespace MGUI.Core.UI.Data_Binding
             if (_BindingsByTargetObject.TryGetValue(TargetObject, out List<DataBinding> ObjectBindings))
             {
                 foreach (DataBinding Binding in ObjectBindings)
-                    RemoveBinding(Binding);
+                    Binding.Dispose();
+                _BindingsByTargetObject.Remove(TargetObject);
                 return ObjectBindings.Count;
             }
             else

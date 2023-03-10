@@ -900,6 +900,23 @@ namespace MGUI.Core.UI
         public virtual MGBorder GetBorder() => null;
         public bool HasBorder => GetBorder() != null;
 
+        /// <summary>Removes all <see cref="DataBinding"/>s for the this <see cref="MGElement"/>.</summary>
+        /// <param name="IncludeChildren">If true, will also recursively remove bindings for all child items.</param>
+        protected internal int RemoveAllBindings(bool IncludeChildren)
+        {
+            if (!IncludeChildren)
+                return DataBindingManager.RemoveBindings(this);
+            else
+            {
+                int Count = 0;
+                foreach (MGElement Item in TraverseVisualTree())
+                {
+                    Count += DataBindingManager.RemoveBindings(Item);
+                }
+                return Count;
+            }
+        }
+
         #region Bounds
         protected internal Matrix GetTransform(CoordinateSpace From, CoordinateSpace To)
         {
