@@ -15,8 +15,8 @@ using MGUI.Shared.Input.Keyboard;
 using MGUI.Shared.Input;
 using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Containers.Grids;
+using MGUI.Core.UI.Data_Binding;
 using PropertyBinding = MGUI.Core.UI.XAML.PropertyBinding;
-using IObservableDataContext = MGUI.Core.UI.XAML.IObservableDataContext;
 
 namespace MGUI.Core.UI
 {

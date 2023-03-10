@@ -1,8 +1,7 @@
 ﻿using MGUI.Core.UI.Brushes.Fill_Brushes;
-using Newtonsoft.Json.Linq;
+using MGUI.Core.UI.XAML;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -10,9 +9,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
-using System.Windows.Markup;
 
-namespace MGUI.Core.UI.XAML
+namespace MGUI.Core.UI.Data_Binding
 {
     public enum DataContextResolver
     {
@@ -40,170 +38,6 @@ namespace MGUI.Core.UI.XAML
         /// This mode effectively combines the functionality of <see cref="OneWay"/> and <see cref="OneWayToSource"/></summary>
         TwoWay
         //OneTimeToSource? The opposite of OneTime. Read Target object's property value during initialization, copy that value to the source object's property value.
-    }
-
-    #region Resolvers
-    /// <summary>For concrete implementations, use:<br/>
-    /// <see cref="SourceObjectResolverSelf"/><br/>
-    /// <see cref="SourceObjectResolverElementName"/><br/>
-    /// <see cref="SourceObjectResolverElementAncestor{T}"/><br/>
-    /// <see cref="SourceObjectResolverDesktop"/></summary>
-    public interface ISourceObjectResolver
-    {
-        public object ResolveSourceObject(object TargetObject);
-
-        private static readonly SourceObjectResolverSelf SelfResolver = new();
-        /// <summary>Indicates that the source object of the binding is the same as the Targeted object</summary>
-        public static ISourceObjectResolver FromSelf() => SelfResolver;
-
-        /// <summary>Indicates that the source object of the binding should be retrieved via <see cref="MGWindow.GetElementByName(string)"/><br/>
-        /// (assuming the target object is of type <see cref="MGElement"/> and belongs to a <see cref="MGWindow"/>)</summary>
-        public static ISourceObjectResolver FromElementName(string ElementName) => new SourceObjectResolverElementName(ElementName);
-
-        /// <summary>Indicates that the source object of the binding should be retrieved by traversing up the visual tree 
-        /// by a certain number of hierarchical levels and looking for a parent of a particular <typeparamref name="T"/> type.<br/>
-        /// (assuming the target object is of type <see cref="MGElement"/>)</summary>
-        public static ISourceObjectResolver FromElementAncestor<T>(int AncestorLevel = 1) where T : MGElement => new SourceObjectResolverElementAncestor<T>(AncestorLevel);
-        public static ISourceObjectResolver FromElementAncestor(int AncestorLevel = 1) => FromElementAncestor<MGElement>(AncestorLevel);
-
-        private static readonly SourceObjectResolverDesktop DesktopResolver = new();
-        /// <summary>Indicates that the source object of the binding should be retrieved via <see cref="MGElement.GetDesktop"/><br/>
-        /// (assuming the target object is of type <see cref="MGElement"/>)</summary>
-        public static ISourceObjectResolver FromDesktop() => DesktopResolver;
-    }
-
-    /// <summary>Indicates that the source object of the binding is the same as the Targeted object</summary>
-    public class SourceObjectResolverSelf : ISourceObjectResolver
-    {
-        public SourceObjectResolverSelf() { }
-        public object ResolveSourceObject(object TargetObject) => TargetObject;
-        public override string ToString() => $"{nameof(SourceObjectResolverSelf)}";
-    }
-
-    /// <summary>Indicates that the source object of the binding should be retrieved via <see cref="MGWindow.GetElementByName(string)"/><br/>
-    /// (assuming the target object is of type <see cref="MGElement"/> and belongs to a <see cref="MGWindow"/>)</summary>
-    public class SourceObjectResolverElementName : ISourceObjectResolver
-    {
-        public readonly string ElementName;
-
-        public SourceObjectResolverElementName(string ElementName)
-        {
-            this.ElementName = ElementName ?? throw new ArgumentNullException(nameof(ElementName));
-        }
-
-        public object ResolveSourceObject(object TargetObject)
-        {
-            if (TargetObject is MGElement Element && Element.SelfOrParentWindow.TryGetElementByName(ElementName, out MGElement NamedElement))
-                return NamedElement;
-            else
-                return null;
-        }
-
-        public override string ToString() => $"{nameof(SourceObjectResolverElementName)}: {ElementName}";
-    }
-
-    /// <summary>Indicates that the source object of the binding should be retrieved by traversing up the visual tree 
-    /// by a certain number of hierarchical levels and looking for a parent of a particular <typeparamref name="T"/> type.<br/>
-    /// (assuming the target object is of type <see cref="MGElement"/>)</summary>
-    public class SourceObjectResolverElementAncestor<T> : ISourceObjectResolver
-        where T : MGElement
-    {
-        /// <summary>The number of matches that must be found before ending the search.<para/>
-        /// EX: If <see cref="AncestorLevel"/>=2 and <typeparamref name="T"/>=typeof(<see cref="MGBorder"/>), 
-        /// this resolver will look for the 2nd <see cref="MGBorder"/> parent when traversing the visual tree upwards.</summary>
-        public readonly int AncestorLevel;
-
-        /// <param name="AncestorLevel">The number of matches that must be found before ending the search.<para/>
-        /// EX: If <paramref name="AncestorLevel"/>=2 and <typeparamref name="T"/>=typeof(<see cref="MGBorder"/>), 
-        /// this resolver will look for the 2nd <see cref="MGBorder"/> parent when traversing the visual tree upwards.</param>
-        public SourceObjectResolverElementAncestor(int AncestorLevel = 1)
-        {
-            this.AncestorLevel = AncestorLevel;
-        }
-
-        public object ResolveSourceObject(object TargetObject)
-        {
-            if (AncestorLevel == 0)
-                return TargetObject;
-
-            if (TargetObject is MGElement Element)
-            {
-                int Count = AncestorLevel;
-                MGElement Current = Element;
-
-                while (Count > 0 && Current != null)
-                {
-                    Current = Current.Parent;
-                    if (Current is T)
-                    {
-                        Count--;
-                        if (Count == 0)
-                            return Current;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        public override string ToString() => $"{nameof(SourceObjectResolverElementAncestor<T>)}: {typeof(T).Name} ({AncestorLevel})";
-    }
-
-    /// <summary>Indicates that the source object of the binding should be retrieved via <see cref="MGElement.GetDesktop"/><br/>
-    /// (assuming the target object is of type <see cref="MGElement"/>)</summary>
-    public class SourceObjectResolverDesktop : ISourceObjectResolver
-    {
-        public SourceObjectResolverDesktop() { }
-
-        public object ResolveSourceObject(object TargetObject)
-        {
-            if (TargetObject is MGElement Element)
-                return Element.GetDesktop();
-            else
-                return null;
-        }
-
-        public override string ToString() => $"{nameof(SourceObjectResolverDesktop)}";
-    }
-
-    //TODO: After you make a 'Resources' class, it could have a Dictionary<string, object> or something that DataBindings could reference by string key
-    //public class SourceObjectResolverNamedResource : ISourceObjectResolver
-    //		or could call it SourceObjectResolverStaticResource
-    #endregion Resolvers
-
-    public readonly record struct MGBinding(string _TargetPath, string _SourcePath, DataBindingMode BindingMode = DataBindingMode.OneWay,
-        ISourceObjectResolver SourceResolver = null, DataContextResolver DataContextResolver = DataContextResolver.DataContext,
-        IValueConverter Converter = null, object ConverterParameter = null, object FallbackValue = null)
-    {
-        private readonly string _TargetPath = _TargetPath ?? throw new ArgumentNullException(nameof(_TargetPath));
-        public string TargetPath
-        {
-            get => _TargetPath;
-            init
-            {
-                _TargetPath = value;
-                TargetPaths = GetPaths(TargetPath);
-            }
-        }
-        public readonly ReadOnlyCollection<string> TargetPaths = GetPaths(_TargetPath);
-
-        private readonly string _SourcePath = _SourcePath ?? throw new ArgumentNullException(nameof(_SourcePath));
-        public string SourcePath
-        {
-            get => _SourcePath;
-            init
-            {
-                _SourcePath = value;
-                SourcePaths = GetPaths(SourcePath);
-            }
-        }
-
-        public readonly ReadOnlyCollection<string> SourcePaths = GetPaths(_SourcePath);
-
-        private static ReadOnlyCollection<string> GetPaths(string Path)
-            => Path == string.Empty ? new List<string>() { "" }.AsReadOnly() : Path.Split('.', StringSplitOptions.RemoveEmptyEntries).ToList().AsReadOnly();
-
-        public ISourceObjectResolver SourceResolver { get; init; } = SourceResolver ?? ISourceObjectResolver.FromSelf();
     }
 
     public interface IObservableDataContext
@@ -489,7 +323,7 @@ namespace MGUI.Core.UI.XAML
                     catch (Exception ex) { Debug.WriteLine(ex); }
                     return true;
                 }
-                else if ((Value == null && !TargetPropertyType.IsValueType) || 
+                else if ((Value == null && !TargetPropertyType.IsValueType) ||
                     (Value != null && IsAssignableOrConvertible(SourceType, TargetPropertyType)))
                 {
                     object ActualValue = ConvertValue(SourceType, TargetPropertyType, Value, null);
@@ -770,142 +604,4 @@ namespace MGUI.Core.UI.XAML
         public void OnComponentChanged() { }
         public bool OnComponentChanging() => true;
     }
-
-    /// <summary>Static class that keeps track of all <see cref="DataBinding"/>s for all objects.</summary>
-    public static class DataBindingManager
-    {
-        private static readonly List<DataBinding> _Bindings = new();
-        public static IReadOnlyList<DataBinding> Bindings => _Bindings;
-
-        private static readonly Dictionary<object, List<DataBinding>> _BindingsByTargetObject = new();
-
-        public static DataBinding AddBinding(MGBinding Config, object TargetObject)
-        {
-            if (TargetObject == null)
-                throw new ArgumentNullException(nameof(TargetObject));
-
-            DataBinding Binding = new(Config, TargetObject);
-            _Bindings.Add(Binding);
-
-            if (_BindingsByTargetObject.TryGetValue(TargetObject, out List<DataBinding> ObjectBindings))
-            {
-                //  Validate that there isn't already a binding for this TargetObject/TargetProperty tuple
-                //  (TODO: I guess we could instead remove the existing binding to replace it with the new one)
-                if (ObjectBindings.Any(x => x.Config.TargetPath == Config.TargetPath))
-                {
-                    throw new InvalidOperationException($"Unable to bind to target property '{Config.TargetPath}' of target object '{TargetObject}' " +
-                        $"because a binding was already created for this target.");
-                }
-            }
-            else
-            {
-                ObjectBindings = new();
-                _BindingsByTargetObject.Add(TargetObject, ObjectBindings);
-            }
-
-            ObjectBindings.Add(Binding);
-
-            return Binding;
-        }
-
-        public static bool RemoveBinding(DataBinding Binding)
-        {
-            if (Binding == null)
-                throw new ArgumentNullException(nameof(Binding));
-
-            bool Result = _Bindings.Remove(Binding);
-
-            if (_BindingsByTargetObject.TryGetValue(Binding.TargetObject, out List<DataBinding> ObjectBindings))
-            {
-                if (ObjectBindings.Remove(Binding) && ObjectBindings.Count == 0)
-                    _BindingsByTargetObject.Remove(Binding.TargetObject);
-            }
-
-            if (Result)
-                Binding.Dispose();
-            return Result;
-        }
-
-        /// <summary>Removes all <see cref="DataBinding"/>s that use <paramref name="TargetObject"/> as their <see cref="DataBinding.TargetObject"/></summary>
-        /// <returns>The count of the removed bindings</returns>
-        public static int RemoveBindings(object TargetObject)
-        {
-            if (TargetObject == null)
-                throw new ArgumentNullException(nameof(TargetObject));
-
-            if (_BindingsByTargetObject.TryGetValue(TargetObject, out List<DataBinding> ObjectBindings))
-            {
-                foreach (DataBinding Binding in ObjectBindings)
-                    RemoveBinding(Binding);
-                return ObjectBindings.Count;
-            }
-            else
-                return 0;
-        }
-    }
-
-#if UseWPF
-    public class MGBindingExtension : MarkupExtension
-    {
-        /// <summary>The path to the source property. Separate nested object properties with a '.'.<para/>
-        /// EX: "Location.City" retrieve the value of the "Location" property. Then look for the value of the "City" property on that inner object.</summary>
-        public string Path { get; set; } = "";
-        /// <summary>If specified, the binding will use <see cref="SourceObjectResolverElementName"/> to find the source object.<para/>
-        /// If not specified, the binding will use <see cref="SourceObjectResolverSelf"/>.</summary>
-        public string ElementName { get; set; } = null;
-        public DataBindingMode Mode { get; set; } = DataBindingMode.OneWay;
-        /// <summary>If not specified, defaults to <see cref="DataContextResolver.Self"/> when binding using <see cref="ElementName"/>,<br/>
-        /// uses <see cref="DataContextResolver.DataContext"/> in all other cases.</summary>
-        public DataContextResolver? DataContextResolver { get; set; } = null;
-
-        /// <summary>Optional. Converts values of the source or target property before setting them to the other property.<para/>
-        /// If <see cref="Mode"/> is <see cref="DataBindingMode.OneTime"/>, <see cref="DataBindingMode.OneWay"/>, or <see cref="DataBindingMode.TwoWay"/>,
-        /// this converter must implement <see cref="IValueConverter.Convert(object, Type, object, System.Globalization.CultureInfo)"/>.<para/>
-        /// If <see cref="Mode"/> is <see cref="DataBindingMode.OneWayToSource"/> or <see cref="DataBindingMode.TwoWay"/>,
-        /// this converter must implement <see cref="IValueConverter.ConvertBack(object, Type, object, System.Globalization.CultureInfo)"/></summary>
-        public IValueConverter Converter { get; set; } = null;
-        /// <summary>Optional. A parameter to pass in when converting values via the given <see cref="Converter"/></summary>
-        public object ConverterParameter { get; set; } = null;
-
-        /// <summary>Optional. A default value to set the target property to if the source property of the binding could not be resolved.</summary>
-        public object FallbackValue { get; set; } = null;
-
-        /// <summary>This value is automatically determined by the name of the property that the binding is attached to.<para/>
-        /// However, some properties on <see cref="XAML"/> objects (such as <see cref="Button"/>) don't have the same name as their corresponding property on the
-        /// <see cref="UI"/> objects (such as <see cref="MGButton"/>), so you can override the TargetPropertyName if needed.</summary>
-        public string TargetPropertyNameOverride { get; set; } = null;
-
-        public ISourceObjectResolver SourceObjectResolver =>
-            string.IsNullOrEmpty(ElementName) ? ISourceObjectResolver.FromSelf() : ISourceObjectResolver.FromElementName(ElementName);
-
-        public MGBindingExtension() { }
-
-        //  If binding using ElementName, user probably wants to bind directly to that object instead of to it's DataContext.
-        private DataContextResolver ActualDataContextResolver =>
-            DataContextResolver ?? (!string.IsNullOrEmpty(ElementName) ? XAML.DataContextResolver.Self : XAML.DataContextResolver.DataContext);
-
-        private MGBinding ToBinding(string TargetPropertyName)
-            => new(TargetPropertyName, Path, Mode, SourceObjectResolver, ActualDataContextResolver, Converter, ConverterParameter, FallbackValue);
-
-        public override object ProvideValue(IServiceProvider Provider)
-        {
-            IProvideValueTarget ProvideValueTarget = (IProvideValueTarget)Provider.GetService(typeof(IProvideValueTarget));
-            if (ProvideValueTarget.TargetProperty is PropertyInfo TargetProperty && ProvideValueTarget.TargetObject is Element TargetObject)
-            {
-                //  Save the binding info onto the target object so it can be evaluated later on (once we've instantiated the MGElement instance from the Element object)
-                TargetObject.Bindings.Add(ToBinding(TargetPropertyNameOverride ?? TargetProperty.Name));
-
-                //  Return the fallbackvalue or default for now. The actual value will be evaluated later
-                if (FallbackValue != null && FallbackValue.GetType().IsAssignableTo(TargetProperty.PropertyType))
-                    return FallbackValue;
-                else
-                    return GetDefaultValue(TargetProperty.PropertyType);
-            }
-
-            throw new NotImplementedException("Cannot provide a value when the underlying Type is unknown.");
-        }
-
-        private static object GetDefaultValue(Type Type) => Type.IsValueType ? Activator.CreateInstance(Type) : null;
-    }
-#endif
 }
