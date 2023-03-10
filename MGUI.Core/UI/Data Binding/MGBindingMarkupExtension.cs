@@ -21,11 +21,11 @@ namespace MGUI.Core.UI.XAML
         public string Path { get; set; } = "";
         /// <summary>If specified, the binding will use <see cref="SourceObjectResolverElementName"/> to find the source object.<para/>
         /// If not specified, the binding will use <see cref="SourceObjectResolverSelf"/>.</summary>
-        public string ElementName { get; set; } = null;
+        public string ElementName { get; set; }
         public DataBindingMode Mode { get; set; } = DataBindingMode.OneWay;
         /// <summary>If not specified, defaults to <see cref="DataContextResolver.Self"/> when binding using <see cref="ElementName"/>,<br/>
         /// uses <see cref="DataContextResolver.DataContext"/> in all other cases.</summary>
-        public DataContextResolver? DataContextResolver { get; set; } = null;
+        public DataContextResolver? DataContextResolver { get; set; }
 
         /// <summary>Optional. Converts values of the source or target property before setting them to the other property.<para/>
         /// If <see cref="Mode"/> is <see cref="DataBindingMode.OneTime"/>, <see cref="DataBindingMode.OneWay"/>, or <see cref="DataBindingMode.TwoWay"/>,
@@ -34,15 +34,18 @@ namespace MGUI.Core.UI.XAML
         /// this converter must implement <see cref="IValueConverter.ConvertBack(object, Type, object, System.Globalization.CultureInfo)"/></summary>
         public IValueConverter Converter { get; set; } = null;
         /// <summary>Optional. A parameter to pass in when converting values via the given <see cref="Converter"/></summary>
-        public object ConverterParameter { get; set; } = null;
+        public object ConverterParameter { get; set; }
 
         /// <summary>Optional. A default value to set the target property to if the source property of the binding could not be resolved.</summary>
-        public object FallbackValue { get; set; } = null;
+        public object FallbackValue { get; set; }
+
+        /// <summary>Optional. Used to format values that are being converted to a string property value.</summary>
+        public string StringFormat { get; set; }
 
         /// <summary>This value is automatically determined by the name of the property that the binding is attached to.<para/>
         /// However, some properties on <see cref="XAML"/> objects (such as <see cref="Button"/>) don't have the same name as their corresponding property on the
         /// <see cref="UI"/> objects (such as <see cref="MGButton"/>), so you can override the TargetPropertyName if needed.</summary>
-        public string TargetPropertyNameOverride { get; set; } = null;
+        public string TargetPropertyNameOverride { get; set; }
 
         public ISourceObjectResolver SourceObjectResolver =>
             string.IsNullOrEmpty(ElementName) ? ISourceObjectResolver.FromSelf() : ISourceObjectResolver.FromElementName(ElementName);
@@ -54,7 +57,7 @@ namespace MGUI.Core.UI.XAML
             DataContextResolver ?? (!string.IsNullOrEmpty(ElementName) ? Data_Binding.DataContextResolver.Self : Data_Binding.DataContextResolver.DataContext);
 
         private MGBinding ToBinding(string TargetPropertyName)
-            => new(TargetPropertyName, Path, Mode, SourceObjectResolver, ActualDataContextResolver, Converter, ConverterParameter, FallbackValue);
+            => new(TargetPropertyName, Path, Mode, SourceObjectResolver, ActualDataContextResolver, Converter, ConverterParameter, FallbackValue, StringFormat);
 
         public override object ProvideValue(IServiceProvider Provider)
         {

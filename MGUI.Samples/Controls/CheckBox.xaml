@@ -39,7 +39,7 @@
                 </CheckBox>
             </StackPanel>
             <Separator />
-
+            
             <DockPanel>
                 <TextBlock Dock="Top">
                     Use [c=Turquoise][i]IsChecked[/i][/c] to get or set the current check-state. You can also subscribe to these events:

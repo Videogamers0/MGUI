@@ -285,7 +285,7 @@ namespace MGUI.Core.UI.Data_Binding
             try
             {
                 IsSettingValue = true;
-                return TrySetValue(this, Value, TargetObject, TargetProperty, TargetPropertyType, ConverterSettings);
+                return TrySetValue(this, Value, TargetObject, TargetProperty, TargetPropertyType, ConverterSettings, Config.StringFormat);
             }
             finally { IsSettingValue = false; }
         }
@@ -299,14 +299,17 @@ namespace MGUI.Core.UI.Data_Binding
             try
             {
                 IsSettingValue = true;
-                return TrySetValue(this, SourceObject, SourceProperty, SourcePropertyType, TargetObject, TargetProperty, TargetPropertyType, ConverterSettings);
+                return TrySetValue(this, SourceObject, SourceProperty, SourcePropertyType, 
+                    TargetObject, TargetProperty, TargetPropertyType, 
+                    ConverterSettings, Config.StringFormat);
             }
             finally { IsSettingValue = false; }
         }
 
         /// <summary>Attempts to copy the given <paramref name="Value"/> into the <paramref name="TargetObject"/>'s <paramref name="TargetProperty"/>.</summary>
         /// <param name="TargetPropertyType">If null, will be retrieved via <see cref="GetUnderlyingType(PropertyInfo)"/></param>
-        private static bool TrySetValue(ITypeDescriptorContext Context, object Value, object TargetObject, PropertyInfo TargetProperty, Type TargetPropertyType, ConverterConfig? ConverterSettings)
+        private static bool TrySetValue(ITypeDescriptorContext Context, object Value, object TargetObject, PropertyInfo TargetProperty, Type TargetPropertyType, 
+            ConverterConfig? ConverterSettings, string StringFormat)
         {
             if (TargetObject != null && TargetProperty != null)
             {
@@ -319,7 +322,7 @@ namespace MGUI.Core.UI.Data_Binding
                 if ((Value == null && !TargetPropertyType.IsValueType) ||
                     (Value != null && IsAssignableOrConvertible(SourceType, TargetPropertyType)))
                 {
-                    object ActualValue = ConvertValue(Context, SourceType, TargetPropertyType, Value, null);
+                    object ActualValue = ConvertValue(Context, SourceType, TargetPropertyType, Value, null, StringFormat);
                     try { TargetProperty.SetValue(TargetObject, ActualValue); }
                     catch (Exception ex) { Debug.WriteLine(ex); }
                     return true;
@@ -334,7 +337,7 @@ namespace MGUI.Core.UI.Data_Binding
         /// <param name="SourcePropertyType">If null, will be retrieved via <see cref="GetUnderlyingType(PropertyInfo)"/></param>
         /// <param name="TargetPropertyType">If null, will be retrieved via <see cref="GetUnderlyingType(PropertyInfo)"/></param>
         private static bool TrySetValue(ITypeDescriptorContext Context, object SourceObject, PropertyInfo SourceProperty, Type SourcePropertyType,
-            object TargetObject, PropertyInfo TargetProperty, Type TargetPropertyType, ConverterConfig? ConverterSettings)
+            object TargetObject, PropertyInfo TargetProperty, Type TargetPropertyType, ConverterConfig? ConverterSettings, string StringFormat)
         {
             if (SourceObject != null && SourceProperty != null && TargetObject != null && TargetProperty != null)
             {
@@ -349,7 +352,7 @@ namespace MGUI.Core.UI.Data_Binding
                 bool CanConvert = IsConvertible(SourcePropertyType, TargetPropertyType);
                 if (ConverterSettings.HasValue || CanAssign || CanConvert)
                 {
-                    object ActualValue = ConvertValue(Context, SourcePropertyType, TargetPropertyType, Value, CanAssign);
+                    object ActualValue = ConvertValue(Context, SourcePropertyType, TargetPropertyType, Value, CanAssign, StringFormat);
                     try { TargetProperty.SetValue(TargetObject, ActualValue); }
                     catch (Exception ex) { Debug.WriteLine(ex); }
                     return true;
@@ -360,10 +363,12 @@ namespace MGUI.Core.UI.Data_Binding
         }
 
         /// <param name="CanAssign">If null, will be computed via <see cref="IsAssignable(Type, Type)"/></param>
-        private static object ConvertValue(ITypeDescriptorContext Context, Type SourceType, Type TargetType, object Value, bool? CanAssign)
+        private static object ConvertValue(ITypeDescriptorContext Context, Type SourceType, Type TargetType, object Value, bool? CanAssign, string StringFormat)
         {
             if (Value == null)
                 return null;
+            else if (StringFormat != null && TargetType == typeof(string))
+                return string.Format(StringFormat, Value);
             else if (CanAssign == true || (!CanAssign.HasValue && IsAssignable(SourceType, TargetType)))
                 return Value;
             else if (TryConvertWithTypeConverter(Context, SourceType, TargetType, Value, out object TypeConvertedValue))

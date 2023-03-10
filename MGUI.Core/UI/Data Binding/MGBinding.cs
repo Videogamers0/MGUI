@@ -13,7 +13,7 @@ namespace MGUI.Core.UI.Data_Binding
 {
     public readonly record struct MGBinding(string _TargetPath, string _SourcePath, DataBindingMode BindingMode = DataBindingMode.OneWay,
         ISourceObjectResolver SourceResolver = null, DataContextResolver DataContextResolver = DataContextResolver.DataContext,
-        IValueConverter Converter = null, object ConverterParameter = null, object FallbackValue = null)
+        IValueConverter Converter = null, object ConverterParameter = null, object FallbackValue = null, string StringFormat = null)
     {
         private readonly string _TargetPath = _TargetPath ?? throw new ArgumentNullException(nameof(_TargetPath));
         public string TargetPath
@@ -45,6 +45,4 @@ namespace MGUI.Core.UI.Data_Binding
 
         public ISourceObjectResolver SourceResolver { get; init; } = SourceResolver ?? ISourceObjectResolver.FromSelf();
     }
-
-
 }
