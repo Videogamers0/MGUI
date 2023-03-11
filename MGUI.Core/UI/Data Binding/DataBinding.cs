@@ -89,6 +89,7 @@ namespace MGUI.Core.UI.Data_Binding
                     //when any of them are changed, SourceObject must be re-calculated starting from the changed object's position along the path
                     //so if the path were "Foo.Bar.Baz", listen for changes to Foo's Value, or Bar's Value within the Foo object
                     //if Foo's value changes, recalculate Bar from the new Foo value. If Bar changes, just set SourceObject to the new Bar, don't need to recalculate from Foo
+                    //EX Binding: Text="{MGBinding Path=SelectedItem.DisplayName, Mode=OneWay}". SelectedItem changes means SourceObject changes to the new value
                 }
             }
         }
@@ -206,8 +207,6 @@ namespace MGUI.Core.UI.Data_Binding
         //In classes that use Template.GetContent, should implement logic that disposes of old bindings when the old item is removed
         //      such as in MGComboBox.ItemsSource's CollectionChanged, the removed items should be removed from DataBindingManager
         //      to unsubscribe from any propertychanged subscriptions
-        //nested windows should probably inherit their WindowDataContext from their parent window
-        //
 
         /// <param name="Object">The object which the property paths (<see cref="MGBinding.TargetPath"/>, <see cref="MGBinding.SourcePath"/>) should be retrieved from.</param>
         internal DataBinding(MGBinding Config, object Object)

@@ -596,25 +596,21 @@ namespace MGUI.Core.UI
         private static readonly Thickness DefaultWindowPadding = new(5);
         private static readonly Thickness DefaultWindowBorderThickness = new(2);
 
+        #region Data Context
         private object _WindowDataContext;
         /// <summary>The default <see cref="MGElement.DataContext"/> for all elements that do not explicitly define a <see cref="MGElement.DataContextOverride"/></summary>
         public object WindowDataContext
         {
-            get => _WindowDataContext;
+            get => _WindowDataContext ?? ParentWindow?.WindowDataContext;
             set
             {
                 if (_WindowDataContext != value)
                 {
                     _WindowDataContext = value;
                     NPC(nameof(WindowDataContext));
+                    NPC(nameof(DataContextOverride));
                     WindowDataContextChanged?.Invoke(this, WindowDataContext);
-
-                    //  Changing the DataContext may have changed the sizes of elements on this window, so attempt to resize the window to its contents
-                    if (RecentSizeToContentSettings.HasValue)
-                    {
-                        ApplySizeToContent(RecentSizeToContentSettings.Value.Type, RecentSizeToContentSettings.Value.MinWidth, RecentSizeToContentSettings.Value.MinHeight, 
-                            RecentSizeToContentSettings.Value.MaxWidth, RecentSizeToContentSettings.Value.MaxHeight, false);
-                    }
+                    HandleWindowDataContextChanged();
                 }
             }
         }
@@ -626,6 +622,17 @@ namespace MGUI.Core.UI
         }
 
         public event EventHandler<object> WindowDataContextChanged;
+
+        private void HandleWindowDataContextChanged()
+        {
+            //  Changing the DataContext may have changed the sizes of elements on this window, so attempt to resize the window to its contents
+            if (RecentSizeToContentSettings.HasValue)
+            {
+                ApplySizeToContent(RecentSizeToContentSettings.Value.Type, RecentSizeToContentSettings.Value.MinWidth, RecentSizeToContentSettings.Value.MinHeight,
+                    RecentSizeToContentSettings.Value.MaxWidth, RecentSizeToContentSettings.Value.MaxHeight, false);
+            }
+        }
+        #endregion Data Context
 
         #region Constructors
         /// <summary>Initializes a root-level window.</summary>
@@ -865,12 +872,28 @@ namespace MGUI.Core.UI
                     WindowKeyboardHandler.ManualUpdate();
                 };
 
+                //  Nested windows inherit their WindowDataContext from the parent if they don't have their own explicit value
+                if (ParentWindow != null)
+                {
+                    ParentWindow.WindowDataContextChanged += (sender, e) =>
+                    {
+                        if (_WindowDataContext == null)
+                        {
+                            NPC(nameof(WindowDataContext));
+                            NPC(nameof(DataContextOverride));
+                            NPC(nameof(DataContext));
+                            WindowDataContextChanged?.Invoke(this, WindowDataContext);
+                            HandleWindowDataContextChanged();
+                        }
+                    };
+                }
+
                 MakeDraggable();
             }
         }
-#endregion Constructors
+        #endregion Constructors
 
-#region Drag Window Position
+        #region Drag Window Position
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool IsDraggingWindowPosition = false;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

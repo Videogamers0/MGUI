@@ -900,21 +900,17 @@ namespace MGUI.Core.UI
         public virtual MGBorder GetBorder() => null;
         public bool HasBorder => GetBorder() != null;
 
-        /// <summary>Removes all <see cref="DataBinding"/>s for the this <see cref="MGElement"/>.</summary>
+        /// <summary>Removes all <see cref="DataBinding"/>s that are associated with this <see cref="MGElement"/>.<para/>
+        /// Recommended to invoke this method if you are about to remove this <see cref="MGElement"/> from the visual tree,<br/>
+        /// so that all data bindings can unsubscribe from events such as <see cref="System.ComponentModel.INotifyPropertyChanged.PropertyChanged"/>.</summary>
         /// <param name="IncludeChildren">If true, will also recursively remove bindings for all child items.</param>
-        protected internal int RemoveAllBindings(bool IncludeChildren)
+        /// <returns>The number of <see cref="DataBinding"/>s that were deleted.</returns>
+        public int RemoveDataBindings(bool IncludeChildren)
         {
             if (!IncludeChildren)
                 return DataBindingManager.RemoveBindings(this);
             else
-            {
-                int Count = 0;
-                foreach (MGElement Item in TraverseVisualTree())
-                {
-                    Count += DataBindingManager.RemoveBindings(Item);
-                }
-                return Count;
-            }
+                return TraverseVisualTree().Sum(x => DataBindingManager.RemoveBindings(x));
         }
 
         #region Bounds

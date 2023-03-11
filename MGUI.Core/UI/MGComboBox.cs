@@ -107,10 +107,10 @@ namespace MGUI.Core.UI
             }
         }
 
-        private void HandleItemsRemoved(IEnumerable<TemplatedElement<TItemType, MGButton>> Items)
+        private static void HandleItemsRemoved(IEnumerable<TemplatedElement<TItemType, MGButton>> Items)
         {
             foreach (var Item in Items)
-                Item.Element.RemoveAllBindings(true);
+                Item.Element.RemoveDataBindings(true);
         }
 
         private void TemplatedItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -176,7 +176,7 @@ namespace MGUI.Core.UI
 
         private void UpdateSelectedContent()
         {
-            Content?.RemoveAllBindings(true);
+            Content?.RemoveDataBindings(true);
             MGElement SelectedContent = SelectedTemplatedItem == null || SelectedItemTemplate == null ? null : SelectedItemTemplate(SelectedTemplatedItem.SourceData);
             ManagedSetContent(SelectedContent);
         }
