@@ -50,6 +50,19 @@ namespace MGUI.Core.UI
         }
         public IReadOnlyList<MGListViewItem<TItemType>> RowItems => InternalRowItems;
 
+        //TODO invoke this method whenever Content that was auto-created via a column's CellTemplate gets deleted.
+        //  (Such as in MGListViewColumn.RefreshColumnContent or in RowItems_CollectionChanged)
+        //  This isn't completely necessary but may help avoid memory leaks from old DataBindings that are subscribed to
+        //  PropertyChanged events even though the target object isn't in use anymore.
+        private void HandleTemplatedContentRemoved(IEnumerable<MGElement> Items)
+        {
+            if (Items != null)
+            {
+                foreach (MGElement Item in Items)
+                    Item.RemoveDataBindings(true);
+            }
+        }
+
         private void RowItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             using (DataGrid.AllowChangingContentTemporarily())
@@ -497,16 +510,16 @@ namespace MGUI.Core.UI
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Func<TItemType, MGElement> _ItemTemplate;
+        private Func<TItemType, MGElement> _CellTemplate;
         /// <summary>This function is invoked to instantiate the content of each cell in this column</summary>
         public Func<TItemType, MGElement> CellTemplate
         {
-            get => _ItemTemplate;
+            get => _CellTemplate;
             set
             {
-                if (_ItemTemplate != value)
+                if (_CellTemplate != value)
                 {
-                    _ItemTemplate = value;
+                    _CellTemplate = value;
                     RefreshColumnContent();
                 }
             }

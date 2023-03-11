@@ -81,6 +81,8 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
+    //Call NotifyPropertyChanged when properties in MGElement or its subclasses change, such as ProgressBar.Minimum, CheckBox.IsChecked, Element.VerticalAlignment etc
+    //      this will allow 2-way DataBindings to MGElement objects.
     //'Resources' class? MGDesktop would have 1 reference to this instance.
     //		Contains things like Dictionary<string, MGTheme> Themes (so you can specify a ThemeId when parsing XAML)
     //      Dictionary<string, StyleSet> a StyleSet just contains a name/Id and a List<Style>

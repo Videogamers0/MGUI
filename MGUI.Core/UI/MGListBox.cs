@@ -117,7 +117,10 @@ namespace MGUI.Core.UI
                 if (_InternalItems != value)
                 {
                     if (InternalItems != null)
-                        InternalItems.CollectionChanged += ListBoxItems_CollectionChanged;
+                    {
+                        HandleTemplatedContentRemoved(InternalItems.Select(x => x.Content));
+                        InternalItems.CollectionChanged -= ListBoxItems_CollectionChanged;
+                    }
                     _InternalItems = value;
                     if (InternalItems != null)
                         InternalItems.CollectionChanged += ListBoxItems_CollectionChanged;
@@ -141,6 +144,15 @@ namespace MGUI.Core.UI
             }
         }
         public IReadOnlyList<MGListBoxItem<TItemType>> ListBoxItems => InternalItems;
+
+        private static void HandleTemplatedContentRemoved(IEnumerable<MGElement> Items)
+        {
+            if (Items != null)
+            {
+                foreach (var Item in Items)
+                    Item.RemoveDataBindings(true);
+            }
+        }
 
         private void ListBoxItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -205,6 +217,8 @@ namespace MGUI.Core.UI
                 }
                 if (SelectionSourceItem != null && Removed.Contains(SelectionSourceItem))
                     SelectionSourceItem = null;
+
+                HandleTemplatedContentRemoved(Removed.Select(x => x.Content));
             }
         }
 
@@ -239,6 +253,7 @@ namespace MGUI.Core.UI
         {
             if (e.Action is NotifyCollectionChangedAction.Reset)
             {
+                HandleTemplatedContentRemoved(InternalItems.Select(x => x.Content));
                 InternalItems.Clear();
             }
             else if (e.Action is NotifyCollectionChangedAction.Add && e.NewItems != null)
@@ -257,6 +272,7 @@ namespace MGUI.Core.UI
                 foreach (TItemType Item in e.OldItems)
                 {
                     InternalItems.RemoveAt(CurrentIndex);
+                    CurrentIndex++;
                 }
             }
             else if (e.Action is NotifyCollectionChangedAction.Replace)
@@ -720,7 +736,11 @@ namespace MGUI.Core.UI
             this.Data = Data ?? throw new ArgumentNullException(nameof(Data));
             this.ContentPresenter = new(ListBox.SelfOrParentWindow);
 
-            ListBox.ItemTemplateChanged += (sender, e) => { this.Content = ListBox.ItemTemplate?.Invoke(this.Data); };
+            ListBox.ItemTemplateChanged += (sender, e) =>
+            {
+                Content?.RemoveDataBindings(true);
+                Content = ListBox.ItemTemplate?.Invoke(this.Data);
+            };
             this.Content = ListBox.ItemTemplate?.Invoke(this.Data);
             ContentPresenter.CanChangeContent = false;
 

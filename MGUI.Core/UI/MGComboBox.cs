@@ -94,7 +94,7 @@ namespace MGUI.Core.UI
                 {
                     if (TemplatedItems != null)
                     {
-                        HandleItemsRemoved(TemplatedItems);
+                        HandleTemplatedContentRemoved(TemplatedItems.Select(x => x.Element));
                         TemplatedItems.CollectionChanged -= TemplatedItems_CollectionChanged;
                     }
                     _TemplatedItems = value;
@@ -107,10 +107,13 @@ namespace MGUI.Core.UI
             }
         }
 
-        private static void HandleItemsRemoved(IEnumerable<TemplatedElement<TItemType, MGButton>> Items)
+        private static void HandleTemplatedContentRemoved(IEnumerable<MGButton> Items)
         {
-            foreach (var Item in Items)
-                Item.Element.RemoveDataBindings(true);
+            if (Items != null)
+            {
+                foreach (var Item in Items)
+                    Item.RemoveDataBindings(true);
+            }
         }
 
         private void TemplatedItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -119,13 +122,7 @@ namespace MGUI.Core.UI
 
             if (e.Action is NotifyCollectionChangedAction.Remove or NotifyCollectionChangedAction.Replace && e.OldItems != null)
             {
-                HandleItemsRemoved(e.OldItems.Cast<TemplatedElement<TItemType, MGButton>>());
-            }
-            else if (e.Action is NotifyCollectionChangedAction.Reset)
-            {
-                //  Needs to call HandleItemsRemoved on everything that was deleted from the ObservableCollection
-                //  But e.OldItems would be empty when action is Reset
-                throw new NotImplementedException();
+                HandleTemplatedContentRemoved(e.OldItems.Cast<TemplatedElement<TItemType, MGButton>>().Select(x => x.Element));
             }
         }
 
@@ -244,6 +241,7 @@ namespace MGUI.Core.UI
             {
                 if (e.Action is NotifyCollectionChangedAction.Reset)
                 {
+                    HandleTemplatedContentRemoved(TemplatedItems.Select(x => x.Element));
                     TemplatedItems.Clear();
                 }
                 else if (e.Action is NotifyCollectionChangedAction.Add && e.NewItems != null)

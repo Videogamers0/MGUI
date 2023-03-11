@@ -202,12 +202,6 @@ namespace MGUI.Core.UI.Data_Binding
         private static Type GetUnderlyingType(PropertyInfo PropInfo) =>
             PropInfo == null ? null : Nullable.GetUnderlyingType(PropInfo.PropertyType) ?? PropInfo.PropertyType;
 
-        //TODO:
-        //Call NotifyPropertyChanged when properties in MGElement subclasses change, such as ProgressBar.Minimum, CheckBox.IsChecked, Element.VerticalAlignment etc
-        //In classes that use Template.GetContent, should implement logic that disposes of old bindings when the old item is removed
-        //      such as in MGComboBox.ItemsSource's CollectionChanged, the removed items should be removed from DataBindingManager
-        //      to unsubscribe from any propertychanged subscriptions
-
         /// <param name="Object">The object which the property paths (<see cref="MGBinding.TargetPath"/>, <see cref="MGBinding.SourcePath"/>) should be retrieved from.</param>
         internal DataBinding(MGBinding Config, object Object)
         {
