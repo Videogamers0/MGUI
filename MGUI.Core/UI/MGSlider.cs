@@ -59,6 +59,7 @@ namespace MGUI.Core.UI
             {
                 float Previous = Value;
                 _Value = ActualValue;
+                NPC(nameof(Value));
                 ValueChanged?.Invoke(this, new(Previous, Value));
             }
             return ActualValue;

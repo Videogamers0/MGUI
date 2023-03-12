@@ -10,7 +10,7 @@ using System.Windows.Data;
 using System.Windows.Markup;
 #endif
 
-namespace MGUI.Core.UI.XAML
+namespace MGUI.Core.UI.Data_Binding.Converters
 {
 #if UseWPF
     public class BoolToVisibilityConverter : MarkupExtension, IValueConverter
@@ -62,66 +62,6 @@ namespace MGUI.Core.UI.XAML
                 throw new InvalidOperationException($"{nameof(BoolToVisibilityConverter)}: Cannot convert back to a boolean from value of type {value?.GetType()?.Name ?? "null"}. " +
                     $"Expected value of type: {nameof(Visibility)}");
             }
-        }
-
-        public override object ProvideValue(IServiceProvider serviceProvider) => this;
-    }
-
-    public class InverseBoolConverter : MarkupExtension, IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is bool BoolValue)
-                return !BoolValue;
-            else
-                throw new NotImplementedException();
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is bool BoolValue)
-                return !BoolValue;
-            else
-                throw new NotImplementedException();
-        }
-
-        private static readonly InverseBoolConverter Instance = new();
-        public override object ProvideValue(IServiceProvider serviceProvider) => Instance;
-    }
-
-    public class StringToNumericConverter : MarkupExtension, IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is string StringValue)
-                return System.Convert.ChangeType(StringValue, targetType, culture);
-            else
-                throw new NotImplementedException();
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is IConvertible TypedValue)
-                return TypedValue.ToString(culture);
-            else
-                throw new NotImplementedException();
-        }
-
-        private static readonly StringToNumericConverter Instance = new();
-        public override object ProvideValue(IServiceProvider serviceProvider) => Instance;
-    }
-
-    public class NullToBoolConverter : MarkupExtension, IValueConverter
-    {
-        public bool NullValue { get; set; } = true;
-        public bool NonNullValue { get; set; } = false;
-
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            => value == null ? NullValue : NonNullValue;
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
         }
 
         public override object ProvideValue(IServiceProvider serviceProvider) => this;

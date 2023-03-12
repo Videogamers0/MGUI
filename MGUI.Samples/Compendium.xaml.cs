@@ -22,7 +22,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace MGUI.Samples
 {
-    public abstract class SampleBase
+    public abstract class SampleBase : ViewModelBase
     {
         public ContentManager Content { get; }
         public MGDesktop Desktop { get; }
@@ -32,11 +32,12 @@ namespace MGUI.Samples
         public bool IsVisible
         {
             get => _IsVisible;
-            private set
+            set
             {
                 if (_IsVisible != value)
                 {
                     _IsVisible = value;
+                    NPC(nameof(IsVisible));
 
                     if (IsVisible)
                         Desktop.Windows.Add(Window);
@@ -133,6 +134,7 @@ namespace MGUI.Samples
 
         #region Features
         public StylesSamples StylesSamples { get; }
+        public DataBindingSamples DataBindingSamples { get; }
         #endregion Features
 
         #region Dialogs
@@ -151,58 +153,35 @@ namespace MGUI.Samples
 
             #region Controls
             ButtonSamples = new(Content, Desktop);
-            BindVisibility(ButtonSamples, "Button_Toggle");
             CheckBoxSamples = new(Content, Desktop);
-            BindVisibility(CheckBoxSamples, "CheckBox_Toggle");
             ComboBoxSamples = new(Content, Desktop);
-            BindVisibility(ComboBoxSamples, "ComboBox_Toggle");
             ContextMenuSamples = new(Content, Desktop);
-            BindVisibility(ContextMenuSamples, "ContextMenu_Toggle");
             ContextualContentPresenterSamples = new(Content, Desktop);
-            BindVisibility(ContextualContentPresenterSamples, "ContextualContentPresenter_Toggle");
             DockPanelSamples = new(Content, Desktop);
-            BindVisibility(DockPanelSamples, "DockPanel_Toggle");
             ExpanderSamples = new(Content, Desktop);
-            BindVisibility(ExpanderSamples, "Expander_Toggle");
             GridSamples = new(Content, Desktop);
-            BindVisibility(GridSamples, "Grid_Toggle");
             GroupBoxSamples = new(Content, Desktop);
-            BindVisibility(GroupBoxSamples, "GroupBox_Toggle");
             ImageSamples = new(Content, Desktop);
-            BindVisibility(ImageSamples, "Image_Toggle");
             ListBoxSamples = new(Content, Desktop);
-            BindVisibility(ListBoxSamples, "ListBox_Toggle");
             ListViewSamples = new(Content, Desktop);
-            BindVisibility(ListViewSamples, "ListView_Toggle");
             PasswordBoxSamples = new(Content, Desktop);
-            BindVisibility(PasswordBoxSamples, "PasswordBox_Toggle");
             ProgressBarSamples = new(Content, Desktop);
-            BindVisibility(ProgressBarSamples, "ProgressBar_Toggle");
             RadioButtonSamples = new(Content, Desktop);
-            BindVisibility(RadioButtonSamples, "RadioButton_Toggle");
             ScrollViewerSamples = new(Content, Desktop);
-            BindVisibility(ScrollViewerSamples, "ScrollViewer_Toggle");
             SliderSamples = new(Content, Desktop);
-            BindVisibility(SliderSamples, "Slider_Toggle");
             StackPanelSamples = new(Content, Desktop);
-            BindVisibility(StackPanelSamples, "StackPanel_Toggle");
             TabControlSamples = new(Content, Desktop);
-            BindVisibility(TabControlSamples, "TabControl_Toggle");
             TextBlockSamples = new(Content, Desktop);
-            BindVisibility(TextBlockSamples, "TextBlock_Toggle");
             TextBoxSamples = new(Content, Desktop);
-            BindVisibility(TextBoxSamples, "TextBox_Toggle");
             ToolTipSamples = new(Content, Desktop);
-            BindVisibility(ToolTipSamples, "ToolTip_Toggle");
             UniformGridSamples = new(Content, Desktop);
-            BindVisibility(UniformGridSamples, "UniformGrid_Toggle");
             WindowSamples = new(Content, Desktop);
-            BindVisibility(WindowSamples, "Window_Toggle");
             #endregion Controls
 
             #region Features
             StylesSamples = new(Content, Desktop);
             BindVisibility(StylesSamples, "Styles_Toggle");
+            DataBindingSamples = new(Content, Desktop);
             #endregion Features
 
             #region Dialogs
@@ -221,14 +200,16 @@ namespace MGUI.Samples
             #endregion Dialogs
 
 #if DEBUG
-            //CheckBoxSamples.Show();
+            DataBindingSamples.Show();
 
             //  DataContext and simple data bindings
-            Debug2.Show();
-            DataContextTest DC = new();
-            Debug2.Window.WindowDataContext = DC;
-            Debug2.Window.AddNamedAction("Test1", x => { DC.TestString = "Clicked"; });
+            //Debug2.Show();
+            //DataContextTest DC = new();
+            //Debug2.Window.WindowDataContext = DC;
+            //Debug2.Window.AddNamedAction("Test1", x => { DC.TestString = "Clicked"; });
 #endif
+
+            Window.WindowDataContext = this;
         }
 
         private void BindVisibility(SampleBase Sample, string ToggleButtonName, bool IsChecked = false)

@@ -174,7 +174,8 @@ namespace MGUI.Core.UI
         }
 
         /// <summary>The source object that data bindings are resolved from.<para/>
-        /// This value prioritizes <see cref="DataContextOverride"/>, but falls back on <see cref="MGWindow.WindowDataContext"/> if there is no explicit override.</summary>
+        /// This value prioritizes <see cref="DataContextOverride"/>, but falls back on <see cref="MGWindow.WindowDataContext"/> if there is no explicit override.<para/>
+        /// To set this value, set <see cref="DataContextOverride"/> or set <see cref="MGWindow.WindowDataContext"/></summary>
         public object DataContext => DataContextOverride ?? SelfOrParentWindow.WindowDataContext;
         /// <summary>Invoked after <see cref="DataContext"/> is changed.</summary>
         public event EventHandler<object> DataContextChanged;

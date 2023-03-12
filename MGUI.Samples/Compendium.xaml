@@ -40,30 +40,31 @@
                                 <Setter Property="FontSize" Value="10" />
                             </Style>
                         </UniformGrid.Styles>
-                        <ToggleButton Content="Button" Name="Button_Toggle" Opacity="0.25" />
-                        <ToggleButton Content="CheckBox" Name="CheckBox_Toggle" />
-                        <ToggleButton Content="ComboBox" Name="ComboBox_Toggle" />
-                        <ToggleButton Content="ContextMenu" Name="ContextMenu_Toggle" />
-                        <ToggleButton Content="ContextualContentPresenter" Name="ContextualContentPresenter_Toggle" ToolTip="ContextualContentPresenter" />
-                        <ToggleButton Content="DockPanel" Name="DockPanel_Toggle" />
-                        <ToggleButton Content="Expander" Name="Expander_Toggle" />
-                        <ToggleButton Content="Grid" Name="Grid_Toggle" Opacity="0.25" />
-                        <ToggleButton Content="GroupBox" Name="GroupBox_Toggle" Opacity="0.25" />
-                        <ToggleButton Content="Image" Name="Image_Toggle" Opacity="0.25" />
-                        <ToggleButton Content="ListBox" Name="ListBox_Toggle" Opacity="0.25" />
-                        <ToggleButton Content="ListView" Name="ListView_Toggle" />
-                        <ToggleButton Content="PasswordBox" Name="PasswordBox_Toggle" Opacity="0.25" />
-                        <ToggleButton Content="ProgressBar" Name="ProgressBar_Toggle" />
-                        <ToggleButton Content="RadioButton" Name="RadioButton_Toggle" />
-                        <ToggleButton Content="ScrollViewer" Name="ScrollViewer_Toggle" />
-                        <ToggleButton Content="Slider" Name="Slider_Toggle" />
-                        <ToggleButton Content="StackPanel" Name="StackPanel_Toggle" />
-                        <ToggleButton Content="TabControl" Name="TabControl_Toggle" />
-                        <ToggleButton Content="TextBlock" Name="TextBlock_Toggle" />
-                        <ToggleButton Content="TextBox" Name="TextBox_Toggle" />
-                        <ToggleButton Content="ToolTip" Name="ToolTip_Toggle" Opacity="0.25" />
-                        <ToggleButton Content="UniformGrid" Name="UniformGrid_Toggle" />
-                        <ToggleButton Content="Window" Name="Window_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="Button" Opacity="0.25" IsChecked="{MGBinding Path=ButtonSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="CheckBox" IsChecked="{MGBinding Path=CheckBoxSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="ComboBox" IsChecked="{MGBinding Path=ComboBoxSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="ContextMenu" IsChecked="{MGBinding Path=ContextMenuSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="ContextualContentPresenter" IsChecked="{MGBinding Path=ContextualContentPresenterSamples.IsVisible, Mode=TwoWay}" 
+                                      ToolTip="ContextualContentPresenter" />
+                        <ToggleButton Content="DockPanel" IsChecked="{MGBinding Path=DockPanelSamples.IsVisible, Mode=TwoWay}"/>
+                        <ToggleButton Content="Expander" IsChecked="{MGBinding Path=ExpanderSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="Grid" IsChecked="{MGBinding Path=GridSamples.IsVisible, Mode=TwoWay}" Opacity="0.25" />
+                        <ToggleButton Content="GroupBox" IsChecked="{MGBinding Path=GroupBoxSamples.IsVisible, Mode=TwoWay}" Opacity="0.25" />
+                        <ToggleButton Content="Image" IsChecked="{MGBinding Path=ImageSamples.IsVisible, Mode=TwoWay}" Opacity="0.25" />
+                        <ToggleButton Content="ListBox" IsChecked="{MGBinding Path=ListBoxSamples.IsVisible, Mode=TwoWay}" Opacity="0.25" />
+                        <ToggleButton Content="ListView" IsChecked="{MGBinding Path=ListViewSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="PasswordBox" IsChecked="{MGBinding Path=PasswordBoxSamples.IsVisible, Mode=TwoWay}" Opacity="0.25" />
+                        <ToggleButton Content="ProgressBar" IsChecked="{MGBinding Path=ProgressBarSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="RadioButton" IsChecked="{MGBinding Path=RadioButtonSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="ScrollViewer" IsChecked="{MGBinding Path=ScrollViewerSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="Slider" IsChecked="{MGBinding Path=SliderSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="StackPanel" IsChecked="{MGBinding Path=StackPanelSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="TabControl" IsChecked="{MGBinding Path=TabControlSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="TextBlock" IsChecked="{MGBinding Path=TextBlockSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="TextBox" IsChecked="{MGBinding Path=TextBoxSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="ToolTip" IsChecked="{MGBinding Path=ToolTipSamples.IsVisible, Mode=TwoWay}" Opacity="0.25" />
+                        <ToggleButton Content="UniformGrid" IsChecked="{MGBinding Path=UniformGridSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="Window" IsChecked="{MGBinding Path=WindowSamples.IsVisible, Mode=TwoWay}" Opacity="0.25" />
                     </UniformGrid>
                 </StackPanel>
             </Expander>
@@ -83,7 +84,7 @@
                         </UniformGrid.Styles>
                         <ToggleButton Content="XAML" Name="XAML_Toggle" Opacity="0.25" />
                         <ToggleButton Content="Styles" Name="Styles_Toggle" />
-                        <ToggleButton Content="Bindings" Name="Bindings_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="DataBindings" IsChecked="{MGBinding Path=DataBindingSamples.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="Theme" Name="Theme_Toggle" Opacity="0.25" />
                         <ToggleButton Content="VisualState" Name="VisualState_Toggle" Opacity="0.25" />
                         <ToggleButton Content="BorderBrush" Name="BorderBrush_Toggle" Opacity="0.25" />

@@ -51,6 +51,18 @@ namespace MGUI.Core.UI.Data_Binding
     /// <summary>To instantiate a binding, use <see cref="DataBindingManager.AddBinding"/></summary>
     public sealed class DataBinding : IDisposable, ITypeDescriptorContext
     {
+        //TODO maybe all the event listeners should utilize the Weak event pattern to avoid memory leaks:
+        //https://learn.microsoft.com/en-us/dotnet/desktop/wpf/events/weak-event-patterns?view=netdesktop-7.0&redirectedfrom=MSDN
+        //https://learn.microsoft.com/en-us/dotnet/api/system.componentmodel.propertychangedeventmanager?redirectedfrom=MSDN&view=windowsdesktop-7.0
+        //I'm too lazy to read all this shit right now, good luck to future me.
+        //If you do implement this, then DataBindings won't need to implement IDisposable anymore and won't need to call
+        //DataBinding.Dispose() in files such as MGComboBox.cs or MGListBox.cs
+
+        //Probably just need to use:
+        //PropertyChangedEventManager.AddHandler(PreviousObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
+        //PropertyChangedEventManager.RemoveHandler(PreviousObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
+        //instead of directly subscribing via instance.PropertyChanged += ...
+
         public readonly MGBinding Config;
 
         public readonly object TargetObject;
@@ -104,6 +116,7 @@ namespace MGUI.Core.UI.Data_Binding
                 {
                     if (IsSubscribedToSourceObjectPropertyChanged && SourceObject is INotifyPropertyChanged PreviousObservableSourceObject)
                     {
+                        //PropertyChangedEventManager.RemoveHandler(PreviousObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
                         PreviousObservableSourceObject.PropertyChanged -= ObservableSourceObject_PropertyChanged;
                     }
 
@@ -132,6 +145,7 @@ namespace MGUI.Core.UI.Data_Binding
                     if (SourceProperty != null && Config.BindingMode is DataBindingMode.OneWay or DataBindingMode.TwoWay &&
                         SourceObject is INotifyPropertyChanged ObservableSourceObject)
                     {
+                        //PropertyChangedEventManager.AddHandler(ObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
                         ObservableSourceObject.PropertyChanged += ObservableSourceObject_PropertyChanged;
                         IsSubscribedToSourceObjectPropertyChanged = true;
                     }
@@ -217,15 +231,15 @@ namespace MGUI.Core.UI.Data_Binding
 
             //  The Source object is computed in 3 steps:
             //  1. Use the SourceObjectResolver to determine where to start
-            //			If SourceObjectResolverType=Self, we start from the TargetObject
-            //			If SourceObjectResolverType=ElementName, we start from a particular named element in the TargetObject's Window
-            //			If SourceObjectResolverType=Desktop, we start from the TargetObject's Desktop
+            //			If SourceObjectResolver=Self, we start from the Object constructor parameter
+            //			If SourceObjectResolver=ElementName, we start from a particular named element in the Object's Window
+            //			If SourceObjectResolver=Desktop, we start from the Object's Desktop
             //  2. Use the DataContextResolver to determine if we should be reading directly from
             //			the 1st step's result, or if we additionally have to read the value of a 'DataContext' property.
             //  3. Traverse the path given by SourcePaths
             //			EX: If SourcePaths="A.B.C" then we want to take the result of step #2, and look for a property named "A".
             //				Then from that property's value, look for a property named "B" and take it's value.
-            //				since we only want the parent property of the innermost source property, we would stop at object "B".
+            //				Since we only want the parent property of the innermost source property, we would stop at object "B".
 
             object InitialSourceRoot = Config.SourceResolver.ResolveSourceObject(Object);
             switch (Config.DataContextResolver)

@@ -1,5 +1,4 @@
-﻿using Autofac.Core;
-using MGUI.Shared.Helpers;
+﻿using MGUI.Shared.Helpers;
 using MGUI.Shared.Input;
 using MGUI.Shared.Text;
 using Microsoft.Xna.Framework;

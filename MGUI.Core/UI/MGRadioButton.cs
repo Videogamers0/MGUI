@@ -58,6 +58,8 @@ namespace MGUI.Core.UI
                 {
                     MGRadioButton Previous = CheckedItem;
                     _CheckedItem = Value;
+                    Previous?.NPC(nameof(MGRadioButton.IsChecked));
+                    CheckedItem?.NPC(nameof(MGRadioButton.IsChecked));
                     Previous?.HandleCheckStateChanged();
                     CheckedItem?.HandleCheckStateChanged();
                     CheckedItemChanged?.Invoke(this, new EventArgs<MGRadioButton>(Previous, CheckedItem));
