@@ -83,13 +83,60 @@ namespace MGUI.Core.UI.Data_Binding
             {
                 if (_SourceRoot != value)
                 {
-                    ClearPathChangeListeners();
-
                     _SourceRoot = value;
                     if (Config.SourcePaths.Count <= 1)
                         SourceObject = SourceRoot;
                     else
                         SourceObject = ResolvePath(SourceRoot, Config.SourcePaths, true);
+                }
+            }
+        }
+
+        private object _SourceObject;
+        public object SourceObject
+        {
+            get => _SourceObject;
+            private set
+            {
+                if (_SourceObject != value)
+                {
+                    ClearPathChangeListeners();
+
+                    if (IsSubscribedToSourceObjectPropertyChanged && SourceObject is INotifyPropertyChanged PreviousObservableSourceObject)
+                    {
+                        PropertyChangedEventManager.RemoveHandler(PreviousObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
+                        IsSubscribedToSourceObjectPropertyChanged = false;
+                    }
+
+                    _SourceObject = value;
+                    SourceProperty = GetPublicProperty(SourceObject, SourcePropertyName);
+                    SourcePropertyValueChanged();
+
+                    //  Apply the FallbackValue if we couldn't find a valid property to bind to
+                    if (SourceProperty == null && Config.FallbackValue != null && !IsSettingValue &&
+                        Config.BindingMode is DataBindingMode.OneTime or DataBindingMode.OneWay or DataBindingMode.TwoWay)
+                    {
+                        TrySetPropertyValue(Config.FallbackValue, TargetObject, TargetProperty, TargetPropertyType, ConvertSettings);
+                    }
+
+                    //  Update the target object's property value if the binding is directly on the source object (instead of a property on the source object)
+                    if (string.IsNullOrEmpty(SourcePropertyName) && Config.BindingMode is DataBindingMode.OneTime or DataBindingMode.OneWay)
+                    {
+                        TrySetPropertyValue(SourceObject, TargetObject, TargetProperty, TargetPropertyType, ConvertSettings);
+                    }
+                    //  Apply OneTime bindings
+                    else if (Config.BindingMode is DataBindingMode.OneTime)
+                    {
+                        TrySetPropertyValue(SourceObject, SourceProperty, SourcePropertyType, TargetObject, TargetProperty, TargetPropertyType, ConvertSettings);
+                    }
+
+                    //  Listen for changes to the source object's property value
+                    if (SourceProperty != null && Config.BindingMode is DataBindingMode.OneWay or DataBindingMode.TwoWay &&
+                        SourceObject is INotifyPropertyChanged ObservableSourceObject)
+                    {
+                        PropertyChangedEventManager.AddHandler(ObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
+                        IsSubscribedToSourceObjectPropertyChanged = true;
+                    }
 
                     //  Refresh the SourceObject when any object along the source path changes its value
                     //  EX: SourcePath="Foo.Bar.Baz"
@@ -139,53 +186,6 @@ namespace MGUI.Core.UI.Data_Binding
         }
 
         private void UpdateSourceObject(object sender, PropertyChangedEventArgs e) => SourceObject = ResolvePath(SourceRoot, Config.SourcePaths, true);
-
-        private object _SourceObject;
-        public object SourceObject
-        {
-            get => _SourceObject;
-            private set
-            {
-                if (_SourceObject != value)
-                {
-                    if (IsSubscribedToSourceObjectPropertyChanged && SourceObject is INotifyPropertyChanged PreviousObservableSourceObject)
-                    {
-                        PropertyChangedEventManager.RemoveHandler(PreviousObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
-                        IsSubscribedToSourceObjectPropertyChanged = false;
-                    }
-
-                    _SourceObject = value;
-                    SourceProperty = GetPublicProperty(SourceObject, SourcePropertyName);
-                    SourcePropertyValueChanged();
-
-                    //  Apply the FallbackValue if we couldn't find a valid property to bind to
-                    if (SourceProperty == null && Config.FallbackValue != null && !IsSettingValue &&
-                        Config.BindingMode is DataBindingMode.OneTime or DataBindingMode.OneWay or DataBindingMode.TwoWay)
-                    {
-                        TrySetPropertyValue(Config.FallbackValue, TargetObject, TargetProperty, TargetPropertyType, ConvertSettings);
-                    }
-
-                    //  Update the target object's property value if the binding is directly on the source object (instead of a property on the source object)
-                    if (string.IsNullOrEmpty(SourcePropertyName) && Config.BindingMode is DataBindingMode.OneTime or DataBindingMode.OneWay)
-                    {
-                        TrySetPropertyValue(SourceObject, TargetObject, TargetProperty, TargetPropertyType, ConvertSettings);
-                    }
-                    //  Apply OneTime bindings
-                    else if (Config.BindingMode is DataBindingMode.OneTime)
-                    {
-                        TrySetPropertyValue(SourceObject, SourceProperty, SourcePropertyType, TargetObject, TargetProperty, TargetPropertyType, ConvertSettings);
-                    }
-
-                    //  Listen for changes to the source object's property value
-                    if (SourceProperty != null && Config.BindingMode is DataBindingMode.OneWay or DataBindingMode.TwoWay &&
-                        SourceObject is INotifyPropertyChanged ObservableSourceObject)
-                    {
-                        PropertyChangedEventManager.AddHandler(ObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
-                        IsSubscribedToSourceObjectPropertyChanged = true;
-                    }
-                }
-            }
-        }
 
         private PropertyInfo _SourceProperty;
         public PropertyInfo SourceProperty
