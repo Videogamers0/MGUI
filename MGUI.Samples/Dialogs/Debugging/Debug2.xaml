@@ -1,21 +1,7 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         Left="440" Top="20" MinHeight="0" SizeToContent="WidthAndHeight" WindowStyle="None">
     <Border BorderThickness="12" Background="DarkBlue" Padding="10">
-        <StackPanel Orientation="Vertical">
-            <TextBlock Name="TextBlock1" Text="{MGBinding Path=TestString}" />
-            <!-- This TextBlock's Text is bound to TextBlock1.Text, so changes to TextBlock1.Text should propagate to this TextBlock's Text -->
-            <TextBlock Text="{MGBinding ElementName=TextBlock1, Path=Text, Mode=OneWay, DataContextResolver=Self}" MinHeight="10" Background="Orange * 0.25" />
-            
-            <Button CommandName="Test1" Content="Click to change 'TestString' property value of the\ndatacontext to demonstrate data binding" />
-
-            <CheckBox Name="CB1" IsChecked="{MGBinding ElementName=CB2, Path=IsChecked, Mode=TwoWay, DataContextResolver=Self}" Content="2-way binding test1" />
-            <CheckBox Name="CB2" IsChecked="{MGBinding ElementName=CB1, Path=IsChecked, Mode=TwoWay, DataContextResolver=Self}" Content="2-way bound check states" />
-            
-            <TextBlock Text="The following textblock displays the name of its own Background brush" />
-            <TextBlock Background="Orange" Text="{MGBinding DataContextResolver=Self, Path=BackgroundBrush.NormalValue, Mode=OneWay}" />
-        </StackPanel>
-
-        <!--<Border.BorderBrush>
+        <Border.BorderBrush>
             <TexturedBorderBrush EdgeTextureRegionName="BorderEdgeRegion1" CornerTextureRegionName="BorderCornerRegion1" EdgeBasis="Right" CornerBasis="BottomRight" />
         </Border.BorderBrush>
 
@@ -39,6 +25,6 @@
                 <TabItem Header="Audio" Content="Content of Audio tab" />
                 <TabItem Header="Controls" Content="Content of Controls tab" />
             </TabControl>
-        </Grid>-->
+        </Grid>
     </Border>
 </Window>

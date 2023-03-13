@@ -113,9 +113,7 @@ namespace MGUI.Samples.Dialogs.FF7
                 if (_SelectedItem != value)
                 {
                     _SelectedItem = value;
-
-                    //  Update the item description label at the top of the window
-                    ItemDescriptionLabel.SetText(SelectedItem?.Description ?? "Select an Item");
+                    NPC(nameof(SelectedItem));
 
                     if (SelectedItem == null)
                         ItemsList.ClearSelection();
@@ -126,7 +124,7 @@ namespace MGUI.Samples.Dialogs.FF7
         }
 
         private MGListBox<InventoryItem> ItemsList { get; }
-        private MGTextBlock ItemDescriptionLabel { get; }
+        //private MGTextBlock ItemDescriptionLabel { get; }
 
         public FF7Inventory(ContentManager Content, MGDesktop Desktop)
             : base(Content, Desktop, $"{nameof(Dialogs)}.{nameof(FF7)}", $"{nameof(FF7Inventory)}.xaml")
@@ -189,8 +187,6 @@ namespace MGUI.Samples.Dialogs.FF7
 
             ItemsList.SelectionChanged += (sender, e) => { SelectedItem = e.FirstOrDefault()?.Data; };
 
-            ItemDescriptionLabel = Window.GetElementByName<MGTextBlock>("ItemDescriptionLabel");
-
             //  When a character is clicked, try to use the selected item on them
             foreach (MGListBoxItem<PartyMember> PartyMember in PartyList.ListBoxItems)
             {
@@ -206,6 +202,8 @@ namespace MGUI.Samples.Dialogs.FF7
             //  Handle clicking on the close button
             MGButton CloseButton = Window.GetElementByName<MGButton>("CloseButton");
             CloseButton.AddCommandHandler((btn, e) => { Hide(); });
+
+            Window.WindowDataContext = this;
         }
 
         private bool TryUseItemOn(InventoryItem InventoryItem, PartyMember Character)

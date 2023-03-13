@@ -99,7 +99,7 @@ namespace MGUI.Samples
 
         public DataContextTest()
         {
-            this.TestString = "Hello World";
+            TestString = "Hello World";
         }
     }
 
@@ -180,52 +180,23 @@ namespace MGUI.Samples
 
             #region Features
             StylesSamples = new(Content, Desktop);
-            BindVisibility(StylesSamples, "Styles_Toggle");
             DataBindingSamples = new(Content, Desktop);
             #endregion Features
 
             #region Dialogs
-            FF7Inventory = new(Content, Desktop);
-            BindVisibility(FF7Inventory, "FF7Inventory_Toggle", true);
+            FF7Inventory = new(Content, Desktop) { IsVisible = true };
             SDVInventory = new(Content, Desktop);
-            BindVisibility(SDVInventory, "SDVInventory_Toggle", false);
             Registration = new(Content, Desktop);
-            BindVisibility(Registration, "Registration_Toggle");
             XAMLDesignerWindow = new(Content, Desktop);
-            BindVisibility(XAMLDesignerWindow, "XAMLDesigner_Toggle");
             Debug1 = new(Content, Desktop);
-            BindVisibility(Debug1, "Debug1_Toggle");
             Debug2 = new(Content, Desktop);
-            BindVisibility(Debug2, "Debug2_Toggle");
             #endregion Dialogs
 
 #if DEBUG
-            DataBindingSamples.Show();
-
-            //  DataContext and simple data bindings
-            //Debug2.Show();
-            //DataContextTest DC = new();
-            //Debug2.Window.WindowDataContext = DC;
-            //Debug2.Window.AddNamedAction("Test1", x => { DC.TestString = "Clicked"; });
+            //DataBindingSamples.Show();
 #endif
 
             Window.WindowDataContext = this;
-        }
-
-        private void BindVisibility(SampleBase Sample, string ToggleButtonName, bool IsChecked = false)
-        {
-            MGToggleButton ToggleButton = Window.GetElementByName<MGToggleButton>(ToggleButtonName);
-
-            Sample.VisibilityChanged += (sender, e) => { ToggleButton.IsChecked = e; };
-            ToggleButton.OnCheckStateChanged += (sender, e) =>
-            {
-                if (e.NewValue)
-                    Sample.Show();
-                else
-                    Sample.Hide();
-            };
-
-            ToggleButton.IsChecked = IsChecked;
         }
     }
 }

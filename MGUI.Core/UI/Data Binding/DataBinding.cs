@@ -51,17 +51,9 @@ namespace MGUI.Core.UI.Data_Binding
     /// <summary>To instantiate a binding, use <see cref="DataBindingManager.AddBinding"/></summary>
     public sealed class DataBinding : IDisposable, ITypeDescriptorContext
     {
-        //TODO maybe all the event listeners should utilize the Weak event pattern to avoid memory leaks:
+        //"Weak event pattern" information to avoid memory leaks with the event listeners:
         //https://learn.microsoft.com/en-us/dotnet/desktop/wpf/events/weak-event-patterns?view=netdesktop-7.0&redirectedfrom=MSDN
         //https://learn.microsoft.com/en-us/dotnet/api/system.componentmodel.propertychangedeventmanager?redirectedfrom=MSDN&view=windowsdesktop-7.0
-        //I'm too lazy to read all this shit right now, good luck to future me.
-        //If you do implement this, then DataBindings won't need to implement IDisposable anymore and won't need to call
-        //DataBinding.Dispose() in files such as MGComboBox.cs or MGListBox.cs
-
-        //Probably just need to use:
-        //PropertyChangedEventManager.AddHandler(PreviousObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
-        //PropertyChangedEventManager.RemoveHandler(PreviousObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
-        //instead of directly subscribing via instance.PropertyChanged += ...
 
         public readonly MGBinding Config;
 
@@ -158,8 +150,8 @@ namespace MGUI.Core.UI.Data_Binding
                 {
                     if (IsSubscribedToSourceObjectPropertyChanged && SourceObject is INotifyPropertyChanged PreviousObservableSourceObject)
                     {
-                        //PropertyChangedEventManager.RemoveHandler(PreviousObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
-                        PreviousObservableSourceObject.PropertyChanged -= ObservableSourceObject_PropertyChanged;
+                        PropertyChangedEventManager.RemoveHandler(PreviousObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
+                        IsSubscribedToSourceObjectPropertyChanged = false;
                     }
 
                     _SourceObject = value;
@@ -188,12 +180,9 @@ namespace MGUI.Core.UI.Data_Binding
                     if (SourceProperty != null && Config.BindingMode is DataBindingMode.OneWay or DataBindingMode.TwoWay &&
                         SourceObject is INotifyPropertyChanged ObservableSourceObject)
                     {
-                        //PropertyChangedEventManager.AddHandler(ObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
-                        ObservableSourceObject.PropertyChanged += ObservableSourceObject_PropertyChanged;
+                        PropertyChangedEventManager.AddHandler(ObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
                         IsSubscribedToSourceObjectPropertyChanged = true;
                     }
-                    else
-                        IsSubscribedToSourceObjectPropertyChanged = false;
                 }
             }
         }
@@ -312,7 +301,7 @@ namespace MGUI.Core.UI.Data_Binding
             if (TargetProperty != null && Config.BindingMode is DataBindingMode.OneWayToSource or DataBindingMode.TwoWay &&
                 TargetObject is INotifyPropertyChanged ObservableTargetObject)
             {
-                ObservableTargetObject.PropertyChanged += ObservableTargetObject_PropertyChanged;
+                PropertyChangedEventManager.AddHandler(ObservableTargetObject, ObservableTargetObject_PropertyChanged, TargetPropertyName);
                 IsSubscribedToTargetObjectPropertyChanged = true;
             }
             else
@@ -584,6 +573,8 @@ namespace MGUI.Core.UI.Data_Binding
         {
             if (e.PropertyName == SourcePropertyName)
                 SourcePropertyValueChanged();
+            else
+                throw new InvalidOperationException($"{nameof(DataBinding)}.{nameof(ObservableSourceObject_PropertyChanged)}: Expected PropertyName={SourcePropertyName}. Actual PropertyName={e.PropertyName}");
         }
 
         /// <summary>True if this binding subscribed to the <see cref="TargetObject"/>'s PropertyChanged event during initialization.<para/>
@@ -594,6 +585,8 @@ namespace MGUI.Core.UI.Data_Binding
         {
             if (e.PropertyName == TargetPropertyName)
                 TargetPropertyValueChanged();
+            else
+                throw new InvalidOperationException($"{nameof(DataBinding)}.{nameof(ObservableTargetObject_PropertyChanged)}: Expected PropertyName={TargetPropertyName}. Actual PropertyName={e.PropertyName}");
         }
 
         private void SourcePropertyValueChanged()
@@ -624,11 +617,11 @@ namespace MGUI.Core.UI.Data_Binding
                 //  Unsubscribe from PropertyChanged events
                 if (IsSubscribedToTargetObjectPropertyChanged && TargetObject is INotifyPropertyChanged ObservableTargetObject)
                 {
-                    ObservableTargetObject.PropertyChanged -= ObservableTargetObject_PropertyChanged;
+                    PropertyChangedEventManager.RemoveHandler(ObservableTargetObject, ObservableTargetObject_PropertyChanged, TargetPropertyName);
                 }
                 if (IsSubscribedToSourceObjectPropertyChanged && SourceObject is INotifyPropertyChanged ObservableSourceObject)
                 {
-                    ObservableSourceObject.PropertyChanged -= ObservableSourceObject_PropertyChanged;
+                    PropertyChangedEventManager.RemoveHandler(ObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
                     IsSubscribedToSourceObjectPropertyChanged = false;
                 }
                 ClearPathChangeListeners();

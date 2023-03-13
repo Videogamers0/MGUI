@@ -35,14 +35,15 @@
                 <TextBlock HorizontalAlignment="Center" FontSize="14" Text="Items" />
             </Border>
             <Border StyleNames="PanelBorder" Dock="Top">
-                <TextBlock Name="ItemDescriptionLabel" HorizontalAlignment="Left" Text="Select an item" AllowsInlineFormatting="False" />
+                <TextBlock HorizontalAlignment="Left" AllowsInlineFormatting="False"
+                           Text="{MGBinding Path=SelectedItem.Description, Mode=OneWay, FallbackValue='Select an Item'}" />
             </Border>
 
             <DockPanel>
                 <Border StyleNames="PanelBorder" Dock="Left">
                     <!-- List of each party member -->
                     <ListBox Name="PartyList" ItemType="{x:Type local:PartyMember}" IsTitleVisible="False" Background="Transparent" 
-                         Margin="5" AlternatingRowBackgrounds="{x:Null}" ItemsPanelBorderThickness="0" SelectionMode="None">
+                             Margin="5" AlternatingRowBackgrounds="{x:Null}" ItemsPanelBorderThickness="0" SelectionMode="None">
                         <ListBox.ItemContainerStyle>
                             <Border BorderThickness="0" />
                         </ListBox.ItemContainerStyle>
@@ -117,7 +118,7 @@
                 <Border StyleNames="PanelBorder">
                     <!-- List of each item in the inventory -->
                     <ListBox Name="ItemsList" ItemType="{x:Type local:InventoryItem}" IsTitleVisible="False" Background="Transparent" 
-                         Margin="10" AlternatingRowBackgrounds="{x:Null}" ItemsPanelBorderThickness="0">
+                             Margin="10" AlternatingRowBackgrounds="{x:Null}" ItemsPanelBorderThickness="0">
                         <ListBox.ItemTemplate>
                             <ContentTemplate>
                                 <DockPanel>

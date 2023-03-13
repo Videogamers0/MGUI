@@ -83,7 +83,7 @@
                             </Style>
                         </UniformGrid.Styles>
                         <ToggleButton Content="XAML" Name="XAML_Toggle" Opacity="0.25" />
-                        <ToggleButton Content="Styles" Name="Styles_Toggle" />
+                        <ToggleButton Content="Styles" IsChecked="{MGBinding Path=StylesSamples.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="DataBindings" IsChecked="{MGBinding Path=DataBindingSamples.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="Theme" Name="Theme_Toggle" Opacity="0.25" />
                         <ToggleButton Content="VisualState" Name="VisualState_Toggle" Opacity="0.25" />
@@ -106,12 +106,12 @@
                                 <Setter Property="FontSize" Value="10" />
                             </Style>
                         </UniformGrid.Styles>
-                        <ToggleButton Content="FF7 Inventory" Name="FF7Inventory_Toggle" />
-                        <ToggleButton Content="Stardew Valley" Name="SDVInventory_Toggle" />
-                        <ToggleButton Content="Registration" Name="Registration_Toggle" />
-                        <ToggleButton Content="XAML Designer" Name="XAMLDesigner_Toggle" />
-                        <ToggleButton Content="Debug1" Name="Debug1_Toggle" TextForeground="Yellow" Opacity="0.7" />
-                        <ToggleButton Content="Debug2" Name="Debug2_Toggle" TextForeground="Yellow" Opacity="0.7" />
+                        <ToggleButton Content="FF7 Inventory" IsChecked="{MGBinding Path=FF7Inventory.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="Stardew Valley" IsChecked="{MGBinding Path=SDVInventory.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="Registration" IsChecked="{MGBinding Path=Registration.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="XAML Designer" IsChecked="{MGBinding Path=XAMLDesignerWindow.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="Debug1" IsChecked="{MGBinding Path=Debug1.IsVisible, Mode=TwoWay}" TextForeground="Yellow" Opacity="0.7" />
+                        <ToggleButton Content="Debug2" IsChecked="{MGBinding Path=Debug2.IsVisible, Mode=TwoWay}" TextForeground="Yellow" Opacity="0.7" />
                     </UniformGrid>
                 </StackPanel>
             </Expander>
