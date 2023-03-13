@@ -91,20 +91,62 @@ namespace MGUI.Core.UI.Data_Binding
             {
                 if (_SourceRoot != value)
                 {
+                    ClearPathChangeListeners();
+
                     _SourceRoot = value;
                     if (Config.SourcePaths.Count <= 1)
                         SourceObject = SourceRoot;
                     else
                         SourceObject = ResolvePath(SourceRoot, Config.SourcePaths, true);
 
-                    //TODO need to listen for changes to all objects along the path.
-                    //when any of them are changed, SourceObject must be re-calculated starting from the changed object's position along the path
-                    //so if the path were "Foo.Bar.Baz", listen for changes to Foo's Value, or Bar's Value within the Foo object
-                    //if Foo's value changes, recalculate Bar from the new Foo value. If Bar changes, just set SourceObject to the new Bar, don't need to recalculate from Foo
-                    //EX Binding: Text="{MGBinding Path=SelectedItem.DisplayName, Mode=OneWay}". SelectedItem changes means SourceObject changes to the new value
+                    //  Refresh the SourceObject when any object along the source path changes its value
+                    //  EX: SourcePath="Foo.Bar.Baz"
+                    //  SourceObject must be updated when the Foo property value of the SourceRoot changes, or when the Bar property value of the Foo object changes.
+                    if (SourceRoot != null && Config.SourcePaths.Count > 1)
+                    {
+                        IList<string> PropertyNames = Config.SourcePaths;
+
+                        object Current = SourceRoot;
+                        for (int i = 0; i < PropertyNames.Count - 1; i++)
+                        {
+                            string PropertyName = PropertyNames[i];
+                            PropertyInfo Property = GetPublicProperty(Current, PropertyName);
+                            if (Property == null)
+                                break;
+
+                            if (Current is INotifyPropertyChanged PropChangedObject)
+                                UpdateSourceObjectWhenPropertyChanges(new(PropChangedObject, PropertyName));
+
+                            Current = Property.GetValue(Current, null);
+                            if (Current == null)
+                                break;
+                        }
+                    }
                 }
             }
         }
+
+        private readonly record struct PropertyChangedSourceMetadata(INotifyPropertyChanged Object, string PropertyName);
+        private readonly List<PropertyChangedSourceMetadata> PathChangeHandlers = new();
+        private void UpdateSourceObjectWhenPropertyChanges(PropertyChangedSourceMetadata Item)
+        {
+            PropertyChangedEventManager.AddHandler(Item.Object, UpdateSourceObject, Item.PropertyName);
+            PathChangeHandlers.Add(Item);
+        }
+        private void ClearPathChangeListeners()
+        {
+            if (PathChangeHandlers.Any())
+            {
+                try
+                {
+                    foreach (PropertyChangedSourceMetadata Item in PathChangeHandlers)
+                        PropertyChangedEventManager.RemoveHandler(Item.Object, UpdateSourceObject, Item.PropertyName);
+                }
+                finally { PathChangeHandlers.Clear(); }
+            }
+        }
+
+        private void UpdateSourceObject(object sender, PropertyChangedEventArgs e) => SourceObject = ResolvePath(SourceRoot, Config.SourcePaths, true);
 
         private object _SourceObject;
         public object SourceObject
@@ -122,6 +164,7 @@ namespace MGUI.Core.UI.Data_Binding
 
                     _SourceObject = value;
                     SourceProperty = GetPublicProperty(SourceObject, SourcePropertyName);
+                    SourcePropertyValueChanged();
 
                     //  Apply the FallbackValue if we couldn't find a valid property to bind to
                     if (SourceProperty == null && Config.FallbackValue != null && !IsSettingValue &&
@@ -165,7 +208,6 @@ namespace MGUI.Core.UI.Data_Binding
                 {
                     _SourceProperty = value;
                     SourcePropertyType = GetUnderlyingType(SourceProperty);
-                    SourcePropertyValueChanged();
                 }
             }
         }
@@ -589,6 +631,7 @@ namespace MGUI.Core.UI.Data_Binding
                     ObservableSourceObject.PropertyChanged -= ObservableSourceObject_PropertyChanged;
                     IsSubscribedToSourceObjectPropertyChanged = false;
                 }
+                ClearPathChangeListeners();
             }
         }
 

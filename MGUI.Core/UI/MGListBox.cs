@@ -341,6 +341,17 @@ namespace MGUI.Core.UI
             }
         }
 
+        private readonly EqualityComparer<TItemType> EqualityComparer = EqualityComparer<TItemType>.Default;
+
+        /// <summary>Returns the <see cref="MGListBoxItem{TItemType}.Data"/> of the first item in <see cref="SelectedItems"/>, or default(<typeparamref name="TItemType"/>) if no items are selected.<para/>
+        /// Setting this value overwrites the <see cref="SelectedItems"/> with the first <see cref="MGListBoxItem{TItemType}"/> containing the matching data.<br/>
+        /// If no matching item is found, clears the selection entirely.</summary>
+        public TItemType SelectedValue
+        {
+            get => SelectedItems.Count == 0 ? default(TItemType) : SelectedItems.First().Data;
+            set => SelectItem(value, true);
+        }
+
         private ReadOnlyCollection<MGListBoxItem<TItemType>> _SelectedItems;
         /// <summary>The currently-selected items. This collection is never null: Uses an empty list if setting to null.</summary>
         public ReadOnlyCollection<MGListBoxItem<TItemType>> SelectedItems
@@ -357,6 +368,8 @@ namespace MGUI.Core.UI
                     }
 
                     _SelectedItems = value ?? new List<MGListBoxItem<TItemType>>().AsReadOnly();
+                    NPC(nameof(SelectedItems));
+                    NPC(nameof(SelectedValue));
 
                     if (SelectedItems.Any(x => x == null))
                         throw new ArgumentNullException($"{nameof(MGListBoxItem<object>)}.{nameof(SelectedItems)} cannnot contain null items.");
@@ -371,21 +384,33 @@ namespace MGUI.Core.UI
 
         public event EventHandler<ReadOnlyCollection<MGListBoxItem<TItemType>>> SelectionChanged;
 
-        public void SelectItem(TItemType Item)
+        /// <summary>Note: This method clears the selection if <see cref="SelectionMode"/> is <see cref="ListBoxSelectionMode.None"/></summary>
+        /// <param name="Item">The item to select. Will search for a <see cref="MGListBoxItem{TItemType}"/> whose <see cref="MGListBoxItem{TItemType}.Data"/> matches this value.</param>
+        /// <param name="DeselectAllIfNotFound">If true, and if no corresponding <see cref="MGListBoxItem{TItemType}"/> is found that matches the given <paramref name="Item"/>, the selection will be cleared.</param>
+        public void SelectItem(TItemType Item, bool DeselectAllIfNotFound)
         {
-            if (SelectedItems?.Count == 1 && SelectedItems.First().Data.Equals(Item))
+            if (SelectionMode is ListBoxSelectionMode.None)
+            {
+                ClearSelection();
+                return;
+            }
+
+            if (SelectedItems?.Count == 1 && EqualityComparer.Equals(SelectedItems.First().Data, Item))
                 return;
 
             //  Find ListBoxItem that wraps the Item data
             foreach (MGListBoxItem<TItemType> LBI in ListBoxItems)
             {
-                if (LBI.Data.Equals(Item))
+                if (EqualityComparer.Equals(LBI.Data, Item))
                 {
                     //  Select it
                     this.SelectedItems = new List<MGListBoxItem<TItemType>>() { LBI }.AsReadOnly();
                     return;
                 }
             }
+
+            if (DeselectAllIfNotFound)
+                ClearSelection();
         }
 
         public void ClearSelection()

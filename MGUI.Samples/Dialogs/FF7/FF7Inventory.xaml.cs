@@ -120,7 +120,7 @@ namespace MGUI.Samples.Dialogs.FF7
                     if (SelectedItem == null)
                         ItemsList.ClearSelection();
                     else if (ItemsList.SelectedItems.Count != 1 || ItemsList.SelectedItems.First().Data != SelectedItem)
-                        ItemsList.SelectItem(SelectedItem);
+                        ItemsList.SelectItem(SelectedItem, true);
                 }
             }
         }

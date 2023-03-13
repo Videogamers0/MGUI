@@ -144,6 +144,10 @@ namespace MGUI.Core.UI
                     if (SelectedTemplatedItem != null)
                         SelectedTemplatedItem.Element.IsSelected = true;
 
+                    NPC(nameof(SelectedTemplatedItem));
+                    NPC(nameof(SelectedItem));
+                    NPC(nameof(SelectedIndex));
+
                     SelectedItemChanged?.Invoke(this, new(
                         PreviousSelection == null ? default(TItemType) : PreviousSelection.SourceData,
                         SelectedTemplatedItem == null ? default(TItemType) : SelectedTemplatedItem.SourceData
