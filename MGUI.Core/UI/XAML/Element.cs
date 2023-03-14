@@ -287,7 +287,9 @@ namespace MGUI.Core.UI.XAML
             { nameof(DisabledBackground), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.DisabledValue)}" },
             { nameof(TextForeground), $"{nameof(MGElement.DefaultTextForeground)}.{nameof(VisualStateSetting<XNAColor>.NormalValue)}" },
             { nameof(SelectedTextForeground), $"{nameof(MGElement.DefaultTextForeground)}.{nameof(VisualStateSetting<XNAColor>.SelectedValue)}" },
-            { nameof(DisabledTextForeground), $"{nameof(MGElement.DefaultTextForeground)}.{nameof(VisualStateSetting<XNAColor>.DisabledValue)}" }
+            { nameof(DisabledTextForeground), $"{nameof(MGElement.DefaultTextForeground)}.{nameof(VisualStateSetting<XNAColor>.DisabledValue)}" },
+            { nameof(Width), $"{nameof(MGElement.PreferredWidth)}" },
+            { nameof(Height), $"{nameof(MGElement.PreferredHeight)}" }
         };
 
         /// <summary>Resolves any pending <see cref="MGBinding"/>s by converting them into <see cref="DataBinding"/>s</summary>

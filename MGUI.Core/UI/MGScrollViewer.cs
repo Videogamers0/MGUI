@@ -42,6 +42,8 @@ namespace MGUI.Core.UI
                 {
                     _VSBVisibility = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(VSBVisibility));
+                    NPC(nameof(VerticalScrollBarVisibility));
                 }
             }
         }
@@ -64,6 +66,8 @@ namespace MGUI.Core.UI
                 {
                     _HSBVisibility = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(HSBVisibility));
+                    NPC(nameof(HorizontalScrollBarVisibility));
                 }
             }
         }
@@ -75,10 +79,24 @@ namespace MGUI.Core.UI
             set => HSBVisibility = value;
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Rectangle _ContentViewport;
         /// <summary>The bounds that this <see cref="MGScrollViewer"/>'s Content can draw itself to, 
         /// after accounting for <see cref="MGElement.Padding"/> and the width/height that the scrollbars reserved, if any.</summary>
-        public Rectangle ContentViewport { get; private set; }
+        public Rectangle ContentViewport
+        {
+            get => _ContentViewport;
+            private set
+            {
+                if (_ContentViewport != value)
+                {
+                    _ContentViewport = value;
+                    NPC(nameof(ContentViewport));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Rectangle? _VSBBounds;
         public Rectangle? VSBBounds
         {
@@ -89,6 +107,8 @@ namespace MGUI.Core.UI
                 {
                     Rectangle? Previous = VSBBounds;
                     _VSBBounds = value;
+                    NPC(nameof(VSBBounds));
+                    NPC(nameof(PaddedVSBBounds));
                     VerticalScrollBarBoundsChanged?.Invoke(Previous, VSBBounds);
                 }
             }
@@ -98,6 +118,7 @@ namespace MGUI.Core.UI
         /// <summary>The screen bounds that the vertical scrollbar will be rendered to, after applying the <see cref="ScrollBarPadding"/></summary>
         public Rectangle? PaddedVSBBounds => VSBBounds?.GetCompressed(ScrollBarPadding);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Rectangle? _HSBBounds;
         public Rectangle? HSBBounds
         {
@@ -108,6 +129,8 @@ namespace MGUI.Core.UI
                 {
                     Rectangle? Previous = HSBBounds;
                     _HSBBounds = value;
+                    NPC(nameof(HSBBounds));
+                    NPC(nameof(PaddedHSBBounds));
                     HorizontalScrollBarBoundsChanged?.Invoke(Previous, HSBBounds);
                 }
             }
@@ -139,6 +162,7 @@ namespace MGUI.Core.UI
                     float Previous = VerticalOffset;
                     _VerticalOffset = ClampedValue;
                     ParentWindow.InvalidatePressedAndHoveredElements = true;
+                    NPC(nameof(VerticalOffset));
                     VerticalOffsetChanged?.Invoke(this, new(Previous, VerticalOffset));
                     OffsetChanged?.Invoke(this, EventArgs.Empty);
                 }
@@ -160,6 +184,7 @@ namespace MGUI.Core.UI
                     float Previous = MaxVerticalOffset;
                     _MaxVerticalOffset = value;
                     VerticalOffset = Math.Clamp(VerticalOffset, 0, MaxVerticalOffset);
+                    NPC(nameof(MaxVerticalOffset));
                     MaxVerticalOffsetChanged?.Invoke(this, new(Previous, MaxVerticalOffset));
                 }
             }
@@ -200,6 +225,7 @@ namespace MGUI.Core.UI
                     float Previous = HorizontalOffset;
                     _HorizontalOffset = ClampedValue;
                     ParentWindow.InvalidatePressedAndHoveredElements = true;
+                    NPC(nameof(HorizontalOffset));
                     HorizontalOffsetChanged?.Invoke(this, new(Previous, HorizontalOffset));
                     OffsetChanged?.Invoke(this, EventArgs.Empty);
                 }
@@ -219,6 +245,7 @@ namespace MGUI.Core.UI
                 {
                     float Previous = MaxHorizontalOffset;
                     _MaxHorizontalOffset = value;
+                    NPC(nameof(MaxHorizontalOffset));
                     HorizontalOffset = Math.Clamp(HorizontalOffset, 0, MaxHorizontalOffset);
                     MaxHorizontalOffsetChanged?.Invoke(this, new(Previous, MaxHorizontalOffset));
                 }
@@ -251,14 +278,41 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private VisualStateFillBrush _ScrollBarOuterBrush;
         /// <summary>The brush to use for the outer portion of the scrollbars.<br/>
         /// Default value: <see cref="MGTheme.ScrollBarOuterBrush"/><para/>
         /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/></summary>
-        public VisualStateFillBrush ScrollBarOuterBrush { get; set; }
+        public VisualStateFillBrush ScrollBarOuterBrush
+        {
+            get => _ScrollBarOuterBrush;
+            set
+            {
+                if (_ScrollBarOuterBrush != value)
+                {
+                    _ScrollBarOuterBrush = value;
+                    NPC(nameof(ScrollBarOuterBrush));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private VisualStateFillBrush _ScrollBarInnerBrush;
         /// <summary>The brush to use for the inner portion of the scrollbars.<br/>
         /// Default value: <see cref="MGTheme.ScrollBarInnerBrush"/><para/>
         /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/></summary>
-        public VisualStateFillBrush ScrollBarInnerBrush { get; set; }
+        public VisualStateFillBrush ScrollBarInnerBrush
+        {
+            get => _ScrollBarInnerBrush;
+            set
+            {
+                if (_ScrollBarInnerBrush != value)
+                {
+                    _ScrollBarInnerBrush = value;
+                    NPC(nameof(ScrollBarInnerBrush));
+                }
+            }
+        }
 
         protected override bool CanCacheSelfMeasurement => false; // The self measurement depends on the measurement of the children, so it must be re-calculated each time it's requested
 

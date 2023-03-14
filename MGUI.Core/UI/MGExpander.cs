@@ -30,39 +30,90 @@ namespace MGUI.Core.UI
             get => ExpanderToggleButton.PreferredWidth ?? 0;
             set
             {
-                ExpanderToggleButton.PreferredWidth = value;
-                ExpanderToggleButton.PreferredHeight = value;
+                if (ExpanderToggleButton.PreferredWidth != value || ExpanderToggleButton.PreferredHeight != value)
+                {
+                    ExpanderToggleButton.PreferredWidth = value;
+                    ExpanderToggleButton.PreferredHeight = value;
+                    NPC(nameof(ExpanderButtonSize));
+                }
             }
         }
 
         public IBorderBrush ExpanderButtonBorderBrush
         {
             get => ExpanderToggleButton.BorderBrush;
-            set => ExpanderToggleButton.BorderBrush = value;
+            set
+            {
+                if (ExpanderToggleButton.BorderBrush != value)
+                {
+                    ExpanderToggleButton.BorderBrush = value;
+                    NPC(nameof(ExpanderButtonBorderBrush));
+                }
+            }
         }
 
         public Thickness ExpanderButtonBorderThickness
         {
             get => ExpanderToggleButton.BorderThickness;
-            set => ExpanderToggleButton.BorderThickness = value;
+            set
+            {
+                if (!ExpanderToggleButton.BorderThickness.Equals(value))
+                {
+                    ExpanderToggleButton.BorderThickness = value;
+                    NPC(nameof(ExpanderButtonBorderThickness));
+                }
+            }
         }
 
         /// <summary>Contains the <see cref="Brushes.Fill_Brushes.IFillBrush"/>es to use when drawing the background of the button part of this <see cref="MGExpander"/>'s header.</summary>
         public VisualStateFillBrush ExpanderButtonBackgroundBrush
         {
             get => ExpanderToggleButton.BackgroundBrush;
-            set => ExpanderToggleButton.BackgroundBrush = value;
+            set
+            {
+                if (ExpanderToggleButton.BackgroundBrush != value)
+                {
+                    ExpanderToggleButton.BackgroundBrush = value;
+                    NPC(nameof(ExpanderButtonBackgroundBrush));
+                }
+            }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Color _ExpanderDropdownArrowColor;
         /// <summary>The color to use when rendering the dropdown arrow icon inside the button part of this <see cref="MGExpander"/>'s header.<para/>
         /// Default value: <see cref="MGTheme.DropdownArrowColor"/><para/>
         /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/></summary>
-        public Color ExpanderDropdownArrowColor { get; set; }
+        public Color ExpanderDropdownArrowColor
+        {
+            get => _ExpanderDropdownArrowColor;
+            set
+            {
+                if (_ExpanderDropdownArrowColor != value)
+                {
+                    _ExpanderDropdownArrowColor = value;
+                    NPC(nameof(ExpanderDropdownArrowColor));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _ExpanderDropdownArrowSize;
         /// <summary>The width of the dropdown arrow icon inside the button part of this <see cref="MGExpander"/>'s header.<para/>
         /// The height of the dropdown arrow icon is based on the width.<para/>
         /// Default value: <see cref="DefaultExpanderDropdownArrowSize"/></summary>
-        public int ExpanderDropdownArrowSize { get; set; }
+        public int ExpanderDropdownArrowSize
+        {
+            get => _ExpanderDropdownArrowSize;
+            set
+            {
+                if (_ExpanderDropdownArrowSize != value)
+                {
+                    _ExpanderDropdownArrowSize = value;
+                    NPC(nameof(ExpanderDropdownArrowSize));
+                }
+            }
+        }
         #endregion Expander Button
 
         #region Header
@@ -70,7 +121,14 @@ namespace MGUI.Core.UI
         public int HeaderSpacingWidth
         {
             get => HeadersPanelElement.Spacing;
-            set => HeadersPanelElement.Spacing = value;
+            set
+            {
+                if (HeadersPanelElement.Spacing != value)
+                {
+                    HeadersPanelElement.Spacing = value;
+                    NPC(nameof(HeaderSpacingWidth));
+                }
+            }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -100,6 +158,10 @@ namespace MGUI.Core.UI
                             HeadersPanelElement.TryAddChild(Header);
                         }
                     }
+
+                    NPC(nameof(Header));
+                    NPC(nameof(HeaderVerticalAlignment));
+                    NPC(nameof(HasHeader));
                 }
             }
         }
@@ -118,6 +180,7 @@ namespace MGUI.Core.UI
                 if (value.HasValue && Header != null)
                 {
                     Header.VerticalAlignment = value.Value;
+                    NPC(nameof(HeaderVerticalAlignment));
                 }
             }
         }
@@ -188,12 +251,39 @@ namespace MGUI.Core.UI
         public event EventHandler<EventArgs> Collapsed;
         #endregion IsExpanded
 
-        /// <summary>The <see cref="Visibility"/> value to apply to <see cref="MGSingleContentHost.Content"/> when <see cref="IsExpanded"/>=true<para/>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Visibility _ExpandedVisibility;
+        /// <summary>The <see cref="Visibility"/> value to apply to <see cref="MGSingleContentHost.Content"/> when <see cref="IsExpanded"/> is true<para/>
         /// Default value: <see cref="Visibility.Visible"/></summary>
-        public Visibility ExpandedVisibility { get; set; } = Visibility.Visible;
-        /// <summary>The <see cref="Visibility"/> value to apply to <see cref="MGSingleContentHost.Content"/> when <see cref="IsCollapsed"/>=true<para/>
+        public Visibility ExpandedVisibility
+        {
+            get => _ExpandedVisibility;
+            set
+            {
+                if (_ExpandedVisibility != value)
+                {
+                    _ExpandedVisibility = value;
+                    NPC(nameof(ExpandedVisibility));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Visibility _CollapsedVisibility;
+        /// <summary>The <see cref="Visibility"/> value to apply to <see cref="MGSingleContentHost.Content"/> when <see cref="IsCollapsed"/> is true<para/>
         /// Default value: <see cref="Visibility.Collapsed"/></summary>
-        public Visibility CollapsedVisibility { get; set; } = Visibility.Collapsed;
+        public Visibility CollapsedVisibility
+        {
+            get => _CollapsedVisibility;
+            set
+            {
+                if (_CollapsedVisibility != value)
+                {
+                    _CollapsedVisibility = value;
+                    NPC(nameof(CollapsedVisibility));
+                }
+            }
+        }
 
         private ObservableCollection<MGElement> BoundItems { get; }
         /// <summary>Binds the given <paramref name="Element"/>'s <see cref="MGElement.Visibility"/> to this <see cref="MGExpander"/>'s <see cref="IsExpanded"/> state.<para/>
@@ -213,7 +303,14 @@ namespace MGUI.Core.UI
         public int HeaderBottomMargin
         {
             get => HeadersPanelElement.Margin.Bottom;
-            set => HeadersPanelElement.Margin = HeadersPanelElement.Margin.ChangeBottom(value);
+            set
+            {
+                if (HeadersPanelElement.Margin.Bottom != value)
+                {
+                    HeadersPanelElement.Margin = HeadersPanelElement.Margin.ChangeBottom(value);
+                    NPC(nameof(HeaderBottomMargin));
+                }
+            }
         }
 
         public MGExpander(MGWindow Window, bool IsExpanded = true) 
@@ -226,6 +323,9 @@ namespace MGUI.Core.UI
                     true, false, true, true, false, false, true,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds.GetCompressed(Padding), HorizontalAlignment.Stretch, VerticalAlignment.Top, ComponentSize.Size));
                 AddComponent(HeadersPanelComponent);
+
+                ExpandedVisibility = Visibility.Visible;
+                CollapsedVisibility = Visibility.Collapsed;
 
                 this.HeaderBottomMargin = 3;
 

@@ -45,8 +45,21 @@ namespace MGUI.Core.UI
         private Rectangle? _SourceRect;
         public Rectangle? SourceRect { get => _SourceRect; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Color? _TextureColor;
         /// <summary>A color to use when drawing the texture. Uses <see cref="Color.White"/> if null.</summary>
-        public Color? TextureColor { get; set; }
+        public Color? TextureColor
+        {
+            get => _TextureColor;
+            set
+            {
+                if (_TextureColor != value)
+                {
+                    _TextureColor = value;
+                    NPC(nameof(TextureColor));
+                }
+            }
+        }
 
         private int UnstretchedWidth => SourceRect?.Width ?? Texture?.Width ?? 0;
         private int UnstretchedHeight => SourceRect?.Height ?? Texture?.Height ?? 0;

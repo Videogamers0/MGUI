@@ -48,8 +48,37 @@ namespace MGUI.Core.UI
             }
         }
 
-        public int Left { get; set; }
-        public int Top { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _Left;
+        public int Left
+        {
+            get => _Left;
+            set
+            {
+                if (_Left != value)
+                {
+                    _Left = value;
+                    NPC(nameof(Left));
+                    NPC(nameof(TopLeft));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _Top;
+        public int Top
+        {
+            get => _Top;
+            set
+            {
+                if (_Top != value)
+                {
+                    _Top = value;
+                    NPC(nameof(Top));
+                    NPC(nameof(TopLeft));
+                }
+            }
+        }
 
         /// <summary>Note: This event is not invoked immediately after <see cref="Left"/> or <see cref="Top"/> changes.<br/>
         /// It is invoked during the Update tick to improve performance by only allowing it to notify once per tick.</summary>
@@ -69,6 +98,7 @@ namespace MGUI.Core.UI
                     LayoutChanged(this, true);
                     UpdateScaleTransforms();
                     RecentSizeToContentSettings = null;
+                    NPC(nameof(WindowWidth));
                 }
             }
         }
@@ -87,6 +117,7 @@ namespace MGUI.Core.UI
                     LayoutChanged(this, true);
                     UpdateScaleTransforms();
                     RecentSizeToContentSettings = null;
+                    NPC(nameof(WindowHeight));
                 }
             }
         }
@@ -223,6 +254,8 @@ namespace MGUI.Core.UI
 #if NEVER
                     UpdateRenderTarget();
 #endif
+                    NPC(nameof(Scale));
+                    NPC(nameof(IsWindowScaled));
                     ScaleChanged?.Invoke(this, new(Previous, Scale));
                 }
             }
@@ -304,6 +337,7 @@ namespace MGUI.Core.UI
             {
                 _IsUserResizable = value;
                 ResizeGripElement.Visibility = IsUserResizable ? Visibility.Visible : Visibility.Collapsed;
+                NPC(nameof(IsUserResizable));
             }
         }
         #endregion Resizing
@@ -329,8 +363,25 @@ namespace MGUI.Core.UI
         #endregion Border
 
         #region Nested Windows
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private MGWindow _ModalWindow;
         /// <summary>A child <see cref="MGWindow"/> of this <see cref="MGWindow"/>, which blocks all input handling on this <see cref="MGWindow"/></summary>
-        public MGWindow ModalWindow { get; set; }
+        public MGWindow ModalWindow
+        {
+            get => _ModalWindow;
+            set
+            {
+                if (_ModalWindow != value)
+                {
+                    MGWindow Previous = ModalWindow;
+                    _ModalWindow = value;
+                    NPC(nameof(ModalWindow));
+                    NPC(nameof(HasModalWindow));
+                    Previous?.NPC(nameof(MGWindow.IsModalWindow));
+                    ModalWindow?.NPC(nameof(MGWindow.IsModalWindow));
+                }
+            }
+        }
         /// <summary>True if a modal window is being displayed overtop of this window.</summary>
         public bool HasModalWindow => ModalWindow != null;
         /// <summary>True if this window instance is the modal window of its parent window.</summary>
@@ -425,7 +476,14 @@ namespace MGUI.Core.UI
         public string TitleText
         {
             get => TitleBarTextBlockElement.Text;
-            set { TitleBarTextBlockElement.Text = value; }
+            set
+            {
+                if (TitleBarTextBlockElement.Text != value)
+                {
+                    TitleBarTextBlockElement.Text = value;
+                    NPC(nameof(TitleText));
+                }
+            }
         }
 
         /// <summary>True if the title bar should be visible at the top of this <see cref="MGWindow"/><para/>
@@ -433,7 +491,15 @@ namespace MGUI.Core.UI
         public bool IsTitleBarVisible
         {
             get => TitleBarElement.Visibility == Visibility.Visible;
-            set => TitleBarElement.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+            set
+            {
+                Visibility ActualValue = value ? Visibility.Visible : Visibility.Collapsed;
+                if (TitleBarElement.Visibility != ActualValue)
+                {
+                    TitleBarElement.Visibility = ActualValue;
+                    NPC(nameof(IsTitleBarVisible));
+                }
+            }
         }
 
         #region Close
@@ -442,10 +508,31 @@ namespace MGUI.Core.UI
         public bool IsCloseButtonVisible
         {
             get => CloseButtonElement.Visibility == Visibility.Visible;
-            set => CloseButtonElement.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+            set
+            {
+                Visibility ActualValue = value ? Visibility.Visible : Visibility.Collapsed;
+                if (CloseButtonElement.Visibility != ActualValue)
+                {
+                    CloseButtonElement.Visibility = ActualValue;
+                    NPC(nameof(IsCloseButtonVisible));
+                }
+            }
         }
 
-        public bool CanCloseWindow { get; set; } = true;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _CanCloseWindow = true;
+        public bool CanCloseWindow
+        {
+            get => _CanCloseWindow;
+            set
+            {
+                if (_CanCloseWindow != value)
+                {
+                    _CanCloseWindow = value;
+                    NPC(nameof(CanCloseWindow));
+                }
+            }
+        }
 
         public bool TryCloseWindow()
         {
@@ -553,33 +640,99 @@ namespace MGUI.Core.UI
         /// This allows subscribing to keyboard events that can get handled just before the <see cref="MGWindow"/>'s input handling can occur.</summary>
         public KeyboardHandler WindowKeyboardHandler { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _AllowsClickThrough = false;
         /// <summary>If true, mouse clicks overtop of this <see cref="MGWindow"/> that weren't handled by any child elements will remain unhandled,<br/>
         /// allowing content underneath this <see cref="MGWindow"/> to handle the mouse event.<para/>
         /// Default value: false<para/>
         /// This property is ignored if <see cref="IsModalWindow"/> is true.</summary>
-        public bool AllowsClickThrough { get; set; } = false;
+        public bool AllowsClickThrough
+        {
+            get => _AllowsClickThrough;
+            set
+            {
+                if (_AllowsClickThrough != value)
+                {
+                    _AllowsClickThrough = value;
+                    NPC(nameof(AllowsClickThrough));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _IsDraggable = true;
         /// <summary>True if this <see cref="MGWindow"/> can be moved by dragging the title bar.<para/>
         /// Warning: You may need to set <see cref="IsTitleBarVisible"/> to true to utilize this feature.</summary>
-        public bool IsDraggable { get; set; } = true;
+        public bool IsDraggable
+        {
+            get => _IsDraggable;
+            set
+            {
+                if (_IsDraggable != value)
+                {
+                    _IsDraggable = value;
+                    NPC(nameof(IsDraggable));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private MGTheme _Theme;
         /// <summary>If null, uses <see cref="MGDesktop.Theme"/> instead.<para/>
         /// Default value: null<para/>
         /// See also:<br/><see cref="MGElement.GetTheme()"/><br/><see cref="MGDesktop.Theme"/></summary>
-        public MGTheme Theme { get; set; }
+        public MGTheme Theme
+        {
+            get => _Theme;
+            set
+            {
+                if (_Theme != value)
+                {
+                    _Theme = value;
+                    NPC(nameof(Theme));
+                }
+            }
+        }
 
         private MGElement PressedElementAtBeginUpdate { get; set; }
         private MGElement HoveredElementAtBeginUpdate { get; set; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private MGElement _PressedElement;
         /// <summary>The inner-most element of the visual tree that the mouse was hovering at the moment that the left mouse button was pressed.<br/>
         /// Null if the left mouse button is currently released or the mouse wasn't hovering an element when the button was pressed down.<para/>
         /// See also: <see cref="HoveredElement"/>, <see cref="PressedElementChanged"/></summary>
-        public MGElement PressedElement { get; private set; }
+        public MGElement PressedElement
+        {
+            get => _PressedElement;
+            private set
+            {
+                if (_PressedElement != value)
+                {
+                    _PressedElement = value;
+                    NPC(nameof(PressedElement));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private MGElement _HoveredElement;
         /// <summary>The inner-most element of the visual tree that the mouse is currently hovering, if any.<para/>
         /// If the mouse is hovering several sibling elements (such as children of an <see cref="MGOverlayPanel"/>, or elements placed inside the same cell of an <see cref="MGGrid"/>)<br/>
         /// then this property prioritizes the topmost element.<para/>
         /// See also: <see cref="PressedElement"/>, <see cref="HoveredElementChanged"/></summary>
-        public MGElement HoveredElement { get; private set; }
+        public MGElement HoveredElement
+        {
+            get => _HoveredElement;
+            private set
+            {
+                if (_HoveredElement != value)
+                {
+                    _HoveredElement = value;
+                    NPC(nameof(HoveredElement));
+                }
+            }
+        }
 
         /// <summary>Invoked after <see cref="PressedElement"/> changes, but is intentionally deferred until the end of the current update tick so that <see cref="MGElement.VisualState"/> 
         /// values are properly synced with the <see cref="PressedElement"/></summary>
@@ -609,6 +762,7 @@ namespace MGUI.Core.UI
                     _WindowDataContext = value;
                     NPC(nameof(WindowDataContext));
                     NPC(nameof(DataContextOverride));
+                    NPC(nameof(DataContext));
                     WindowDataContextChanged?.Invoke(this, WindowDataContext);
                     HandleWindowDataContextChanged();
                 }
@@ -694,6 +848,8 @@ namespace MGUI.Core.UI
                 this.BorderElement = new(this, DefaultWindowBorderThickness, MGUniformBorderBrush.Black);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
+                BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
+                BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
                 this.TitleBarElement = new(this);
                 TitleBarElement.Padding = new(2);
@@ -1093,6 +1249,7 @@ namespace MGUI.Core.UI
 
         private VisualStateFillBrush PreviousBackgroundBrush = null;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private WindowStyle _WindowStyle = WindowStyle.Default;
         public WindowStyle WindowStyle
         {
@@ -1131,6 +1288,8 @@ namespace MGUI.Core.UI
                             break;
                         default: throw new NotImplementedException($"Unrecognized {nameof(WindowStyle)}: {value}");
                     }
+
+                    NPC(nameof(WindowStyle));
                 }
             }
         }

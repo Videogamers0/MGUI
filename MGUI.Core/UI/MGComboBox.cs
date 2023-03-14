@@ -70,7 +70,14 @@ namespace MGUI.Core.UI
         public int DropdownArrowLeftMargin
         {
             get => DropdownArrowElement.Margin.Left;
-            set => DropdownArrowElement.Margin = DropdownArrowElement.Margin.ChangeLeft(value);
+            set
+            {
+                if (DropdownArrowElement.Margin.Left != value)
+                {
+                    DropdownArrowElement.Margin = DropdownArrowElement.Margin.ChangeLeft(value);
+                    NPC(nameof(DropdownArrowLeftMargin));
+                }
+            }
         }
 
         /// <summary>The default empty width between the right edge of the dropdown arrow and the right edge of this <see cref="MGComboBox{TItemType}"/><para/>
@@ -78,7 +85,14 @@ namespace MGUI.Core.UI
         public int DropdownArrowRightMargin
         {
             get => DropdownArrowElement.Margin.Right;
-            set => DropdownArrowElement.Margin = DropdownArrowElement.Margin.ChangeRight(value);
+            set
+            {
+                if (DropdownArrowElement.Margin.Right != value)
+                {
+                    DropdownArrowElement.Margin = DropdownArrowElement.Margin.ChangeRight(value);
+                    NPC(nameof(DropdownArrowRightMargin));
+                }
+            }
         }
         #endregion Dropdown Arrow
 
@@ -184,8 +198,9 @@ namespace MGUI.Core.UI
         #endregion Selected Item
 
         #region Hovered Item
-        /// <summary>The item within the dropdown that is currently hovered by the mouse, if any.</summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private TemplatedElement<TItemType, MGButton> _HoveredItem;
+        /// <summary>The item within the dropdown that is currently hovered by the mouse, if any.</summary>
         public TemplatedElement<TItemType, MGButton> HoveredItem
         {
             get => _HoveredItem;
@@ -195,6 +210,7 @@ namespace MGUI.Core.UI
                 {
                     TemplatedElement<TItemType, MGButton> Previous = HoveredItem;
                     _HoveredItem = value;
+                    NPC(nameof(HoveredItem));
                     HoveredItemChanged?.Invoke(this, new(Previous, HoveredItem));
                 }
             }
@@ -235,6 +251,8 @@ namespace MGUI.Core.UI
                         IEnumerable<TemplatedElement<TItemType, MGButton>> Values = ItemsSource.Select(x => new TemplatedElement<TItemType, MGButton>(x, DropdownItemTemplate(x)));
                         this.TemplatedItems = new ObservableCollection<TemplatedElement<TItemType, MGButton>>(Values);
                     }
+
+                    NPC(nameof(ItemsSource));
                 }
             }
         }
@@ -349,6 +367,8 @@ namespace MGUI.Core.UI
                         IEnumerable<TemplatedElement<TItemType, MGButton>> Values = ItemsSource.Select(x => new TemplatedElement<TItemType, MGButton>(x, DropdownItemTemplate(x)));
                         this.TemplatedItems = new ObservableCollection<TemplatedElement<TItemType, MGButton>>(Values);
                     }
+
+                    NPC(nameof(DropdownItemTemplate));
                 }
             }
         }
@@ -369,6 +389,7 @@ namespace MGUI.Core.UI
                 {
                     _SelectedItemTemplate = value;
                     UpdateSelectedContent();
+                    NPC(nameof(SelectedItemTemplate));
                 }
             }
         }
@@ -455,6 +476,7 @@ namespace MGUI.Core.UI
 
                     HoveredItem = null;
 
+                    NPC(nameof(IsDropdownOpen));
                     DropdownOpened?.Invoke(this, EventArgs.Empty);
                 }
             }
@@ -463,10 +485,23 @@ namespace MGUI.Core.UI
         public event EventHandler<CancelEventArgs> DropdownOpening;
         public event EventHandler<EventArgs> DropdownOpened;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Color _DropdownArrowColor;
         /// <summary>The color of the inverted triangle on the right-side of this <see cref="MGComboBox{TItemType}"/>.<para/>
         /// Default value: <see cref="MGTheme.DropdownArrowColor"/><para/>
         /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/></summary>
-        public Color DropdownArrowColor { get; set; }
+        public Color DropdownArrowColor
+        {
+            get => _DropdownArrowColor;
+            set
+            {
+                if (_DropdownArrowColor != value)
+                {
+                    _DropdownArrowColor = value;
+                    NPC(nameof(DropdownArrowColor));
+                }
+            }
+        }
 
         private void ManagedSetContent(MGElement Content)
         {
@@ -479,6 +514,7 @@ namespace MGUI.Core.UI
         private MGContentPresenter DropdownHeaderPresenter { get; }
         private MGContentPresenter DropdownFooterPresenter { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGElement _DropdownHeader;
         /// <summary>Optional content that is displayed at the top of the <see cref="Dropdown"/> window.<para/>
         /// Recommended to use a bottom margin or padding to visually separate the <see cref="DropdownHeader"/> from the items list.<para/>
@@ -495,10 +531,12 @@ namespace MGUI.Core.UI
                     {
                         DropdownHeaderPresenter.SetContent(DropdownHeader);
                     }
+                    NPC(nameof(DropdownHeader));
                 }
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGElement _DropdownFooter;
         /// <summary>Optional content that is displayed at the bottom of the <see cref="Dropdown"/> window.<para/>
         /// Recommended to use a top margin or padding to visually separate the <see cref="DropdownFooter"/> from the items list.<para/>
@@ -515,6 +553,7 @@ namespace MGUI.Core.UI
                     {
                         DropdownFooterPresenter.SetContent(DropdownFooter);
                     }
+                    NPC(nameof(DropdownFooter));
                 }
             }
         }
@@ -534,6 +573,8 @@ namespace MGUI.Core.UI
                 this.BorderElement = new(Window, BorderThickness, BorderBrush);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
+                BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
+                BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
                 this.DropdownArrowElement = new(Window) { PreferredWidth = DropdownArrowPaddedWidth, PreferredHeight = DropdownArrowPaddedHeight };
                 this.DropdownArrowComponent = new(DropdownArrowElement, false, true, false, true, true, false, false,

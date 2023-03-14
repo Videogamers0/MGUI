@@ -61,7 +61,21 @@ namespace MGUI.Core.UI
     public abstract class MGContextMenuItem : MGSingleContentHost
     {
         public MGContextMenu Menu { get; }
-        public string CommandId { get; set; }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string _CommandId;
+        public string CommandId
+        {
+            get => _CommandId;
+            set
+            {
+                if (_CommandId != value)
+                {
+                    _CommandId = value;
+                    NPC(nameof(CommandId));
+                }
+            }
+        }
 
         public ContextMenuItemType MenuItemType { get; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -74,9 +88,22 @@ namespace MGUI.Core.UI
         /// <summary>True if this <see cref="MGContextMenuItem"/> can accept and handle mouse input.</summary>
         public bool HandlesInput => !IsSeparator;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Func<bool> _ComputeIsVisible;
         /// <summary>Can be null. This <see cref="Func{TResult}"/> will be evaluated each time the parent <see cref="Menu"/> is opened to refresh this element's <see cref="MGElement.Visibility"/>.<para/>
         /// True = <see cref="Visibility.Visible"/><br/>False = <see cref="Visibility.Collapsed"/></summary>
-        public Func<bool> ComputeIsVisible { get; set; }
+        public Func<bool> ComputeIsVisible
+        {
+            get => _ComputeIsVisible;
+            set
+            {
+                if (_ComputeIsVisible != value)
+                {
+                    _ComputeIsVisible = value;
+                    NPC(nameof(ComputeIsVisible));
+                }
+            }
+        }
 
         protected MGContextMenuItem(MGContextMenu Menu, ContextMenuItemType MenuItemType)
             : base(Menu, MGElementType.ContextMenuItem)
@@ -139,6 +166,7 @@ namespace MGUI.Core.UI
                         SetContent(ContentWrapper);
                     }
 
+                    NPC(nameof(ContentWrapper));
                     OnContentWrapperChanged();
                 }
             }
@@ -168,6 +196,8 @@ namespace MGUI.Core.UI
                         if (MenuItemContent != null)
                             Container.TryAddChild(MenuItemContent);
                     }
+
+                    NPC(nameof(MenuItemContent));
                 }
             }
         }
@@ -216,6 +246,8 @@ namespace MGUI.Core.UI
                     ContentWrapper.SpoofIsHoveredWhileDrawingBackground = Submenu?.IsContextMenuOpen == true;
 
                     SubmenuArrowElement.Visibility = Submenu == null ? Visibility.Collapsed : Visibility.Visible;
+
+                    NPC(nameof(Submenu));
                 }
             }
         }
@@ -301,6 +333,7 @@ namespace MGUI.Core.UI
     /// <summary>Instantiated via <see cref="MGContextMenu.AddButton(MGElement, Action{MGContextMenuButton})"/></summary>
     public class MGContextMenuButton : MGWrappedContextMenuItem
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGImage _Icon;
         public MGImage Icon
         {
@@ -315,6 +348,8 @@ namespace MGUI.Core.UI
                     {
                         HeaderPresenter.SetContent(Icon);
                     }
+
+                    NPC(nameof(Icon));
                 }
             }
         }
@@ -330,7 +365,20 @@ namespace MGUI.Core.UI
             });
         }
 
-        public Action<MGContextMenuButton> Action { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Action<MGContextMenuButton> _Action;
+        public Action<MGContextMenuButton> Action
+        {
+            get => _Action;
+            set
+            {
+                if (_Action != value)
+                {
+                    _Action = value;
+                    NPC(nameof(Action));
+                }
+            }
+        }
 
         internal MGContextMenuButton(MGContextMenu Menu, MGElement Content, Action<MGContextMenuButton> Action = null)
             : base(Menu, ContextMenuItemType.Button, Menu.ButtonWrapperTemplate(Menu), Content)
@@ -361,6 +409,7 @@ namespace MGUI.Core.UI
                 if (_IsChecked != value)
                 {
                     _IsChecked = value;
+                    NPC(nameof(IsChecked));
                     OnToggled?.Invoke(this, IsChecked);
                 }
             }
@@ -406,7 +455,14 @@ namespace MGUI.Core.UI
         public int Height
         {
             get => SeparatorElement.Size;
-            set => SeparatorElement.Size = value;
+            set
+            {
+                if (SeparatorElement.Size != value)
+                {
+                    SeparatorElement.Size = value;
+                    NPC(nameof(Height));
+                }
+            }
         }
 
         internal MGContextMenuSeparator(MGContextMenu Menu, int Height)

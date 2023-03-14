@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,10 +14,66 @@ namespace MGUI.Core.UI
     /// rather than allowing unhandled inputs to continue bubbling up the visual tree.</summary>
     public class MGInputConsumer : MGSingleContentHost
     {
-        public bool HandlesMousePresses { get; set; }
-        public bool HandlesMouseReleases { get; set; }
-        public bool HandlesMouseDrags { get; set; }
-        public bool HandlesMouseScroll { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _HandlesMousePresses;
+        public bool HandlesMousePresses
+        {
+            get => _HandlesMousePresses;
+            set
+            {
+                if (_HandlesMousePresses != value)
+                {
+                    _HandlesMousePresses = value;
+                    NPC(nameof(HandlesMousePresses));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _HandlesMouseReleases;
+        public bool HandlesMouseReleases
+        {
+            get => _HandlesMouseReleases;
+            set
+            {
+                if (_HandlesMouseReleases != value)
+                {
+                    _HandlesMouseReleases = value;
+                    NPC(nameof(HandlesMouseReleases));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _HandlesMouseDrags;
+        public bool HandlesMouseDrags
+        {
+            get => _HandlesMouseDrags;
+            set
+            {
+                if (_HandlesMouseDrags != value)
+                {
+                    _HandlesMouseDrags = value;
+                    NPC(nameof(HandlesMouseDrags));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _HandlesMouseScroll;
+        public bool HandlesMouseScroll
+        {
+            get => _HandlesMouseScroll;
+            set
+            {
+                if (_HandlesMouseScroll != value)
+                {
+                    _HandlesMouseScroll = value;
+                    NPC(nameof(HandlesMouseScroll));
+                }
+            }
+        }
+
 
         public MGInputConsumer(MGWindow Window, bool HandlesMousePresses = true, bool HandlesMouseReleases = true, bool HandlesMouseDrags = true, bool HandlesMouseScroll = true)
             : base(Window, MGElementType.InputConsumer)

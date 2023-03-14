@@ -75,6 +75,7 @@ namespace MGUI.Core.UI.Containers.Grids
                             _ = ClearRowContent(i);
                     }
                     LayoutChanged(this, true);
+                    NPC(nameof(Rows));
                 }
             }
         }
@@ -97,6 +98,7 @@ namespace MGUI.Core.UI.Containers.Grids
                             _ = ClearColumnContent(i);
                     }
                     LayoutChanged(this, true);
+                    NPC(nameof(Columns));
                 }
             }
         }
@@ -118,6 +120,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     _CellSize = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(CellSize));
                 }
             }
         }
@@ -134,6 +137,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     _HeaderRowHeight = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(HeaderRowHeight));
                 }
             }
         }
@@ -150,6 +154,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     _HeaderColumnWidth = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(HeaderColumnWidth));
                 }
             }
         }
@@ -364,11 +369,27 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     _SelectionMode = value;
                     CurrentSelection = HasSelection ? CurrentSelection.Value with { SelectionMode = SelectionMode } : CurrentSelection;
+                    NPC(nameof(SelectionMode));
+                    NPC(nameof(CurrentSelection));
+                    NPC(nameof(HasSelection));
                 }
             }
         }
 
-        public bool CanDeselectByClickingSelectedCell { get; set; } = true;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _CanDeselectByClickingSelectedCell = true;
+        public bool CanDeselectByClickingSelectedCell
+        {
+            get => _CanDeselectByClickingSelectedCell;
+            set
+            {
+                if (_CanDeselectByClickingSelectedCell != value)
+                {
+                    _CanDeselectByClickingSelectedCell = value;
+                    NPC(nameof(CanDeselectByClickingSelectedCell));
+                }
+            }
+        }
 
         private StaticGridSelection? PreviousSelection = null;
         public StaticGridSelection? CurrentSelection = null;
@@ -422,13 +443,53 @@ namespace MGUI.Core.UI.Containers.Grids
             }
         }
 
-        public IFillBrush SelectionBackground { get; set; } = MGSolidFillBrush.Yellow * 0.5f;
-        public IFillBrush SelectionOverlay { get; set; } = new MGSolidFillBrush(Color.Yellow * 0.25f);
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IFillBrush _SelectionBackground = MGSolidFillBrush.Yellow * 0.5f;
+        public IFillBrush SelectionBackground
+        {
+            get => _SelectionBackground;
+            set
+            {
+                if (_SelectionBackground != value)
+                {
+                    _SelectionBackground = value;
+                    NPC(nameof(SelectionBackground));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IFillBrush _SelectionOverlay = new MGSolidFillBrush(Color.Yellow * 0.25f);
+        public IFillBrush SelectionOverlay
+        {
+            get => _SelectionOverlay;
+            set
+            {
+                if (_SelectionOverlay != value)
+                {
+                    _SelectionOverlay = value;
+                    NPC(nameof(SelectionOverlay));
+                }
+            }
+        }
         #endregion Selection
 
         #region GridLines
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private GridLineIntersection _GridLineIntersectionHandling;
         /// <summary>Default value: <see cref="GridLineIntersection.HorizontalThenVertical"/></summary>
-        public GridLineIntersection GridLineIntersectionHandling { get; set; }
+        public GridLineIntersection GridLineIntersectionHandling
+        {
+            get => _GridLineIntersectionHandling;
+            set
+            {
+                if (_GridLineIntersectionHandling != value)
+                {
+                    _GridLineIntersectionHandling = value;
+                    NPC(nameof(GridLineIntersectionHandling));
+                }
+            }
+        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private GridLinesVisibility _GridLinesVisibility;
@@ -442,6 +503,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     _GridLinesVisibility = value;
                     CheckIfOuterPaddingChanged();
+                    NPC(nameof(GridLinesVisibility));
                 }
             }
         }
@@ -461,12 +523,40 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     _GridLineMargin = value;
                     CheckIfOuterPaddingChanged();
+                    NPC(nameof(GridLineMargin));
                 }
             }
         }
 
-        public IFillBrush HorizontalGridLineBrush { get; set; }
-        public IFillBrush VerticalGridLineBrush { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IFillBrush _HorizontalGridLineBrush;
+        public IFillBrush HorizontalGridLineBrush
+        {
+            get => _HorizontalGridLineBrush;
+            set
+            {
+                if (_HorizontalGridLineBrush != value)
+                {
+                    _HorizontalGridLineBrush = value;
+                    NPC(nameof(HorizontalGridLineBrush));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IFillBrush _VerticalGridLineBrush;
+        public IFillBrush VerticalGridLineBrush
+        {
+            get => _VerticalGridLineBrush;
+            set
+            {
+                if (_VerticalGridLineBrush != value)
+                {
+                    _VerticalGridLineBrush = value;
+                    NPC(nameof(VerticalGridLineBrush));
+                }
+            }
+        }
         #endregion GridLines
 
         private void CheckIfOuterPaddingChanged()
@@ -497,6 +587,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     _RowSpacing = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(RowSpacing));
                 }
             }
         }
@@ -515,14 +606,42 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     _ColumnSpacing = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(ColumnSpacing));
                 }
             }
         }
 
-        public VisualStateFillBrush CellBackground { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private VisualStateFillBrush _CellBackground;
+        public VisualStateFillBrush CellBackground
+        {
+            get => _CellBackground;
+            set
+            {
+                if (_CellBackground != value)
+                {
+                    _CellBackground = value;
+                    NPC(nameof(CellBackground));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _DrawEmptyCells;
         /// <summary>If true, the <see cref="CellBackground"/> will be drawn on cells which do not contain any child content.<para/>
         /// Default value: true.</summary>
-        public bool DrawEmptyCells { get; set; }
+        public bool DrawEmptyCells
+        {
+            get => _DrawEmptyCells;
+            set
+            {
+                if (_DrawEmptyCells != value)
+                {
+                    _DrawEmptyCells = value;
+                    NPC(nameof(DrawEmptyCells));
+                }
+            }
+        }
 
         public class RenderCellArgs : EventArgs
         {

@@ -69,6 +69,7 @@ namespace MGUI.Core.UI
                 {
                     _ValueDisplayFormat = value;
                     UpdateDisplayedValue(true);
+                    NPC(nameof(ValueDisplayFormat));
                 }
             }
         }
@@ -85,6 +86,7 @@ namespace MGUI.Core.UI
                     TimeSpan Previous = Elapsed;
                     _Elapsed = value;
                     UpdateDisplayedValue(false);
+                    NPC(nameof(Elapsed));
                     ElapsedChanged?.Invoke(this, new(Previous, Elapsed));
                 }
             }
@@ -93,11 +95,24 @@ namespace MGUI.Core.UI
         /// <summary>Invoked when <see cref="Elapsed"/> changes.</summary>
         public event EventHandler<EventArgs<TimeSpan>> ElapsedChanged;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private double _TimeScale;
         /// <summary>Determines the rate at which <see cref="Elapsed"/> changes.<para/>
         /// Default value: 1.0, which means <see cref="Elapsed"/> is incremented by 1 second per 1 real-life second.<para/>
         /// For example, if the player has an ability that slows time to 0.50x, you may wish to temporarily set <see cref="TimeScale"/> to 0.50 while the ability is active,<br/>
         /// unless you still wanted the stopwatch to track real time</summary>
-        public double TimeScale { get; set; } = 1.0;
+        public double TimeScale
+        {
+            get => _TimeScale;
+            set
+            {
+                if (_TimeScale != value)
+                {
+                    _TimeScale = value;
+                    NPC(nameof(TimeScale));
+                }
+            }
+        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<TimeSpan, string> _ElapsedToString;
@@ -115,6 +130,7 @@ namespace MGUI.Core.UI
                 {
                     _ElapsedToString = value;
                     UpdateDisplayedValue(true);
+                    NPC(nameof(ElapsedToString));
                 }
             }
         }
@@ -129,6 +145,7 @@ namespace MGUI.Core.UI
                 if (_IsRunning != value)
                 {
                     _IsRunning = value;
+                    NPC(nameof(IsRunning));
                     if (IsRunning)
                         Started?.Invoke(this, EventArgs.Empty);
                     else
@@ -176,6 +193,8 @@ namespace MGUI.Core.UI
                 this.BorderElement = new(Window);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
+                BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
+                BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
                 this.ValueElement = new(Window, "", Color.White, GetTheme().FontSettings.MediumFontSize);
                 this.ValueComponent = new(ValueElement, false, false, true, true, false, false, true,
@@ -188,6 +207,7 @@ namespace MGUI.Core.UI
 
                 this.ElapsedToString = (TimeSpan Elapsed) => Elapsed.ToString(@"m\:ss\.%f");
                 this.ValueDisplayFormat = DefaultValueDisplayFormat;
+                this.TimeScale = 1.0;
             }
         }
 

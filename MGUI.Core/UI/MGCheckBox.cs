@@ -42,6 +42,8 @@ namespace MGUI.Core.UI
                     Size ButtonSize = new(CheckBoxComponentSize, CheckBoxComponentSize);
                     ButtonElement.PreferredWidth = ButtonSize.Width;
                     ButtonElement.PreferredHeight = ButtonSize.Height;
+
+                    NPC(nameof(CheckBoxComponentSize));
                 }
             }
         }
@@ -52,20 +54,81 @@ namespace MGUI.Core.UI
         public int SpacingWidth
         {
             get => ButtonElement.Margin.Right;
-            set => ButtonElement.Margin = new(ButtonElement.Margin.Left, ButtonElement.Margin.Top, value, ButtonElement.Margin.Bottom);
+            set
+            {
+                if (ButtonElement.Margin.Right != value)
+                {
+                    ButtonElement.Margin = ButtonElement.Margin.ChangeRight(value);
+                    NPC(nameof(SpacingWidth));
+                }
+            }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Color _CheckMarkColor;
         /// <summary>The <see cref="Color"/> to use when stroking the check mark if <see cref="IsChecked"/> is true.<para/>
         /// Default value: <see cref="MGTheme.CheckMarkColor"/><para/>
         /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/></summary>
-        public Color CheckMarkColor { get; set; }
+        public Color CheckMarkColor
+        {
+            get => _CheckMarkColor;
+            set
+            {
+                if (_CheckMarkColor != value)
+                {
+                    _CheckMarkColor = value;
+                    NPC(nameof(CheckMarkColor));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _IsCheckMarkShadowed;
         /// <summary>If true, the graphics of the <see cref="ButtonElement"/> will be drawn an extra time
         /// with Color=<see cref="CheckMarkShadowColor"/> and using Offset=<see cref="CheckMarkShadowOffset"/><para/>
         /// Default value: false</summary>
-        public bool IsCheckMarkShadowed { get; set; }
-        public Color CheckMarkShadowColor { get; set; }
-        public Point CheckMarkShadowOffset { get; set; }
+        public bool IsCheckMarkShadowed
+        {
+            get => _IsCheckMarkShadowed;
+            set
+            {
+                if (_IsCheckMarkShadowed != value)
+                {
+                    _IsCheckMarkShadowed = value;
+                    NPC(nameof(IsCheckMarkShadowed));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Color _CheckMarkShadowColor;
+        public Color CheckMarkShadowColor
+        {
+            get => _CheckMarkShadowColor;
+            set
+            {
+                if (_CheckMarkShadowColor != value)
+                {
+                    _CheckMarkShadowColor = value;
+                    NPC(nameof(CheckMarkShadowColor));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Point _CheckMarkShadowOffset;
+        public Point CheckMarkShadowOffset
+        {
+            get => _CheckMarkShadowOffset;
+            set
+            {
+                if (_CheckMarkShadowOffset != value)
+                {
+                    _CheckMarkShadowOffset = value;
+                    NPC(nameof(CheckMarkShadowOffset));
+                }
+            }
+        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsThreeState;
@@ -81,6 +144,7 @@ namespace MGUI.Core.UI
                     _IsThreeState = value;
                     if (!IsThreeState && !IsChecked.HasValue)
                         IsChecked = false;
+                    NPC(nameof(IsThreeState));
                 }
             }
         }
@@ -114,9 +178,22 @@ namespace MGUI.Core.UI
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _IsReadonly;
         /// <summary>If true, the user will be unable to modify <see cref="IsChecked"/> by manually clicking the <see cref="ButtonElement"/>.<para/>
         /// Default value: false</summary>
-        public bool IsReadonly { get; set; }
+        public bool IsReadonly
+        {
+            get => _IsReadonly;
+            set
+            {
+                if (_IsReadonly != value)
+                {
+                    _IsReadonly = value;
+                    NPC(nameof(IsReadonly));
+                }
+            }
+        }
 
         /// <summary>Note: This event is invoked before <see cref="OnChecked"/> / <see cref="OnUnchecked"/></summary>
         public event EventHandler<EventArgs<bool?>> OnCheckStateChanged;

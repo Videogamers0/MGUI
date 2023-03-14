@@ -42,16 +42,6 @@ namespace MGUI.Core.UI
         public MGComponent<MGTextBlock> ValueComponent { get; }
         private MGTextBlock ValueElement { get; }
 
-        //public enum ValueDisplayType
-        //{
-        //    /// <summary>The current <see cref="Value"/> will not be shown.</summary>
-        //    None,
-        //    /// <summary>The current <see cref="Value"/> will be shown (up to 2 decimal places)</summary>
-        //    AsExact,
-        //    /// <summary>The current <see cref="Value"/> will be shown, but will be displayed using its percentage (<see cref="ValuePercent"/>)</summary>
-        //    AsPercent
-        //}
-
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _ShowValue;
         /// <summary>True if the current value should be displayed.<para/>
@@ -69,6 +59,7 @@ namespace MGUI.Core.UI
                     _ShowValue = value;
                     ValueElement.Visibility = ShowValue ? Visibility.Visible : Visibility.Collapsed;
                     UpdateDisplayedValue(true);
+                    NPC(nameof(ShowValue));
                 }
             }
         }
@@ -96,6 +87,7 @@ namespace MGUI.Core.UI
                 {
                     _ValueDisplayFormat = value;
                     UpdateDisplayedValue(true);
+                    NPC(nameof(ValueDisplayFormat));
                 }
             }
         }
@@ -115,6 +107,7 @@ namespace MGUI.Core.UI
                 {
                     _NumberFormat = value;
                     UpdateDisplayedValue(true);
+                    NPC(nameof(NumberFormat));
                 }
             }
         }
@@ -162,6 +155,9 @@ namespace MGUI.Core.UI
                 {
                     _Minimum = value;
                     UpdateDisplayedValue(true);
+                    NPC(nameof(Minimum));
+                    NPC(nameof(ActualValue));
+                    NPC(nameof(ValuePercent));
                 }
             }
         }
@@ -177,6 +173,9 @@ namespace MGUI.Core.UI
                 {
                     _Maximum = value;
                     UpdateDisplayedValue(true);
+                    NPC(nameof(Maximum));
+                    NPC(nameof(ActualValue));
+                    NPC(nameof(ValuePercent));
                 }
             }
         }
@@ -192,6 +191,9 @@ namespace MGUI.Core.UI
                 {
                     _Value = value;
                     UpdateDisplayedValue(false);
+                    NPC(nameof(Value));
+                    NPC(nameof(ActualValue));
+                    NPC(nameof(ValuePercent));
                 }
             }
         }
@@ -216,14 +218,42 @@ namespace MGUI.Core.UI
                 {
                     _Size = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(Size));
                 }
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private VisualStateFillBrush _CompletedBrush;
         /// <summary>The brush to use for the completed portion of this <see cref="MGProgressBar"/></summary>
-        public VisualStateFillBrush CompletedBrush { get; set; }
+        public VisualStateFillBrush CompletedBrush
+        {
+            get => _CompletedBrush;
+            set
+            {
+                if (_CompletedBrush != value)
+                {
+                    _CompletedBrush = value;
+                    NPC(nameof(CompletedBrush));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private VisualStateFillBrush _IncompleteBrush;
         /// <summary>The brush to use for the incomplete portion of this <see cref="MGProgressBar"/>. Can be null. This brush is rendered overtop of <see cref="MGElement.BackgroundBrush"/></summary>
-        public VisualStateFillBrush IncompleteBrush { get; set; }
+        public VisualStateFillBrush IncompleteBrush
+        {
+            get => _IncompleteBrush;
+            set
+            {
+                if (_IncompleteBrush != value)
+                {
+                    _IncompleteBrush = value;
+                    NPC(nameof(IncompleteBrush));
+                }
+            }
+        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Orientation _Orientation;
@@ -240,6 +270,9 @@ namespace MGUI.Core.UI
                 {
                     _Orientation = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(Orientation));
+                    NPC(nameof(IsHorizontal));
+                    NPC(nameof(IsVertical));
                 }
             }
         }
@@ -249,12 +282,25 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsVertical => Orientation == Orientation.Vertical;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _IsReversed;
         /// <summary>If true, the bar will flow in the opposite direction.<para/>
         /// If <see cref="Orientation"/> is <see cref="Orientation.Horizontal"/>, progress bar starts on the right, and completes on the left.<br/>
         /// If <see cref="Orientation"/> is <see cref="Orientation.Vertical"/>, progress bar starts on the top, and completes on the bottom.<para/>
         /// This value also reverses the placement of the current value, if <see cref="ShowValue"/> is true.<para/>
         /// Default value: false</summary>
-        public bool IsReversed { get; set; }
+        public bool IsReversed
+        {
+            get => _IsReversed;
+            set
+            {
+                if (_IsReversed != value)
+                {
+                    _IsReversed = value;
+                    NPC(nameof(IsReversed));
+                }
+            }
+        }
 
         /// <param name="Value">The current value. This should be in the inclusive range [<paramref name="Minimum"/>, <paramref name="Maximum"/>]</param>
         /// <param name="Size">The size, in pixels, of the bar. If the orientation is <see cref="Orientation.Horizontal"/>, this represents the height of the bar.</param>
@@ -267,6 +313,8 @@ namespace MGUI.Core.UI
                 this.BorderElement = new(Window);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
+                BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
+                BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
                 this.NumberFormat = "0.0";
 

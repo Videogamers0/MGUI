@@ -136,6 +136,8 @@ namespace MGUI.Core.UI
                         IEnumerable<MGListViewItem<TItemType>> Values = ItemsSource.Select((x, Index) => new MGListViewItem<TItemType>(this, x, DataGrid.Rows[Index]));
                         this.InternalRowItems = new ObservableCollection<MGListViewItem<TItemType>>(Values);
                     }
+
+                    NPC(nameof(ItemsSource));
                 }
             }
         }
@@ -218,6 +220,7 @@ namespace MGUI.Core.UI
                 {
                     _RowHeight = value;
                     RowLength = RowHeight.HasValue ? GridLength.CreatePixelLength(RowHeight.Value) : GridLength.Auto;
+                    NPC(nameof(RowHeight));
                 }
             }
         }
@@ -240,6 +243,8 @@ namespace MGUI.Core.UI
                             Row.Length = RowLength;
                         }
                     }
+
+                    NPC(nameof(RowLength));
                 }
             }
         }
@@ -255,7 +260,14 @@ namespace MGUI.Core.UI
         public GridSelectionMode SelectionMode
         {
             get => DataGrid.SelectionMode;
-            set => DataGrid.SelectionMode = value;
+            set
+            {
+                if (SelectionMode != value)
+                {
+                    DataGrid.SelectionMode = value;
+                    NPC(nameof(SelectionMode));
+                }
+            }
         }
 
         /// <summary>To get the underlying <see cref="MGElement"/>s in the selection,<br/>
@@ -376,7 +388,7 @@ namespace MGUI.Core.UI
         }
     }
     
-    public class ListViewColumnWidth
+    public class ListViewColumnWidth : ViewModelBase
     {
         public GridLength Length { get; private set; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -392,6 +404,9 @@ namespace MGUI.Core.UI
             {
                 Length = GridLength.CreatePixelLength(value);
                 WidthChanged?.Invoke(this, EventArgs.Empty);
+                NPC(nameof(WidthPixels));
+                NPC(nameof(WidthWeight));
+                NPC(nameof(Length));
             }
         }
 
@@ -403,6 +418,9 @@ namespace MGUI.Core.UI
             {
                 Length = GridLength.CreateWeightedLength(value);
                 WidthChanged?.Invoke(this, EventArgs.Empty);
+                NPC(nameof(WidthWeight));
+                NPC(nameof(WidthPixels));
+                NPC(nameof(Length));
             }
         }
 
@@ -474,7 +492,7 @@ namespace MGUI.Core.UI
         }
     }
 
-    public class MGListViewColumn<TItemType>
+    public class MGListViewColumn<TItemType> : ViewModelBase
     {
         public MGListView<TItemType> ListView { get; }
         public ListViewColumnWidth Width { get; }
@@ -505,6 +523,8 @@ namespace MGUI.Core.UI
                             HeaderGrid.TryAddChild(HeaderRow, HeaderColumn, Header);
                         }
                     }
+
+                    NPC(nameof(Header));
                 }
             }
         }
@@ -521,6 +541,7 @@ namespace MGUI.Core.UI
                 {
                     _CellTemplate = value;
                     RefreshColumnContent();
+                    NPC(nameof(CellTemplate));
                 }
             }
         }
