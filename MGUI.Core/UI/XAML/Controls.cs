@@ -165,27 +165,7 @@ namespace MGUI.Core.UI.XAML
             Border.ApplySettings(Button, Button.BorderComponent.Element, false);
 
             if (CommandName != null)
-            {
-                MGWindow Window = Button.ParentWindow;
-                if (Window.NamedActions.TryGetValue(CommandName, out var Command))
-                {
-                    Button.AddCommandHandler((btn, e) => { Command(Button); });
-                }
-                else
-                {
-                    //  Listen for when the command with the given name is registered to the window
-                    void WindowActionRegistered(object sender, string name)
-                    {
-                        if (name == CommandName)
-                        {
-                            Button.AddCommandHandler((btn, e) => { Window.NamedActions[CommandName](Button); });
-                            Window.OnActionRegistered -= WindowActionRegistered;
-                        }
-                    }
-
-                    Window.OnActionRegistered += WindowActionRegistered;
-                }
-            }
+                Button.CommandName = CommandName;
 
             base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
