@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 #if UseWPF
 using System.Windows.Data;
-using System.Windows.Markup;
+#else
+using Portable.Xaml.Markup;
 #endif
 
 namespace MGUI.Core.UI.Data_Binding.Converters
 {
-#if UseWPF
     public class InverseBoolConverter : MarkupExtension, IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -34,5 +34,4 @@ namespace MGUI.Core.UI.Data_Binding.Converters
         private static readonly InverseBoolConverter Instance = new();
         public override object ProvideValue(IServiceProvider serviceProvider) => Instance;
     }
-#endif
 }

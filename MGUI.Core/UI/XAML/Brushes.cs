@@ -11,6 +11,8 @@ using XNAColor = Microsoft.Xna.Framework.Color;
 
 #if UseWPF
 using System.Windows.Markup;
+#else
+using Portable.Xaml.Markup;
 #endif
 
 namespace MGUI.Core.UI.XAML
@@ -178,9 +180,7 @@ namespace MGUI.Core.UI.XAML
         public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGTextureFillBrush(Desktop, TextureRegionName, Stretch, Opacity, Color.ToXNAColor());
     }
 
-#if UseWPF
     [ContentProperty(nameof(FillBrush))]
-#endif
     public class BorderedFillBrush : FillBrush
     {
         public Thickness BorderThickness { get; set; }
@@ -202,9 +202,7 @@ namespace MGUI.Core.UI.XAML
         public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGBorderedFillBrush(BorderThickness.ToThickness(), BorderBrush?.ToBorderBrush(Desktop), FillBrush?.ToFillBrush(Desktop), PadFillBoundsByBorderThickness);
     }
 
-#if UseWPF
     [ContentProperty(nameof(Brushes))]
-#endif
     public class CompositedFillBrush : FillBrush
     {
         public List<FillBrush> Brushes { get; set; } = new();
@@ -220,9 +218,7 @@ namespace MGUI.Core.UI.XAML
         public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGCompositedFillBrush(Brushes.Select(x => x.ToFillBrush(Desktop)).ToArray());
     }
 
-#if UseWPF
     [ContentProperty(nameof(Brush))]
-#endif
     public class PaddedFillBrush : FillBrush
     {
         public FillBrush Brush { get; set; }
@@ -295,9 +291,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-#if UseWPF
     [ContentProperty(nameof(Brush))]
-#endif
     public class UniformBorderBrush : BorderBrush
     {
         public FillBrush Brush { get; set; }
@@ -334,9 +328,7 @@ namespace MGUI.Core.UI.XAML
         public override IBorderBrush ToBorderBrush(MGDesktop Desktop) => new MGDockedBorderBrush(Left.ToFillBrush(Desktop), Top.ToFillBrush(Desktop), Right.ToFillBrush(Desktop), Bottom.ToFillBrush(Desktop));
     }
 
-#if UseWPF
     [ContentProperty(nameof(Bands))]
-#endif
     public class BandedBorderBrush : BorderBrush
     {
         public List<BorderBand> Bands { get; set; } = new();
@@ -352,9 +344,7 @@ namespace MGUI.Core.UI.XAML
         public override IBorderBrush ToBorderBrush(MGDesktop Desktop) => new MGBandedBorderBrush(Bands.Select(x => x.ToBorderBand(Desktop)).ToArray());
     }
 
-#if UseWPF
     [ContentProperty(nameof(Brush))]
-#endif
     public class BorderBand
     {
         public BorderBrush Brush { get; set; } = new UniformBorderBrush(new SolidFillBrush(new XAMLColor(255, 255, 255, 0)));

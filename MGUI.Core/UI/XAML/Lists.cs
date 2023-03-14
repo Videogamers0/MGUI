@@ -12,13 +12,13 @@ using System.Diagnostics;
 
 #if UseWPF
 using System.Windows.Markup;
+#else
+using Portable.Xaml.Markup;
 #endif
 
 namespace MGUI.Core.UI.XAML
 {
-#if UseWPF
     [ContentProperty(nameof(Items))]
-#endif
     public class ListBox : MultiContentHost
     {
         public override MGElementType ElementType => MGElementType.ListBox;
@@ -155,9 +155,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-#if UseWPF
     [ContentProperty(nameof(Columns))]
-#endif
     public class ListView : MultiContentHost
     {
         public override MGElementType ElementType => MGElementType.ListView;
@@ -208,9 +206,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-#if UseWPF
     [ContentProperty(nameof(Header))]
-#endif
     public class ListViewColumn
     {
         [Category("Layout")]

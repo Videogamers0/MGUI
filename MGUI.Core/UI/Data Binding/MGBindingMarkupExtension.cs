@@ -6,14 +6,19 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Data;
+
+#if UseWPF
 using System.Windows.Markup;
+using System.Windows.Data;
+#else
+using Portable.Xaml.Markup;
+using MGUI.Core.UI.Data_Binding.Converters;
+#endif
 
 //  This markup extension is intentionally placed in MGUI.Core.UI.XAML namespace so that it can be
 //  referenced in XAML without requiring any additional XML namespace prefixes.
 namespace MGUI.Core.UI.XAML
 {
-#if UseWPF
     public class MGBindingExtension : MarkupExtension
     {
         /// <summary>The path to the source property. Separate nested object properties with a '.'.<para/>
@@ -79,5 +84,4 @@ namespace MGUI.Core.UI.XAML
 
         private static object GetDefaultValue(Type Type) => Type.IsValueType ? Activator.CreateInstance(Type) : null;
     }
-#endif
 }

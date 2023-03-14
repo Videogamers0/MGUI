@@ -8,8 +8,14 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Data;
 using System.Globalization;
+
+#if UseWPF
+
+#else
+using Portable.Xaml;
+using MGUI.Core.UI.Data_Binding.Converters;
+#endif
 
 namespace MGUI.Core.UI.Data_Binding
 {
@@ -126,8 +132,13 @@ namespace MGUI.Core.UI.Data_Binding
         private readonly List<PropertyChangedSourceMetadata> PathChangeHandlers = new();
         private void UpdateSourceObjectWhenPropertyChanges(PropertyChangedSourceMetadata Item)
         {
+#if UseWPF
             PropertyChangedEventManager.AddHandler(Item.Object, UpdateSourceObject, Item.PropertyName);
             PathChangeHandlers.Add(Item);
+#else
+            //TODO: implementation that does not rely on PropertyChangedEventManager
+            //PathChangeHandlers.Add(Item);
+#endif
         }
         private void ClearPathChangeListeners()
         {
@@ -135,8 +146,12 @@ namespace MGUI.Core.UI.Data_Binding
             {
                 try
                 {
+#if UseWPF
                     foreach (PropertyChangedSourceMetadata Item in PathChangeHandlers)
                         PropertyChangedEventManager.RemoveHandler(Item.Object, UpdateSourceObject, Item.PropertyName);
+#else
+                    //TODO: implementation that does not rely on PropertyChangedEventManager
+#endif
                 }
                 finally { PathChangeHandlers.Clear(); }
             }
@@ -154,7 +169,11 @@ namespace MGUI.Core.UI.Data_Binding
                 {
                     if (IsSubscribedToSourceObjectPropertyChanged && SourceObject is INotifyPropertyChanged PreviousObservableSourceObject)
                     {
+#if UseWPF
                         PropertyChangedEventManager.RemoveHandler(PreviousObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
+#else
+                        PreviousObservableSourceObject.PropertyChanged -= ObservableSourceObject_PropertyChanged;
+#endif
                         IsSubscribedToSourceObjectPropertyChanged = false;
                     }
 
@@ -184,7 +203,11 @@ namespace MGUI.Core.UI.Data_Binding
                     if (SourceProperty != null && Config.BindingMode is DataBindingMode.OneWay or DataBindingMode.TwoWay &&
                         SourceObject is INotifyPropertyChanged ObservableSourceObject)
                     {
+#if UseWPF
                         PropertyChangedEventManager.AddHandler(ObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
+#else
+                        ObservableSourceObject.PropertyChanged += ObservableSourceObject_PropertyChanged;
+#endif
                         IsSubscribedToSourceObjectPropertyChanged = true;
                     }
                 }
@@ -305,7 +328,11 @@ namespace MGUI.Core.UI.Data_Binding
             if (TargetProperty != null && Config.BindingMode is DataBindingMode.OneWayToSource or DataBindingMode.TwoWay &&
                 TargetObject is INotifyPropertyChanged ObservableTargetObject)
             {
+#if UseWPF
                 PropertyChangedEventManager.AddHandler(ObservableTargetObject, ObservableTargetObject_PropertyChanged, TargetPropertyName);
+#else
+                ObservableTargetObject.PropertyChanged += ObservableTargetObject_PropertyChanged;
+#endif
                 IsSubscribedToTargetObjectPropertyChanged = true;
             }
             else
@@ -577,8 +604,10 @@ namespace MGUI.Core.UI.Data_Binding
         {
             if (e.PropertyName == SourcePropertyName)
                 SourcePropertyValueChanged();
+#if UseWPF
             else
                 throw new InvalidOperationException($"{nameof(DataBinding)}.{nameof(ObservableSourceObject_PropertyChanged)}: Expected PropertyName={SourcePropertyName}. Actual PropertyName={e.PropertyName}");
+#endif
         }
 
         /// <summary>True if this binding subscribed to the <see cref="TargetObject"/>'s PropertyChanged event during initialization.<para/>
@@ -589,8 +618,10 @@ namespace MGUI.Core.UI.Data_Binding
         {
             if (e.PropertyName == TargetPropertyName)
                 TargetPropertyValueChanged();
+#if UseWPF
             else
                 throw new InvalidOperationException($"{nameof(DataBinding)}.{nameof(ObservableTargetObject_PropertyChanged)}: Expected PropertyName={TargetPropertyName}. Actual PropertyName={e.PropertyName}");
+#endif
         }
 
         private void SourcePropertyValueChanged()
@@ -621,11 +652,19 @@ namespace MGUI.Core.UI.Data_Binding
                 //  Unsubscribe from PropertyChanged events
                 if (IsSubscribedToTargetObjectPropertyChanged && TargetObject is INotifyPropertyChanged ObservableTargetObject)
                 {
+#if UseWPF
                     PropertyChangedEventManager.RemoveHandler(ObservableTargetObject, ObservableTargetObject_PropertyChanged, TargetPropertyName);
+#else
+                    ObservableTargetObject.PropertyChanged -= ObservableTargetObject_PropertyChanged;
+#endif
                 }
                 if (IsSubscribedToSourceObjectPropertyChanged && SourceObject is INotifyPropertyChanged ObservableSourceObject)
                 {
+#if UseWPF
                     PropertyChangedEventManager.RemoveHandler(ObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
+#else
+                    ObservableSourceObject.PropertyChanged -= ObservableSourceObject_PropertyChanged;
+#endif
                     IsSubscribedToSourceObjectPropertyChanged = false;
                 }
                 ClearPathChangeListeners();

@@ -7,8 +7,13 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Data;
+
+#if UseWPF
 using System.Windows.Markup;
+using System.Windows.Data;
+#else
+using MGUI.Core.UI.Data_Binding.Converters;
+#endif
 
 namespace MGUI.Core.UI.Data_Binding
 {
