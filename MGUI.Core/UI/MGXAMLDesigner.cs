@@ -182,6 +182,7 @@ namespace MGUI.Core.UI
                     if (!string.IsNullOrEmpty(FileWatcher.Path) && Directory.Exists(Path.GetDirectoryName(FileWatcher.Path)))
                         FileWatcher.EnableRaisingEvents = true;
                     RefreshParsedContent();
+                    NPC(nameof(FromFilePath));
                 }
             }
         }

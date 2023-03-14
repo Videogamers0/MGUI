@@ -17,15 +17,30 @@ using System.Diagnostics;
 namespace MGUI.Core.UI
 {
     /// <summary>This class handles mutual exclusion between the <see cref="MGRadioButton.IsChecked"/> property of multiple <see cref="MGRadioButton"/>s belonging to the same <see cref="MGRadioButtonGroup"/></summary>
-    public class MGRadioButtonGroup
+    public class MGRadioButtonGroup : ViewModelBase
     {
         public MGWindow Window { get; }
         public string Name { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _AllowUnchecking;
         /// <summary>If true, the <see cref="CheckedItem"/> can be unchecked by clicking it again.<br/>
         /// Only relevant if <see cref="AllowNullCheckedItem"/>=true.<para/>
         /// Default value: false<para/>See also: <see cref="ActualAllowUnchecking"/>, <see cref="AllowNullCheckedItem"/></summary>
-        public bool AllowUnchecking { get; set; }
+        public bool AllowUnchecking
+        {
+            get => _AllowUnchecking;
+            set
+            {
+                if (_AllowUnchecking != value)
+                {
+                    _AllowUnchecking = value;
+                    NPC(nameof(AllowUnchecking));
+                    NPC(nameof(ActualAllowUnchecking));
+                }
+            }
+        }
+
         public bool ActualAllowUnchecking => AllowUnchecking && AllowNullCheckedItem;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -42,6 +57,8 @@ namespace MGUI.Core.UI
                     _AllowNullCheckedItem = value;
                     if (!AllowNullCheckedItem)
                         CheckedItem ??= _RadioButtons.FirstOrDefault();
+                    NPC(nameof(AllowNullCheckedItem));
+                    NPC(nameof(ActualAllowUnchecking));
                 }
             }
         }
@@ -58,8 +75,11 @@ namespace MGUI.Core.UI
                 {
                     MGRadioButton Previous = CheckedItem;
                     _CheckedItem = Value;
+                    Previous?.NPC(nameof(MGRadioButton.IsChecked));
+                    CheckedItem?.NPC(nameof(MGRadioButton.IsChecked));
                     Previous?.HandleCheckStateChanged();
                     CheckedItem?.HandleCheckStateChanged();
+                    NPC(nameof(CheckedItem));
                     CheckedItemChanged?.Invoke(this, new EventArgs<MGRadioButton>(Previous, CheckedItem));
                 }
             }
@@ -131,25 +151,78 @@ namespace MGUI.Core.UI
                     Size ButtonSize = GetButtonComponentPreferredSize();
                     ButtonElement.PreferredWidth = ButtonSize.Width;
                     ButtonElement.PreferredHeight = ButtonSize.Height;
+                    NPC(nameof(BubbleComponentSize));
                 }
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Color _BubbleComponentBorderColor;
         /// <summary>The <see cref="Color"/> to use when drawing the Border of the checkable part.</summary>
-        public Color BubbleComponentBorderColor { get; set; }
+        public Color BubbleComponentBorderColor
+        {
+            get => _BubbleComponentBorderColor;
+            set
+            {
+                if (_BubbleComponentBorderColor != value)
+                {
+                    _BubbleComponentBorderColor = value;
+                    NPC(nameof(BubbleComponentBorderColor));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private float _BubbleComponentBorderThickness;
         /// <summary>The thickness to use for the checkable part's border.<br/>
         /// This value cannot exceed <see cref="BubbleComponentSize"/>/2.0<para/>
         /// Recommended value: 1 or 2</summary>
-        public float BubbleComponentBorderThickness { get; set; }
+        public float BubbleComponentBorderThickness
+        {
+            get => _BubbleComponentBorderThickness;
+            set
+            {
+                if (_BubbleComponentBorderThickness != value)
+                {
+                    _BubbleComponentBorderThickness = value;
+                    NPC(nameof(BubbleComponentBorderThickness));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private VisualStateColorBrush _BubbleComponentBackground;
         /// <summary>The background to use when drawing the checkable part.</summary>
-        public VisualStateColorBrush BubbleComponentBackground { get; set; }
+        public VisualStateColorBrush BubbleComponentBackground
+        {
+            get => _BubbleComponentBackground;
+            set
+            {
+                if (_BubbleComponentBackground != value)
+                {
+                    _BubbleComponentBackground = value;
+                    NPC(nameof(BubbleComponentBackground));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Color _BubbleCheckedColor;
         /// <summary>The <see cref="Color"/> to use when filling in the checkable bubble part when <see cref="IsChecked"/> is true.<para/>
         /// Default value: <see cref="MGTheme.RadioButtonCheckedFillColor"/><para/>
         /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/></summary>
-        public Color BubbleCheckedColor { get; set; }
+        public Color BubbleCheckedColor
+        {
+            get => _BubbleCheckedColor;
+            set
+            {
+                if (_BubbleCheckedColor != value)
+                {
+                    _BubbleCheckedColor = value;
+                    NPC(nameof(BubbleCheckedColor));
+                }
+            }
+        }
 
         /// <summary>The reserved empty width between the checkable part of this <see cref="MGRadioButton"/> and its <see cref="MGSingleContentHost.Content"/>.<para/>
         /// See also: <see cref="DefaultBubbleSpacingWidth"/>.<para/>
@@ -157,7 +230,14 @@ namespace MGUI.Core.UI
         public int SpacingWidth
         {
             get => ButtonElement.Margin.Right;
-            set => ButtonElement.Margin = new(ButtonElement.Margin.Left, ButtonElement.Margin.Top, value, ButtonElement.Margin.Bottom);
+            set
+            {
+                if (SpacingWidth != value)
+                {
+                    ButtonElement.Margin = ButtonElement.Margin.ChangeRight(value);
+                    NPC(nameof(SpacingWidth));
+                }
+            }
         }
 
         public bool IsChecked
@@ -232,7 +312,9 @@ namespace MGUI.Core.UI
             int BubbleRadius = BubblePartBounds.Width / 2;
 
             Color BubbleComponentFillColor = BubbleComponentBackground.GetUnderlay(VisualState.Primary);
-            DT.StrokeAndFillCircle(BubbleCenter.ToVector2(), BubbleComponentBorderColor * Opacity, BubbleComponentFillColor * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
+            DT.FillCircle(BubbleCenter.ToVector2(), BubbleComponentFillColor * Opacity, BubbleRadius - BubbleComponentBorderThickness / 2, CircleDetailLevel);
+            DT.StrokeCircle(BubbleCenter.ToVector2(), BubbleComponentBorderColor * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
+            //DT.StrokeAndFillCircle(BubbleCenter.ToVector2(), BubbleComponentBorderColor * Opacity, BubbleComponentFillColor * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
 
             if (!ParentWindow.HasModalWindow)
             {
@@ -251,7 +333,9 @@ namespace MGUI.Core.UI
                 Color? Overlay = BubbleComponentBackground.GetColorOverlay(IsBubblePartPressed ? SecondaryVisualState.Pressed : IsBubblePartHovered ? SecondaryVisualState.Hovered : SecondaryVisualState.None);
                 if (Overlay.HasValue)
                 {
-                    DT.StrokeAndFillCircle(BubbleCenter.ToVector2(), Overlay.Value * Opacity, Overlay.Value * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
+                    DT.FillCircle(BubbleCenter.ToVector2(), Overlay.Value * Opacity, BubbleRadius - BubbleComponentBorderThickness / 2, CircleDetailLevel);
+                    DT.StrokeCircle(BubbleCenter.ToVector2(), Overlay.Value * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
+                    //DT.StrokeAndFillCircle(BubbleCenter.ToVector2(), Overlay.Value * Opacity, Overlay.Value * Opacity, BubbleRadius, BubbleComponentBorderThickness, CircleDetailLevel);
                 }
             }
 

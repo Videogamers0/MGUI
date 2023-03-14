@@ -347,7 +347,7 @@ namespace MGUI.Core.UI.Text
     public class MGTextRunImage : MGTextRun
     {
         /// <summary>The name of the <see cref="NamedTextureRegion"/> to render.<para/>
-        /// See also:<br/><see cref="MGDesktop.NamedRegions"/><br/><see cref="MGDesktop.AddNamedRegion(NamedTextureRegion)"/><br/><see cref="MGDesktop.TryDrawNamedRegion(DrawTransaction, string, Point, int?, int?, float)"/></summary>
+        /// See also:<br/><see cref="MGDesktop.NamedRegions"/><br/><see cref="MGDesktop.AddNamedRegion(NamedTextureRegion)"/><br/><see cref="MGDesktop.TryDrawNamedRegion(DrawTransaction, string, Point, int?, int?, float, Color?)"/></summary>
         public readonly string RegionName;
         public readonly int TargetWidth;
         public readonly int TargetHeight;

@@ -29,6 +29,7 @@ namespace MGUI.Core.UI
                 {
                     MGElement Previous = Header;
                     _Header = value;
+                    NPC(nameof(Header));
                     HeaderChanged?.Invoke(this, new(Previous, Header));
                     LayoutChanged(this, true);
                 }

@@ -31,6 +31,8 @@ namespace MGUI.Core.UI
                 //_Content?.SetParent(this);
                 LayoutChanged(this, true);
                 //InvokeContentAdded(_Content);
+                NPC(nameof(Content));
+                NPC(nameof(HasContent));
             }
         }
 
@@ -75,7 +77,14 @@ namespace MGUI.Core.UI
         public VisualStateFillBrush HeaderAreaBackground
         {
             get => HeadersPanelElement.BackgroundBrush;
-            set => HeadersPanelElement.BackgroundBrush = value;
+            set
+            {
+                if (HeadersPanelElement.BackgroundBrush != value)
+                {
+                    HeadersPanelElement.BackgroundBrush = value;
+                    NPC(nameof(HeaderAreaBackground));
+                }
+            }
         }
 
         private bool ManagedAddHeadersPanelChild(MGSingleContentHost NewItem)
@@ -141,6 +150,7 @@ namespace MGUI.Core.UI
                         if (Tab.IsTabSelected)
                             UpdateHeaderWrapper(Tab);
                     }
+                    NPC(nameof(SelectedTabHeaderTemplate));
                 }
             }
         }
@@ -164,6 +174,7 @@ namespace MGUI.Core.UI
                         if (!Tab.IsTabSelected)
                             UpdateHeaderWrapper(Tab);
                     }
+                    NPC(nameof(UnselectedTabHeaderTemplate));
                 }
             }
         }
@@ -267,6 +278,10 @@ namespace MGUI.Core.UI
                 UpdateHeaderWrapper(SelectedTab);
 
                 SetContent(SelectedTab);
+                NPC(nameof(SelectedTab));
+                NPC(nameof(SelectedTabIndex));
+                Previous?.NPC(nameof(MGTabItem.IsTabSelected));
+                _SelectedTab?.NPC(nameof(MGTabItem.IsTabSelected));
                 SelectedTabChanged?.Invoke(this, new(Previous, SelectedTab));
                 return true;
             }
@@ -319,6 +334,8 @@ namespace MGUI.Core.UI
                 this.BorderElement = new(Window);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
+                BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
+                BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
                 this.Padding = new(12);
 

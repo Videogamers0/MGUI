@@ -15,8 +15,21 @@ namespace MGUI.Core.UI
     /// <summary>Can be attached to another <see cref="MGElement"/> to allow resizing via dragging the mouse.</summary>
     public class MGResizeGrip : MGElement
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private VisualStateColorBrush _Foreground;
         /// <summary>The primary color to draw the resizer dots with.</summary>
-        public VisualStateColorBrush Foreground { get; set; }
+        public VisualStateColorBrush Foreground
+        {
+            get => _Foreground;
+            set
+            {
+                if (_Foreground != value)
+                {
+                    _Foreground = value;
+                    NPC(nameof(Foreground));
+                }
+            }
+        }
 
         /// <summary>Determines how much width and height this element takes up. This value is derived from <see cref="MaxDots"/>, <see cref="Spacing"/>, and <see cref="MGElement.Margin"/>.<br/>
         /// Formula: 1 + (<see cref="MaxDots"/> - 1) * <see cref="Spacing"/> + <see cref="MGElement.Margin"/>.Right</summary>
@@ -36,6 +49,8 @@ namespace MGUI.Core.UI
                 {
                     _MaxDots = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(MaxDots));
+                    NPC(nameof(Size));
                 }
             }
         }
@@ -53,6 +68,8 @@ namespace MGUI.Core.UI
                 {
                     _Spacing = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(Spacing));
+                    NPC(nameof(MaxDots));
                 }
             }
         }
@@ -78,6 +95,8 @@ namespace MGUI.Core.UI
 
                 _Host = Value;
                 SetParent(Host);
+                NPC(nameof(Host));
+                NPC(nameof(ActualHost));
 
                 if (Host != null)
                 {
@@ -143,6 +162,7 @@ namespace MGUI.Core.UI
 
                 this.MaxDots = 4;
                 this.Spacing = 3;
+                OnMarginChanged += (sender, e) => { NPC(nameof(Size)); };
 
                 MouseHandler.DragStartCondition = DragStartCondition.MousePressed;
                 MouseHandler.DragStart += (sender, e) =>

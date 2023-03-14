@@ -58,8 +58,21 @@ namespace MGUI.Core.UI
         }
 
         #region Open / Close
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _CanContextMenuOpen;
         /// <summary>True if this <see cref="MGContextMenu"/> can be shown.</summary>
-        public bool CanContextMenuOpen { get; set; }
+        public bool CanContextMenuOpen
+        {
+            get => _CanContextMenuOpen;
+            set
+            {
+                if (_CanContextMenuOpen != value)
+                {
+                    _CanContextMenuOpen = value;
+                    NPC(nameof(CanContextMenuOpen));
+                }
+            }
+        }
 
         /// <summary>True if this <see cref="MGContextMenu"/> is currently being shown. To open this <see cref="MGContextMenu"/>, use <see cref="Host"/>'s <see cref="IContextMenuHost.TryOpenContextMenu(MGContextMenu, Point)"/>.<para/>
         /// See also: <see cref="MGDesktop.ActiveContextMenu"/>,  <see cref="MGContextMenu.ActiveContextMenu"/></summary>
@@ -80,9 +93,17 @@ namespace MGUI.Core.UI
         public bool TryCloseContextMenu() => IsContextMenuOpen && Host.TryCloseActiveContextMenu();
 
         internal void InvokeContextMenuOpening() => ContextMenuOpening?.Invoke(this, EventArgs.Empty);
-        internal void InvokeContextMenuOpened() => ContextMenuOpened?.Invoke(this, EventArgs.Empty);
+        internal void InvokeContextMenuOpened()
+        {
+            NPC(nameof(IsContextMenuOpen));
+            ContextMenuOpened?.Invoke(this, EventArgs.Empty);
+        }
         internal void InvokeContextMenuClosing() => ContextMenuClosing?.Invoke(this, EventArgs.Empty);
-        internal void InvokeContextMenuClosed() => ContextMenuClosed?.Invoke(this, EventArgs.Empty);
+        internal void InvokeContextMenuClosed()
+        {
+            NPC(nameof(IsContextMenuOpen));
+            ContextMenuClosed?.Invoke(this, EventArgs.Empty);
+        }
 
         public event EventHandler<EventArgs> ContextMenuOpening;
         public event EventHandler<EventArgs> ContextMenuOpened;
@@ -91,23 +112,62 @@ namespace MGUI.Core.UI
         #endregion Open / Close
 
         #region Close Conditions
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _StaysOpenOnItemSelected;
         /// <summary>If true, this menu will not be automatically closed when the user clicks on a particular <see cref="MGContextMenuButton"/> to execute.<para/>
         /// Warning - Closing this menu may be cancelled, such as via <see cref="MGDesktop.ContextMenuClosing"/>'s 'Cancel' property.<para/>
         /// Default value: false<para/>See also: <see cref="StaysOpenOnItemToggled"/></summary>
-        public bool StaysOpenOnItemSelected { get; set; }
+        public bool StaysOpenOnItemSelected
+        {
+            get => _StaysOpenOnItemSelected;
+            set
+            {
+                if (_StaysOpenOnItemSelected != value)
+                {
+                    _StaysOpenOnItemSelected = value;
+                    NPC(nameof(StaysOpenOnItemSelected));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _StaysOpenOnItemToggled;
         /// <summary>If true, this menu will not be automatically closed when the user clicks on a particular <see cref="MGContextMenuToggle"/> to toggle.<para/>
         /// Warning - Closing this menu may be cancelled, such as via <see cref="MGDesktop.ContextMenuClosing"/>'s 'Cancel' property.<para/>
         /// Default value: true<para/>See also: <see cref="StaysOpenOnItemSelected"/></summary>
-        public bool StaysOpenOnItemToggled { get; set; }
+        public bool StaysOpenOnItemToggled
+        {
+            get => _StaysOpenOnItemToggled;
+            set
+            {
+                if (_StaysOpenOnItemToggled != value)
+                {
+                    _StaysOpenOnItemToggled = value;
+                    NPC(nameof(StaysOpenOnItemToggled));
+                }
+            }
+        }
 
         public static float DefaultAutoCloseThreshold = 75;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private float? _AutoCloseThreshold;
         /// <summary>Only relevant if <see cref="IsSubmenu"/> is false.<br/>
         /// Determines how far away the mouse can move from <see cref="MGElement.LayoutBounds"/> before this menu is automatically closed.<para/>
         /// Warning - Closing this menu may be cancelled, such as via <see cref="MGDesktop.ContextMenuClosing"/>'s 'Cancel' property.<para/>
         /// Default value: <see cref="DefaultAutoCloseThreshold"/></summary>
-        public float? AutoCloseThreshold { get; set; }
+        public float? AutoCloseThreshold
+        {
+            get => _AutoCloseThreshold;
+            set
+            {
+                if (_AutoCloseThreshold != value)
+                {
+                    _AutoCloseThreshold = value;
+                    NPC(nameof(AutoCloseThreshold));
+                }
+            }
+        }
         #endregion Close Conditions
 
         public MGButton CreateDefaultDropdownButton(MGWindow Window)
@@ -139,6 +199,7 @@ namespace MGUI.Core.UI
                 if (_ButtonWrapperTemplate != value)
                 {
                     _ButtonWrapperTemplate = value;
+                    NPC(nameof(ButtonWrapperTemplate));
                     ButtonWrapperTemplateChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
@@ -199,6 +260,7 @@ namespace MGUI.Core.UI
                 {
                     Size Previous = HeaderSize;
                     _HeaderSize = value;
+                    NPC(nameof(HeaderSize));
                     HeaderSizeChanged?.Invoke(this, new(Previous, HeaderSize));
                 }
             }
@@ -223,6 +285,7 @@ namespace MGUI.Core.UI
                 MGContextMenu Previous = ActiveContextMenu;
                 ActiveContextMenu.InvokeContextMenuClosing();
                 _ActiveContextMenu = null;
+                NPC(nameof(ActiveContextMenu));
                 Previous.InvokeContextMenuClosed();
                 SubmenuClosed?.Invoke(this, Previous);
                 return true;
@@ -270,6 +333,7 @@ namespace MGUI.Core.UI
                 Menu.TopLeft = Position;
                 _ = Menu.ApplySizeToContent(SizeToContent.WidthAndHeight, MinWidth, MinHeight, MaxWidth, MaxHeight, true);
 
+                NPC(nameof(ActiveContextMenu));
                 ActiveContextMenu.InvokeContextMenuOpened();
                 SubmenuOpened?.Invoke(this, Menu);
                 return true;

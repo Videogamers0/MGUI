@@ -15,7 +15,24 @@ namespace MGUI.Core.UI
 {
     public class MGBorder : MGSingleContentHost
     {
-        public IBorderBrush BorderBrush { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IBorderBrush _BorderBrush;
+        public IBorderBrush BorderBrush
+        {
+            get => _BorderBrush;
+            set
+            {
+                if (_BorderBrush != value)
+                {
+                    IBorderBrush Previous = BorderBrush;
+                    _BorderBrush = value;
+                    NPC(nameof(BorderBrush));
+                    OnBorderBrushChanged?.Invoke(this, new(Previous, BorderBrush));
+                }
+            }
+        }
+
+        public event EventHandler<EventArgs<IBorderBrush>> OnBorderBrushChanged;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Thickness _BorderThickness;
@@ -26,11 +43,16 @@ namespace MGUI.Core.UI
             {
                 if (!_BorderThickness.Equals(value))
                 {
+                    Thickness Previous = BorderThickness;
                     _BorderThickness = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(BorderThickness));
+                    OnBorderThicknessChanged?.Invoke(this, new(Previous, BorderThickness));
                 }
             }
         }
+
+        public event EventHandler<EventArgs<Thickness>> OnBorderThicknessChanged;
 
         public MGBorder(MGWindow Window)
             : this(Window, new(1), MGUniformBorderBrush.Black) { }

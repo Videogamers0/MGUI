@@ -23,7 +23,7 @@ namespace MGUI.Core.UI
 
     /// <summary>Represents a Rectanglular screen bounds that you can add or remove <see cref="MGWindow"/>s to/from, 
     /// and handles mutual exclusion with things like input handling or ensuring there is only 1 <see cref="MGToolTip"/> or <see cref="MGContextMenu"/> on the user interface at a time.</summary>
-    public class MGDesktop : IMouseHandlerHost, IKeyboardHandlerHost, IContextMenuHost
+    public class MGDesktop : ViewModelBase, IMouseHandlerHost, IKeyboardHandlerHost, IContextMenuHost
     {
         public MainRenderer Renderer { get; }
         public InputTracker InputTracker => Renderer.Input;
@@ -70,6 +70,7 @@ namespace MGUI.Core.UI
                     }
 
                     _ActiveToolTip = value;
+                    NPC(nameof(ActiveToolTip));
 
                     if (ActiveToolTip != null)
                     {
@@ -94,9 +95,22 @@ namespace MGUI.Core.UI
         /// <summary>Default value: 0.4s</summary>
         public static TimeSpan DefaultToolTipShowDelay { get; set; } = TimeSpan.FromSeconds(0.40);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private TimeSpan _ToolTipShowDelay;
         /// <summary>The amount of time that the mouse must hover a particular <see cref="MGElement"/> before its <see cref="MGElement.ToolTip"/> can be shown.<para/>
         /// Default value: <see cref="DefaultToolTipShowDelay"/></summary>
-        public TimeSpan ToolTipShowDelay { get; set; }
+        public TimeSpan ToolTipShowDelay
+        {
+            get => _ToolTipShowDelay;
+            set
+            {
+                if (_ToolTipShowDelay != value)
+                {
+                    _ToolTipShowDelay = value;
+                    NPC(nameof(ToolTipShowDelay));
+                }
+            }
+        }
         #endregion ToolTip
 
         #region Context Menu
@@ -129,6 +143,7 @@ namespace MGUI.Core.UI
                 ActiveContextMenu.InvokeContextMenuClosing();
 
                 _ActiveContextMenu = null;
+                NPC(nameof(ActiveContextMenu));
 
                 Previous.InvokeContextMenuClosed();
                 ContextMenuClosed?.Invoke(this, Previous);
@@ -185,6 +200,7 @@ namespace MGUI.Core.UI
                 Menu.TopLeft = Position;
                 _ = Menu.ApplySizeToContent(SizeToContent.WidthAndHeight, MinWidth, MinHeight, MaxWidth, MaxHeight, true);
 
+                NPC(nameof(ActiveContextMenu));
                 ActiveContextMenu.InvokeContextMenuOpened();
                 ContextMenuOpened?.Invoke(this, Menu);
 
@@ -275,6 +291,7 @@ namespace MGUI.Core.UI
                     if (FocusedKeyboardHandler is MGTextBox CurrentTextBox)
                         CurrentTextBox.ReadonlyChanged += TextBox_ReadonlyChanged;
 
+                    NPC(nameof(FocusedKeyboardHandler));
                     FocusedKeyboardHandlerChanged?.Invoke(this, new(Previous, FocusedKeyboardHandler));
                 }
             }

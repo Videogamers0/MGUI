@@ -52,25 +52,65 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     _Size = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(Size));
                 }
             }
         }
 
         /// <summary>The default value for <see cref="TickSize"/>: (22,1)</summary>
         public static readonly Size DefaultTickSize = new(22, 1);
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Size _TickSize;
         /// <summary>The size to use when drawing the small grip thumb graphics in the center of this element's bounds.<para/>
         /// <see cref="TickSize"/>.Width represents the size of the larger dimension (The height of a vertical <see cref="MGGridSplitter"/>, the width of a horizontal <see cref="MGGridSplitter"/>)<br/>
         /// <see cref="TickSize"/>.Height represents the size of the smaller dimension.<para/>
         /// See also: <see cref="Orientation"/><para/>
         /// Default value: <see cref="DefaultTickSize"/></summary>
-        public Size TickSize { get; set; }
+        public Size TickSize
+        {
+            get => _TickSize;
+            set
+            {
+                if (_TickSize != value)
+                {
+                    _TickSize = value;
+                    NPC(nameof(TickSize));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private VisualStateFillBrush _Foreground;
         /// <summary>The brush to use when drawing the thumb tick marks in the center of this element's bounds.</summary>
-        public VisualStateFillBrush Foreground { get; set; }
+        public VisualStateFillBrush Foreground
+        {
+            get => _Foreground;
+            set
+            {
+                if (_Foreground != value)
+                {
+                    _Foreground = value;
+                    NPC(nameof(Foreground));
+                }
+            }
+        }
 
         public Orientation Orientation => LayoutBounds.Width > LayoutBounds.Height ? Orientation.Horizontal : Orientation.Vertical;
 
-        public bool IsDragging { get; private set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _IsDragging;
+        public bool IsDragging
+        {
+            get => _IsDragging;
+            private set
+            {
+                if (_IsDragging != value)
+                {
+                    _IsDragging = value;
+                    NPC(nameof(IsDragging));
+                }
+            }
+        }
 
         /// <summary>Contains information about the target <see cref="MGGrid"/> that the resizing operations will be applied to during <see cref="MouseHandler.Dragged"/> events.</summary>
         private GridDragData? GridData { get; set; }
@@ -188,6 +228,8 @@ namespace MGUI.Core.UI.Containers.Grids
                 this.BorderElement = new(ParentWindow, new(0), MGUniformBorderBrush.Black);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
+                BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
+                BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
                 MGTheme Theme = GetTheme();
 
@@ -197,6 +239,8 @@ namespace MGUI.Core.UI.Containers.Grids
                 this.TickSize = DefaultTickSize;
 
                 this.Foreground = GetTheme().GridSplitterForeground.GetValue(true);
+
+                OnLayoutUpdated += (sender, e) => { NPC(nameof(Orientation)); };
 
                 MouseHandler.DragStart += (sender, e) =>
                 {

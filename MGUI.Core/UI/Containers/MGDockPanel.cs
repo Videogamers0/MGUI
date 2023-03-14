@@ -37,6 +37,7 @@ namespace MGUI.Core.UI.Containers
                 {
                     _LastChildFill = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(LastChildFill));
                 }
             }
         }

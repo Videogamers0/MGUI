@@ -78,6 +78,7 @@ namespace MGUI.Core.UI
                 {
                     _ItemSize = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(ItemSize));
                 }
             }
         }
@@ -95,6 +96,7 @@ namespace MGUI.Core.UI
                 {
                     _Spacing = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(Spacing));
                 }
             }
         }
@@ -134,6 +136,10 @@ namespace MGUI.Core.UI
 
                 if (PreviousMaximum != Maximum)
                     LayoutChanged(this, true);
+
+                NPC(nameof(Minimum));
+                NPC(nameof(Maximum));
+                NPC(nameof(Interval));
             }
         }
 
@@ -150,7 +156,10 @@ namespace MGUI.Core.UI
         {
             float ActualValue = GetActualValue(DesiredValue);
             if (Value != ActualValue)
+            {
                 _Value = ActualValue;
+                NPC(nameof(Value));
+            }
             return ActualValue;
         }
 
@@ -188,6 +197,7 @@ namespace MGUI.Core.UI
                     _UseDiscreteValues = value;
                     if (UseDiscreteValues)
                         _ = SetValue(Value);
+                    NPC(nameof(UseDiscreteValues));
                 }
             }
         }
@@ -205,24 +215,150 @@ namespace MGUI.Core.UI
                     _DiscreteValueInterval = value;
                     if (UseDiscreteValues)
                         _ = SetValue(Value);
+                    NPC(nameof(DiscreteValueInterval));
                 }
             }
         }
         #endregion Value
 
-        public int UnfilledShapeStrokeThickness { get; set; } = 1;
-        public Color UnfilledShapeStrokeColor { get; set; } = Color.Black;
-        public Color UnfilledShapeFillColor { get; set; } = Color.Transparent;
+        #region Stroke / Fill Settings
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _UnfilledShapeStrokeThickness;
+        public int UnfilledShapeStrokeThickness
+        {
+            get => _UnfilledShapeStrokeThickness;
+            set
+            {
+                if (_UnfilledShapeStrokeThickness != value)
+                {
+                    _UnfilledShapeStrokeThickness = value;
+                    NPC(nameof(UnfilledShapeStrokeThickness));
+                }
+            }
+        }
 
-        public int FilledShapeStrokeThickness { get; set; } = 1;
-        public Color FilledShapeStrokeColor { get; set; } = Color.Black;
-        public Color FilledShapeFillColor { get; set; } = Color.Yellow;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Color _UnfilledShapeStrokeColor;
+        public Color UnfilledShapeStrokeColor
+        {
+            get => _UnfilledShapeStrokeColor;
+            set
+            {
+                if (_UnfilledShapeStrokeColor != value)
+                {
+                    _UnfilledShapeStrokeColor = value;
+                    NPC(nameof(UnfilledShapeStrokeColor));
+                }
+            }
+        }
 
-        public int PreviewShapeStrokeThickness { get; set; } = 0;
-        public Color PreviewShapeStrokeColor { get; set; } = Color.Transparent;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Color _UnfilledShapeFillColor;
+        public Color UnfilledShapeFillColor
+        {
+            get => _UnfilledShapeFillColor;
+            set
+            {
+                if (_UnfilledShapeFillColor != value)
+                {
+                    _UnfilledShapeFillColor = value;
+                    NPC(nameof(UnfilledShapeFillColor));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _FilledShapeStrokeThickness;
+        public int FilledShapeStrokeThickness
+        {
+            get => _FilledShapeStrokeThickness;
+            set
+            {
+                if (_FilledShapeStrokeThickness != value)
+                {
+                    _FilledShapeStrokeThickness = value;
+                    NPC(nameof(FilledShapeStrokeThickness));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Color _FilledShapeStrokeColor;
+        public Color FilledShapeStrokeColor
+        {
+            get => _FilledShapeStrokeColor;
+            set
+            {
+                if (_FilledShapeStrokeColor != value)
+                {
+                    _FilledShapeStrokeColor = value;
+                    NPC(nameof(FilledShapeStrokeColor));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Color _FilledShapeFillColor;
+        public Color FilledShapeFillColor
+        {
+            get => _FilledShapeFillColor;
+            set
+            {
+                if (_FilledShapeFillColor != value)
+                {
+                    _FilledShapeFillColor = value;
+                    NPC(nameof(FilledShapeFillColor));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _PreviewShapeStrokeThickness;
+        public int PreviewShapeStrokeThickness
+        {
+            get => _PreviewShapeStrokeThickness;
+            set
+            {
+                if (_PreviewShapeStrokeThickness != value)
+                {
+                    _PreviewShapeStrokeThickness = value;
+                    NPC(nameof(PreviewShapeStrokeThickness));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Color _PreviewShapeStrokeColor;
+        public Color PreviewShapeStrokeColor
+        {
+            get => _PreviewShapeStrokeColor;
+            set
+            {
+                if (_PreviewShapeStrokeColor != value)
+                {
+                    _PreviewShapeStrokeColor = value;
+                    NPC(nameof(PreviewShapeStrokeColor));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Color _PreviewShapeFillColor;
         /// <summary>The fill color to use when drawing <see cref="PreviewValue"/>, if there is one.<para/>
         /// Recommended to use a transparent <see cref="Color"/> so that <see cref="UnfilledShapeFillColor"/> and/or <see cref="FilledShapeFillColor"/> will still be partially visible underneath.</summary>
-        public Color PreviewShapeFillColor { get; set; } = Color.LightBlue * 0.35f;
+        public Color PreviewShapeFillColor
+        {
+            get => _PreviewShapeFillColor;
+            set
+            {
+                if (_PreviewShapeFillColor != value)
+                {
+                    _PreviewShapeFillColor = value;
+                    NPC(nameof(PreviewShapeFillColor));
+                }
+            }
+        }
+        #endregion Stroke / Fill Settings
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float? _PreviewValue;
@@ -234,7 +370,10 @@ namespace MGUI.Core.UI
             {
                 float? ActualValue = !value.HasValue ? null : GetActualValue(value.Value);
                 if (PreviewValue != ActualValue)
+                {
                     _PreviewValue = ActualValue;
+                    NPC(nameof(PreviewValue));
+                }
             }
         }
 
@@ -251,6 +390,7 @@ namespace MGUI.Core.UI
                 {
                     _IsReadonly = value;
                     PreviewValue = null;
+                    NPC(nameof(IsReadonly));
                 }
             }
         }
@@ -272,6 +412,18 @@ namespace MGUI.Core.UI
                 SetRange(MinimumValue, MaximumValue);
 
                 this.IsReadonly = false;
+
+                UnfilledShapeStrokeThickness = 1;
+                UnfilledShapeStrokeColor = Color.Black;
+                UnfilledShapeFillColor = Color.Transparent;
+
+                FilledShapeStrokeThickness = 1;
+                FilledShapeStrokeColor = Color.Black;
+                FilledShapeFillColor = Color.Yellow;
+
+                PreviewShapeStrokeThickness = 0;
+                PreviewShapeStrokeColor = Color.Transparent;
+                PreviewShapeFillColor = Color.LightBlue * 0.35f;
 
                 MouseHandler.MovedInside += (sender, e) =>
                 {
@@ -429,7 +581,9 @@ namespace MGUI.Core.UI
 
                     if (IsCompletelyFilled)
                     {
-                        DA.DT.StrokeAndFillCircle(Center, StrokeColor, FillColor, Radius, StrokeThickness);
+                        DA.DT.FillCircle(Center, FillColor, Radius - StrokeThickness);
+                        DA.DT.StrokeCircle(Center, StrokeColor, Radius, StrokeThickness);
+                        //DA.DT.StrokeAndFillCircle(Center, StrokeColor, FillColor, Radius, StrokeThickness);
                     }
                     else if (IsPartiallyFilled)
                     {
@@ -441,7 +595,9 @@ namespace MGUI.Core.UI
                         Rectangle ClipTarget = ConvertCoordinateSpace(CoordinateSpace.UnscaledScreen, CoordinateSpace.Screen, UnscaledClipTarget);
                         using (DA.DT.SetClipTargetTemporary(ClipTarget, true))
                         {
-                            DA.DT.StrokeAndFillCircle(Center, StrokeColor, FillColor, Radius, StrokeThickness);
+                            DA.DT.FillCircle(Center, FillColor, Radius - StrokeThickness);
+                            DA.DT.StrokeCircle(Center, StrokeColor, Radius, StrokeThickness);
+                            //DA.DT.StrokeAndFillCircle(Center, StrokeColor, FillColor, Radius, StrokeThickness);
                         }
                     }
                     break;

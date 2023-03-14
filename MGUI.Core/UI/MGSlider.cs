@@ -40,6 +40,10 @@ namespace MGUI.Core.UI
                 _Minimum = Minimum;
                 _Maximum = Maximum;
                 _ = SetValue(Value);
+                NPC(nameof(Minimum));
+                NPC(nameof(Maximum));
+                NPC(nameof(Interval));
+                NPC(nameof(CanDrawTickMarks));
             }
         }
 
@@ -59,6 +63,7 @@ namespace MGUI.Core.UI
             {
                 float Previous = Value;
                 _Value = ActualValue;
+                NPC(nameof(Value));
                 ValueChanged?.Invoke(this, new(Previous, Value));
             }
             return ActualValue;
@@ -100,6 +105,7 @@ namespace MGUI.Core.UI
                     _UseDiscreteValues = value;
                     if (UseDiscreteValues)
                         _ = SetValue(Value);
+                    NPC(nameof(UseDiscreteValues));
                 }
             }
         }
@@ -117,13 +123,27 @@ namespace MGUI.Core.UI
                     _DiscreteValueInterval = value;
                     if (UseDiscreteValues)
                         _ = SetValue(Value);
+                    NPC(nameof(DiscreteValueInterval));
                 }
             }
         }
         #endregion Value
 
         #region Number Line
-        public bool IsHoveringNumberLine { get; private set; } = false;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _IsHoveringNumberLine;
+        public bool IsHoveringNumberLine
+        {
+            get => _IsHoveringNumberLine;
+            private set
+            {
+                if (_IsHoveringNumberLine != value)
+                {
+                    _IsHoveringNumberLine = value;
+                    NPC(nameof(IsHoveringNumberLine));
+                }
+            }
+        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _NumberLineSize;
@@ -137,13 +157,57 @@ namespace MGUI.Core.UI
                 {
                     _NumberLineSize = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(NumberLineSize));
                 }
             }
         }
 
-        public Thickness NumberLineBorderThickness { get; set; }
-        public IBorderBrush NumberLineBorderBrush { get; set; }
-        public IFillBrush NumberLineFillBrush { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Thickness _NumberLineBorderThickness;
+        public Thickness NumberLineBorderThickness
+        {
+            get => _NumberLineBorderThickness;
+            set
+            {
+                if (!_NumberLineBorderThickness.Equals(value))
+                {
+                    _NumberLineBorderThickness = value;
+                    NPC(nameof(NumberLineBorderThickness));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IBorderBrush _NumberLineBorderBrush;
+        public IBorderBrush NumberLineBorderBrush
+        {
+            get => _NumberLineBorderBrush;
+            set
+            {
+                if (_NumberLineBorderBrush != value)
+                {
+                    _NumberLineBorderBrush = value;
+                    NPC(nameof(NumberLineBorderBrush));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IFillBrush _NumberLineFillBrush;
+        public IFillBrush NumberLineFillBrush
+        {
+            get => _NumberLineFillBrush;
+            set
+            {
+                if (_NumberLineFillBrush != value)
+                {
+                    _NumberLineFillBrush = value;
+                    NPC(nameof(NumberLineFillBrush));
+                    NPC(nameof(ActualNumberLineFillBrush));
+                }
+            }
+        }
+
         public IFillBrush ActualNumberLineFillBrush => NumberLineFillBrush ?? Foreground;
         #endregion Number Line
 
@@ -155,7 +219,21 @@ namespace MGUI.Core.UI
         /// (Represents the Height if <see cref="Orientation"/>==<see cref="Orientation.Vertical"/>. Else represents the Width)</summary>
         private const int DefaultTickSecondarySize = 18;
 
-        public float? TickFrequency { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private float? _TickFrequency;
+        public float? TickFrequency
+        {
+            get => _TickFrequency;
+            set
+            {
+                if (_TickFrequency != value)
+                {
+                    _TickFrequency = value;
+                    NPC(nameof(TickFrequency));
+                    NPC(nameof(CanDrawTickMarks));
+                }
+            }
+        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _DrawTicks;
@@ -171,6 +249,8 @@ namespace MGUI.Core.UI
                 {
                     _DrawTicks = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(DrawTicks));
+                    NPC(nameof(CanDrawTickMarks));
                 }
             }
         }
@@ -193,6 +273,8 @@ namespace MGUI.Core.UI
                     _TickWidth = value;
                     if (DrawTicks)
                         LayoutChanged(this, true);
+                    NPC(nameof(TickWidth));
+                    NPC(nameof(ActualTickWidth));
                 }
             }
         }
@@ -212,6 +294,8 @@ namespace MGUI.Core.UI
                     _TickHeight = value;
                     if (DrawTicks)
                         LayoutChanged(this, true);
+                    NPC(nameof(TickHeight));
+                    NPC(nameof(ActualTickHeight));
                 }
             }
         }
@@ -224,9 +308,52 @@ namespace MGUI.Core.UI
         /// Only relevant if <see cref="TickFrequency"/> is specified.</summary>
         public bool DrawTickValues { get; set; }*/
 
-        public Thickness TickBorderThickness { get; set; }
-        public IBorderBrush TickBorderBrush { get; set; }
-        public IFillBrush TickFillBrush { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Thickness _TickBorderThickness;
+        public Thickness TickBorderThickness
+        {
+            get => _TickBorderThickness;
+            set
+            {
+                if (!_TickBorderThickness.Equals(value))
+                {
+                    _TickBorderThickness = value;
+                    NPC(nameof(TickBorderThickness));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IBorderBrush _TickBorderBrush;
+        public IBorderBrush TickBorderBrush
+        {
+            get => _TickBorderBrush;
+            set
+            {
+                if (_TickBorderBrush != value)
+                {
+                    _TickBorderBrush = value;
+                    NPC(nameof(TickBorderBrush));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IFillBrush _TickFillBrush;
+        public IFillBrush TickFillBrush
+        {
+            get => _TickFillBrush;
+            set
+            {
+                if (_TickFillBrush != value)
+                {
+                    _TickFillBrush = value;
+                    NPC(nameof(TickFillBrush));
+                    NPC(nameof(ActualTickFillBrush));
+                }
+            }
+        }
+
         public IFillBrush ActualTickFillBrush => TickFillBrush ?? Foreground;
         #endregion Ticks
 
@@ -255,6 +382,8 @@ namespace MGUI.Core.UI
                 {
                     _ThumbWidth = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(ThumbWidth));
+                    NPC(nameof(ActualThumbWidth));
                 }
             }
         }
@@ -273,6 +402,8 @@ namespace MGUI.Core.UI
                 {
                     _ThumbHeight = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(ThumbHeight));
+                    NPC(nameof(ActualThumbHeight));
                 }
             }
         }
@@ -280,9 +411,52 @@ namespace MGUI.Core.UI
         public int ActualThumbWidth => ThumbWidth ?? (IsHorizontal ? DefaultThumbPrimarySize : IsVertical ? DefaultThumbSecondarySize : throw new NotImplementedException());
         public int ActualThumbHeight => ThumbHeight ?? (IsHorizontal ? DefaultThumbSecondarySize : IsVertical ? DefaultThumbPrimarySize : throw new NotImplementedException());
 
-        public Thickness ThumbBorderThickness { get; set; }
-        public IBorderBrush ThumbBorderBrush { get; set; }
-        public IFillBrush ThumbFillBrush { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Thickness _ThumbBorderThickness;
+        public Thickness ThumbBorderThickness
+        {
+            get => _ThumbBorderThickness;
+            set
+            {
+                if (!_ThumbBorderThickness.Equals(value))
+                {
+                    _ThumbBorderThickness = value;
+                    NPC(nameof(ThumbBorderThickness));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IBorderBrush _ThumbBorderBrush;
+        public IBorderBrush ThumbBorderBrush
+        {
+            get => _ThumbBorderBrush;
+            set
+            {
+                if (_ThumbBorderBrush != value)
+                {
+                    _ThumbBorderBrush = value;
+                    NPC(nameof(ThumbBorderBrush));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IFillBrush _ThumbFillBrush;
+        public IFillBrush ThumbFillBrush
+        {
+            get => _ThumbFillBrush;
+            set
+            {
+                if (_ThumbFillBrush != value)
+                {
+                    _ThumbFillBrush = value;
+                    NPC(nameof(ThumbFillBrush));
+                    NPC(nameof(ActualThumbFillBrush));
+                }
+            }
+        }
+
         public IFillBrush ActualThumbFillBrush => ThumbFillBrush ?? Foreground;
         #endregion Thumb
 
@@ -298,6 +472,13 @@ namespace MGUI.Core.UI
                 {
                     _Orientation = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(Orientation));
+                    NPC(nameof(IsHorizontal));
+                    NPC(nameof(IsVertical));
+                    NPC(nameof(ActualTickWidth));
+                    NPC(nameof(ActualTickHeight));
+                    NPC(nameof(ActualThumbWidth));
+                    NPC(nameof(ActualThumbHeight));
                 }
             }
         }
@@ -308,17 +489,60 @@ namespace MGUI.Core.UI
         public bool IsVertical => Orientation == Orientation.Vertical;
         #endregion Orientation
 
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private VisualStateFillBrush _FocusBrush;
         /// <summary>A brush that is rendered overtop of this <see cref="MGSlider"/> while hovering, dragging, or pressing it.<br/>
         /// Only the <see cref="VisualStateBrush{TDataType}.FocusedColor"/>, <see cref="VisualStateBrush{TDataType}.PressedModifierType"/>, and <see cref="VisualStateBrush{TDataType}.PressedModifier"/> are used.</summary>
-        public VisualStateFillBrush FocusBrush { get; set; }
+        public VisualStateFillBrush FocusBrush
+        {
+            get => _FocusBrush;
+            set
+            {
+                if (_FocusBrush != value)
+                {
+                    _FocusBrush = value;
+                    NPC(nameof(FocusBrush));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IFillBrush _Foreground;
         /// <summary>The fallback <see cref="IFillBrush"/> for drawing the number line, ticks, or the thumb if they don't have an explicit <see cref="IFillBrush"/> specified.<para/>
         /// See also: <see cref="NumberLineFillBrush"/>, <see cref="TickFillBrush"/>, <see cref="ThumbFillBrush"/></summary>
-        public IFillBrush Foreground { get; set; }
+        public IFillBrush Foreground
+        {
+            get => _Foreground;
+            set
+            {
+                if (_Foreground != value)
+                {
+                    _Foreground = value;
+                    NPC(nameof(Foreground));
+                    NPC(nameof(ActualNumberLineFillBrush));
+                    NPC(nameof(ActualTickFillBrush));
+                    NPC(nameof(ActualThumbFillBrush));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _AcceptsMouseScrollWheel;
         /// <summary>If true, the slider value can be modified by using the mouse scroll wheel while hovering the number line portion.<para/>
         /// Default value: false</summary>
-        public bool AcceptsMouseScrollWheel { get; set; }
+        public bool AcceptsMouseScrollWheel
+        {
+            get => _AcceptsMouseScrollWheel;
+            set
+            {
+                if (_AcceptsMouseScrollWheel != value)
+                {
+                    _AcceptsMouseScrollWheel = value;
+                    NPC(nameof(AcceptsMouseScrollWheel));
+                }
+            }
+        }
 
         //TODO maybe add an option to show the value in a bordered textblock to the right of the slider portion?
 

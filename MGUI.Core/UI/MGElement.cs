@@ -15,7 +15,7 @@ using MGUI.Shared.Input.Keyboard;
 using MGUI.Shared.Input;
 using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Containers.Grids;
-using PropertyBinding = MGUI.Core.UI.XAML.PropertyBinding;
+using MGUI.Core.UI.Data_Binding;
 
 namespace MGUI.Core.UI
 {
@@ -106,9 +106,6 @@ namespace MGUI.Core.UI
     //      Check if the same problem is affecting scrollable ListBoxes too, especially in this line of code in MGListBox's constructor:
     //      MGListBoxItem<TItemType> PressedItem = InternalItems?.FirstOrDefault(x => x.ContentPresenter.IsHovered);
     //Maybe make a CompositedBorderBrush, like CompositedFillBrush it's just a wrapper for 0-many border brushes that are drawn in sequence overtop of each other.
-    //implement some basic converters for the PropertyBinding markup extension. at least need a BooleanToVisibilityConverter (has a Visibility TrueValue, Visibility FalseValue. Defaults to TrueValue=Visible, False=Collapsed)
-    //		this would allow making inverse converters easily. or making one that converts to hidden instead of collapsed
-    //		also make an InverseBooleanConverter.
     //something for mouse cursors?
     //		maybe an enum MouseCursorType
     //		and MGElement would have MouseCursorType Cursor property
@@ -141,7 +138,7 @@ namespace MGUI.Core.UI
     //		The Visual Tree traversal logic should have an additional parameter, IncludeAttached
 
     /// <summary>Base class for all UI elements.</summary>
-    public abstract class MGElement : IMouseHandlerHost, IKeyboardHandlerHost
+    public abstract class MGElement : ViewModelBase, IMouseHandlerHost, IKeyboardHandlerHost, IObservableDataContext
     {
         public string UniqueId { get; }
 
@@ -155,7 +152,33 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public MGWindow SelfOrParentWindow => IsWindow ? this as MGWindow : ParentWindow;
 
-		public static readonly ReadOnlyCollection<MGElementType> WindowElementTypes = new List<MGElementType>() { MGElementType.Window, MGElementType.ToolTip, MGElementType.ContextMenu }.AsReadOnly();
+        private object _DataContextOverride;
+        /// <summary>If null, this element's <see cref="DataContext"/> is defaulted to the window's <see cref="MGWindow.WindowDataContext"/>.<para/>
+        /// Note: <see cref="MGWindow"/> instances cannot have an override and will always use their <see cref="MGWindow.WindowDataContext"/> instead.<br/>
+        /// For <see cref="MGWindow"/>, this property is overridden to set <see cref="MGWindow.WindowDataContext"/></summary>
+        public virtual object DataContextOverride
+        {
+            get => _DataContextOverride;
+            set
+            {
+                if (_DataContextOverride != value)
+                {
+                    _DataContextOverride = value;
+                    NPC(nameof(DataContextOverride));
+                    NPC(nameof(DataContext));
+                    DataContextChanged?.Invoke(this, DataContext);
+                }
+            }
+        }
+
+        /// <summary>The source object that data bindings are resolved from.<para/>
+        /// This value prioritizes <see cref="DataContextOverride"/>, but falls back on <see cref="MGWindow.WindowDataContext"/> if there is no explicit override.<para/>
+        /// To set this value, set <see cref="DataContextOverride"/> or set <see cref="MGWindow.WindowDataContext"/></summary>
+        public object DataContext => DataContextOverride ?? SelfOrParentWindow.WindowDataContext;
+        /// <summary>Invoked after <see cref="DataContext"/> is changed.</summary>
+        public event EventHandler<object> DataContextChanged;
+
+        public static readonly ReadOnlyCollection<MGElementType> WindowElementTypes = new List<MGElementType>() { MGElementType.Window, MGElementType.ToolTip, MGElementType.ContextMenu }.AsReadOnly();
         public MGElementType ElementType { get; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool IsWindow => WindowElementTypes.Contains(ElementType);
@@ -169,22 +192,52 @@ namespace MGUI.Core.UI
             {
                 MGElement Previous = Parent;
                 _Parent = Value;
+                NPC(nameof(Parent));
                 OnParentChanged?.Invoke(this, new(Previous, Parent));
             }
         }
 
 		public event EventHandler<EventArgs<MGElement>> OnParentChanged;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private MGElement _ManagedParent;
         /// <summary>The parent <see cref="MGElement"/> that micromanages this <see cref="MGElement"/>, or null if this <see cref="MGElement"/> is not tightly coupled with its creator.<para/>
         /// For example, an <see cref="MGListView{TItemType}"/> always contains an <see cref="MGGrid"/> to display the column headers, and another <see cref="MGGrid"/> to display the rows<br/>
         /// Those 2 <see cref="MGGrid"/>s are specially-created elements whose <see cref="ManagedParent"/> is the <see cref="MGListView{TItemType}"/></summary>
-        public MGElement ManagedParent { get; protected internal set; }
+        public MGElement ManagedParent
+        {
+            get => _ManagedParent;
+            protected internal set
+            {
+                if (_ManagedParent != value)
+                {
+                    _ManagedParent = value;
+                    NPC(nameof(ManagedParent));
+                    NPC(nameof(IsManagedElement));
+                }
+            }
+        }
+
         /// <summary>True if this <see cref="MGElement"/> is automatically created and managed by its parent,<br/>
         /// such as a ComboBox's <see cref="MGComboBox{TItemType}.Dropdown"/> or a ContextMenu's <see cref="MGContextMenu.ItemsPanel"/></summary>
         public bool IsManagedElement => ManagedParent != null;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private MGElement _ComponentParent;
         /// <summary>The parent <see cref="MGElement"/> that this <see cref="MGComponent{TElementType}"/> belongs to, or null if this <see cref="MGElement"/> is not a <see cref="MGComponent{TElementType}"/>.</summary>
-        public MGElement ComponentParent { get; private set; }
+        public MGElement ComponentParent
+        {
+            get => _ComponentParent;
+            private set
+            {
+                if (_ComponentParent != value)
+                {
+                    _ComponentParent = value;
+                    NPC(nameof(ComponentParent));
+                    NPC(nameof(IsComponent));
+                }
+            }
+        }
         /// <summary>True if this <see cref="MGElement"/> is a <see cref="MGComponent{TElementType}"/> of its parent,
         /// such as the <see cref="MGCheckBox.ButtonComponent"/> of an <see cref="MGCheckBox"/>, or the <see cref="MGButton.BorderComponent"/> of an <see cref="MGButton"/></summary>
         public bool IsComponent => ComponentParent != null;
@@ -209,6 +262,7 @@ namespace MGUI.Core.UI
 				{
 					string Previous = Name;
 					_Name = value;
+                    NPC(nameof(Name));
 					OnNameChanged?.Invoke(this, new(Previous, Name));
 				}
 			}
@@ -226,11 +280,26 @@ namespace MGUI.Core.UI
 			{
 				if (!_Margin.Equals(value))
 				{
+                    Thickness Previous = Margin;
 					_Margin = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(Margin));
+                    NPC(nameof(HorizontalMargin));
+                    NPC(nameof(VerticalMargin));
+                    NPC(nameof(MarginSize));
+                    NPC(nameof(HorizontalMarginAndPadding));
+                    NPC(nameof(VerticalMarginAndPadding));
+                    NPC(nameof(MarginAndPaddingSize));
+                    NPC(nameof(MinSizeIncludingMargin));
+                    NPC(nameof(MaxSizeIncludingMargin));
+                    NPC(nameof(ActualPreferredWidth));
+                    NPC(nameof(ActualPreferredHeight));
+                    OnMarginChanged?.Invoke(this, new(Previous, Margin));
                 }
 			}
 		}
+
+        public event EventHandler<EventArgs<Thickness>> OnMarginChanged;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Thickness _Padding;
@@ -243,6 +312,13 @@ namespace MGUI.Core.UI
 				{
 					_Padding = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(Padding));
+                    NPC(nameof(HorizontalPadding));
+                    NPC(nameof(VerticalPadding));
+                    NPC(nameof(PaddingSize));
+                    NPC(nameof(HorizontalMarginAndPadding));
+                    NPC(nameof(VerticalMarginAndPadding));
+                    NPC(nameof(MarginAndPaddingSize));
                 }
 			}
 		}
@@ -319,6 +395,7 @@ namespace MGUI.Core.UI
 				{
 					HorizontalAlignment Previous = HorizontalAlignment;
 					_HorizontalAlignment = value;
+                    NPC(nameof(HorizontalAlignment));
 					OnHorizontalAlignmentChanged?.Invoke(this, new(Previous, HorizontalAlignment));
                     LayoutChanged(this, true);
                 }
@@ -338,6 +415,7 @@ namespace MGUI.Core.UI
 				{
 					VerticalAlignment Previous = VerticalAlignment;
                     _VerticalAlignment = value;
+                    NPC(nameof(VerticalAlignment));
                     OnVerticalAlignmentChanged?.Invoke(this, new(Previous, VerticalAlignment));
                     LayoutChanged(this, true);
                 }
@@ -357,6 +435,7 @@ namespace MGUI.Core.UI
 				{
 					_HorizontalContentAlignment = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(HorizontalContentAlignment));
                 }
 			}
 		}
@@ -372,6 +451,7 @@ namespace MGUI.Core.UI
 				{
 					_VerticalContentAlignment = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(VerticalContentAlignment));
                 }
 			}
 		}
@@ -391,6 +471,9 @@ namespace MGUI.Core.UI
 				{
 					_MinWidth = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(MinWidth));
+                    NPC(nameof(MinSize));
+                    NPC(nameof(MinSizeIncludingMargin));
                 }
 			}
 		}
@@ -407,6 +490,9 @@ namespace MGUI.Core.UI
                 {
                     _MinHeight = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(MinHeight));
+                    NPC(nameof(MinSize));
+                    NPC(nameof(MinSizeIncludingMargin));
                 }
             }
         }
@@ -423,6 +509,8 @@ namespace MGUI.Core.UI
                 {
                     _MaxWidth = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(MaxWidth));
+                    NPC(nameof(MaxSizeIncludingMargin));
                 }
             }
         }
@@ -439,6 +527,8 @@ namespace MGUI.Core.UI
 				{
 					_MaxHeight = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(MaxHeight));
+                    NPC(nameof(MaxSizeIncludingMargin));
                 }
 			}
 		}
@@ -480,11 +570,13 @@ namespace MGUI.Core.UI
 			{
 				if (_PreferredWidth != value)
 				{
-					if (PreferredWidth.HasValue && PreferredWidth.Value < 0)
+					if (value.HasValue && value.Value < 0)
 						throw new ArgumentOutOfRangeException($"{nameof(MGElement)}.{nameof(PreferredWidth)} cannot be negative.");
 
 					_PreferredWidth = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(PreferredWidth));
+                    NPC(nameof(ActualPreferredWidth));
                 }
 			}
 		}
@@ -502,11 +594,13 @@ namespace MGUI.Core.UI
 			{
 				if (_PreferredHeight != value)
 				{
-                    if (PreferredHeight.HasValue && PreferredHeight.Value < 0)
+                    if (value.HasValue && value.Value < 0)
                         throw new ArgumentOutOfRangeException($"{nameof(MGElement)}.{nameof(PreferredHeight)} cannot be negative.");
 
                     _PreferredHeight = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(PreferredHeight));
+                    NPC(nameof(ActualPreferredHeight));
                 }
 			}
 		}
@@ -531,6 +625,7 @@ namespace MGUI.Core.UI
 				{
 					MGToolTip Previous = ToolTip;
 					_ToolTip = value;
+                    NPC(nameof(ToolTip));
 					ToolTipChanged?.Invoke(this, new(Previous, ToolTip));
 				}
 			}
@@ -553,6 +648,7 @@ namespace MGUI.Core.UI
 				{
 					MGContextMenu Previous = ContextMenu;
 					_ContextMenu = value;
+                    NPC(nameof(ContextMenu));
 					ContextMenuChanged?.Invoke(this, new(Previous, ContextMenu));
 				}
 			}
@@ -600,7 +696,20 @@ namespace MGUI.Core.UI
 
 		bool IKeyboardHandlerHost.HasKeyboardFocus() => GetDesktop().FocusedKeyboardHandler == this;
 
-        public bool CanHandleInputsWhileHidden { get; internal protected set; } = false;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _CanHandleInputsWhileHidden;
+        public bool CanHandleInputsWhileHidden
+        {
+            get => _CanHandleInputsWhileHidden;
+            internal protected set
+            {
+                if (_CanHandleInputsWhileHidden != value)
+                {
+                    _CanHandleInputsWhileHidden = value;
+                    NPC(nameof(CanHandleInputsWhileHidden));
+                }
+            }
+        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsHitTestVisible;
@@ -609,7 +718,14 @@ namespace MGUI.Core.UI
         public bool IsHitTestVisible
         {
             get => _IsHitTestVisible && (Visibility == Visibility.Visible || (CanHandleInputsWhileHidden && Visibility == Visibility.Hidden));
-            set => _IsHitTestVisible = value;
+            set
+            {
+                if (IsHitTestVisible != value)
+                {
+                    _IsHitTestVisible = value;
+                    NPC(nameof(IsHitTestVisible));
+                }
+            }
         }
         /// <summary>True if this <see cref="MGElement"/> should be allowed to detect and handle mouse and keyboard inputs.<para/>
         /// This property is only true if both this <see cref="MGElement"/> and every parent along the visual tree have <see cref="IsHitTestVisible"/>==true.</summary>
@@ -621,6 +737,7 @@ namespace MGUI.Core.UI
         internal protected bool SpoofIsHoveredWhileDrawingBackground { get; set; } = false;
         #endregion Input
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private VisualState _VisualState = new(PrimaryVisualState.Normal, SecondaryVisualState.None);
         public VisualState VisualState
         {
@@ -631,6 +748,7 @@ namespace MGUI.Core.UI
                 {
                     VisualState Previous = VisualState;
                     _VisualState = value;
+                    NPC(nameof(VisualState));
                     VisualStateChanged?.Invoke(this, new(Previous, VisualState));
                 }
             }
@@ -639,25 +757,79 @@ namespace MGUI.Core.UI
         /// <summary>Invoked when <see cref="VisualState"/> changes.</summary>
         public event EventHandler<EventArgs<VisualState>> VisualStateChanged;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _IsSelected;
         /// <summary>This property does not account for the parent's <see cref="IsSelected"/>. Consider using <see cref="DerivedIsSelected"/> instead.</summary>
-        public bool IsSelected { get; set; } = false;
+        public bool IsSelected
+        {
+            get => _IsSelected;
+            set
+            {
+                if (_IsSelected != value)
+                {
+                    _IsSelected = value;
+                    NPC(nameof(IsSelected));
+                }
+            }
+        }
         /// <summary>This property is only false if both this <see cref="MGElement"/> and every parent along the visual tree have <see cref="IsSelected"/>==false.</summary>
         public bool DerivedIsSelected => IsSelected || (Parent?.DerivedIsSelected ?? IsSelected);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _IsEnabled;
         /// <summary>This property does not account for the parent's <see cref="IsEnabled"/>. Consider using <see cref="DerivedIsEnabled"/> instead.</summary>
-        public bool IsEnabled { get; set; } = true;
+        public bool IsEnabled
+        {
+            get => _IsEnabled;
+            set
+            {
+                if (_IsEnabled != value)
+                {
+                    _IsEnabled = value;
+                    NPC(nameof(IsEnabled));
+                }
+            }
+        }
         /// <summary>This property is only true if both this <see cref="MGElement"/> and every parent along the visual tree have <see cref="IsEnabled"/>==true.</summary>
         public bool DerivedIsEnabled => IsEnabled && (Parent?.DerivedIsEnabled ?? IsEnabled);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Thickness _BackgroundRenderPadding;
         /// <summary>A padding to use when drawing the <see cref="BackgroundBrush"/>.<br/>Default = (0,0,0,0).<para/>
         /// A negative value allows the background to span a larger rectangular region, such as if the element's border contained some transparent pixels that you would want to fill with the <see cref="BackgroundBrush"/>.<para/>
         /// Warning - negative padding does NOT increase this element's layout bounds.<br/>
         /// If using a large enough negative padding, some of the background may be rendered outside of this element's bounds, and thus might be clipped if <see cref="ClipToBounds"/> is true.</summary>
-        public Thickness BackgroundRenderPadding { get; set; }
+        public Thickness BackgroundRenderPadding
+        {
+            get => _BackgroundRenderPadding;
+            set
+            {
+                if (!BackgroundRenderPadding.Equals(value))
+                {
+                    _BackgroundRenderPadding = value;
+                    NPC(nameof(BackgroundRenderPadding));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private VisualStateFillBrush _BackgroundBrush;
         /// <summary>The <see cref="IFillBrush"/>es to use for this <see cref="MGElement"/>'s background, depending on the current <see cref="VisualState"/>.<para/>
         /// See also: <see cref="BackgroundUnderlay"/>, <see cref="BackgroundOverlay"/></summary>
-        public VisualStateFillBrush BackgroundBrush { get; set; }
+        public VisualStateFillBrush BackgroundBrush
+        {
+            get => _BackgroundBrush;
+            set
+            {
+                if (_BackgroundBrush != value)
+                {
+                    _BackgroundBrush = value;
+                    NPC(nameof(BackgroundBrush));
+                    NPC(nameof(BackgroundUnderlay));
+                    NPC(nameof(BackgroundOverlay));
+                }
+            }
+        }
         /// <summary>The first <see cref="IFillBrush"/> used to draw this <see cref="MGElement"/>'s background. Drawn before <see cref="BackgroundOverlay"/></summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public IFillBrush BackgroundUnderlay => BackgroundBrush.GetUnderlay(VisualState.Primary);
@@ -665,10 +837,24 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public IFillBrush BackgroundOverlay => BackgroundBrush.GetFillOverlay(VisualState.Secondary);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private VisualStateSetting<Color?> _DefaultTextForeground;
         /// <summary>The default foreground color to use when rendering text on this <see cref="MGElement"/> or any of its child elements.<br/>
         /// For a value that accounts for the parent's <see cref="DefaultTextForeground"/>, use <see cref="DerivedDefaultTextForeground"/> instead.<para/>
         /// See also: <see cref="DerivedDefaultTextForeground"/>, <see cref="CurrentDefaultTextForeground"/></summary>
-        public VisualStateSetting<Color?> DefaultTextForeground { get; set; }
+        public VisualStateSetting<Color?> DefaultTextForeground
+        {
+            get => _DefaultTextForeground;
+            set
+            {
+                if (_DefaultTextForeground != value)
+                {
+                    _DefaultTextForeground = value;
+                    NPC(nameof(DefaultTextForeground));
+                    NPC(nameof(CurrentDefaultTextForeground));
+                }
+            }
+        }
         /// <summary>The currently-active value from <see cref="DefaultTextForeground"/>, based on <see cref="VisualState"/></summary>
         public Color? CurrentDefaultTextForeground => DefaultTextForeground.GetValue(VisualState.Primary);
         /// <summary>This property prioritizes <see cref="CurrentDefaultTextForeground"/> if it has a value.<br/>
@@ -695,6 +881,8 @@ namespace MGUI.Core.UI
                     _Visibility = value;
                     if (Previous == Visibility.Collapsed || Visibility == Visibility.Collapsed)
                         LayoutChanged(this, true);
+                    NPC(nameof(Visibility));
+                    NPC(nameof(IsVisibilityCollapsed));
                 }
             }
         }
@@ -702,15 +890,39 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsVisibilityCollapsed => Visibility == Visibility.Collapsed;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private float _Opacity;
         /// <summary>This property does not account for the parent's <see cref="Opacity"/>.</summary>
-        public float Opacity { get; set; } = 1.0f;
+        public float Opacity
+        {
+            get => _Opacity;
+            set
+            {
+                if (_Opacity != value)
+                {
+                    _Opacity = value;
+                    NPC(nameof(Opacity));
+                }
+            }
+        }
 
         /// <summary>General-purpose dictionary to attach your own data to this <see cref="MGElement"/></summary>
         public Dictionary<string, object> Metadata { get; } = new();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private object _Tag;
         /// <summary>General-purpose object to attach your own data to this <see cref="MGElement"/></summary>
-        public object Tag { get; set; }
-
-        internal List<PropertyBinding> OneWayBindings { get; } = new();
+        public object Tag
+        {
+            get => _Tag;
+            set
+            {
+                if (_Tag != value)
+                {
+                    _Tag = value;
+                    NPC(nameof(Tag));
+                }
+            }
+        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private DeferEventsManager InitializationManager { get; }
@@ -824,6 +1036,15 @@ namespace MGUI.Core.UI
                 this.ParentWindow = ParentWindow;
                 this.ElementType = ElementType;
 
+                SelfOrParentWindow.WindowDataContextChanged += (sender, e) =>
+                {
+                    if (DataContextOverride == null)
+                    {
+                        NPC(nameof(DataContext));
+                        DataContextChanged?.Invoke(this, DataContext);
+                    }
+                };
+
                 MGTheme ActualTheme = Theme ?? ParentWindow?.Theme ?? Desktop.Theme;
 
                 this.MouseHandler = Desktop.InputTracker.Mouse.CreateHandler(this, null);
@@ -845,6 +1066,8 @@ namespace MGUI.Core.UI
                 this.IsEnabled = true;
                 this.IsSelected = false;
 				this.IsHitTestVisible = true;
+                this.ClipToBounds = true;
+                this.Opacity = 1.0f;
 
                 SelfOrParentWindow.OnWindowPositionChanged += (sender, e) =>
 				{
@@ -870,6 +1093,19 @@ namespace MGUI.Core.UI
 
         public virtual MGBorder GetBorder() => null;
         public bool HasBorder => GetBorder() != null;
+
+        /// <summary>Removes all <see cref="DataBinding"/>s that are associated with this <see cref="MGElement"/>.<para/>
+        /// Recommended to invoke this method if you are about to remove this <see cref="MGElement"/> from the visual tree,<br/>
+        /// so that all data bindings can unsubscribe from events such as <see cref="System.ComponentModel.INotifyPropertyChanged.PropertyChanged"/>.</summary>
+        /// <param name="IncludeChildren">If true, will also recursively remove bindings for all child items.</param>
+        /// <returns>The number of <see cref="DataBinding"/>s that were deleted.</returns>
+        public int RemoveDataBindings(bool IncludeChildren)
+        {
+            if (!IncludeChildren)
+                return DataBindingManager.RemoveBindings(this);
+            else
+                return TraverseVisualTree().Sum(x => DataBindingManager.RemoveBindings(x));
+        }
 
         #region Bounds
         protected internal Matrix GetTransform(CoordinateSpace From, CoordinateSpace To)
@@ -928,11 +1164,37 @@ namespace MGUI.Core.UI
 
         public Point ConvertCoordinateSpace(CoordinateSpace From, CoordinateSpace To, Point Value) => ConvertCoordinateSpace(From, To, Value.ToVector2()).ToPoint();
 
-        public virtual bool ClipToBounds { get; set; } = true;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _ClipToBounds;
+        public virtual bool ClipToBounds
+        {
+            get => _ClipToBounds;
+            set
+            {
+                if (_ClipToBounds != value)
+                {
+                    _ClipToBounds = value;
+                    NPC(nameof(ClipToBounds));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Point _Origin;
         /// <summary>This value is typically <see cref="Point.Zero"/> except when this <see cref="MGElement"/> is a child of an <see cref="MGScrollViewer"/>,<br/>
         /// in which case the origin would be based on the <see cref="MGScrollViewer.HorizontalOffset"/> / <see cref="MGScrollViewer.VerticalOffset"/></summary>
-        public Point Origin { get; private set; } = Point.Zero;
+        public Point Origin
+        {
+            get => _Origin;
+            private set
+            {
+                if (_Origin != value)
+                {
+                    _Origin = value;
+                    NPC(nameof(Origin));
+                }
+            }
+        }
 
         protected void TranslateAllBounds(Point Offset)
         {
@@ -969,12 +1231,27 @@ namespace MGUI.Core.UI
         /// <see cref="AlignedContentBounds"/><br/><see cref="ActualLayoutBounds"/></summary>
         public Rectangle RenderBounds { get; private set; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Rectangle _LayoutBounds;
         /// <summary>The screen space that this <see cref="MGElement"/> will render itself to, after accounting for <see cref="Margin"/>.<br/>
         /// The <see cref="BackgroundBrush"/> of this <see cref="MGElement"/> spans these bounds.<para/>
 		/// This value does not account for <see cref="Origin"/> and thus might not match the exact screen bounds where this <see cref="MGElement"/> was drawn.<para/>
         /// See also: <br/><see cref="AllocatedBounds"/><br/><see cref="RenderBounds"/><br/><see cref="LayoutBounds"/><br/><see cref="StretchedContentBounds"/><br/>
         /// <see cref="AlignedContentBounds"/><br/><see cref="ActualLayoutBounds"/></summary>
-        public Rectangle LayoutBounds { get; private set; }
+        public Rectangle LayoutBounds
+        {
+            get => _LayoutBounds;
+            private set
+            {
+                if (_LayoutBounds != value)
+                {
+                    _LayoutBounds = value;
+                    NPC(nameof(LayoutBounds));
+                    NPC(nameof(ActualWidth));
+                    NPC(nameof(ActualHeight));
+                }
+            }
+        }
 
         /// <summary>The screen space that this <see cref="MGElement"/>'s contents will render to, before accounting for <see cref="HorizontalContentAlignment"/> and <see cref="VerticalContentAlignment"/>.<br/>
         /// This value accounts for <see cref="Margin"/>, <see cref="Padding"/>, and any other properties that affect this <see cref="MGElement"/>'s size (such as BorderThickness of a <see cref="MGBorder"/>).<para/>
@@ -1161,16 +1438,42 @@ namespace MGUI.Core.UI
         #endregion Update
 
         #region Draw
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private ConditionalScaleTransform? _RenderScale;
         /// <summary>A scale transform to apply to this <see cref="MGElement"/> when the appropriate condition is met. (such as <see cref="IsLMBPressed"/> is true)<para/>
         /// This scale transform only affects how the element is rendered, but not its layout, so it may result in overlapping elements. Uses the center of <see cref="LayoutBounds"/> as the scaling origin.<para/>
         /// Default value: null</summary>
-        public ConditionalScaleTransform? RenderScale { get; set; }
+        public ConditionalScaleTransform? RenderScale
+        {
+            get => _RenderScale;
+            set
+            {
+                if (_RenderScale != value)
+                {
+                    _RenderScale = value;
+                    NPC(nameof(RenderScale));
+                }
+            }
+        }
 
-		/// <summary>True if the most recent Draw call resulted in this <see cref="MGElement"/> not being drawn, due to one of the following reasons:<para/>
-		/// It was out-of-bounds (See: <see cref="ClipToBounds"/>, <see cref="GraphicsDevice.ScissorRectangle"/>, <see cref="RasterizerState.ScissorTestEnable"/>)<br/>
-		/// It was not visible (See: <see cref="Visibility"/>)<br/>
-		/// It had no geometry (See: <see cref="LayoutBounds"/>, Width and/or Height = 0)</summary>
-		public bool RecentDrawWasClipped { get; private set; } = false;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _RecentDrawWasClipped;
+        /// <summary>True if the most recent Draw call resulted in this <see cref="MGElement"/> not being drawn, due to one of the following reasons:<para/>
+        /// It was out-of-bounds (See: <see cref="ClipToBounds"/>, <see cref="GraphicsDevice.ScissorRectangle"/>, <see cref="RasterizerState.ScissorTestEnable"/>)<br/>
+        /// It was not visible (See: <see cref="Visibility"/>)<br/>
+        /// It had no geometry (See: <see cref="LayoutBounds"/>, Width and/or Height = 0)</summary>
+        public bool RecentDrawWasClipped
+        {
+            get => _RecentDrawWasClipped;
+            private set
+            {
+                if (_RecentDrawWasClipped != value)
+                {
+                    _RecentDrawWasClipped = value;
+                    NPC(nameof(RecentDrawWasClipped));
+                }
+            }
+        }
 
         public virtual void Draw(ElementDrawArgs DA)
 		{
@@ -1309,8 +1612,21 @@ namespace MGUI.Core.UI
                 Parent?.LayoutChanged(Source, NotifyParent);
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _IsLayoutValid;
         /// <summary>If true, indicates that the layout will be re-calculated during the next update tick. This also invalidates any cached measurements.</summary>
-        public bool IsLayoutValid { get; private set; }
+        public bool IsLayoutValid
+        {
+            get => _IsLayoutValid;
+            private set
+            {
+                if (_IsLayoutValid != value)
+                {
+                    _IsLayoutValid = value;
+                    NPC(nameof(IsLayoutValid));
+                }
+            }
+        }
 
         #region Arrange
         protected internal bool IsUpdatingLayout { get; private set; }

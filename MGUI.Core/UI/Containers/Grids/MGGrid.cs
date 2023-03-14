@@ -580,14 +580,29 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     _SelectionMode = value;
                     CurrentSelection = HasSelection ? CurrentSelection.Value with { SelectionMode = SelectionMode } : CurrentSelection;
+                    NPC(nameof(SelectionMode));
                 }
             }
         }
 
-        public bool CanDeselectByClickingSelectedCell { get; set; } = true;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _CanDeselectByClickingSelectedCell = true;
+        public bool CanDeselectByClickingSelectedCell
+        {
+            get => _CanDeselectByClickingSelectedCell;
+            set
+            {
+                if (_CanDeselectByClickingSelectedCell != value)
+                {
+                    _CanDeselectByClickingSelectedCell = value;
+                    NPC(nameof(CanDeselectByClickingSelectedCell));
+                }
+            }
+        }
 
         private GridSelection? PreviousSelection = null;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private GridSelection? _CurrentSelection;
         public GridSelection? CurrentSelection
         {
@@ -597,6 +612,8 @@ namespace MGUI.Core.UI.Containers.Grids
                 if (_CurrentSelection != value)
                 {
                     _CurrentSelection = value;
+                    NPC(nameof(CurrentSelection));
+                    NPC(nameof(HasSelection));
                     SelectionChanged?.Invoke(this, CurrentSelection);
                 }
             }
@@ -655,13 +672,53 @@ namespace MGUI.Core.UI.Containers.Grids
             }
         }
 
-        public IFillBrush SelectionBackground { get; set; } = MGSolidFillBrush.Yellow * 0.5f;
-        public IFillBrush SelectionOverlay { get; set; } = new MGSolidFillBrush(Color.Yellow * 0.25f);
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IFillBrush _SelectionBackground = MGSolidFillBrush.Yellow * 0.5f;
+        public IFillBrush SelectionBackground
+        {
+            get => _SelectionBackground;
+            set
+            {
+                if (_SelectionBackground != value)
+                {
+                    _SelectionBackground = value;
+                    NPC(nameof(SelectionBackground));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IFillBrush _SelectionOverlay = new MGSolidFillBrush(Color.Yellow * 0.25f);
+        public IFillBrush SelectionOverlay
+        {
+            get => _SelectionOverlay;
+            set
+            {
+                if (_SelectionOverlay != value)
+                {
+                    _SelectionOverlay = value;
+                    NPC(nameof(SelectionOverlay));
+                }
+            }
+        }
         #endregion Selection
 
         #region GridLines
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private GridLineIntersection _GridLineIntersectionHandling;
         /// <summary>Default value: <see cref="GridLineIntersection.HorizontalThenVertical"/></summary>
-        public GridLineIntersection GridLineIntersectionHandling { get; set; }
+        public GridLineIntersection GridLineIntersectionHandling
+        {
+            get => _GridLineIntersectionHandling;
+            set
+            {
+                if (_GridLineIntersectionHandling != value)
+                {
+                    _GridLineIntersectionHandling = value;
+                    NPC(nameof(GridLineIntersectionHandling));
+                }
+            }
+        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private GridLinesVisibility _GridLinesVisibility;
@@ -675,6 +732,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     _GridLinesVisibility = value;
                     CheckIfOuterPaddingChanged();
+                    NPC(nameof(GridLinesVisibility));
                 }
             }
         }
@@ -694,12 +752,40 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     _GridLineMargin = value;
                     CheckIfOuterPaddingChanged();
+                    NPC(nameof(GridLineMargin));
                 }
             }
         }
 
-        public IFillBrush HorizontalGridLineBrush { get; set; }
-        public IFillBrush VerticalGridLineBrush { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IFillBrush _HorizontalGridLineBrush;
+        public IFillBrush HorizontalGridLineBrush
+        {
+            get => _HorizontalGridLineBrush;
+            set
+            {
+                if (_HorizontalGridLineBrush != value)
+                {
+                    _HorizontalGridLineBrush = value;
+                    NPC(nameof(HorizontalGridLineBrush));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IFillBrush _VerticalGridLineBrush;
+        public IFillBrush VerticalGridLineBrush
+        {
+            get => _VerticalGridLineBrush;
+            set
+            {
+                if (_VerticalGridLineBrush != value)
+                {
+                    _VerticalGridLineBrush = value;
+                    NPC(nameof(VerticalGridLineBrush));
+                }
+            }
+        }
         #endregion GridLines
 
         private void CheckIfOuterPaddingChanged()
@@ -730,6 +816,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     _RowSpacing = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(RowSpacing));
                 }
             }
         }
@@ -748,6 +835,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     _ColumnSpacing = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(ColumnSpacing));
                 }
             }
         }

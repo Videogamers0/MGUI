@@ -45,6 +45,7 @@ namespace MGUI.Core.UI.Containers
                 {
                     _Orientation = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(Orientation));
                 }
             }
         }
@@ -59,6 +60,7 @@ namespace MGUI.Core.UI.Containers
                 {
                     _FlowDirection = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(FlowDirection));
                 }
             }
         }*/
@@ -76,6 +78,7 @@ namespace MGUI.Core.UI.Containers
                 {
                     _Spacing = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(Spacing));
                 }
             }
         }
@@ -150,6 +153,8 @@ namespace MGUI.Core.UI.Containers
                 this.BorderElement = new(Window, 0, null as IFillBrush);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
+                BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
+                BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
                 this.Orientation = Orientation;
                 //this.FlowDirection = FlowDirection.LeftToRight;

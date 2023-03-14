@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using MGUI.Core.UI.Brushes.Border_Brushes;
+﻿using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using System;
 using System.Collections.Generic;
@@ -8,9 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DrawingColor = System.Drawing.Color;
-using ColorTranslator = System.Drawing.ColorTranslator;
-using System.Text.RegularExpressions;
+using XNAColor = Microsoft.Xna.Framework.Color;
 
 #if UseWPF
 using System.Windows.Markup;
@@ -28,6 +25,7 @@ namespace MGUI.Core.UI.XAML
         public byte A { get; set; }
 
         public XAMLColor() : this(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue) { }
+        public XAMLColor(XNAColor Color) : this(Color.R, Color.G, Color.B, Color.A) { }
         public XAMLColor(byte R, byte G, byte B) : this(R, G, B, byte.MaxValue) { }
         public XAMLColor(byte R, byte G, byte B, byte A)
         {
@@ -44,70 +42,17 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"({R},{G},{B}|{A})";
 
-        public Color ToXNAColor() => new(R, G, B, A);
+        public XNAColor ToXNAColor() => new(R, G, B, A);
     }
 
     public class ColorStringConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
-        {
-            if (sourceType == typeof(string))
-                return true;
-            return base.CanConvertFrom(context, sourceType);
-        }
-
-        private static readonly Regex RGBColorRegex = 
-            new($@"^(?i)RGBA?(?-i)\((?<RedComponent>\d{{1,3}}), ?(?<GreenComponent>\d{{1,3}}), ?(?<BlueComponent>\d{{1,3}})(, ?(?<AlphaComponent>\d{{1,3}}))?\)$"); // EX: "RGB(0,128,255)"
-
+            => sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
-        {
-            if (value is string stringValue)
-                return ParseColor(stringValue);
-            else
-                return base.ConvertFrom(context, culture, value);
-        }
-
+            => value is string stringValue ? ParseColor(stringValue) : base.ConvertFrom(context, culture, value);
         public static XAMLColor ParseColor(string Value)
-        {
-            static DrawingColor ParseDrawingColor(string colorName)
-            {
-                Match RGBMatch = RGBColorRegex.Match(colorName);
-                if (RGBMatch.Success)
-                {
-                    int r = int.Parse(RGBMatch.Groups["RedComponent"].Value);
-                    int g = int.Parse(RGBMatch.Groups["GreenComponent"].Value);
-                    int b = int.Parse(RGBMatch.Groups["BlueComponent"].Value);
-                    int a = RGBMatch.Groups["AlphaComponent"].Success ? int.Parse(RGBMatch.Groups["AlphaComponent"].Value) : byte.MaxValue;
-                    return DrawingColor.FromArgb(a, r, g, b);
-                }
-                //  Special case because System.Drawing.Color.Transparent [rgb(255,255,255,0)] is NOT the same as Microsoft.Xna.Framework.Color.Transparent [rgb(0,0,0,0)]
-                //  Drawing XNA color=(255,255,255,0) will render White, whereas drawing XNA color=(0,0,0,0) draws nothing.
-                else if (colorName.Equals("transparent", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return DrawingColor.FromArgb(0, 0, 0, 0);
-                }
-                else
-                {
-                    return ColorTranslator.FromHtml(colorName);
-                }
-            }
-
-            int asteriskIndex = Value.IndexOf('*');
-            if (asteriskIndex > 0)
-            {
-                string colorName = Value.Substring(0, asteriskIndex).Trim();
-                DrawingColor color = ParseDrawingColor(colorName);
-                string opacityScalarString = Value.Substring(asteriskIndex + 1).Trim();
-                float opacityScalar = float.Parse(opacityScalarString);
-
-                return new XAMLColor(color.R, color.G, color.B, color.A) * opacityScalar;
-            }
-            else
-            {
-                DrawingColor color = ParseDrawingColor(Value);
-                return new XAMLColor(color.R, color.G, color.B, color.A);
-            }
-        }
+            => new(XNAColorStringConverter.ParseColor(Value));
     }
     #endregion Color
 
@@ -143,7 +88,7 @@ namespace MGUI.Core.UI.XAML
             {
                 XAMLColor Color1 = ColorStringConverter.ParseColor(colorStrings[0]);
                 XAMLColor Color2 = ColorStringConverter.ParseColor(colorStrings[1]);
-                Color Lerped = Color.Lerp(Color1.ToXNAColor(), Color2.ToXNAColor(), 0.5f);
+                XNAColor Lerped = XNAColor.Lerp(Color1.ToXNAColor(), Color2.ToXNAColor(), 0.5f);
                 XAMLColor Diagonals = new XAMLColor(Lerped.R, Lerped.G, Lerped.B, Lerped.A);
                 return new GradientFillBrush(Color1, Diagonals, Color2, Diagonals);
             }

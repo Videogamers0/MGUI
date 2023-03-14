@@ -25,20 +25,41 @@ namespace MGUI.Core.UI
         public IBorderBrush UnspoiledBorderBrush
         {
             get => ButtonElement.BorderBrush;
-            set => ButtonElement.BorderBrush = value;
+            set
+            {
+                if (ButtonElement.BorderBrush != value)
+                {
+                    ButtonElement.BorderBrush = value;
+                    NPC(nameof(UnspoiledBorderBrush));
+                }
+            }
         }
 
         public Thickness UnspoiledBorderThickness
         {
             get => ButtonElement.BorderThickness;
-            set => ButtonElement.BorderThickness = value;
+            set
+            {
+                if (!ButtonElement.BorderThickness.Equals(value))
+                {
+                    ButtonElement.BorderThickness = value;
+                    NPC(nameof(UnspoiledBorderThickness));
+                }
+            }
         }
 
         /// <summary>A background to use when this <see cref="MGSpoiler"/> is not revealed.</summary>
         public VisualStateFillBrush UnspoiledBackgroundBrush
         {
             get => ButtonElement.BackgroundBrush;
-            set => ButtonElement.BackgroundBrush = value;
+            set
+            {
+                if (ButtonElement.BackgroundBrush != value)
+                {
+                    ButtonElement.BackgroundBrush = value;
+                    NPC(nameof(UnspoiledBackgroundBrush));
+                }
+            }
         }
         #endregion Button
 
@@ -55,13 +76,27 @@ namespace MGUI.Core.UI
         public string UnspoiledText
         {
             get => TextElement.Text;
-            set => TextElement.Text = value;
+            set
+            {
+                if (TextElement.Text != value)
+                {
+                    TextElement.Text = value;
+                    NPC(nameof(UnspoiledText));
+                }
+            }
         }
 
         public HorizontalAlignment UnspoiledTextAlignment
         {
             get => TextElement.TextAlignment;
-            set => TextElement.TextAlignment = value;
+            set
+            {
+                if (TextElement.TextAlignment != value)
+                {
+                    TextElement.TextAlignment = value;
+                    NPC(nameof(UnspoiledTextAlignment));
+                }
+            }
         }
         #endregion Text
 
@@ -89,6 +124,7 @@ namespace MGUI.Core.UI
                     this.ButtonElement.Visibility = IsRevealed ? Visibility.Collapsed : Visibility.Visible;
                     UpdateContentVisibility();
 
+                    NPC(nameof(IsRevealed));
                     if (IsRevealed)
                         OnRevealed?.Invoke(this, EventArgs.Empty);
                     else

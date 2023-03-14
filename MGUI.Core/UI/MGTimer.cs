@@ -69,6 +69,7 @@ namespace MGUI.Core.UI
                 {
                     _ValueDisplayFormat = value;
                     UpdateDisplayedValue(true);
+                    NPC(nameof(ValueDisplayFormat));
                 }
             }
         }
@@ -86,6 +87,7 @@ namespace MGUI.Core.UI
                     TimeSpan Previous = RemainingDuration;
                     _RemainingDuration = ActualValue;
                     UpdateDisplayedValue(false);
+                    NPC(nameof(RemainingDuration));
                     RemainingDurationChanged?.Invoke(this, new(Previous, RemainingDuration));
 
                     if (RemainingDuration.TotalSeconds <= 0)
@@ -102,11 +104,24 @@ namespace MGUI.Core.UI
 
         public bool AllowsNegativeDuration { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private double _TimeScale = 1.0;
         /// <summary>Determines the rate at which <see cref="RemainingDuration"/> changes.<para/>
         /// Default value: 1.0, which means <see cref="RemainingDuration"/> is decremented by 1 second per 1 real-life second.<para/>
         /// For example, if the player has an ability that slows time to 0.50x, you may wish to temporarily set <see cref="TimeScale"/> to 0.50 while the ability is active,<br/>
         /// unless you still wanted the timer to track real time</summary>
-        public double TimeScale { get; set; } = 1.0;
+        public double TimeScale
+        {
+            get => _TimeScale;
+            set
+            {
+                if (_TimeScale != value)
+                {
+                    _TimeScale = value;
+                    NPC(nameof(TimeScale));
+                }
+            }
+        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<TimeSpan, string> _RemainingDurationToString;
@@ -124,6 +139,7 @@ namespace MGUI.Core.UI
                 {
                     _RemainingDurationToString = value;
                     UpdateDisplayedValue(true);
+                    NPC(nameof(RemainingDurationToString));
                 }
             }
         }
@@ -138,6 +154,7 @@ namespace MGUI.Core.UI
                 if (_IsPaused != value)
                 {
                     _IsPaused = value;
+                    NPC(nameof(IsPaused));
                     if (IsPaused)
                         Paused?.Invoke(this, EventArgs.Empty);
                     else
@@ -176,6 +193,8 @@ namespace MGUI.Core.UI
                 this.BorderElement = new(Window);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
+                BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
+                BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
                 this.ValueElement = new(Window, "", Color.White, GetTheme().FontSettings.MediumFontSize);
                 this.ValueComponent = new(ValueElement, false, false, true, true, false, false, true,

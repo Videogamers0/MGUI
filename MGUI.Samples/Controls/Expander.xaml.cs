@@ -11,17 +11,13 @@ namespace MGUI.Samples.Controls
 {
     public class ExpanderSamples : SampleBase
     {
-        private MGExpander Expander1 { get; }
-        private MGTextBlock TextBlock1 { get; }
-
         public ExpanderSamples(ContentManager Content, MGDesktop Desktop)
             : base(Content, Desktop, $"{nameof(Controls)}", "Expander.xaml")
         {
-            Expander1 = Window.GetElementByName<MGExpander>("Expander1");
-            TextBlock1 = Window.GetElementByName<MGTextBlock>("TextBlock1");
-            UpdateTextBlock1Text();
-            Expander1.ExpandedStateChanged += (sender, e) => { UpdateTextBlock1Text(); };
-
+#if NEVER
+            //  This is an alternative implementation of drawing custom graphics inside the expander's toggle button
+            //  (The current implementation uses a ContextualContentPresenter whose Value is bound to the Expander's IsExpanded property.
+            //      The ContextualContentPresenter alternates between showing 2 different MGImages)
             MGExpander CustomIconExpander = Window.GetElementByName<MGExpander>("CustomIconExpander");
             CustomIconExpander.OnEndingDraw += (sender, e) =>
             {
@@ -30,8 +26,7 @@ namespace MGUI.Samples.Controls
                 Point Position = CustomIconExpander.ExpanderToggleButton.LayoutBounds.Center - new Point(Size / 2, Size / 2) + e.DA.Offset;
                 Desktop.TryDrawNamedRegion(e.DA.DT, TextureName, Position, Size, Size);
             };
+#endif
         }
-
-        private void UpdateTextBlock1Text() => TextBlock1.SetText($"The above expander's [c=Turquoise][i]IsExpanded[/i][/c] state is: [c=LightBlue][s=Blue]{Expander1.IsExpanded}[/s][/c]");
     }
 }

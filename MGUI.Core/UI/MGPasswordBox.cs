@@ -28,6 +28,7 @@ namespace MGUI.Core.UI
 					_PasswordCharacter = value;
 					if (!string.IsNullOrEmpty(Text))
 						_ = base.SetText(ReplaceNormalCharactersWith(Text, PasswordCharacter));
+					NPC(nameof(PasswordCharacter));
 				}
 			}
 		}
@@ -37,6 +38,7 @@ namespace MGUI.Core.UI
 		{
             _Password?.Dispose();
 			_Password = Value.AsSecureString();
+			NPC(nameof(Password));
         }
 
 		protected override bool SetText(string Value, bool ExecuteEvenIfSameValue)
@@ -48,6 +50,7 @@ namespace MGUI.Core.UI
                 //Debug.WriteLine($"{nameof(MGPasswordBox)}: Password changed from: \"{Password}\" to \"{Temp?.AsPlainString()}\"");
                 _Password?.Dispose();
                 _Password = Temp;
+				NPC(nameof(Password));
 				PasswordChanged?.Invoke(this, EventArgs.Empty);
                 return true;
             }

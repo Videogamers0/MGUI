@@ -51,9 +51,52 @@ namespace MGUI.Core.UI
 
     public class VisualStateSetting<TDataType> : ViewModelBase
     {
-        public TDataType DisabledValue { get; set; }
-        public TDataType SelectedValue { get; set; }
-        public TDataType NormalValue { get; set; }
+        private readonly EqualityComparer<TDataType> EqualityComparer = EqualityComparer<TDataType>.Default;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private TDataType _DisabledValue;
+        public TDataType DisabledValue
+        {
+            get => _DisabledValue;
+            set
+            {
+                if (!EqualityComparer.Equals(_DisabledValue, value))
+                {
+                    _DisabledValue = value;
+                    NPC(nameof(DisabledValue));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private TDataType _SelectedValue;
+        public TDataType SelectedValue
+        {
+            get => _SelectedValue;
+            set
+            {
+                if (!EqualityComparer.Equals(_SelectedValue, value))
+                {
+                    _SelectedValue = value;
+                    NPC(nameof(SelectedValue));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private TDataType _NormalValue;
+        public TDataType NormalValue
+        {
+            get => _NormalValue;
+            set
+            {
+                if (!EqualityComparer.Equals(_NormalValue, value))
+                {
+                    _NormalValue = value;
+                    NPC(nameof(NormalValue));
+                }
+            }
+        }
 
         public TDataType GetValue(PrimaryVisualState State)
             => State switch
@@ -100,9 +143,11 @@ namespace MGUI.Core.UI
                 if (_HoveredColor != value)
                 {
                     _HoveredColor = value;
-                    NPC(nameof(FocusedColor));
                     UpdateFocusedOverlay();
                     UpdatePressedOverlay();
+                    NPC(nameof(FocusedColor));
+                    NPC(nameof(HoveredColorOverlay));
+                    NPC(nameof(PressedColorOverlay));
                 }
             }
         }
@@ -119,8 +164,8 @@ namespace MGUI.Core.UI
                 if (_PressedModifier != value)
                 {
                     _PressedModifier = value;
-                    NPC(nameof(PressedModifier));
                     UpdatePressedOverlay();
+                    NPC(nameof(PressedModifier));
                 }
             }
         }
@@ -135,8 +180,8 @@ namespace MGUI.Core.UI
                 if (_PressedModifierType != value)
                 {
                     _PressedModifierType = value;
-                    NPC(nameof(PressedModifierType));
                     UpdatePressedOverlay();
+                    NPC(nameof(PressedModifierType));
                 }
             }
         }
@@ -153,6 +198,9 @@ namespace MGUI.Core.UI
                 HoveredFillOverlay = MGSolidFillBrush.Transparent;
                 HoveredBorderOverlay = MGUniformBorderBrush.Transparent;
             }
+            NPC(nameof(HoveredColorOverlay));
+            NPC(nameof(HoveredFillOverlay));
+            NPC(nameof(HoveredBorderOverlay));
         }
 
         private void UpdatePressedOverlay()
@@ -174,6 +222,9 @@ namespace MGUI.Core.UI
                 PressedFillOverlay = MGSolidFillBrush.Transparent;
                 PressedBorderOverlay = MGUniformBorderBrush.Transparent;
             }
+            NPC(nameof(PressedColorOverlay));
+            NPC(nameof(PressedFillOverlay));
+            NPC(nameof(PressedBorderOverlay));
         }
 
         private Color? HoveredColorOverlay => FocusedColor;

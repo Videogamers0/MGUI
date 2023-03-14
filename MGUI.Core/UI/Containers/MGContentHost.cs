@@ -26,10 +26,24 @@ namespace MGUI.Core.UI.Containers
         protected abstract override Thickness UpdateContentMeasurement(Size AvailableSize);
         protected abstract override void UpdateContentLayout(Rectangle Bounds);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _CanChangeContent = true;
         /// <summary>If false, attempting to add or remove children to this <see cref="MGContentHost"/> will throw an exception.<para/>
         /// This is typically only false in rare cases where a control has built-in logic to micro-manage its children,<br/>
-        /// such as the <see cref="MGTabControl"/>'s <see cref="MGTabControl.HeadersPanelComponent"/>, or the <see cref="MGSingleContentHost.Content"/> of a <see cref="MGComboBox{TItemType}"/> (which is derived from <see cref="MGComboBox{TItemType}.SelectedItemTemplate"/>)</summary>
-        public bool CanChangeContent { get; internal set; } = true;
+        /// such as the <see cref="MGTabControl"/>'s <see cref="MGTabControl.HeadersPanelComponent"/>, or the <see cref="MGSingleContentHost.Content"/> of a <see cref="MGComboBox{TItemType}"/> 
+        /// (which is derived from <see cref="MGComboBox{TItemType}.SelectedItemTemplate"/>)</summary>
+        public bool CanChangeContent
+        {
+            get => _CanChangeContent;
+            internal set
+            {
+                if (_CanChangeContent != value)
+                {
+                    _CanChangeContent = value;
+                    NPC(nameof(CanChangeContent));
+                }
+            }
+        }
 
         internal IDisposable AllowChangingContentTemporarily()
             => new TemporaryChange<bool>(CanChangeContent, true, x => CanChangeContent = x);
@@ -168,6 +182,8 @@ namespace MGUI.Core.UI.Containers
                     }
 
                     LayoutChanged(this, true);
+                    NPC(nameof(HasContent));
+                    NPC(nameof(HasMultipleChildren));
                 };
             }
         }
@@ -199,6 +215,8 @@ namespace MGUI.Core.UI.Containers
                     InvokeContentAdded(_Content);
                 }
                 LayoutChanged(this, true);
+                NPC(nameof(Content));
+                NPC(nameof(HasContent));
             }
         }
 
@@ -278,7 +296,14 @@ namespace MGUI.Core.UI.Containers
         public MGElement Header
         {
             get => HeaderPresenter.Content;
-            set => HeaderPresenter.SetContent(value);
+            set
+            {
+                if (HeaderPresenter.Content != value)
+                {
+                    HeaderPresenter.SetContent(value);
+                    NPC(nameof(Header));
+                }
+            }
         }
 
         private Dock _HeaderPosition;
@@ -333,6 +358,7 @@ namespace MGUI.Core.UI.Containers
 
                 UpdateHeaderMargin();
                 LayoutChanged(this, true);
+                NPC(nameof(HeaderPosition));
             }
         }
 
@@ -350,6 +376,7 @@ namespace MGUI.Core.UI.Containers
                 {
                     _Spacing = value;
                     UpdateHeaderMargin();
+                    NPC(nameof(Spacing));
                 }
             }
         }

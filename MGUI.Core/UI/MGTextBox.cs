@@ -95,6 +95,7 @@ namespace MGUI.Core.UI
                 string Previous = Text;
 
                 _Text = Value;
+                NPC(nameof(Text));
 
                 if (!IsExecutingUndoRedo)
                     ClearRedoStack();
@@ -137,6 +138,7 @@ namespace MGUI.Core.UI
             {
                 _FormattedText = Value;
                 TextBlockElement.SetText(FormattedText, Silent);
+                NPC(nameof(FormattedText));
             }
         }
 
@@ -234,6 +236,7 @@ namespace MGUI.Core.UI
                     _PlaceholderText = value;
                     PlaceholderTextBlockElement.Text = PlaceholderText;
                     UpdatePlaceholderVisibility();
+                    NPC(nameof(PlaceholderText));
                 }
             }
         }
@@ -252,7 +255,14 @@ namespace MGUI.Core.UI
         public int MinLines
         {
             get => TextBlockElement.MinLines;
-            set => TextBlockElement.MinLines = value;
+            set
+            {
+                if (TextBlockElement.MinLines != value)
+                {
+                    TextBlockElement.MinLines = value;
+                    NPC(nameof(MinLines));
+                }
+            }
         }
 
         /// <summary>The maximum # of lines to display, regardless of how many lines the actual text content requires.<br/>
@@ -262,13 +272,27 @@ namespace MGUI.Core.UI
         public int? MaxLines
         {
             get => TextBlockElement.MaxLines;
-            set => TextBlockElement.MaxLines = value;
+            set
+            {
+                if (TextBlockElement.MaxLines != value)
+                {
+                    TextBlockElement.MaxLines = value;
+                    NPC(nameof(MaxLines));
+                }
+            }
         }
 
         public bool WrapText
         {
             get => TextBlockElement.WrapText;
-            set => TextBlockElement.WrapText = value;
+            set
+            {
+                if (TextBlockElement.WrapText != value)
+                {
+                    TextBlockElement.WrapText = value;
+                    NPC(nameof(WrapText));
+                }
+            }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -285,15 +309,20 @@ namespace MGUI.Core.UI
             {
                 if (_CharacterLimit != value)
                 {
+                    int? Previous = CharacterLimit;
                     _CharacterLimit = value;
                     if (CharacterLimit.HasValue && Text.Length > CharacterLimit)
                     {
                         SetText(GetTextBackingField().Substring(0, CharacterLimit.Value));
                     }
                     UpdateCharacterCountText();
+                    NPC(nameof(CharacterLimit));
+                    OnCharacterLimitChanged?.Invoke(this, new(Previous, CharacterLimit));
                 }
             }
         }
+
+        public event EventHandler<EventArgs<int?>> OnCharacterLimitChanged;
 
         /// <summary>Provides direct access to the textblock component that displays the character counts when <see cref="ShowCharacterCount"/> is true.</summary>
         public MGComponent<MGTextBlock> CharacterCountComponent { get; }
@@ -306,9 +335,13 @@ namespace MGUI.Core.UI
             get => CharacterCountElement.Visibility == Visibility.Visible;
             set
             {
-                CharacterCountElement.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
-                if (CharacterCountElement.Visibility == Visibility.Visible)
-                    UpdateCharacterCountText();
+                if (ShowCharacterCount != value)
+                {
+                    CharacterCountElement.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+                    if (CharacterCountElement.Visibility == Visibility.Visible)
+                        UpdateCharacterCountText();
+                    NPC(nameof(ShowCharacterCount));
+                }
             }
         }
 
@@ -330,6 +363,7 @@ namespace MGUI.Core.UI
                     _LimitedCharacterCountFormatString = value;
                     if (CharacterLimit.HasValue)
                         UpdateCharacterCountText();
+                    NPC(nameof(LimitedCharacterCountFormatString));
                 }
             }
         }
@@ -352,6 +386,7 @@ namespace MGUI.Core.UI
                     _LimitlessCharacterCountFormatString = value;
                     if (!CharacterLimit.HasValue)
                         UpdateCharacterCountText();
+                    NPC(nameof(LimitlessCharacterCountFormatString));
                 }
             }
         }
@@ -404,6 +439,7 @@ namespace MGUI.Core.UI
                     UpdateFormattedText(true);
                     //if (CurrentSelection.HasValue)
                     //    CurrentCursorPosition = null;
+                    NPC(nameof(CurrentSelection));
                     SelectionChanged?.Invoke(this, new(Previous, CurrentSelection));
                 }
             }
@@ -451,6 +487,7 @@ namespace MGUI.Core.UI
                 {
                     _FocusedSelectionForegroundColor = value;
                     FocusedSelectionForegroundColorString = ColorTranslator.ToHtml(FocusedSelectionForegroundColor.AsDrawingColor());
+                    NPC(nameof(FocusedSelectionForegroundColor));
                 }
             }
         }
@@ -485,6 +522,7 @@ namespace MGUI.Core.UI
                 {
                     _FocusedSelectedBackgroundColor = value;
                     FocusedSelectionBackgroundColorString = ColorTranslator.ToHtml(FocusedSelectionBackgroundColor.AsDrawingColor());
+                    NPC(nameof(FocusedSelectionBackgroundColor));
                 }
             }
         }
@@ -521,6 +559,7 @@ namespace MGUI.Core.UI
                 {
                     _UnfocusedSelectionForegroundColor = value;
                     UnfocusedSelectionForegroundColorString = ColorTranslator.ToHtml(UnfocusedSelectionForegroundColor.AsDrawingColor());
+                    NPC(nameof(UnfocusedSelectionForegroundColor));
                 }
             }
         }
@@ -555,6 +594,7 @@ namespace MGUI.Core.UI
                 {
                     _UnfocusedSelectionBackgroundColor = value;
                     UnfocusedSelectionBackgroundColorString = ColorTranslator.ToHtml(UnfocusedSelectionBackgroundColor.AsDrawingColor());
+                    NPC(nameof(UnfocusedSelectionBackgroundColor));
                 }
             }
         }
@@ -688,6 +728,7 @@ namespace MGUI.Core.UI
                     _UndoRedoHistorySize = value;
                     UndoStack.SetLimit(UndoRedoHistorySize);
                     RedoStack.SetLimit(UndoRedoHistorySize);
+                    NPC(nameof(UndoRedoHistorySize));
                 }
             }
         }
@@ -777,6 +818,7 @@ namespace MGUI.Core.UI
                         this.CurrentSelection = null;
                     }
 
+                    NPC(nameof(IsReadonly));
                     ReadonlyChanged?.Invoke(this, IsReadonly);
                 }
             }
@@ -785,12 +827,40 @@ namespace MGUI.Core.UI
         /// <summary>Invoked when <see cref="IsReadonly"/> changes.</summary>
         public event EventHandler<bool> ReadonlyChanged;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _AcceptsReturn;
         /// <summary>Note: This feature is not available for <see cref="MGPasswordBox"/>.<para/>
         /// Default value: true</summary>
-        public virtual bool AcceptsReturn { get; set; } = true;
+        public virtual bool AcceptsReturn
+        {
+            get => _AcceptsReturn;
+            set
+            {
+                if (_AcceptsReturn != value)
+                {
+                    _AcceptsReturn = value;
+                    NPC(nameof(AcceptsReturn));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _AcceptsTab;
         /// <summary>Note: This feature is not available for <see cref="MGPasswordBox"/>.<para/>
         /// Default value: true</summary>
-        public virtual bool AcceptsTab { get; set; } = true;
+        public virtual bool AcceptsTab
+        {
+            get => _AcceptsTab;
+            set
+            {
+                if (_AcceptsTab != value)
+                {
+                    _AcceptsTab = value;
+                    NPC(nameof(AcceptsTab));
+                }
+            }
+        }
+
         private const int TabSpacesCount = 4;
 
         private record struct RecentKeyPress(BaseKeyPressedEventArgs KeyArgs)
@@ -803,21 +873,73 @@ namespace MGUI.Core.UI
 
         private RecentKeyPress? LastKeyPress { get; set; } = null;
 
+        [DebuggerBrowsable (DebuggerBrowsableState.Never)]
+        private bool _IsHeldKeyRepeated = true;
         /// <summary>If true, the most-recently pressed key will be repeatedly inputted (~30 times/second). Default value: true<br/>
         /// Some keys might not be repeated, such as special characters, or special keyboard shortcuts like 'Ctrl+C'.<para/>
         /// EX: Text="". Press 'A'. Text="A". Keep holding 'A' for about 1 second. Text="AAAAAAAAAAAAAAAA". Release 'A'.<para/>
         /// See also: <see cref="InitialKeyRepeatDelay"/>, <see cref="KeyRepeatInterval"/></summary>
-        public bool IsHeldKeyRepeated { get; set; } = true;
+        public bool IsHeldKeyRepeated
+        {
+            get => _IsHeldKeyRepeated;
+            set
+            {
+                if (_IsHeldKeyRepeated != value)
+                {
+                    _IsHeldKeyRepeated = value;
+                    NPC(nameof(IsHeldKeyRepeated));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private TimeSpan _InitialKeyRepeatDelay = TimeSpan.FromSeconds(0.5);
         /// <summary>The initial delay before a pressed key will be repeatedly inputted.<para/>
         /// See also: <see cref="IsHeldKeyRepeated"/> <see cref="KeyRepeatInterval"/></summary>
-        public TimeSpan InitialKeyRepeatDelay { get; set; } = TimeSpan.FromSeconds(0.5);
+        public TimeSpan InitialKeyRepeatDelay
+        {
+            get => _InitialKeyRepeatDelay;
+            set
+            {
+                if (_InitialKeyRepeatDelay != value)
+                {
+                    _InitialKeyRepeatDelay = value;
+                    NPC(nameof(InitialKeyRepeatDelay));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private TimeSpan _KeyRepeatInterval = TimeSpan.FromSeconds(1.0 / 30); // 30 repetitions per second when holding down a key
         /// <summary>How often to repeatedly input the most-recently pressed key.<para/>
         /// See also: <see cref="IsHeldKeyRepeated"/>, <see cref="InitialKeyRepeatDelay"/></summary>
-        public TimeSpan KeyRepeatInterval { get; set; } = TimeSpan.FromSeconds(1.0 / 30); // 30 repetitions per second when holding down a key
+        public TimeSpan KeyRepeatInterval
+        {
+            get => _KeyRepeatInterval;
+            set
+            {
+                if (_KeyRepeatInterval != value)
+                {
+                    _KeyRepeatInterval = value;
+                    NPC(nameof(KeyRepeatInterval));
+                }
+            }
+        }
 
-        public TextEntryMode TextEntryMode { get; set; } = TextEntryMode.Insert;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private TextEntryMode _TextEntryMode = UI.TextEntryMode.Insert;
+        public TextEntryMode TextEntryMode
+        {
+            get => _TextEntryMode;
+            set
+            {
+                if (_TextEntryMode != value)
+                {
+                    _TextEntryMode = value;
+                    NPC(nameof(TextEntryMode));
+                }
+            }
+        }
 
         public MGTextCaret Caret { get; }
 
@@ -839,6 +961,7 @@ namespace MGUI.Core.UI
             {
                 _IsUserResizable = value;
                 ResizeGripElement.Visibility = IsUserResizable ? Visibility.Visible : Visibility.Collapsed;
+                NPC(nameof(IsUserResizable));
             }
         }
         #endregion Resizing
@@ -860,6 +983,8 @@ namespace MGUI.Core.UI
                 this.BorderElement = new(Window);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
+                BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
+                BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
                 this.ResizeGripElement = new(Window);
                 this.ResizeGripComponent = MGComponentBase.Create(ResizeGripElement);
@@ -901,6 +1026,9 @@ namespace MGUI.Core.UI
 
                 this.IsReadonly = false;
                 this.CharacterLimit = CharacterLimit;
+
+                this.AcceptsReturn = true;
+                this.AcceptsTab = true;
 
                 this.Caret = new(this, TextBlockElement);
 

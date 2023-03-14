@@ -1,0 +1,479 @@
+<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        xmlns:Converters="clr-namespace:MGUI.Core.UI.Data_Binding.Converters;assembly=MGUI.Core"
+        Left="440" Top="20" MinHeight="0" Width="740" Height="800" TitleText="Bindings" Padding="10">
+    <Window.Styles>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10" />
+        </Style>
+        <Style Name="Header1" TargetType="TextBlock">
+            <Setter Property="IsBold" Value="True" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style TargetType="Separator">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Height" Value="2" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Opacity" Value="0.25" />
+        </Style>
+        <Style TargetType="Expander">
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="Background" Value="White * 0.1" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
+        <StackPanel Orientation="Vertical" Spacing="10">
+            <TextBlock StyleNames="Header1" Text="Data Bindings:" HorizontalAlignment="Center" />
+            <Separator/>
+            <TextBlock>
+                DataBinding refers to the concept of 'binding' 2 separate pieces of data together to synchronize their values. 
+                MGUI uses its own DataBinding engine which provides a convenient and generalized framework for tightly-coupling data, 
+                especially to the user interface.
+            </TextBlock>
+            <Separator />
+
+            <Expander>
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="The basics" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="2" Padding="4">
+                    <TextBlock>Each binding requires 4 pieces of info:</TextBlock>
+                    <StackPanel Orientation="Vertical" Margin="20,0,0,0">
+                        <TextBlock Text="Target Object" />
+                        <TextBlock Text="Target Path" />
+                        <TextBlock Text="Source Object" />
+                        <TextBlock Text="Source Path" />
+                    </StackPanel>
+                    <Spacer Height="3" />
+                    <TextBlock Text="Let's take a look at a simple binding:" />
+                    <TextBox Background="rgb(12,16,82)" IsReadonly="True" Text='&lt;TextBlock Text="{MGBinding Path=DisplayName}" /&gt;' />
+                    <TextBlock>
+                        [c=Turquoise]TargetObject[/c]=[c=LightBlue][s=Blue]The TextBlock[/s][/c],
+                        [c=Turquoise]TargetPath[/c]=[c=LightBlue][s=Blue]Text[/s][/c],
+                        [c=Turquoise]SourceObject[/c]=[c=LightBlue][s=Blue]The TextBlock's DataContext[/s][/c],
+                        [c=Turquoise]SourcePath[/c]=[c=LightBlue][s=Blue]DisplayName[/s][/c]
+                    </TextBlock>
+                    <Spacer Height="4" />
+                    <TextBlock>
+                        This binding would set [c=Turquoise]TextBlock.Text[/c]=[c=LightBlue][s=Blue]TextBlock.DataContext.DisplayName[/s][/c];
+                    </TextBlock>
+                    <Spacer Height="4" />
+                    <TextBlock>
+                        By default, bindings use [c=Turquoise]Mode[/c]=[c=LightBlue][s=Blue]DataBindingMode.OneWay[/s][/c], meaning
+                        that changes to the values of the source property will be propagated to the target property.
+                        But changes will NOT be propagated in the opposite direction. If [c=Turquoise]TextBlock.DataContext.DisplayName[/c] changes,
+                        [c=Turquoise]TextBlock.Text[/c] would be updated, but if [c=Turquoise]TextBlock.Text[/c] changes, [c=Turquoise]TextBlock.DataContext.DisplayName[/c]
+                        would not be updated.
+                    </TextBlock>
+                    <Spacer Height="4" />
+                    <TextBlock Text="Explicitly set the [c=Turquoise]Mode[/c] property if you don't want to use the default value of [c=LightBlue][s=Blue]OneWay[/s][/c]:" />
+                    <TextBox Background="rgb(12,16,82)" IsReadonly="True" Text='&lt;TextBlock Text="{MGBinding Path=DisplayName, Mode=TwoWay}" /&gt;' />
+                    <TextBlock>
+                        This example uses a [c=LightBlue][s=Blue]TwoWay[/s][/c] binding. Changes to the property values are synchronized in both directions.
+                        Other possible values: [c=LightBlue][s=Blue]OneTime[/s][/c] (the source property value is set to the target property, but only once when the
+                        binding is initialized) and [c=LightBlue][s=Blue]OneWayToSource[/s][/c] (the opposite of [c=LightBlue][s=Blue]OneWay[/s][/c]: Values from the
+                        target property are propagated to the source property)
+                    </TextBlock>
+                </StackPanel>
+            </Expander>
+            <Separator />
+
+            <Expander>
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="DataContext" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="2" Padding="4">
+                    <TextBlock>
+                        DataContext is just an object attached to another object, usually via a property named [c=Turquoise]DataContext[/c].
+                        Source data of a binding is typically retrieved from the [c=Turquoise]DataContext[/c].
+                    </TextBlock>
+                    <TextBlock xml:space="preserve" FontSize="8" LinePadding="0">
+public class MyObject
+{
+    public object DataContext { get; set; }
+                    
+    public MyObject()
+    {
+        this.DataContext = new MyDataContext();          
+    }
+}
+                    
+public class MyDataContext
+{
+    public string SomeProperty { get; set; }      
+}
+                    </TextBlock>
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        When the binding engine attempts to find the source data, it starts by looking for the value of a property named 
+                        [c=LightBlue][s=Blue]DataContext[/s][/c] on the [c=Turquoise]TargetObject[/c]. Then it attempts to find a property at the given
+                        [c=Turquoise]SourcePath[/c]. For example, if [c=Turquoise]SourcePath[/c]=[c=LightBlue][s=Blue]Foo.Bar[/s][/c], the source
+                        data is retrieved from [c=LightBlue][s=Blue]TargetObject.DataContext.Foo.Bar[/s][/c].
+                    </TextBlock>
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        If you don't want the source data to be retrieved from a [c=LightBlue][s=Blue]DataContext[/s][/c] property, you can set
+                        [c=Turquoise]DataContextResolver[/c]=[c=LightBlue][s=Blue]Self[/s][/c], which instructs the data binding engine to start
+                        resolving the source path directly from the [c=Turquoise]TargetObject[/c] ([c=LightBlue][s=Blue]TargetObject.Foo.Bar[/s][/c]).
+                        This can be especially useful for binding to data that is directly on the [c=Turquoise]TargetObject[/c], such as this:
+                    </TextBlock>
+                    <TextBox Background="rgb(12,16,82)" IsReadonly="True" Text='&lt;TextBlock ToolTip="{MGBinding DataContextResolver=Self, Path=Text}" /&gt;' />
+                    <TextBlock>
+                        This would set the TextBlock's ToolTip to be the same as the TextBlock's Text. If you're familiar with WPF, you may notice that
+                        MGUI's syntax is a bit different. In WPF you would have used a RelativeSource:
+                    </TextBlock>
+                    <TextBox Background="rgb(12,16,82)" IsReadonly="True" Text='&lt;TextBlock ToolTip="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" /&gt;' />
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        Each [c=Turquoise]Window[/c] instance has a property: [c=Turquoise]WindowDataContext[/c]. The [c=Turquoise]DataContext[/c] of every child element is
+                        automatically set to the window's [c=Turquoise]WindowDataContext[/c]. If you want a particular element to use a different [c=Turquoise]DataContext[/c],
+                        set [c=Turquoise]DataContextOverride[/c]. Nested windows (such as [c=Turquoise]ToolTips[/c] or [c=Turquoise]ContextMenus[/c]) automatically inherit their parent
+                        window's [c=Turquoise]WindowDataContext[/c].
+                    </TextBlock>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <Expander>
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="INotifyPropertyChanged" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="2" Padding="4">
+                    <TextBlock>
+                        The DataBinding engine cannot detect and react to changes of bound data unless the object containing the data notifies that it changed.
+                        This is done through the use of the [c=Turquoise]INotifyPropertyChanged[/c] interface.
+                    </TextBlock>
+                    <TextBlock xml:space="preserve" IsShadowed="True" ShadowColor="Black * 0.5">
+[c=DodgerBlue]public class[/c] [c=Turquoise]SampleDataContext[/c] : [c=Turquoise]INotifyPropertyChanged[/c]
+{
+    [c=LightGreen]//  INotifyPropertyChanged implementation[/c]
+    [c=DodgerBlue]public event[/c] [c=Turquoise]PropertyChangedEventHandler[/c] PropertyChanged;
+    [c=DodgerBlue]public virtual void[/c] NotifyPropertyChanged([c=DodgerBlue]string[/c] PropertyName)
+        => PropertyChanged?.Invoke([c=DodgerBlue]this[/c], [c=DodgerBlue]new[/c] [c=Turquoise]PropertyChangedEventArgs[/c](PropertyName));
+    
+    [c=DodgerBlue]private string[/c] _SampleProperty;
+    [c=DodgerBlue]public string[/c] SampleProperty
+    {
+        [c=DodgerBlue]get[/c] => _SampleProperty;
+        [c=DodgerBlue]set[/c]
+        {
+            [c=DodgerBlue]if[/c] (_SampleProperty != [c=DodgerBlue]value[/c])
+            {
+                _SampleProperty = [c=DodgerBlue]value[/c];
+                NotifyPropertyChanged([c=DodgerBlue]nameof[/c](SampleProperty));
+            }
+        }
+    }
+}
+                    </TextBlock>
+                    <TextBlock>
+                        To bind to a property using a [c=Turquoise]DataBindingMode[/c] other than [c=LightBlue][s=Blue]OneTime[/s][/c], the property should be defined
+                        in a class that implements [c=Turquoise]INotifyPropertyChanged[/c]. Whenever you want to notify the binding engine that the property's value changed,
+                        you should invoke the [c=Turquoise]PropertyChangedEventHandler[/c] with the property's name as the parameter. This is typically done via the
+                        property's setter function, as shown above.
+                    </TextBlock>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <Expander>
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="ElementName" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="2" Padding="4">
+                    <TextBlock>
+                        Usually the [c=Turquoise]SourceObject[/c] is given by the [c=Turquoise]TargetObject[/c]'s [c=Turquoise]DataContext[/c].
+                        As already mentioned, you can set [c=Turquoise]DataContextResolver[/c]=[c=LightBlue][s=Blue]Self[/s][/c] if you don't
+                        want to bind to a path relative to a [c=Turquoise]DataContext[/c] property. But what if you don't want the [c=Turquoise]SourceObject[/c]
+                        to be relative to the [c=Turquoise]TargetObject[/c] at all?
+                    </TextBlock>
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        Set [c=Turquoise]ElementName[/c] to make the [c=Turquoise]SourceObject[/c] be computed relative to another named element.
+                    </TextBlock>
+                    <TextBox Background="rgb(12,16,82)" IsReadonly="True"
+                             Text='&lt;CheckBox Name="CheckBox1" IsChecked="True"&gt;\n    &lt;TextBlock Text="{MGBinding ElementName=CheckBox1, Path=IsChecked}" /&gt;\n&lt;/CheckBox&gt;'>
+                        <TextBox.TextBlock>
+                            <TextBlock FontSize="9" IsShadowed="True" ShadowColor="Black * 0.35" />
+                        </TextBox.TextBlock>
+                    </TextBox>
+                    <Spacer Height="2" />
+                    <DockPanel HorizontalAlignment="Left" Padding="4" Background="White * 0.1">
+                        <TextBlock Dock="Bottom" FontSize="9" Text="Check or un-check the [c=Turquoise]CheckBox[/c] to see the bound [c=Turquoise]Text[/c] property update" />
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <TextBlock Text="Result:" VerticalAlignment="Center" />
+                            <Border Background="White * 0.1" Padding="4,2" HorizontalAlignment="Left" BorderThickness="0">
+                                <CheckBox Name="CheckBox1" IsChecked="True">
+                                    <TextBlock Text="{MGBinding ElementName=CheckBox1, Path=IsChecked}" />
+                                </CheckBox>
+                            </Border>
+                        </StackPanel>
+                    </DockPanel>
+                    <Spacer Height="2" />
+                    <TextBlock>
+                        [c=Turquoise]ElementNames[/c] are only resolved once, when the [c=Turquoise]DataBinding[/c] is initialized. The specified name value
+                        must uniquely refer to another element within the scope of the window that the [c=Turquoise]TargetObject[/c] belongs to.
+                    </TextBlock>
+                    <Spacer Height="2" />
+                    <TextBlock>
+                        Also notice that we didn't need to specify [c=Turquoise]DataContextResolver[/c]=[c=LightBlue][s=Blue]Self[/s][/c] because
+                        that's already the default value when using an [c=Turquoise]ElementName[/c] binding. (Usually the default value is [c=LightBlue][s=Blue]DataContext[/s][/c])
+                    </TextBlock>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <Expander>
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="Value Conversion" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="5" Padding="4">
+                    <TextBlock>
+                        You can bind 2 properties together even if they have different Types. The DataBinding engine will automatically
+                        attempt to convert the types using the default [c=Turquoise]TypeConverter[/c] for the target type. This allows converting
+                        between several primitives types, such as [c=LightBlue][s=Blue]string[/s][/c] to [c=LightBlue][s=Blue]double[/s][/c].
+                        Some data could be lost due to precision such as if attempting to convert from [c=LightBlue][s=Blue]double[/s][/c]
+                        to [c=LightBlue][s=Blue]int[/s][/c].
+                    </TextBlock>
+                    <TextBlock>
+                        If you explicitly specify a [c=Turquoise]Converter[/c] (a class that implements [c=Turquoise]IValueConverter[/c]) when creating the binding, 
+                        that converter's [c=Turquoise]Convert[/c] and [c=Turquoise]ConvertBack[/c] functions will be called on the target value before
+                        any default conversion is applied. [c=Turquoise]Convert[/c] is used when attempting to store the source property's value in the
+                        target property. [c=Turquoise]ConvertBack[/c] is used when attempting to store the target property's value in the source property.
+                    </TextBlock>
+                    
+                    <StackPanel Orientation="Vertical" Spacing="3" Background="White * 0.1" Padding="4">
+                        <TextBlock>
+                            To specify a converter in XAML, you must map the namespace (that the converter is defined in) to a prefix using: xmlns:SomePrefix="{Path to namespace}"
+                        </TextBlock>
+                        <TextBox Background="rgb(12,16,82)" IsReadonly="True"
+                                 Text='&lt;StackPanel Orientation="Vertical"\n                         xmlns:Converters="clr-namespace:MGUI.Core.UI.Data_Binding.Converters;assembly=MGUI.Core"&gt;\n    &lt;CheckBox Name="SampleCheckBox" Content="This CheckBox displays additional text below it when checked" /&gt;\n    &lt;TextBlock Text="The CheckBox is checked" Visibility="{MGBinding ElementName=SampleCheckBox, Path=IsChecked, Converter={Converters:BoolToVisibilityConverter}}" /&gt;\n&lt;/StackPanel&gt;'>
+                            <TextBox.TextBlock>
+                                <TextBlock FontSize="9" IsShadowed="True" ShadowColor="Black * 0.35" />
+                            </TextBox.TextBlock>
+                        </TextBox>
+                        <DockPanel HorizontalAlignment="Left">
+                            <TextBlock VerticalAlignment="Center" Text="Result:" IsBold="True" Dock="Left" Margin="0,0,5,0" />
+                            <StackPanel Orientation="Vertical" Padding="4" Background="White * 0.1">
+                                <CheckBox Name="SampleCheckBox" Content="This CheckBox displays additional text below it when checked" />
+                                <TextBlock Text="The CheckBox is checked" Visibility="{MGBinding ElementName=SampleCheckBox, Path=IsChecked, Converter={Converters:BoolToVisibilityConverter}}" />
+                            </StackPanel>
+                        </DockPanel>
+                        <TextBlock xml:space="preserve">The [c=Turquoise]StackPanel[/c] defines the XML namespace and maps it to the prefix [c=Yellow]Converters[/c]:
+[c=Yellow]xmlns:Converters="clr-namespace:MGUI.Core.UI.Data_Binding.Converters;assembly=MGUI.Core"[/c]
+The Converter is specified using:
+[c=Yellow]Converter={Converters:BoolToVisibilityConverter}[/c]</TextBlock>
+                        <TextBlock>
+                            MGUI has a few built in converters in the namespace: [c=Turquoise]MGUI.Core.UI.Data_Binding.Converters[/c].
+                            If you want to use your own converter, create a class that implements [c=Turquoise]IValueConverter[/c].
+                        </TextBlock>
+                    </StackPanel>
+                    <Spacer Height="3" />
+
+                    <StackPanel Orientation="Vertical" Spacing="5" Background="White * 0.1" Padding="4">
+                        <TextBlock>
+                            If you specify a [c=Turquoise]StringFormat[/c], it will be used to format the value if
+                            the target Type of the binding is [c=LightBlue][s=Blue]string[/c][/s].
+                        </TextBlock>
+                        <StackPanel Orientation="Vertical" Spacing="3">
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock IsBold="True" Text="Without StringFormat:" />
+                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                    <Slider Name="Slider1" Width="300" Minimum="0" Maximum="5" DrawTicks="True" TickFrequency="1" Value="2.566" />
+                                    <TextBlock VerticalAlignment="Center" Text="{MGBinding ElementName=Slider1, Path=Value}" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock IsBold="True" Text="With StringFormat to only show 1 decimal place:" />
+                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                    <Slider Name="Slider2" Width="300" Minimum="0" Maximum="5" DrawTicks="True" TickFrequency="1" Value="2.566" />
+                                    <TextBlock VerticalAlignment="Center" Text="{MGBinding ElementName=Slider2, Path=Value, StringFormat={}{0:0.0}}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                    <TextBlock>
+                        If a conversion could not be made, the target property will not have its value set.
+                    </TextBlock>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <Expander>
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="DataBinding in c# code" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="2" Padding="4">
+                    <TextBlock>
+                        Bindings are usually defined in XAML, but you can also create them with c# code via:
+                        [c=Turquoise]MGUI.Core.UI.Data_Binding.DataBindingManager.AddBinding[/c](...)
+                    </TextBlock>
+                    <TextBlock Text="TODO: more documentation coming soon..." />
+                    <!--TODO: Details about the MGBindingConfig etc -->
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <Expander>
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="Limitations" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="2" Padding="4">
+                    <Expander IsExpanded="False">
+                        <Expander.Header>
+                            <TextBlock StyleNames="Header1" FontSize="12" Text="Properties" />
+                        </Expander.Header>
+                        <StackPanel Orientation="Vertical" Spacing="2" Padding="4">
+                            <TextBlock>
+                                DataBindings will only work properly on [b]Properties[/b]. They should NOT be used with [b]Fields[/b].
+                            </TextBlock>
+                            <TextBlock Padding="3" Margin="2" Background="White * 0.1"
+                        Text="Correct (Property): [c=DodgerBlue]public bool[/c] SampleVariable { [c=DodgerBlue]get[/c]; [c=DodgerBlue]set;[/c] }\n   Incorrect (Field): [c=DodgerBlue]public bool[/c] SampleVariable;" />
+                            <Spacer Height="5" />
+                            <TextBlock>
+                                The getter and setter of the bound property should typically be [c=DodgerBlue]public[/c]. 
+                                If you are binding with a [c=Turquoise]Mode[/c] that doesn't need to set the bound property's value, 
+                                then it's fine for the property's setter to be [c=DodgerBlue]private[/c]. For example, if
+                                you're using a [c=LightBlue][s=Blue]OneWay[/s][/c] binding, then the source property's
+                                setter can be private because the binding engine would only need to set the target property.
+                            </TextBlock>
+                            <Spacer Height="5" />
+                            <TextBlock>
+                                For bindings other than [c=LightBlue][s=Blue]OneTime[/s][/c], the source and/or target properties should belong
+                                to a class that implements [c=Turquoise]INotifyPropertyChanged[/c] interface. The class should raise the
+                                [c=Turquoise]PropertyChanged[/c] event with the name of the modified property after its value changes.
+                            </TextBlock>
+                        </StackPanel>
+                    </Expander>
+                    <Spacer Height="5" />
+                    <Expander IsExpanded="False">
+                        <Expander.Header>
+                            <TextBlock StyleNames="Header1" FontSize="12" Text="IDisposable / Memory Leaks" />
+                        </Expander.Header>
+                        <StackPanel Orientation="Vertical" Spacing="5" Padding="4">
+                            <TextBlock>
+                                [c=Turquoise]DataBinding[/c] objects implement [c=Turquoise]IDisposable[/c]. There may be minor memory leaks
+                                if you don't properly dispose of bindings that you're no longer using.
+                            </TextBlock>
+                            <TextBlock>
+                                When a binding is created, it must
+                                subscribe to [c=Turquoise]PropertyChanged[/c] events to receive and react to property values being changed and
+                                propagate the updated value to the other property of the binding. When a binding is disposed via [c=Turquoise]IDisposable.Dispose[/c],
+                                it will unsubscribe from these events.
+                            </TextBlock>
+                            <TextBlock>
+                                If you have [c=Turquoise]DataBindings[/c] that are attached to [c=Turquoise]MGElement[/c] instances (MGUI.Core.UI.MGElement),
+                                you can call [c=Turquoise]MGElement.RemoveDataBindings[/c]([c=DodgerBlue]bool[/c] IncludeChildren) when you're done using the element.
+                            </TextBlock>
+                            <TextBlock>
+                                In some cases with auto-generated Content, MGUI will automatically dispose of unneeded bindings for you. 
+                                For example, [c=Turquoise]ComboBoxes[/c] have a [c=Turquoise]SelectedItemTemplate[/c] that is used to 
+                                generate the Content for the selected item. When the selected item changes, the Content of the old selected item 
+                                is no longer needed, so MGUI automatically disposes of bindings attached to that old Content.
+                            </TextBlock>
+                        </StackPanel>
+                    </Expander>
+                    <Spacer Height="5" />
+                    <Expander IsExpanded="False">
+                        <Expander.Header>
+                            <TextBlock StyleNames="Header1" FontSize="12" Text="ISourceObjectResolver" />
+                        </Expander.Header>
+                        <StackPanel Orientation="Vertical" Spacing="5" Padding="4">
+                            <TextBlock>The source property of a [c=Turquoise]DataBinding[/c] is computed in 3 steps by the DataBinding engine:</TextBlock>
+                                <TextBlock xml:space="preserve">1. Use the [c=Turquoise]SourceObjectResolver[/c] to determine where to start
+    If [c=Turquoise]SourceObjectResolver[/c]=[c=LightBlue][s=Blue]Self[/s][/c]:
+        Start from the [c=Turquoise]TargetObject[/c]
+    If [c=Turquoise]SourceObjectResolver[/c]=[c=LightBlue][s=Blue]ElementName[/s][/c]
+        Start from a particular named element in the [c=Turquoise]TargetObject[/c]'s [c=Turquoise]Window[/c] ([c=Turquoise]MGelement.SelfOrParentWindow[/c])
+    If [c=Turquoise]SourceObjectResolver[/c]=[c=LightBlue][s=Blue]ElementAncestor[/s][/c]
+        Start from a particular parent element of the [c=Turquoise]TargetObject[/c], based on the [c=Turquoise]AncestorLevel[/c] / [c=Turquoise]AncestorType[/c]
+    If [c=Turquoise]SourceObjectResolver[/c]=[c=LightBlue][s=Blue]Desktop[/s][/c]
+        Start from the [c=Turquoise]TargetObject[/c]'s Desktop ([c=Turquoise]MGElement.GetDesktop[/c]())
+2. Use the [c=Turquoise]DataContextResolver[/c] to determine if the binding should read directly from the 1st step's result ([c=Turquoise]DataContextResolver[/c]=[c=LightBlue][s=Blue]Self[/s][/c]), or if it should additionally read the value of a [c=Turquoise]DataContext[/c] property ([c=Turquoise]DataContextResolver[/c]=[c=LightBlue][s=Blue]DataContext[/s][/c]).
+3. Traverse the binding's [c=Turquoise]SourcePath[/c] to find the desired property.</TextBlock>
+                            <TextBlock>
+                                The 1st step is only resolved once when the binding is initialized. Consider the following scenario: 
+                                A [c=Turquoise]Window[/c] contains a [c=Turquoise]CheckBox[/c] named [b]Item1[/b].
+                                A [c=Turquoise]DataBinding[/c] is created, using [c=Turquoise]ElementName[/c]=[c=LightBlue][s=Blue]Item1[/s][/c].
+                                The [c=Turquoise]CheckBox[/c] is renamed to [b]Item2[/b].
+                                A [c=Turquoise]RadioButton[/c] is added to the [c=Turquoise]Window[/c], and is named [b]Item1[/b].
+                                Since the [c=Turquoise]DataBinding[/c] was already created, it would still be bound to the [c=Turquoise]CheckBox[/c], even though that object has a different name now.
+                            </TextBlock>
+                        </StackPanel>
+                    </Expander>
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        TODO: Documentation on circular dependencies, such as a TwoWay binding to another Element's Height.
+                        Also describe cases where a bound property's setter might set the value to a different value than what was
+                        passed into the setter function, which could result in un-synchronized values.
+                    </TextBlock>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <Expander>
+                <Expander.Header>
+                    <TextBlock StyleNames="Header1" Text="Samples" />
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Spacing="8" Padding="4">
+                    <StackPanel Orientation="Vertical" Spacing="2" Padding="4" Background="White * 0.1">
+                        <TextBlock>
+                            This example places a [c=Turquoise]TextBlock[/c] to the right of a [c=Turquoise]Slider[/c]. 
+                            The [c=Turquoise]TextBlock[/c] displays the current [c=Turquoise]Value[/c] of the [c=Turquoise]Slider[/c].
+                        </TextBlock>
+                        <Separator/>
+                        <Spacer Height="5" />
+                        <DockPanel>
+                            <TextBlock Dock="Right" Margin="5,0,0,0" VerticalAlignment="Center" MinWidth="40" IsBold="True" TextAlignment="Center"
+                                       Text="{MGBinding ElementName=Slider3, Path=Value, Mode=OneWay}" />
+                            <Slider Name="Slider3" Minimum="0" Maximum="10" UseDiscreteValues="True" DiscreteValueInterval="0.25" DrawTicks="True" TickFrequency="1" Value="5" />
+                        </DockPanel>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Spacing="2" Padding="4" Background="White * 0.1">
+                        <TextBlock>
+                            This example contains multiple [c=Turquoise]RadioButtons[/c]. Each one has additional text below it, 
+                            but the additional text is only visible when the [c=Turquoise]RadioButton[/c] above it is checked.
+                            This is achieved using an ElementName binding to the [c=Turquoise]RadioButton.IsChecked[/c] property, and
+                            using a Converter to convert from [c=LightBlue][s=Blue]bool[/s][/c] to [c=LightBlue][s=Blue]Visibility[/s][/c].
+                        </TextBlock>
+                        <Separator/>
+                        <Spacer Height="3" />
+                        <TextBlock Text="Select your favorite programming language:" HorizontalAlignment="Center" FontSize="12" />
+                        <RadioButton Name="RadioButtonC#" GroupName="Group1" Content="C#" IsChecked="True" />
+                        <TextBlock Margin="20,0,0,0" FontSize="8"
+                                   Visibility="{MGBinding ElementName=RadioButtonC#, Path=IsChecked, Mode=OneWay, Converter={Converters:BoolToVisibilityConverter TrueVisibility=Visible, FalseVisibility=Collapsed}}">
+                            <TextBlock.Text>
+                                C# is a general-purpose high-level programming language supporting multiple paradigms. 
+                                C# encompasses static typing, strong typing, lexically scoped, imperative, declarative, functional, generic, 
+                                object-oriented (class-based), and component-oriented programming disciplines.
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <RadioButton Name="RadioButtonJavaScript" GroupName="Group1" Content="JavaScript" IsChecked="False" />
+                        <TextBlock Margin="20,0,0,0" FontSize="8"
+                                   Visibility="{MGBinding ElementName=RadioButtonJavaScript, Path=IsChecked, Mode=OneWay, Converter={Converters:BoolToVisibilityConverter TrueVisibility=Visible, FalseVisibility=Collapsed}}">
+                            <TextBlock.Text>
+                                JavaScript is a high-level, often just-in-time compiled language that conforms to the ECMAScript standard.
+                                It has dynamic typing, prototype-based object-orientation, and first-class functions. 
+                                It is multi-paradigm, supporting event-driven, functional, and imperative programming styles.
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <RadioButton Name="RadioButtonBrainfuck" GroupName="Group1" Content="Brainfuck" IsChecked="False" />
+                        <TextBlock Margin="20,0,0,0" FontSize="8"
+                                   Visibility="{MGBinding ElementName=RadioButtonBrainfuck, Path=IsChecked, Mode=OneWay, Converter={Converters:BoolToVisibilityConverter TrueVisibility=Visible, FalseVisibility=Collapsed}}">
+                            <TextBlock.Text>
+                                Brainfuck is an esoteric programming language notable for its extreme minimalism.
+                                The language consists of only eight simple commands, a data pointer and an instruction pointer. 
+                                While it is fully Turing complete, it is not intended for practical use, but to challenge and amuse programmers.
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+
+                    <TextBlock Text="Mode samples coming soon... probably..." />
+                </StackPanel>
+            </Expander>
+
+        </StackPanel>
+    </ScrollViewer>
+</Window>

@@ -71,8 +71,8 @@
                             <ContentTemplate>
                                 <StackPanel Orientation="Horizontal" Spacing="5">
                                     <Rectangle Stroke="Black" StrokeThickness="1" Width="16" Height="16" VerticalAlignment="Center" 
-                                               Fill="{PropertyBinding Path=FillBrush, Mode=OneTime}" />
-                                    <TextBlock VerticalAlignment="Center" Text="{PropertyBinding Path=Name, Mode=OneTime}" />
+                                               Fill="{MGBinding Path=FillBrush, Mode=OneTime}" />
+                                    <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Name, Mode=OneTime}" />
                                 </StackPanel>
                             </ContentTemplate>
                         </ComboBox.DropdownItemTemplate>
@@ -84,8 +84,8 @@
                             <ContentTemplate>
                                 <StackPanel Orientation="Horizontal" Spacing="5">
                                     <Rectangle Stroke="Black" StrokeThickness="1" Width="16" Height="16" VerticalAlignment="Center" 
-                                               Fill="{PropertyBinding Path=FillBrush, Mode=OneTime}" />
-                                    <TextBlock VerticalAlignment="Center" Text="{PropertyBinding Path=Name, Mode=OneTime}" />
+                                               Fill="{MGBinding Path=FillBrush, Mode=OneTime}" />
+                                    <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Name, Mode=OneTime}" />
                                 </StackPanel>
                             </ContentTemplate>
                         </ComboBox.DropdownItemTemplate>
@@ -93,8 +93,8 @@
                             <ContentTemplate>
                                 <Border BorderBrush="Black * 0.3" BorderThickness="1" Margin="4,2" Padding="4,2" 
                                         VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                                        Background="{PropertyBinding Path=FillBrush, Mode=OneTime}">
-                                    <TextBlock Text="{PropertyBinding Path=Name, Mode=OneTime}" IsBold="True" IsShadowed="True" ShadowColor="Black" Foreground="rgb(240,232,240)" />
+                                        Background="{MGBinding Path=FillBrush, Mode=OneTime}">
+                                    <TextBlock Text="{MGBinding Path=Name, Mode=OneTime}" IsBold="True" IsShadowed="True" ShadowColor="Black" Foreground="rgb(240,232,240)" />
                                 </Border>
                             </ContentTemplate>
                         </ComboBox.SelectedItemTemplate>
@@ -112,8 +112,8 @@
                                         BorderBrush="Gray" BorderThickness="1" Margin="0,4,0,0">
                                     <StackPanel Orientation="Horizontal" Spacing="5">
                                         <Rectangle Stroke="Black" StrokeThickness="1" Width="16" Height="16" VerticalAlignment="Center" 
-                                               Fill="{PropertyBinding Path=FillBrush, Mode=OneTime}" />
-                                        <TextBlock VerticalAlignment="Center" Text="{PropertyBinding Path=Name, Mode=OneTime}" />
+                                               Fill="{MGBinding Path=FillBrush, Mode=OneTime}" />
+                                        <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Name, Mode=OneTime}" />
                                     </StackPanel>
                                 </Button>
                             </ContentTemplate>
@@ -122,8 +122,8 @@
                             <ContentTemplate>
                                 <StackPanel Orientation="Horizontal" Spacing="5">
                                     <Rectangle Stroke="Black" StrokeThickness="1" Width="16" Height="16" VerticalAlignment="Center" 
-                                               Fill="{PropertyBinding Path=FillBrush, Mode=OneTime}" />
-                                    <TextBlock VerticalAlignment="Center" Text="{PropertyBinding Path=Name, Mode=OneTime}" />
+                                               Fill="{MGBinding Path=FillBrush, Mode=OneTime}" />
+                                    <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Name, Mode=OneTime}" />
                                 </StackPanel>
                             </ContentTemplate>
                         </ComboBox.SelectedItemTemplate>
@@ -144,7 +144,7 @@
                               SelectedIndex="1" Background="Turquoise" MaxDropdownWidth="110" MaxDropdownHeight="64">
                         <ComboBox.SelectedItemTemplate>
                             <ContentTemplate>
-                                <TextBlock Foreground="Black" FontSize="11" Text="{PropertyBinding Path=., Mode=OneTime}" />
+                                <TextBlock Foreground="Black" FontSize="11" Text="{MGBinding Mode=OneTime}" />
                             </ContentTemplate>
                         </ComboBox.SelectedItemTemplate>
                         <System:String>Option 1</System:String>
@@ -157,7 +157,7 @@
                               SelectedIndex="2" Background="Turquoise" MinDropdownWidth="240" MinDropdownHeight="200">
                         <ComboBox.SelectedItemTemplate>
                             <ContentTemplate>
-                                <TextBlock Foreground="Black" FontSize="11" Text="{PropertyBinding Path=., Mode=OneTime}" />
+                                <TextBlock Foreground="Black" FontSize="11" Text="{MGBinding Mode=OneTime}" />
                             </ContentTemplate>
                         </ComboBox.SelectedItemTemplate>
                         <System:String>Option 1</System:String>

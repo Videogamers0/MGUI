@@ -102,10 +102,40 @@ namespace MGUI.Core.UI.Containers.Grids
             this.MaxWidth = MaxWidth;
 
             InvokeDimensionsChanged();
+
+            NPC(nameof(MinWidth));
+            NPC(nameof(MaxWidth));
         }
 
-        public int Left { get; protected internal set; }
-        public int Width { get; protected internal set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _Left;
+        public int Left
+        {
+            get => _Left;
+            protected internal set
+            {
+                if (_Left != value)
+                {
+                    _Left = value;
+                    NPC(nameof(Left));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _Width;
+        public int Width
+        {
+            get => _Width;
+            protected internal set
+            {
+                if (_Width != value)
+                {
+                    _Width = value;
+                    NPC(nameof(Width));
+                }
+            }
+        }
 
         public ColumnDefinition(MGGrid Grid, GridLength Length, int? MinWidth = null, int? MaxWidth = null)
             : base(Grid, Length)
@@ -135,10 +165,40 @@ namespace MGUI.Core.UI.Containers.Grids
             this.MaxHeight = MaxHeight;
 
             InvokeDimensionsChanged();
+
+            NPC(nameof(MinHeight));
+            NPC(nameof(MaxHeight));
         }
 
-        public int Top { get; protected internal set; }
-        public int Height { get; protected internal set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _Top;
+        public int Top
+        {
+            get => _Top;
+            protected internal set
+            {
+                if (_Top != value)
+                {
+                    _Top = value;
+                    NPC(nameof(Top));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _Height;
+        public int Height
+        {
+            get => _Height;
+            protected internal set
+            {
+                if (_Height != value)
+                {
+                    _Height = value;
+                    NPC(nameof(Height));
+                }
+            }
+        }
 
         public RowDefinition(MGGrid Grid, GridLength Length, int? MinHeight = null, int? MaxHeight = null)
             : base(Grid, Length)

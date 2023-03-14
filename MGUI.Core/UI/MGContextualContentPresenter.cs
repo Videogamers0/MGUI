@@ -3,6 +3,7 @@ using MGUI.Shared.Helpers;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace MGUI.Core.UI
     /// If <see cref="Value"/> is true, this element will display the <see cref="TrueContent"/>, else displays the <see cref="FalseContent"/></summary>
     public class MGContextualContentPresenter : MGSingleContentHost
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _Value;
         /// <summary>If true, the <see cref="TrueContent"/> will be displayed.<br/>
         /// If false, the <see cref="FalseContent"/> will be displayed.</summary>
@@ -24,6 +26,7 @@ namespace MGUI.Core.UI
                 if (_Value != value)
                 {
                     _Value = value;
+                    NPC(nameof(Value));
                     OnValueChanged?.Invoke(this, Value);
                     UpdateDisplayedContent();
                 }
@@ -34,6 +37,7 @@ namespace MGUI.Core.UI
         /// This event is invoked before <see cref="OnContentUpdated"/></summary>
         public event EventHandler<bool> OnValueChanged;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGElement _TrueContent;
         /// <summary>The content to display when <see cref="Value"/> is true.</summary>
         public MGElement TrueContent
@@ -50,10 +54,13 @@ namespace MGUI.Core.UI
                     InvokeContentAdded(TrueContent);
                     if (Value)
                         UpdateDisplayedContent();
+                    NPC(nameof(TrueContent));
+                    NPC(nameof(CurrentContent));
                 }
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGElement _FalseContent;
         /// <summary>The content to display when <see cref="Value"/> is false.</summary>
         public MGElement FalseContent
@@ -70,6 +77,8 @@ namespace MGUI.Core.UI
                     InvokeContentAdded(FalseContent);
                     if (!Value)
                         UpdateDisplayedContent();
+                    NPC(nameof(FalseContent));
+                    NPC(nameof(CurrentContent));
                 }
             }
         }

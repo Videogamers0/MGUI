@@ -13,6 +13,7 @@ using MGUI.Core.UI.Brushes.Border_Brushes;
 using System.Collections.Specialized;
 using Microsoft.Xna.Framework.Input;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
+using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
@@ -41,6 +42,7 @@ namespace MGUI.Core.UI
 
         private MGComponent<MGDockPanel> MainContent { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _TimestampFormat;
         /// <summary>A format string used to compute the text to display for each message's <see cref="DateTime"/> (<see cref="MGChatBoxMessage.Timestamp"/>)<para/>
         /// Default value: @"'\\['HH:mm:ss']'", which displays the hours/minutes/seconds surrounded by brackets, such as: "[14:33:20]"<para/>
@@ -58,6 +60,7 @@ namespace MGUI.Core.UI
                 {
                     string Previous = TimestampFormat;
                     _TimestampFormat = value;
+                    NPC(nameof(TimestampFormat));
                     TimestampFormatChanged?.Invoke(this, new(Previous, TimestampFormat));
                 }
             }
@@ -86,6 +89,7 @@ namespace MGUI.Core.UI
             set => InputTextBox.CharacterLimit = value;
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _MaxMessages;
         /// <summary>The maximum number of items that can be stored in <see cref="Messages"/>.<br/>
         /// Once this limit is reached, the oldest item will be removed to make room for new items.</summary>
@@ -98,6 +102,7 @@ namespace MGUI.Core.UI
                 {
                     _MaxMessages = value;
                     ValidateNumMessages();
+                    NPC(nameof(MaxMessages));
                 }
             }
         }
@@ -130,6 +135,7 @@ namespace MGUI.Core.UI
                 this.InputTextBox = new(ParentWindow, MaxMessageLength);
                 InputTextBox.AcceptsReturn = false;
                 InputTextBox.ManagedParent = this;
+                InputTextBox.OnCharacterLimitChanged += (sender, e) => { NPC(nameof(MaxMessageLength)); };
                 InputTextBox.KeyboardHandler.Pressed += (sender, e) =>
                 {
                     if (e.Key == Keys.Enter)

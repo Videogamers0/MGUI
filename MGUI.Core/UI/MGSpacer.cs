@@ -27,6 +27,7 @@ namespace MGUI.Core.UI
                 {
                     _Width = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(Width));
                 }
             }
         }
@@ -42,6 +43,7 @@ namespace MGUI.Core.UI
                 {
                     _Height = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(Height));
                 }
             }
         }

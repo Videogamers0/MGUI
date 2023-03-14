@@ -61,7 +61,15 @@ namespace MGUI.Core.UI
         public bool IsExpandable
         {
             get => Expander.Visibility == Visibility.Visible;
-            set => Expander.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+            set
+            {
+                if (IsExpandable != value)
+                {
+                    Expander.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+                    NPC(nameof(IsExpandable));
+                    NPC(nameof(HasHeaderContent));
+                }
+            }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -79,6 +87,8 @@ namespace MGUI.Core.UI
                     {
                         HeaderPresenter.SetContent(Header);
                     }
+                    NPC(nameof(Header));
+                    NPC(nameof(HasHeaderContent));
                 }
             }
         }
@@ -97,6 +107,7 @@ namespace MGUI.Core.UI
                 {
                     _HeaderHorizontalMargin = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(HeaderHorizontalMargin));
                 }
             }
         }
@@ -113,6 +124,7 @@ namespace MGUI.Core.UI
                 {
                     _HeaderHorizontalPadding = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(HeaderHorizontalPadding));
                 }
             }
         }
@@ -128,6 +140,8 @@ namespace MGUI.Core.UI
                 this.BorderElement = new(Window, new Thickness(2), MGUniformBorderBrush.Black);
                 BorderElement.SetParent(this);
                 BorderElement.ManagedParent = this;
+                BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
+                BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
                 this.Expander = new(Window);
                 Expander.Margin = new(0, 0, 5, 0);

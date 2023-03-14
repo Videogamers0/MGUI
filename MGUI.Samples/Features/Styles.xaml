@@ -39,7 +39,7 @@
                 <Expander.Header>
                     <TextBlock StyleNames="Header1" Text="Example XAML" />
                 </Expander.Header>
-                <ScrollViewer VerticalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
+                <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible" Margin="20,0,0,0" MaxHeight="280">
                     <TextBox Name="Example_TextBox" />
                 </ScrollViewer>
             </Expander>

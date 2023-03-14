@@ -99,6 +99,9 @@ namespace MGUI.Core.UI
 
                 InvokeLayoutChanged();
 
+                NPC(nameof(FontFamily));
+                NPC(nameof(FontSize));
+
                 return true;
             }
             else
@@ -114,6 +117,7 @@ namespace MGUI.Core.UI
         }
 
         #region Font Style
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsBold;
         public bool IsBold
         {
@@ -128,10 +132,12 @@ namespace MGUI.Core.UI
                         UpdateRuns();
                         InvokeLayoutChanged();
                     }
+                    NPC(nameof(IsBold));
                 }
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsItalic;
         public bool IsItalic
         {
@@ -146,10 +152,12 @@ namespace MGUI.Core.UI
                         UpdateRuns();
                         InvokeLayoutChanged();
                     }
+                    NPC(nameof(IsItalic));
                 }
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsUnderlined;
         public bool IsUnderlined
         {
@@ -164,6 +172,7 @@ namespace MGUI.Core.UI
                         UpdateRuns();
                         UpdateLines();
                     }
+                    NPC(nameof(IsUnderlined));
                 }
             }
         }
@@ -176,6 +185,7 @@ namespace MGUI.Core.UI
         #endregion Font Style
 
         #region Shadow
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsShadowed;
         public bool IsShadowed
         {
@@ -190,10 +200,12 @@ namespace MGUI.Core.UI
                         UpdateRuns();
                         UpdateLines();
                     }
+                    NPC(nameof(IsShadowed));
                 }
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Point? _ShadowOffset;
         /// <summary>Only relevant if <see cref="IsShadowed"/> is true.<br/>
         /// Determines the offset applied to <see cref="Text"/> when drawing the shadow.<br/>
@@ -213,10 +225,12 @@ namespace MGUI.Core.UI
                         UpdateRuns();
                         UpdateLines();
                     }
+                    NPC(nameof(ShadowOffset));
                 }
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Color? _ShadowColor;
         /// <summary>Only relevant if <see cref="IsShadowed"/> is true.<br/>
         /// If null, uses <see cref="ThemeFontSettings.DefaultFontShadowColor"/> from <see cref="MGTheme.FontSettings"/></summary>
@@ -233,20 +247,36 @@ namespace MGUI.Core.UI
                         UpdateRuns();
                         UpdateLines();
                     }
+                    NPC(nameof(ShadowColor));
                 }
             }
         }
         #endregion Shadow
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private VisualStateSetting<Color?> _Foreground;
         /// <summary>The foreground color to use when rendering the text.<br/>
         /// If the text is formatted with color codes (such as '[color=Red]Hello World[/color]'), the color specified in the <see cref="MGTextRun"/> will take precedence.<para/>
         /// If the value for the current <see cref="MGElement.VisualState"/> is null, will attempt to resolve the value from <see cref="MGElement.DerivedDefaultTextForeground"/>, or <see cref="MGTheme.TextBlockFallbackForeground"/> if no value is specified.<para/>
         /// See also:<br/><see cref="MGElement.DefaultTextForeground"/><br/><see cref="MGElement.DerivedDefaultTextForeground"/><br/><see cref="ActualForeground"/><br/>
         /// <see cref="MGTheme.TextBlockFallbackForeground"/><br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/></summary>
-        public VisualStateSetting<Color?> Foreground { get; set; }
+        public VisualStateSetting<Color?> Foreground
+        {
+            get => _Foreground;
+            set
+            {
+                if (_Foreground != value)
+                {
+                    _Foreground = value;
+                    NPC(nameof(Foreground));
+                    NPC(nameof(ActualForeground));
+                }
+            }
+        }
 
         public Color ActualForeground => Foreground.GetValue(VisualState.Primary) ?? DerivedDefaultTextForeground ?? GetTheme().TextBlockFallbackForeground.GetValue(false).GetValue(VisualState.Primary);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _AllowsInlineFormatting = true;
         /// <summary>If true, <see cref="Text"/> can contain formatting codes such as "[bold]...[/bold]" or "[color=green]...[/color]" etc.<br/>
         /// If false, all formatting codes within <see cref="Text"/> will be treated as literal strings instead of affecting how the text is rendered.<para/>
@@ -261,6 +291,7 @@ namespace MGUI.Core.UI
                     _AllowsInlineFormatting = value;
                     UpdateRuns();
                     InvokeLayoutChanged();
+                    NPC(nameof(AllowsInlineFormatting));
                 }
             }
         }
@@ -286,6 +317,7 @@ namespace MGUI.Core.UI
                     InvokeLayoutChanged();
                 else
                     UpdateLines();
+                NPC(nameof(Text));
             }
         }
 
@@ -321,6 +353,8 @@ namespace MGUI.Core.UI
                 List<FTTokenMatch> Tokens = FTTokenizer.TokenizeLineBreaks(Text, true).ToList();
                 Runs = MGTextRun.ParseRuns(Tokens, DefaultTextRunSettings).ToList().AsReadOnly();
             }
+
+            NPC(nameof(Runs));
         }
 
         public ReadOnlyCollection<MGTextRun> Runs { get; private set; }
@@ -329,6 +363,7 @@ namespace MGUI.Core.UI
         internal void UpdateLines()
         {
             this.Lines = MGTextLine.ParseLines(this, LayoutBounds.Width - Padding.Width, WrapText, Runs, IgnoreEmptySpaceLines).ToList().AsReadOnly();
+            NPC(nameof(Lines));
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -342,6 +377,7 @@ namespace MGUI.Core.UI
                 {
                     _WrapText = value;
                     InvokeLayoutChanged();
+                    NPC(nameof(WrapText));
                 }
             }
         }
@@ -358,10 +394,12 @@ namespace MGUI.Core.UI
                 {
                     _LinePadding = value;
                     InvokeLayoutChanged();
+                    NPC(nameof(LinePadding));
                 }
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _MinLines;
         /// <summary>The minimum # of lines to display, regardless of how many lines the actual text content requires.<para/>
         /// Default value: 0<para/>
@@ -375,10 +413,12 @@ namespace MGUI.Core.UI
                 {
                     _MinLines = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(MinLines));
                 }
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int? _MaxLines;
         /// <summary>The maximum # of lines to display, regardless of how many lines the actual text content requires.<br/>
         /// Use null to indicate there is no maximum.<para/>
@@ -393,11 +433,25 @@ namespace MGUI.Core.UI
                 {
                     _MaxLines = value;
                     LayoutChanged(this, true);
+                    NPC(nameof(MaxLines));
                 }
             }
         }
 
-        public HorizontalAlignment TextAlignment { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private HorizontalAlignment _TextAlignment;
+        public HorizontalAlignment TextAlignment
+        {
+            get => _TextAlignment;
+            set
+            {
+                if (_TextAlignment != value)
+                {
+                    _TextAlignment = value;
+                    NPC(nameof(TextAlignment));
+                }
+            }
+        }
 
         /// <param name="FontSize">If null, uses the font size specified by <see cref="ThemeFontSettings.DefaultFontSize"/>.<para/>
         /// See also:<br/><see cref="MGWindow.Theme"/><br/><see cref="MGDesktop.Theme"/><br/><see cref="MGTheme.FontSettings"/></param>

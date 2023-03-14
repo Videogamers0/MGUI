@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using MGUI.Core.UI.Data_Binding;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using XNAColor = Microsoft.Xna.Framework.Color;
 
 namespace MGUI.Core.UI.XAML
 {
@@ -167,7 +169,7 @@ namespace MGUI.Core.UI.XAML
         [Category("Attached")]
         public object Tag { get; set; }
 
-        protected internal List<PropertyBinding> Bindings { get; } = new();
+        protected internal List<MGBinding> Bindings { get; } = new();
 
         /// <param name="ApplyBaseSettings">If not null, this action will be invoked before <see cref="ApplySettings(MGElement, MGElement, bool)"/> executes.</param>
         public T ToElement<T>(MGWindow Window, MGElement Parent, Action<T> ApplyBaseSettings = null) 
@@ -265,8 +267,64 @@ namespace MGUI.Core.UI.XAML
 
                 if (IncludeBindings)
                 {
-                    foreach (PropertyBinding Binding in this.Bindings.Where(x => x.Mode == BindingMode.OneWay))
-                        Element.OneWayBindings.Add(Binding);
+                    //  These bindings are initialized in Window.ToElement(Desktop, Theme)
+                    //  Because ElementName references cannot be resolved until named elements have been processed and added to the MGWindow instance
+                    if (Bindings.Any())
+                        Element.Metadata[BindingsMetadataKey] = this.Bindings;
+                }
+            }
+        }
+
+        private const string BindingsMetadataKey = "TmpBindings";
+
+        //  DataBindings are defined in XAML (so they are applied to the properties of the XAML types)
+        //  but are bound to the properties of the actual type (such as MGUI.Core.UI.MGButton instead of MGUI.Core.UI.XAML.Button).
+        //  This dictionary is intended to handle cases where a property on the XAML type isn't the same name/path as the actual property of the binding
+        private static readonly Dictionary<string, string> BindingPathMappings = new()
+        {
+            { nameof(Background), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.NormalValue)}" },
+            { nameof(SelectedBackground), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.SelectedValue)}" },
+            { nameof(DisabledBackground), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.DisabledValue)}" },
+            { nameof(TextForeground), $"{nameof(MGElement.DefaultTextForeground)}.{nameof(VisualStateSetting<XNAColor>.NormalValue)}" },
+            { nameof(SelectedTextForeground), $"{nameof(MGElement.DefaultTextForeground)}.{nameof(VisualStateSetting<XNAColor>.SelectedValue)}" },
+            { nameof(DisabledTextForeground), $"{nameof(MGElement.DefaultTextForeground)}.{nameof(VisualStateSetting<XNAColor>.DisabledValue)}" },
+            { nameof(Width), $"{nameof(MGElement.PreferredWidth)}" },
+            { nameof(Height), $"{nameof(MGElement.PreferredHeight)}" }
+        };
+
+        /// <summary>Resolves any pending <see cref="MGBinding"/>s by converting them into <see cref="DataBinding"/>s</summary>
+        /// <param name="DataContextOverride">If not null, this value will be applied to the <see cref="MGElement.DataContextOverride"/> value of every element that is processed.<para/>
+        /// If <paramref name="RecurseChildren"/> is false, this is only applied to <paramref name="Element"/>. Else it's applied to <paramref name="Element"/> and all its nested children.</param>
+        internal static void ProcessBindings(MGElement Element, bool RecurseChildren, object DataContextOverride)
+        {
+            if (RecurseChildren)
+            {
+                foreach (MGElement Child in Element.TraverseVisualTree(true, true, MGElement.TreeTraversalMode.Preorder))
+                {
+                    ProcessBindings(Child, false, DataContextOverride);
+                }
+            }
+            else
+            {
+                if (DataContextOverride != null)
+                    Element.DataContextOverride = DataContextOverride;
+
+                if (Element.Metadata.TryGetValue(BindingsMetadataKey, out object Value) && Value is List<MGBinding> Bindings)
+                {
+                    foreach (MGBinding Binding in Bindings)
+                    {
+                        object TargetObject = Element;
+                        MGBinding PostProcessedBinding = Binding;
+
+                        //  Handle some special-cases where the name of the XAML property isn't the same as the corresponding property on the c# object
+                        if (BindingPathMappings.TryGetValue(Binding.TargetPath, out string ActualPath))
+                        {
+                            PostProcessedBinding = Binding with { TargetPath = ActualPath };
+                        }
+
+                        DataBindingManager.AddBinding(PostProcessedBinding, TargetObject);
+                    }
+                    Element.Metadata.Remove(BindingsMetadataKey);
                 }
             }
         }

@@ -39,7 +39,14 @@ namespace MGUI.Core.UI
         public IFillBrush CheckedBackgroundBrush
         {
             get => BackgroundBrush.SelectedValue;
-            set => BackgroundBrush.SelectedValue = value;
+            set
+            {
+                if (BackgroundBrush.SelectedValue != value)
+                {
+                    BackgroundBrush.SelectedValue = value;
+                    NPC(nameof(CheckedBackgroundBrush));
+                }
+            }
         }
 
         /// <summary>A foreground color to use on child content of this <see cref="MGToggleButton"/> when <see cref="IsChecked"/> is true.<para/>
@@ -47,7 +54,14 @@ namespace MGUI.Core.UI
         public Color? CheckedTextForeground
         {
             get => DefaultTextForeground.SelectedValue;
-            set => DefaultTextForeground.SelectedValue = value;
+            set
+            {
+                if (DefaultTextForeground.SelectedValue != value)
+                {
+                    DefaultTextForeground.SelectedValue = value;
+                    NPC(nameof(CheckedTextForeground));
+                }
+            }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -61,6 +75,7 @@ namespace MGUI.Core.UI
                 {
                     bool Previous = IsChecked;
                     _IsChecked = value;
+                    NPC(nameof(IsChecked));
                     OnCheckStateChanged?.Invoke(this, new(Previous, IsChecked));
 
                     IsSelected = IsChecked;
@@ -91,6 +106,8 @@ namespace MGUI.Core.UI
                 this.BorderElement = new(Window, BorderThickness, BorderBrush);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
+                BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
+                BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
                 this.HorizontalContentAlignment = HorizontalAlignment.Center;
                 this.VerticalContentAlignment = VerticalAlignment.Center;

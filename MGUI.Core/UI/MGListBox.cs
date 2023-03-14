@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Thickness = MonoGame.Extended.Thickness;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using MGUI.Shared.Helpers;
 
 namespace MGUI.Core.UI
 {
@@ -47,13 +48,27 @@ namespace MGUI.Core.UI
         public IBorderBrush OuterBorderBrush
         {
             get => OuterBorder.BorderBrush;
-            set => OuterBorder.BorderBrush = value;
+            set
+            {
+                if (OuterBorderBrush != value)
+                {
+                    OuterBorder.BorderBrush = value;
+                    NPC(nameof(OuterBorderBrush));
+                }
+            }
         }
 
         public Thickness OuterBorderThickness
         {
             get => OuterBorder.BorderThickness;
-            set => OuterBorder.BorderThickness = value;
+            set
+            {
+                if (!OuterBorderThickness.Equals(value))
+                {
+                    OuterBorder.BorderThickness = value;
+                    NPC(nameof(OuterBorderThickness));
+                }
+            }
         }
         #endregion Outer Border
 
@@ -68,13 +83,27 @@ namespace MGUI.Core.UI
         public IBorderBrush InnerBorderBrush
         {
             get => InnerBorder.BorderBrush;
-            set => InnerBorder.BorderBrush = value;
+            set
+            {
+                if (InnerBorderBrush != value)
+                {
+                    InnerBorder.BorderBrush = value;
+                    NPC(nameof(InnerBorderBrush));
+                }
+            }
         }
 
         public Thickness InnerBorderThickness
         {
             get => InnerBorder.BorderThickness;
-            set => InnerBorder.BorderThickness = value;
+            set
+            {
+                if (!InnerBorderThickness.Equals(value))
+                {
+                    InnerBorder.BorderThickness = value;
+                    NPC(nameof(InnerBorderThickness));
+                }
+            }
         }
         #endregion Inner Border
 
@@ -89,20 +118,41 @@ namespace MGUI.Core.UI
 
         public IBorderBrush TitleBorderBrush
         {
-            get => TitleComponent.Element.BorderBrush;
-            set => TitleComponent.Element.BorderBrush = value;
+            get => TitleBorder.BorderBrush;
+            set
+            {
+                if (TitleBorder.BorderBrush != value)
+                {
+                    TitleBorder.BorderBrush = value;
+                    NPC(nameof(TitleBorderBrush));
+                }
+            }
         }
 
         public Thickness TitleBorderThickness
         {
-            get => TitleComponent.Element.BorderThickness;
-            set => TitleComponent.Element.BorderThickness = value;
+            get => TitleBorder.BorderThickness;
+            set
+            {
+                if (!TitleBorder.BorderThickness.Equals(value))
+                {
+                    TitleBorder.BorderThickness = value;
+                    NPC(nameof(TitleBorderThickness));
+                }
+            }
         }
 
         public bool IsTitleVisible
         {
             get => TitleBorder.Visibility == Visibility.Visible;
-            set => TitleBorder.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+            set
+            {
+                if (IsTitleVisible != value)
+                {
+                    TitleBorder.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+                    NPC(nameof(IsTitleVisible));
+                }
+            }
         }
         #endregion Title
 
@@ -117,7 +167,10 @@ namespace MGUI.Core.UI
                 if (_InternalItems != value)
                 {
                     if (InternalItems != null)
-                        InternalItems.CollectionChanged += ListBoxItems_CollectionChanged;
+                    {
+                        HandleTemplatedContentRemoved(InternalItems.Select(x => x.Content));
+                        InternalItems.CollectionChanged -= ListBoxItems_CollectionChanged;
+                    }
                     _InternalItems = value;
                     if (InternalItems != null)
                         InternalItems.CollectionChanged += ListBoxItems_CollectionChanged;
@@ -137,10 +190,21 @@ namespace MGUI.Core.UI
 
                     ClearSelection();
                     RefreshRowBackgrounds();
+
+                    NPC(nameof(ListBoxItems));
                 }
             }
         }
         public IReadOnlyList<MGListBoxItem<TItemType>> ListBoxItems => InternalItems;
+
+        private static void HandleTemplatedContentRemoved(IEnumerable<MGElement> Items)
+        {
+            if (Items != null)
+            {
+                foreach (var Item in Items)
+                    Item.RemoveDataBindings(true);
+            }
+        }
 
         private void ListBoxItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -205,6 +269,8 @@ namespace MGUI.Core.UI
                 }
                 if (SelectionSourceItem != null && Removed.Contains(SelectionSourceItem))
                     SelectionSourceItem = null;
+
+                HandleTemplatedContentRemoved(Removed.Select(x => x.Content));
             }
         }
 
@@ -231,6 +297,8 @@ namespace MGUI.Core.UI
                         IEnumerable<MGListBoxItem<TItemType>> Values = ItemsSource.Select((x, Index) => new MGListBoxItem<TItemType>(this, x));
                         this.InternalItems = new ObservableCollection<MGListBoxItem<TItemType>>(Values);
                     }
+
+                    NPC(nameof(ItemsSource));
                 }
             }
         }
@@ -239,6 +307,7 @@ namespace MGUI.Core.UI
         {
             if (e.Action is NotifyCollectionChangedAction.Reset)
             {
+                HandleTemplatedContentRemoved(InternalItems.Select(x => x.Content));
                 InternalItems.Clear();
             }
             else if (e.Action is NotifyCollectionChangedAction.Add && e.NewItems != null)
@@ -257,6 +326,7 @@ namespace MGUI.Core.UI
                 foreach (TItemType Item in e.OldItems)
                 {
                     InternalItems.RemoveAt(CurrentIndex);
+                    CurrentIndex++;
                 }
             }
             else if (e.Action is NotifyCollectionChangedAction.Replace)
@@ -288,13 +358,27 @@ namespace MGUI.Core.UI
         #endregion Items Source
 
         #region Selection
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _CanDeselectByClickingSelectedItem;
         /// <summary>Only relevant if <see cref="SelectionMode"/> is not <see cref="ListBoxSelectionMode.None"/><para/>
         /// If true, allows deselecting a currently-selected item by left-clicking it.<para/>
         /// Note: If <see cref="SelectionMode"/> is <see cref="ListBoxSelectionMode.Multiple"/>, and the Control key is held when clicking an item,<br/>
         /// the user is always able to deselect regardless of this setting.<para/>
         /// Default value: true</summary>
-        public bool CanDeselectByClickingSelectedItem { get; set; }
+        public bool CanDeselectByClickingSelectedItem
+        {
+            get => _CanDeselectByClickingSelectedItem;
+            set
+            {
+                if (_CanDeselectByClickingSelectedItem != value)
+                {
+                    _CanDeselectByClickingSelectedItem = value;
+                    NPC(nameof(CanDeselectByClickingSelectedItem));
+                }
+            }
+        }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ListBoxSelectionMode _SelectionMode;
         public ListBoxSelectionMode SelectionMode
         {
@@ -305,10 +389,12 @@ namespace MGUI.Core.UI
                 {
                     _SelectionMode = value;
                     ClearSelection();
+                    NPC(nameof(SelectionMode));
                 }
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGListBoxItem<TItemType> _SelectionSourceItem;
         /// <summary>Only relevant if <see cref="SelectionMode"/> is <see cref="ListBoxSelectionMode.Contiguous"/>.<para/>
         /// Represents the starting item of the contiguous selection of items.</summary>
@@ -320,11 +406,23 @@ namespace MGUI.Core.UI
                 if (_SelectionSourceItem != value)
                 {
                     _SelectionSourceItem = value;
-
+                    NPC(nameof(SelectionSourceItem));
                 }
             }
         }
 
+        private readonly EqualityComparer<TItemType> EqualityComparer = EqualityComparer<TItemType>.Default;
+
+        /// <summary>Returns the <see cref="MGListBoxItem{TItemType}.Data"/> of the first item in <see cref="SelectedItems"/>, or default(<typeparamref name="TItemType"/>) if no items are selected.<para/>
+        /// Setting this value overwrites the <see cref="SelectedItems"/> with the first <see cref="MGListBoxItem{TItemType}"/> containing the matching data.<br/>
+        /// If no matching item is found, clears the selection entirely.</summary>
+        public TItemType SelectedValue
+        {
+            get => SelectedItems.Count == 0 ? default(TItemType) : SelectedItems.First().Data;
+            set => SelectItem(value, true);
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ReadOnlyCollection<MGListBoxItem<TItemType>> _SelectedItems;
         /// <summary>The currently-selected items. This collection is never null: Uses an empty list if setting to null.</summary>
         public ReadOnlyCollection<MGListBoxItem<TItemType>> SelectedItems
@@ -348,6 +446,8 @@ namespace MGUI.Core.UI
                     foreach (MGListBoxItem<TItemType> Item in SelectedItems)
                         Item.ContentPresenter.IsSelected = true;
 
+                    NPC(nameof(SelectedItems));
+                    NPC(nameof(SelectedValue));
                     SelectionChanged?.Invoke(this, SelectedItems);
                 }
             }
@@ -355,21 +455,33 @@ namespace MGUI.Core.UI
 
         public event EventHandler<ReadOnlyCollection<MGListBoxItem<TItemType>>> SelectionChanged;
 
-        public void SelectItem(TItemType Item)
+        /// <summary>Note: This method clears the selection if <see cref="SelectionMode"/> is <see cref="ListBoxSelectionMode.None"/></summary>
+        /// <param name="Item">The item to select. Will search for a <see cref="MGListBoxItem{TItemType}"/> whose <see cref="MGListBoxItem{TItemType}.Data"/> matches this value.</param>
+        /// <param name="DeselectAllIfNotFound">If true, and if no corresponding <see cref="MGListBoxItem{TItemType}"/> is found that matches the given <paramref name="Item"/>, the selection will be cleared.</param>
+        public void SelectItem(TItemType Item, bool DeselectAllIfNotFound)
         {
-            if (SelectedItems?.Count == 1 && SelectedItems.First().Data.Equals(Item))
+            if (SelectionMode is ListBoxSelectionMode.None)
+            {
+                ClearSelection();
+                return;
+            }
+
+            if (SelectedItems?.Count == 1 && EqualityComparer.Equals(SelectedItems.First().Data, Item))
                 return;
 
             //  Find ListBoxItem that wraps the Item data
             foreach (MGListBoxItem<TItemType> LBI in ListBoxItems)
             {
-                if (LBI.Data.Equals(Item))
+                if (EqualityComparer.Equals(LBI.Data, Item))
                 {
                     //  Select it
                     this.SelectedItems = new List<MGListBoxItem<TItemType>>() { LBI }.AsReadOnly();
                     return;
                 }
             }
+
+            if (DeselectAllIfNotFound)
+                ClearSelection();
         }
 
         public void ClearSelection()
@@ -394,6 +506,7 @@ namespace MGUI.Core.UI
             InnerBorderThickness = new(BorderThickness);
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGElement _Header;
         /// <summary>Content to display inside the <see cref="TitlePresenter"/>. Only relevant if <see cref="IsTitleVisible"/> is true.</summary>
         public MGElement Header
@@ -408,10 +521,12 @@ namespace MGUI.Core.UI
                     {
                         TitlePresenter.SetContent(Header);
                     }
+                    NPC(nameof(Header));
                 }
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Func<TItemType, MGElement> _ItemTemplate;
         /// <summary>This function is invoked to instantiate the <see cref="MGListBoxItem{TItemType}.Content"/> of each <see cref="MGListBoxItem{TItemType}"/> in this <see cref="MGListBox{TItemType}"/></summary>
         public Func<TItemType, MGElement> ItemTemplate
@@ -422,6 +537,7 @@ namespace MGUI.Core.UI
                 if (_ItemTemplate != value)
                 {
                     _ItemTemplate = value;
+                    NPC(nameof(ItemTemplate));
                     ItemTemplateChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
@@ -440,6 +556,7 @@ namespace MGUI.Core.UI
             Item.BackgroundBrush = GetTheme().ListBoxItemBackground.GetValue(true);
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Action<MGBorder> _ItemContainerStyle;
         /// <summary>An action that will be invoked on every <see cref="MGBorder"/> that wraps each <see cref="MGListBoxItem{TItemType}"/>'s content.<para/>
         /// See also: <see cref="MGListBoxItem{TItemType}.ContentPresenter"/><para/>
@@ -452,6 +569,7 @@ namespace MGUI.Core.UI
                 if (_ItemContainerStyle != value)
                 {
                     _ItemContainerStyle = value;
+                    NPC(nameof(ItemContainerStyle));
                     ItemContainerStyleChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
@@ -459,6 +577,7 @@ namespace MGUI.Core.UI
 
         public event EventHandler<EventArgs> ItemContainerStyleChanged;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ReadOnlyCollection<IFillBrush> _AlternatingRowBackgrounds;
         /// <summary>If not null/empty, the row items will cycle through these <see cref="IFillBrush"/> for their backgrounds</summary>
         public ReadOnlyCollection<IFillBrush> AlternatingRowBackgrounds
@@ -470,6 +589,7 @@ namespace MGUI.Core.UI
                 {
                     _AlternatingRowBackgrounds = value;
                     RefreshRowBackgrounds();
+                    NPC(nameof(AlternatingRowBackgrounds));
                 }
             }
         }
@@ -495,12 +615,16 @@ namespace MGUI.Core.UI
                 this.OuterBorder = new(ParentWindow, 0, MGSolidFillBrush.Black);
                 this.OuterBorderComponent = MGComponentBase.Create(OuterBorder);
                 AddComponent(OuterBorderComponent);
+                OuterBorder.OnBorderBrushChanged += (sender, e) => { NPC(nameof(OuterBorderBrush)); };
+                OuterBorder.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(OuterBorderThickness)); };
 
                 //  Create the title bar
                 this.TitleBorder = new(ParentWindow);
                 TitleBorder.Padding = new(6, 3);
                 TitleBorder.BackgroundBrush = GetTheme().TitleBackground.GetValue(true);
                 TitleBorder.DefaultTextForeground.SetAll(Color.White);
+                TitleBorder.OnBorderBrushChanged += (sender, e) => { NPC(nameof(TitleBorderBrush)); };
+                TitleBorder.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(TitleBorderThickness)); };
                 this.TitlePresenter = new(ParentWindow);
                 TitlePresenter.VerticalAlignment = VerticalAlignment.Center;
                 TitleBorder.SetContent(TitlePresenter);
@@ -515,6 +639,8 @@ namespace MGUI.Core.UI
                 this.InnerBorderComponent = new(InnerBorder, false, false, true, true, true, true, false,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Stretch, ComponentSize.Size));
                 AddComponent(InnerBorderComponent);
+                InnerBorder.OnBorderBrushChanged += (sender, e) => { NPC(nameof(InnerBorderBrush)); };
+                InnerBorder.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(InnerBorderThickness)); };
 
                 //  Create the scrollviewer and itemspanel
                 this.ItemsPanel = new(ParentWindow, Orientation.Vertical);
@@ -683,7 +809,7 @@ namespace MGUI.Core.UI
         }
     }
 
-    public class MGListBoxItem<TItemType>
+    public class MGListBoxItem<TItemType> : ViewModelBase
     {
         public MGListBox<TItemType> ListBox { get; }
 
@@ -694,6 +820,7 @@ namespace MGUI.Core.UI
         /// <summary>The wrapper element that hosts this item's content</summary>
         public MGBorder ContentPresenter { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGElement _Content;
         /// <summary>This <see cref="MGElement"/> is automatically generated via <see cref="MGListBox{TItemType}.ItemTemplate"/> using this.<see cref="Data"/> as the parameter.<para/>
         /// See also: <see cref="ContentPresenter"/></summary>
@@ -705,11 +832,11 @@ namespace MGUI.Core.UI
                 if (_Content != value)
                 {
                     _Content = value;
-
                     using (ContentPresenter.AllowChangingContentTemporarily())
                     {
                         ContentPresenter.SetContent(Content);
                     }
+                    NPC(nameof(Content));
                 }
             }
         }
@@ -720,7 +847,11 @@ namespace MGUI.Core.UI
             this.Data = Data ?? throw new ArgumentNullException(nameof(Data));
             this.ContentPresenter = new(ListBox.SelfOrParentWindow);
 
-            ListBox.ItemTemplateChanged += (sender, e) => { this.Content = ListBox.ItemTemplate?.Invoke(this.Data); };
+            ListBox.ItemTemplateChanged += (sender, e) =>
+            {
+                Content?.RemoveDataBindings(true);
+                Content = ListBox.ItemTemplate?.Invoke(this.Data);
+            };
             this.Content = ListBox.ItemTemplate?.Invoke(this.Data);
             ContentPresenter.CanChangeContent = false;
 
