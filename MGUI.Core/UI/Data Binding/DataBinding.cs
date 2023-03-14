@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Globalization;
 
 #if UseWPF
-
+using System.Windows.Data;
 #else
 using Portable.Xaml;
 using MGUI.Core.UI.Data_Binding.Converters;

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 #if UseWPF
+using System.Windows.Markup;
 using System.Windows.Data;
 #else
 using Portable.Xaml.Markup;
