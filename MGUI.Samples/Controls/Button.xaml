@@ -1,5 +1,5 @@
 <Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="440" Top="20" MinHeight="0" Width="500" Height="800" TitleText="Button" Padding="10">
+        Left="440" Top="20" MinHeight="0" Width="560" SizeToContent="Height" TitleText="Button" Padding="10">
     <Window.Styles>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="10" />
@@ -25,18 +25,75 @@
             <TextBlock StyleNames="Header1" Text="Button:" HorizontalAlignment="Center" />
             <Separator/>
             <TextBlock>
-
+                Buttons are rectangular clickable controls that can host arbitrary Content inside them.
             </TextBlock>
             <Separator />
+            <Button Name="Button1" Content="Click me!" HorizontalAlignment="Left" Padding="15,5" />
 
             <DockPanel>
                 <TextBlock Dock="Top">
-
+                    [c=Turquoise]Buttons[/c] execute an Action when clicked.
                 </TextBlock>
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
-
+                        Set [c=Turquoise]CommandName[/c] to associate a named action to the [c=Turquoise]Button[/c].
+                        Named actions are stored in [c=Turquoise]Window.NamedActions[/c] (Use [c=Turquoise]Window.AddNamedAction[/c](...) to create one).
                     </TextBlock>
+                    <Button CommandName="ReduceOpacity" HorizontalAlignment="Left" Content="Click me to reduce my [c=Turquoise]Opacity[/c] by 10%" />
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        Alternatively, set [c=Turquoise]Command[/c] to directly attach a delegate to the [c=Turquoise]Button[/c].
+                    </TextBlock>
+                    <Button Name="Button2" HorizontalAlignment="Left" Content="This [c=Turquoise]Button[/c] has a [c=Turquoise]Command[/c] that was set in c# code" />
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        If you need to execute several delegates when the button is clicked, subscribe to [c=Turquoise]OnLeftClicked[/c] or [c=Turquoise]OnRightClicked[/c].
+                    </TextBlock>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    [c=Turquoise]Buttons[/c] can host any arbitrary [c=Turquoise]Content[/c] inside them.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        This [c=Turquoise]Button[/c] contains a [c=Turquoise]StackPanel[/c], which contains a colored [c=Turquoise]Rectangle[/c] and a [c=Turquoise]TextBlock[/c]
+                    </TextBlock>
+                    <Button Background="MediumPurple" BorderBrush="Purple" Padding="15,4" HorizontalAlignment="Left">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Rectangle VerticalAlignment="Center" Width="16" Height="16" Stroke="Black" StrokeThickness="1" Fill="MediumSeaGreen" />
+                            <Spacer Width="5" />
+                            <TextBlock VerticalAlignment="Center" Text="MediumSeaGreen" />
+                        </StackPanel>
+                    </Button>
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        This [c=Turquoise]Button[/c] contains an [c=Turquoise]Image[/c]
+                    </TextBlock>
+                    <Button Background="Brown" Padding="5" HorizontalAlignment="Left" BorderThickness="4">
+                        <Button.BorderBrush>
+                            <BandedBorderBrush>
+                                <BorderBand Brush="rgb(50,50,50)" />
+                                <BorderBand Brush="rgb(70,70,70)" />
+                                <BorderBand Brush="rgb(100,100,100)" />
+                                <BorderBand Brush="rgb(130,130,130)" />
+                            </BandedBorderBrush>
+                        </Button.BorderBrush>
+                        <Image Width="24" Height="24" RegionName="Computer" />
+                    </Button>
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        Don't ask me why you'd ever do this, but this [c=Turquoise]Button[/c] contains another [c=Turquoise]Button[/c] inside it.
+                    </TextBlock>
+                    <Button CommandName="OuterButtonCommand" Background="DarkOliveGreen" BorderBrush="DarkGreen" BorderThickness="1" Padding="10,6" BackgroundFocusedColor="White * 0.03">
+                        <Button CommandName="InnerButtonCommand" Background="DarkKhaki" BorderBrush="DarkGray" BorderThickness="1" Padding="10,2">
+                            <TextBlock Text="A [c=Turquoise][s=Black]Button[/s][/c] inside a [c=Turquoise][s=Black]Button[/s][/c].\nWhat is the world coming to?"
+                                       TextAlignment="Center" />
+                        </Button>
+                    </Button>
+                    <TextBlock Text="{MGBinding Path=TextBlock1Text, Mode=OneWay}" MinHeight="30" />
                 </StackPanel>
             </DockPanel>
             <Separator/>

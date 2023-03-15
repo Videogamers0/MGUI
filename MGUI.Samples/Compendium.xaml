@@ -40,7 +40,7 @@
                                 <Setter Property="FontSize" Value="10" />
                             </Style>
                         </UniformGrid.Styles>
-                        <ToggleButton Content="Button" Opacity="0.25" IsChecked="{MGBinding Path=ButtonSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="Button" IsChecked="{MGBinding Path=ButtonSamples.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="CheckBox" IsChecked="{MGBinding Path=CheckBoxSamples.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="ComboBox" IsChecked="{MGBinding Path=ComboBoxSamples.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="ContextMenu" IsChecked="{MGBinding Path=ContextMenuSamples.IsVisible, Mode=TwoWay}" />

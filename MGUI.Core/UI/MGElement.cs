@@ -82,8 +82,11 @@ namespace MGUI.Core.UI
 
     //TODO:
     //Fix issue where tooltips appear while hovering objects in occluded windows.
-    //      So if mouse is hovering a window that appears earlier in the MGDesktop.Windows list, and that window doesn't allow clickthrough and half opacity>=1.0f,
+    //      So if mouse is hovering a window that appears earlier in the MGDesktop.Windows list, and that window doesn't allow clickthrough and has opacity>=1.0f,
     //      then ignore the hover action on windows underneath it.
+    //make a default TypeConverter to convert strings to MGToolTips in XAML
+    //maybe a way to register your own custom text markdown?
+    //      RegisterFormattingCode(string Name, settings...)
     //'Resources' class? MGDesktop would have 1 reference to this instance.
     //		Contains things like Dictionary<string, MGTheme> Themes (so you can specify a ThemeId when parsing XAML)
     //      Dictionary<string, StyleSet> a StyleSet just contains a name/Id and a List<Style>
