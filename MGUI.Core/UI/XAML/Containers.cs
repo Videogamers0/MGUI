@@ -14,13 +14,13 @@ using System.Diagnostics;
 
 #if UseWPF
 using System.Windows.Markup;
+#else
+using Portable.Xaml.Markup;
 #endif
 
 namespace MGUI.Core.UI.XAML
 {
-#if UseWPF
     [ContentProperty(nameof(Children))]
-#endif
     public abstract class MultiContentHost : Element
     {
         [Browsable(false)]
@@ -29,9 +29,7 @@ namespace MGUI.Core.UI.XAML
         protected internal override IEnumerable<Element> GetChildren() => Children;
     }
 
-#if UseWPF
     [ContentProperty(nameof(Content))]
-#endif
     public abstract class SingleContentHost : Element
     {
         [Category("Data")]

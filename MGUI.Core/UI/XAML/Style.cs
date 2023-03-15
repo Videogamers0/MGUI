@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+#if UseWPF
 using System.Windows.Markup;
+#else
+using Portable.Xaml.Markup;
+#endif
 
 namespace MGUI.Core.UI.XAML
 {
-#if UseWPF
     [ContentProperty(nameof(Setters))]
-#endif
     public class Style
     {
         public MGElementType TargetType { get; set; }

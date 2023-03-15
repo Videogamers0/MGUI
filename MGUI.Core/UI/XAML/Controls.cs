@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 
 #if UseWPF
 using System.Windows.Markup;
+#else
+using Portable.Xaml.Markup;
 #endif
 
 namespace MGUI.Core.UI.XAML
@@ -295,9 +297,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-#if UseWPF
     [ContentProperty(nameof(Items))]
-#endif
     public class ComboBox : MultiContentHost
     {
         public override MGElementType ElementType => MGElementType.ComboBox;
@@ -1315,9 +1315,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-#if UseWPF
     [ContentProperty(nameof(Tabs))]
-#endif
     public class TabControl : Element
     {
         public override MGElementType ElementType => MGElementType.TabControl;
@@ -1456,9 +1454,7 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
-#if UseWPF
     [ContentProperty(nameof(Text))]
-#endif
     public class TextBlock : Element
     {
         public override MGElementType ElementType => MGElementType.TextBlock;

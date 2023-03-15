@@ -8,13 +8,12 @@ using System.Threading.Tasks;
 
 #if UseWPF
 using System.Windows.Markup;
+#else
+using Portable.Xaml.Markup;
 #endif
-
 namespace MGUI.Core.UI.XAML
 {
-#if UseWPF
     [ContentProperty(nameof(Items))]
-#endif
     public class ContextMenu : Window
     {
         public override MGElementType ElementType => MGElementType.ContextMenu;

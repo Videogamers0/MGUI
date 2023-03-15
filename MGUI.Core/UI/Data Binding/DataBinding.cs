@@ -8,8 +8,14 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Data;
 using System.Globalization;
+
+#if UseWPF
+using System.Windows.Data;
+#else
+using Portable.Xaml;
+using MGUI.Core.UI.Data_Binding.Converters;
+#endif
 
 namespace MGUI.Core.UI.Data_Binding
 {
@@ -55,7 +61,7 @@ namespace MGUI.Core.UI.Data_Binding
         //https://learn.microsoft.com/en-us/dotnet/desktop/wpf/events/weak-event-patterns?view=netdesktop-7.0&redirectedfrom=MSDN
         //https://learn.microsoft.com/en-us/dotnet/api/system.componentmodel.propertychangedeventmanager?redirectedfrom=MSDN&view=windowsdesktop-7.0
 
-        public readonly MGBinding Config;
+        public readonly BindingConfig Config;
 
         public readonly object TargetObject;
         public readonly string TargetPropertyName;
@@ -72,9 +78,9 @@ namespace MGUI.Core.UI.Data_Binding
         private readonly ConverterConfig? ConvertBackSettings;
 
         private object _SourceRoot;
-        /// <summary>The root of the source object, as determined by <see cref="MGBinding.SourceResolver"/> and <see cref="MGBinding.DataContextResolver"/>.<para/>
-        /// This might not be the same as <see cref="SourceObject"/> if the <see cref="MGBinding.SourcePath"/> must recurse nested objects.<br/>
-        /// For example, if the <see cref="MGBinding.SourcePath"/> is "Foo.Bar", then the <see cref="SourceRoot"/> would be the object containing the Foo property, 
+        /// <summary>The root of the source object, as determined by <see cref="BindingConfig.SourceResolver"/> and <see cref="BindingConfig.DataContextResolver"/>.<para/>
+        /// This might not be the same as <see cref="SourceObject"/> if the <see cref="BindingConfig.SourcePath"/> must recurse nested objects.<br/>
+        /// For example, if the <see cref="BindingConfig.SourcePath"/> is "Foo.Bar", then the <see cref="SourceRoot"/> would be the object containing the Foo property, 
         /// and the <see cref="SourceObject"/> would be the Foo object itself. ("Bar" would be the Source Property's Name)</summary>
         public object SourceRoot
         {
@@ -123,11 +129,23 @@ namespace MGUI.Core.UI.Data_Binding
         }
 
         private readonly record struct PropertyChangedSourceMetadata(INotifyPropertyChanged Object, string PropertyName);
+
+#if UseWPF
         private readonly List<PropertyChangedSourceMetadata> PathChangeHandlers = new();
+#else
+        private readonly List<PropertyNameHandler> PathChangeHandlers = new();
+#endif
+
         private void UpdateSourceObjectWhenPropertyChanges(PropertyChangedSourceMetadata Item)
         {
+#if UseWPF
             PropertyChangedEventManager.AddHandler(Item.Object, UpdateSourceObject, Item.PropertyName);
             PathChangeHandlers.Add(Item);
+#else
+            //  Maybe use this: https://github.com/davidmilligan/WeakEventListener/blob/master/WeakEventListener/WeakEventManager.cs
+            PropertyNameHandler Handler = new(Item.Object, Item.PropertyName, UpdateSourceObject);
+            PathChangeHandlers.Add(Handler);
+#endif
         }
         private void ClearPathChangeListeners()
         {
@@ -135,8 +153,13 @@ namespace MGUI.Core.UI.Data_Binding
             {
                 try
                 {
+#if UseWPF
                     foreach (PropertyChangedSourceMetadata Item in PathChangeHandlers)
                         PropertyChangedEventManager.RemoveHandler(Item.Object, UpdateSourceObject, Item.PropertyName);
+#else
+                    foreach (PropertyNameHandler Handler in PathChangeHandlers)
+                        Handler.Detach();
+#endif
                 }
                 finally { PathChangeHandlers.Clear(); }
             }
@@ -154,7 +177,11 @@ namespace MGUI.Core.UI.Data_Binding
                 {
                     if (IsSubscribedToSourceObjectPropertyChanged && SourceObject is INotifyPropertyChanged PreviousObservableSourceObject)
                     {
+#if UseWPF
                         PropertyChangedEventManager.RemoveHandler(PreviousObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
+#else
+                        PreviousObservableSourceObject.PropertyChanged -= ObservableSourceObject_PropertyChanged;
+#endif
                         IsSubscribedToSourceObjectPropertyChanged = false;
                     }
 
@@ -184,7 +211,11 @@ namespace MGUI.Core.UI.Data_Binding
                     if (SourceProperty != null && Config.BindingMode is DataBindingMode.OneWay or DataBindingMode.TwoWay &&
                         SourceObject is INotifyPropertyChanged ObservableSourceObject)
                     {
+#if UseWPF
                         PropertyChangedEventManager.AddHandler(ObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
+#else
+                        ObservableSourceObject.PropertyChanged += ObservableSourceObject_PropertyChanged;
+#endif
                         IsSubscribedToSourceObjectPropertyChanged = true;
                     }
                 }
@@ -251,8 +282,8 @@ namespace MGUI.Core.UI.Data_Binding
         private static Type GetUnderlyingType(PropertyInfo PropInfo) =>
             PropInfo == null ? null : Nullable.GetUnderlyingType(PropInfo.PropertyType) ?? PropInfo.PropertyType;
 
-        /// <param name="Object">The object which the property paths (<see cref="MGBinding.TargetPath"/>, <see cref="MGBinding.SourcePath"/>) should be retrieved from.</param>
-        internal DataBinding(MGBinding Config, object Object)
+        /// <param name="Object">The object which the property paths (<see cref="BindingConfig.TargetPath"/>, <see cref="BindingConfig.SourcePath"/>) should be retrieved from.</param>
+        internal DataBinding(BindingConfig Config, object Object)
         {
             this.Config = Config;
             ConvertSettings = Config.Converter == null ? null : new(Config.Converter, Config.ConverterParameter, false);
@@ -305,7 +336,11 @@ namespace MGUI.Core.UI.Data_Binding
             if (TargetProperty != null && Config.BindingMode is DataBindingMode.OneWayToSource or DataBindingMode.TwoWay &&
                 TargetObject is INotifyPropertyChanged ObservableTargetObject)
             {
+#if UseWPF
                 PropertyChangedEventManager.AddHandler(ObservableTargetObject, ObservableTargetObject_PropertyChanged, TargetPropertyName);
+#else
+                ObservableTargetObject.PropertyChanged += ObservableTargetObject_PropertyChanged;
+#endif
                 IsSubscribedToTargetObjectPropertyChanged = true;
             }
             else
@@ -577,8 +612,10 @@ namespace MGUI.Core.UI.Data_Binding
         {
             if (e.PropertyName == SourcePropertyName)
                 SourcePropertyValueChanged();
+#if UseWPF
             else
                 throw new InvalidOperationException($"{nameof(DataBinding)}.{nameof(ObservableSourceObject_PropertyChanged)}: Expected PropertyName={SourcePropertyName}. Actual PropertyName={e.PropertyName}");
+#endif
         }
 
         /// <summary>True if this binding subscribed to the <see cref="TargetObject"/>'s PropertyChanged event during initialization.<para/>
@@ -589,8 +626,10 @@ namespace MGUI.Core.UI.Data_Binding
         {
             if (e.PropertyName == TargetPropertyName)
                 TargetPropertyValueChanged();
+#if UseWPF
             else
                 throw new InvalidOperationException($"{nameof(DataBinding)}.{nameof(ObservableTargetObject_PropertyChanged)}: Expected PropertyName={TargetPropertyName}. Actual PropertyName={e.PropertyName}");
+#endif
         }
 
         private void SourcePropertyValueChanged()
@@ -621,11 +660,19 @@ namespace MGUI.Core.UI.Data_Binding
                 //  Unsubscribe from PropertyChanged events
                 if (IsSubscribedToTargetObjectPropertyChanged && TargetObject is INotifyPropertyChanged ObservableTargetObject)
                 {
+#if UseWPF
                     PropertyChangedEventManager.RemoveHandler(ObservableTargetObject, ObservableTargetObject_PropertyChanged, TargetPropertyName);
+#else
+                    ObservableTargetObject.PropertyChanged -= ObservableTargetObject_PropertyChanged;
+#endif
                 }
                 if (IsSubscribedToSourceObjectPropertyChanged && SourceObject is INotifyPropertyChanged ObservableSourceObject)
                 {
+#if UseWPF
                     PropertyChangedEventManager.RemoveHandler(ObservableSourceObject, ObservableSourceObject_PropertyChanged, SourcePropertyName);
+#else
+                    ObservableSourceObject.PropertyChanged -= ObservableSourceObject_PropertyChanged;
+#endif
                     IsSubscribedToSourceObjectPropertyChanged = false;
                 }
                 ClearPathChangeListeners();

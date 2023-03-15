@@ -169,7 +169,7 @@ namespace MGUI.Core.UI.XAML
         [Category("Attached")]
         public object Tag { get; set; }
 
-        protected internal List<MGBinding> Bindings { get; } = new();
+        protected internal List<BindingConfig> Bindings { get; } = new();
 
         /// <param name="ApplyBaseSettings">If not null, this action will be invoked before <see cref="ApplySettings(MGElement, MGElement, bool)"/> executes.</param>
         public T ToElement<T>(MGWindow Window, MGElement Parent, Action<T> ApplyBaseSettings = null) 
@@ -292,7 +292,7 @@ namespace MGUI.Core.UI.XAML
             { nameof(Height), $"{nameof(MGElement.PreferredHeight)}" }
         };
 
-        /// <summary>Resolves any pending <see cref="MGBinding"/>s by converting them into <see cref="DataBinding"/>s</summary>
+        /// <summary>Resolves any pending <see cref="BindingConfig"/>s by converting them into <see cref="DataBinding"/>s</summary>
         /// <param name="DataContextOverride">If not null, this value will be applied to the <see cref="MGElement.DataContextOverride"/> value of every element that is processed.<para/>
         /// If <paramref name="RecurseChildren"/> is false, this is only applied to <paramref name="Element"/>. Else it's applied to <paramref name="Element"/> and all its nested children.</param>
         internal static void ProcessBindings(MGElement Element, bool RecurseChildren, object DataContextOverride)
@@ -309,12 +309,12 @@ namespace MGUI.Core.UI.XAML
                 if (DataContextOverride != null)
                     Element.DataContextOverride = DataContextOverride;
 
-                if (Element.Metadata.TryGetValue(BindingsMetadataKey, out object Value) && Value is List<MGBinding> Bindings)
+                if (Element.Metadata.TryGetValue(BindingsMetadataKey, out object Value) && Value is List<BindingConfig> Bindings)
                 {
-                    foreach (MGBinding Binding in Bindings)
+                    foreach (BindingConfig Binding in Bindings)
                     {
                         object TargetObject = Element;
-                        MGBinding PostProcessedBinding = Binding;
+                        BindingConfig PostProcessedBinding = Binding;
 
                         //  Handle some special-cases where the name of the XAML property isn't the same as the corresponding property on the c# object
                         if (BindingPathMappings.TryGetValue(Binding.TargetPath, out string ActualPath))

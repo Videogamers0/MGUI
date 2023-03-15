@@ -6,18 +6,19 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Data;
+
+#if UseWPF
 using System.Windows.Markup;
+#else
+using Portable.Xaml.Markup;
+#endif
 
 namespace MGUI.Core.UI.XAML
 {
-#if UseWPF
     [ContentProperty(nameof(Content))]
-#endif
     public class ContentTemplate
     {
         [Category("Data")]

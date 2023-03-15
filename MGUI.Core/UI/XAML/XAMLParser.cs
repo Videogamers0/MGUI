@@ -14,10 +14,12 @@ using System.IO;
 using System.Xml;
 using System.Xml.Linq;
 using MGUI.Shared.Helpers;
-using MonoGame.Extended.Timers;
 
 #if UseWPF
 using System.Xaml;
+#else
+using Portable.Xaml;
+using Portable.Xaml.Markup;
 #endif
 
 namespace MGUI.Core.UI.XAML
@@ -168,7 +170,6 @@ namespace MGUI.Core.UI.XAML
             }
         }
 
-#if UseWPF
         /// <param name="SanitizeXAMLString">If true, the given <paramref name="XAMLString"/> will be pre-processed via the following logic:<para/>
         /// 1. Trim leading and trailing whitespace<br/>
         /// 2. Insert required XML namespaces (such as "xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation")<br/>
@@ -208,6 +209,5 @@ namespace MGUI.Core.UI.XAML
             Parsed.ProcessStyles();
             return Parsed.ToElement(Desktop, Theme);
         }
-#endif
     }
 }

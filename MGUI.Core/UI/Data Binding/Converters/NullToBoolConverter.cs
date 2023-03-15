@@ -6,13 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 
 #if UseWPF
-using System.Windows.Data;
 using System.Windows.Markup;
+using System.Windows.Data;
+#else
+using Portable.Xaml.Markup;
 #endif
 
 namespace MGUI.Core.UI.Data_Binding.Converters
 {
-#if UseWPF
     public class NullToBoolConverter : MarkupExtension, IValueConverter
     {
         public bool NullValue { get; set; } = true;
@@ -28,5 +29,4 @@ namespace MGUI.Core.UI.Data_Binding.Converters
 
         public override object ProvideValue(IServiceProvider serviceProvider) => this;
     }
-#endif
 }
