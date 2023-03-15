@@ -129,15 +129,22 @@ namespace MGUI.Core.UI.Data_Binding
         }
 
         private readonly record struct PropertyChangedSourceMetadata(INotifyPropertyChanged Object, string PropertyName);
+
+#if UseWPF
         private readonly List<PropertyChangedSourceMetadata> PathChangeHandlers = new();
+#else
+        private readonly List<PropertyNameHandler> PathChangeHandlers = new();
+#endif
+
         private void UpdateSourceObjectWhenPropertyChanges(PropertyChangedSourceMetadata Item)
         {
 #if UseWPF
             PropertyChangedEventManager.AddHandler(Item.Object, UpdateSourceObject, Item.PropertyName);
             PathChangeHandlers.Add(Item);
 #else
-            //TODO: implementation that does not rely on PropertyChangedEventManager
-            //PathChangeHandlers.Add(Item);
+            //  Maybe use this: https://github.com/davidmilligan/WeakEventListener/blob/master/WeakEventListener/WeakEventManager.cs
+            PropertyNameHandler Handler = new(Item.Object, Item.PropertyName, UpdateSourceObject);
+            PathChangeHandlers.Add(Handler);
 #endif
         }
         private void ClearPathChangeListeners()
@@ -150,7 +157,8 @@ namespace MGUI.Core.UI.Data_Binding
                     foreach (PropertyChangedSourceMetadata Item in PathChangeHandlers)
                         PropertyChangedEventManager.RemoveHandler(Item.Object, UpdateSourceObject, Item.PropertyName);
 #else
-                    //TODO: implementation that does not rely on PropertyChangedEventManager
+                    foreach (PropertyNameHandler Handler in PathChangeHandlers)
+                        Handler.Detach();
 #endif
                 }
                 finally { PathChangeHandlers.Clear(); }
