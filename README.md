@@ -1,6 +1,6 @@
 # MGUI
 
-MGUI is a UI framework for [MonoGame](https://www.monogame.net/) ([Src](https://github.com/MonoGame/MonoGame)) that features a powerful layout engine similar to WPF, and a robust set of controls to build your UI with. 
+MGUI is a UI framework for [MonoGame](https://www.monogame.net/) ([Src](https://github.com/MonoGame/MonoGame)) that features a powerful layout engine and data binding engine similar to WPF, and a robust set of controls to build your UI with. 
 
 All control names are prefixed with 'MG' and have similar names and properties to what you might find in WPF. Currently supported controls:
 - 'Container'-like Controls that define their own logic for arranging their children:
@@ -42,7 +42,7 @@ All control names are prefixed with 'MG' and have similar names and properties t
   - MGTextBox
   - MGTimer
   
-[Wiki is under construction.](https://github.com/Videogamers0/MGUI/wiki) More documentation coming soon...
+[Wiki is under construction.](https://github.com/Videogamers0/MGUI/wiki) More documentation coming soon... maybe...
   
 # Examples
   
@@ -55,36 +55,36 @@ A simple registration window created with MGUI:
 ```xaml
 <Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Left="50" Top="50" Width="300" Height="380">
-    
+        Left="440" Top="20" MinWidth="300" SizeToContent="Height">
+
     <!-- Replace the window's Title bar with custom content -->
     <Window.TitleBar>
-        <!-- The root-element of the window's Title bar must always be an MGDockPanel, but we can add whatever we want to it -->
+        <!-- The root-element of the window's Title bar must always be an DockPanel, but we can add whatever we want to it -->
         <DockPanel Padding="5,2">
             <Rectangle Dock="Left" Width="16" Height="16" Stroke="Gray" StrokeThickness="1" Fill="Black" Margin="0,0,5,0">
                 <Rectangle.ToolTip>
-                    <ToolTip Padding="0" Width="240" Height="30" TextForeground="RoyalBlue" Background="White * 0.85">
+                    <ToolTip Padding="8,4" MinHeight="0" SizeToContent="WidthAndHeight" TextForeground="RoyalBlue" Background="White * 0.85">
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="[b]Pretend this is a window icon[/b]" />
                     </ToolTip>
                 </Rectangle.ToolTip>
             </Rectangle>
-            
+
             <TextBlock FontSize="10" Foreground="White" Text="Registration Form" />
         </DockPanel>
     </Window.TitleBar>
-    
+
     <DockPanel Margin="5">
         <!-- Window header -->
         <StackPanel Dock="Top" Orientation="Vertical">
             <TextBlock Dock="Top" HorizontalAlignment="Center" FontSize="14" Foreground="Orange" Text="Register for a new account" />
             <Separator Size="3" Orientation="Horizontal" Background="Orange * 0.5" />
         </StackPanel>
-        
+
         <!-- Register -->
         <Button Name="Button_Register" Dock="Bottom" Background="Orange" HorizontalAlignment="Center" Padding="25,5">
             <TextBlock Text="[b]Register[/b]" FontSize="14" />
         </Button>
-        
+
         <Border BorderBrush="Black" BorderThickness="1">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="8" Margin="0,10,0,15" Background="White * 0.08">
                 <StackPanel Orientation="Vertical">
@@ -94,7 +94,7 @@ A simple registration window created with MGUI:
                             <Setter Property="Spacing" Value="2" />
                         </Style>
                     </StackPanel.Styles>
-                    
+
                     <!-- Email -->
                     <HeaderedContentPresenter>
                         <HeaderedContentPresenter.Header>
@@ -103,7 +103,7 @@ A simple registration window created with MGUI:
                         <TextBox Name="TextBox_Email" PlaceholderText="[i][opacity=0.5]Email[/opacity][/i]" CharacterLimit="40" ShowCharacterCount="false" AcceptsReturn="false" AcceptsTab="false" />
                     </HeaderedContentPresenter>
                     <Spacer Height="8" />
-                    
+
                     <!-- Username -->
                     <HeaderedContentPresenter>
                         <HeaderedContentPresenter.Header>
@@ -111,7 +111,7 @@ A simple registration window created with MGUI:
                         </HeaderedContentPresenter.Header>
                         <TextBox Name="TextBox_Username" PlaceholderText="[i][opacity=0.5]Username[/opacity][/i]" CharacterLimit="16" ShowCharacterCount="true" AcceptsReturn="false" AcceptsTab="false">
                             <TextBox.ToolTip>
-                                <ToolTip Width="320" Height="64" TextForeground="Red" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                <ToolTip SizeToContent="WidthAndHeight" TextForeground="Red" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
                                     <TextBlock WrapText="True" LinePadding="10" FontSize="10" Text="Must contain only alphanumeric characters.\nCannot exceed [b]16[/b] characters." />
                                 </ToolTip>
                             </TextBox.ToolTip>
@@ -127,10 +127,10 @@ A simple registration window created with MGUI:
                         <PasswordBox Name="TextBox_Password" PasswordCharacter="*" Text="Hunter2" />
                     </HeaderedContentPresenter>
                     <Spacer Height="16" />
-                    
+
                     <!-- Terms of service -->
                     <CheckBox Name="CheckBox_TOS" IsChecked="true">
-                        <TextBlock Text="I agree to the [color=#3483eb][i][u]Terms of service[/u][/i][/color]" />
+                        <TextBlock Text="I agree to the [Action=OpenTOS][color=#3483eb][i][u]Terms of service[/u][/i][/color][/Action]" />
                     </CheckBox>
                 </StackPanel>
             </ScrollViewer>
@@ -147,128 +147,145 @@ A simple registration window created with MGUI:
 ```xaml
 <Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Left="300" Top="400" Width="800" Height="500" IsUserResizable="False">
+        Left="420" Top="20" SizeToContent="WidthAndHeight" WindowStyle="None" AllowsClickThrough="True">
     <OverlayPanel TextForeground="Black" HorizontalAlignment="Center" VerticalAlignment="Center">
         <Button Name="Button_Close" HorizontalAlignment="Right" VerticalAlignment="Top" Content="[b]X" TextForeground="Red" Padding="3,2,3,0"
-                BorderBrush="RGB(91,43,42)" BorderThickness="2" Background="rgb(242,191,114)" />
-        
-        <TabControl Name="Tabs" Background="RGB(255,203,123)" BorderBrush="RGB(177,78,5)" BorderThickness="0" MinWidth="300" MinHeight="300" Padding="0" Margin="0,12,12,0">
-            <TabControl.HeadersPanel>
-                <StackPanel Orientation="Horizontal" Margin="35,0,0,0" Spacing="0" />
-            </TabControl.HeadersPanel>
-            <TabItem Padding="0">
-                <TabItem.Header>
-                    <TextBlock Text="[b]1" Foreground="Black" Padding="5,2" />
-                </TabItem.Header>
+                BorderBrush="RGB(91,43,42)" BorderThickness="2" Background="rgb(242,191,114)" ZIndex="100" />
 
-                <!-- Content of the first tab -->
-                <Border BorderBrush="RGB(133,54,5)" BorderThickness="3">
-                    <Border BorderBrush="RGB(250,147,5)" BorderThickness="3">
-                        <Border BorderBrush="RGB(177,78,5)" BorderThickness="3">
-                            <StackPanel Orientation="Vertical">
-                                
-                                <!-- 4x12 grid of 48x48 px slots -->
-                                <UniformGrid Name="UniformGrid_Inventory" Rows="4" Columns="12" CellSize="48,48" Margin="16,8,16,12" HeaderRowHeight="15" RowSpacing="3">
-                                    <UniformGrid.Styles>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Foreground" Value="Gray" />
-                                            <Setter Property="FontSize" Value="8" />
-                                            <Setter Property="HorizontalAlignment" Value="Center" />
-                                            <Setter Property="VerticalAlignment" Value="Center" />
-                                        </Style>
-                                    </UniformGrid.Styles>
-                                    <TextBlock Foreground="Red" Text="1" Row="0" Column="0" />
-                                    <TextBlock Text="2" Row="0" Column="1" />
-                                    <TextBlock Text="3" Row="0" Column="2" />
-                                    <TextBlock Text="4" Row="0" Column="3" />
-                                    <TextBlock Text="5" Row="0" Column="4" />
-                                    <TextBlock Text="6" Row="0" Column="5" />
-                                    <TextBlock Text="7" Row="0" Column="6" />
-                                    <TextBlock Text="8" Row="0" Column="7" />
-                                    <TextBlock Text="9" Row="0" Column="8" />
-                                    <TextBlock Text="0" Row="0" Column="9" />
-                                    <TextBlock Text="-" Row="0" Column="10" />
-                                    <TextBlock Text="=" Row="0" Column="11" />
-                                </UniformGrid>
+        <InputConsumer Margin="0,12,12,0">
+            <TabControl Background="RGB(255,203,123)" BorderBrush="RGB(177,78,5)" BorderThickness="0" MinWidth="300" MinHeight="300" Padding="0">
+                <TabControl.HeadersPanel>
+                    <StackPanel Orientation="Horizontal" Margin="35,0,0,0" Spacing="0" />
+                </TabControl.HeadersPanel>
+                <TabControl.SelectedTabHeaderTemplate>
+                    <Button Padding="2,1" BorderThickness="2,2,2,0" BorderBrush="rgb(177,78,5)" Background="rgb(255,210,132)" VerticalAlignment="Bottom" />
+                </TabControl.SelectedTabHeaderTemplate>
+                <TabControl.UnselectedTabHeaderTemplate>
+                    <Button Padding="2,3" BorderThickness="2,2,2,0" BorderBrush="rgb(177,78,5)" Background="rgb(228,174,110)" VerticalAlignment="Bottom" />
+                </TabControl.UnselectedTabHeaderTemplate>
 
-                                <Separator Orientation="Horizontal" Size="3" Margin="0" Background="RGB(133,54,5)" />
-                                <Separator Orientation="Horizontal" Size="3" Margin="0" Background="RGB(250,147,5)" />
-                                <Separator Orientation="Horizontal" Size="3" Margin="0" Background="RGB(177,78,5)" />
+                <TabItem Padding="0">
+                    <TabItem.Header>
+                        <TextBlock Text="[b]1" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
 
-                                <DockPanel Margin="12,10,12,12">
-                                    <Grid Dock="Left" RowLengths="48,48,48,30" ColumnLengths="48,100,48">
-                                        <!-- Note: If you specify 4 colors, delimited by a hyphen, it will create an MGDockedBorderBrush (Left, Top, Right, Bottom) -->
-                                        <Border Row="0" Column="0" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
-                                        <Border Row="1" Column="0" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
-                                        <Border Row="2" Column="0" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+                    <!-- Content of the first tab -->
+                    <Border BorderThickness="9">
+                        <Border.BorderBrush>
+                            <BandedBorderBrush>
+                                <BorderBand Brush="RGB(133,54,5)" />
+                                <BorderBand Brush="RGB(250,147,5)" />
+                                <BorderBand Brush="RGB(177,78,5)" />
+                            </BandedBorderBrush>
+                        </Border.BorderBrush>
 
-                                        <Border Row="0" Column="1" RowSpan="3" Margin="9,0"  BorderBrush="RGB(133,54,5)" BorderThickness="3">
-                                            <Border BorderBrush="RGB(250,147,5)" BorderThickness="3">
-                                                <Border BorderBrush="RGB(177,78,5)" BorderThickness="3" Background="RGB(56,170,255)">
-                                                    <!--<Image Texture="texture_name..."></Image>-->
-                                                </Border>
-                                            </Border>
-                                        </Border>
+                        <StackPanel Orientation="Vertical">
 
-                                        <Border Row="0" Column="2" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
-                                        <Border Row="1" Column="2" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
-                                        <Border Row="2" Column="2" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+                            <!-- 4x12 grid of 48x48 px slots -->
+                            <UniformGrid Name="UniformGrid_Inventory" Rows="4" Columns="12" CellSize="48,48" Margin="16,8,16,12" HeaderRowHeight="15" RowSpacing="3">
+                                <UniformGrid.Styles>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="Gray" />
+                                        <Setter Property="FontSize" Value="8" />
+                                        <Setter Property="HorizontalAlignment" Value="Center" />
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                    </Style>
+                                </UniformGrid.Styles>
+                                <TextBlock Foreground="Red" Text="1" Row="0" Column="0" />
+                                <TextBlock Text="2" Row="0" Column="1" />
+                                <TextBlock Text="3" Row="0" Column="2" />
+                                <TextBlock Text="4" Row="0" Column="3" />
+                                <TextBlock Text="5" Row="0" Column="4" />
+                                <TextBlock Text="6" Row="0" Column="5" />
+                                <TextBlock Text="7" Row="0" Column="6" />
+                                <TextBlock Text="8" Row="0" Column="7" />
+                                <TextBlock Text="9" Row="0" Column="8" />
+                                <TextBlock Text="0" Row="0" Column="9" />
+                                <TextBlock Text="-" Row="0" Column="10" />
+                                <TextBlock Text="=" Row="0" Column="11" />
+                            </UniformGrid>
 
-                                        <TextBlock Row="3" Column="0" ColumnSpan="3" Margin="0,12,0,0" Text="Character Name" HorizontalAlignment="Center" FontSize="14" />
+                            <Separator Orientation="Horizontal" Size="3" Margin="0" Background="RGB(133,54,5)" />
+                            <Separator Orientation="Horizontal" Size="3" Margin="0" Background="RGB(250,147,5)" />
+                            <Separator Orientation="Horizontal" Size="3" Margin="0" Background="RGB(177,78,5)" />
+
+                            <DockPanel Margin="12,10,12,12">
+                                <Grid Dock="Left" RowLengths="48,48,48,auto" ColumnLengths="48,100,48">
+                                    <!-- Note: If you specify 4 colors, delimited by a hyphen, it will create an MGDockedBorderBrush (Left, Top, Right, Bottom) -->
+                                    <Border Row="0" Column="0" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+                                    <Border Row="1" Column="0" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+                                    <Border Row="2" Column="0" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+
+                                    <Border Row="0" Column="1" RowSpan="3" Margin="9,0" BorderThickness="9" Background="RGB(56,170,255)">
+                                        <Border.BorderBrush>
+                                            <BandedBorderBrush>
+                                                <BorderBand Brush="RGB(133,54,5)" />
+                                                <BorderBand Brush="RGB(250,147,5)" />
+                                                <BorderBand Brush="RGB(177,78,5)" />
+                                            </BandedBorderBrush>
+                                        </Border.BorderBrush>
+
+                                        <!--<Image Texture="texture_name..."></Image>-->
+                                    </Border>
+
+                                    <Border Row="0" Column="2" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+                                    <Border Row="1" Column="2" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+                                    <Border Row="2" Column="2" BorderBrush="RGB(255,228,161)-RGB(214,143,84)-RGB(214,143,84)-RGB(255,228,161)" BorderThickness="3" />
+
+                                    <TextBlock Row="3" Column="0" ColumnSpan="3" Margin="0,12,0,0" Text="Character Name" HorizontalAlignment="Center" FontSize="14" />
+                                </Grid>
+
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Margin="15,15,15,65">
+                                    <TextBlock Text="Farm Name" FontSize="20" HorizontalAlignment="Center" />
+                                    <Grid HorizontalAlignment="Center" RowSpacing="12" ColumnSpacing="8" RowLengths="auto,auto" ColumnLengths="auto,auto">
+                                        <TextBlock Row="0" Column="0" Text="Current Funds:" FontSize="18" HorizontalAlignment="Right" />
+                                        <TextBlock Row="0" Column="1"  Text="999,999g" FontSize="18" HorizontalAlignment="Left" />
+
+                                        <TextBlock Row="1" Column="0" Text="Total Earnings:" FontSize="18" HorizontalAlignment="Right" />
+                                        <TextBlock Row="1" Column="1" Text="2,147,483,647g" FontSize="18" HorizontalAlignment="Left" />
                                     </Grid>
-
-                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Margin="15,15,15,65">
-                                        <TextBlock Text="Farm Name" FontSize="20" HorizontalAlignment="Center" />
-                                        <Grid HorizontalAlignment="Center" RowSpacing="12" ColumnSpacing="8" RowLengths="auto,auto" ColumnLengths="auto,auto">
-                                            <TextBlock Row="0" Column="0" Text="Current Funds:" FontSize="18" HorizontalAlignment="Right" />
-                                            <TextBlock Row="0" Column="1"  Text="999,999g" FontSize="18" HorizontalAlignment="Left" />
-
-                                            <TextBlock Row="1" Column="0" Text="Total Earnings:" FontSize="18" HorizontalAlignment="Right" />
-                                            <TextBlock Row="1" Column="1" Text="2,147,483,647g" FontSize="18" HorizontalAlignment="Left" />
-                                        </Grid>
-                                    </StackPanel>
-                                </DockPanel>
-                            </StackPanel>
-                        </Border>
+                                </StackPanel>
+                            </DockPanel>
+                        </StackPanel>
                     </Border>
-                </Border>
-            </TabItem>
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Text="[b]2" Foreground="Black" Padding="5,2" />
-                </TabItem.Header>
-            </TabItem>
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Text="[b]3" Foreground="Black" Padding="5,2" />
-                </TabItem.Header>
-            </TabItem>
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Text="[b]4" Foreground="Black" Padding="5,2" />
-                </TabItem.Header>
-            </TabItem>
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Text="[b]5" Foreground="Black" Padding="5,2" />
-                </TabItem.Header>
-            </TabItem>
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Text="[b]6" Foreground="Black" Padding="5,2" />
-                </TabItem.Header>
-            </TabItem>
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Text="[b]7" Foreground="Black" Padding="5,2" />
-                </TabItem.Header>
-            </TabItem>
-            <TabItem>
-                <TabItem.Header>
-                    <TextBlock Text="[b]8" Foreground="Black" Padding="5,2" />
-                </TabItem.Header>
-            </TabItem>
-        </TabControl>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="[b]2" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="[b]3" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="[b]4" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="[b]5" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="[b]6" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="[b]7" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <TextBlock Text="[b]8" Foreground="Black" Padding="5,2" />
+                    </TabItem.Header>
+                </TabItem>
+            </TabControl>
+        </InputConsumer>
     </OverlayPanel>
 </Window>
 ```
@@ -281,10 +298,10 @@ A simple registration window created with MGUI:
 ```xaml
 <Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:MGUI.Samples.FF7_Samples;assembly=MGUI.Samples"
+        xmlns:local="clr-namespace:MGUI.Samples.Dialogs.FF7;assembly=MGUI.Samples"
         WindowStyle="None" Width="600" Height="470">
-    <DockPanel>
-        <DockPanel.Styles>
+    <OverlayPanel>
+        <OverlayPanel.Styles>
             <Style TargetType="TextBlock">
                 <Setter Property="FontSize" Value="14" />
                 <Setter Property="Foreground" Value="rgb(236,236,236)" />
@@ -295,8 +312,6 @@ A simple registration window created with MGUI:
             <Style TargetType="Border" Name="PanelBorder">
                 <Setter Property="BorderBrush">
                     <Setter.Value>
-                    <!-- BandedBorderBrushes are similar to nesting several Borders within each other. -->
-                    <!-- It just draws each Border in sequence, from the outside edge moving inwards -->
                         <BandedBorderBrush>
                             <BorderBand Brush="rgb(128,128,128)" />
                             <BorderBand Brush="rgb(168,168,168)" />
@@ -308,118 +323,128 @@ A simple registration window created with MGUI:
                     </Setter.Value>
                 </Setter>
                 <Setter Property="BorderThickness" Value="6" />
-                <!-- Specifying 2 colors, separated by '|', creates a diagonal gradient brush -->
                 <Setter Property="Background" Value="rgb(0,0,180)|rgb(0,0,50)" />
                 <Setter Property="Padding" Value="8,4" />
             </Style>
-        </DockPanel.Styles>
-
-        <Border StyleNames="PanelBorder" Dock="Top">
-            <TextBlock HorizontalAlignment="Center" FontSize="14" Text="Items" />
-        </Border>
-        <Border StyleNames="PanelBorder" Dock="Top">
-            <TextBlock Name="ItemDescriptionLabel" HorizontalAlignment="Left" Text="Select an item" AllowsInlineFormatting="False" />
-        </Border>
+        </OverlayPanel.Styles>
 
         <DockPanel>
-            <Border StyleNames="PanelBorder" Dock="Left">
-                <!-- List of each party member -->
-                <ListBox Name="PartyList" ItemType="{x:Type local:PartyMember}" IsTitleVisible="False" Background="Transparent" 
-                         Margin="5" AlternatingRowBackgrounds="{x:Null}" ItemsPanelBorderThickness="0" SelectionMode="None">
-                    <ListBox.ItemTemplate>
-                        <ContentTemplate>
-                            <DockPanel Margin="0,5">
-                                <DockPanel.Styles>
-                                    <Style TargetType="TextBlock" Name="HeaderLabel">
-                                        <Setter Property="IsBold" Value="True" />
-                                        <Setter Property="Foreground" Value="rgb(24,215,215)" />
-                                        <Setter Property="Margin" Value="0,0,1,0" />
-                                        <Setter Property="MinWidth" Value="32" />
-                                        <Setter Property="TextAlignment" Value="Left" />
-                                        <Setter Property="VerticalAlignment" Value="Center" />
-                                    </Style>
-                                </DockPanel.Styles>
-                                
-                                <!-- Character Portrait -->
-                                <Border BorderBrush="Black" BorderThickness="2" Dock="Left" Margin="0,0,6,0" VerticalAlignment="Center">
-                                    <Image Stretch="None" Texture="{PropertyBinding Path=Portrait, Mode=OneTime}" />
-                                </Border>
-                                
-                                <StackPanel Margin="8,0,0,0" VerticalAlignment="Center" Orientation="Vertical">
-                                    <!-- Character Name -->
-                                    <TextBlock Text="{PropertyBinding Path=Name, Mode=OneTime, FallbackValue='&lt;Name&gt;'}" />
-                                    
-                                    <!-- Character Level -->
-                                    <DockPanel>
-                                        <TextBlock StyleNames="HeaderLabel" Dock="Left" Text="LV" />
-                                        <TextBlock Foreground="White" IsBold="True" Text="{PropertyBinding Path=Level, Mode=OneWay}" />
-                                    </DockPanel>
-                                    
-                                    <!-- Character HP -->
-                                    <DockPanel>
-                                        <TextBlock StyleNames="HeaderLabel" Dock="Left" Text="HP" />
-                                        <DockPanel VerticalAlignment="Center">
-                                            <!-- Tip: If you specify 4 colors, delimited by a '|', it will create an MGGradientBrush using those colors as the 4 corners of the gradient -->
-                                            <ProgressBar Dock="Bottom" Height="4" BorderThickness="0,0,0,1" BorderBrush="Black"
-                                                         Minimum="0" Maximum="{PropertyBinding Path=MaxHP, Mode=OneWay}" Value="{PropertyBinding Path=CurrentHP, Mode=OneWay}"
-                                                         CompletedBrush="rgb(56,114,217)|rgb(155,178,220)|rgb(155,178,220)|rgb(56,114,217)" 
-                                                         IncompleteBrush="rgb(60,0,0)" />
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{PropertyBinding Path=CurrentHP, Mode=OneWay}" />
-                                                <TextBlock Margin="3,0" Text="/" FontSize="12" />
-                                                <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{PropertyBinding Path=MaxHP, Mode=OneWay}" />
-                                            </StackPanel>
-                                        </DockPanel>
-                                    </DockPanel>
-                                    
-                                    <!-- Character MP -->
-                                    <DockPanel>
-                                        <TextBlock StyleNames="HeaderLabel" Dock="Left" Text="MP" />
-                                        <DockPanel VerticalAlignment="Center">
-                                            <ProgressBar Dock="Bottom" Height="4" BorderThickness="0,0,0,1" BorderBrush="Black"
-                                                         Minimum="0" Maximum="{PropertyBinding Path=MaxMP, Mode=OneWay}" Value="{PropertyBinding Path=CurrentMP, Mode=OneWay}"
-                                                         CompletedBrush="rgb(65,217,152)|rgb(170,205,196)|rgb(170,205,196)|rgb(65,217,152)" 
-                                                         IncompleteBrush="rgb(60,0,0)" />
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{PropertyBinding Path=CurrentMP, Mode=OneWay}" />
-                                                <TextBlock Margin="3,0" Text="/" FontSize="12" />
-                                                <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{PropertyBinding Path=MaxMP, Mode=OneWay}" />
-                                            </StackPanel>
-                                        </DockPanel>
-                                    </DockPanel>
-                                </StackPanel>
-                            </DockPanel>
-                        </ContentTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+            <Border StyleNames="PanelBorder" Dock="Top">
+                <TextBlock HorizontalAlignment="Center" FontSize="14" Text="Items" />
+            </Border>
+            <Border StyleNames="PanelBorder" Dock="Top">
+                <TextBlock HorizontalAlignment="Left" AllowsInlineFormatting="False"
+                           Text="{MGBinding Path=SelectedItem.Description, Mode=OneWay, FallbackValue='Select an Item'}" />
             </Border>
 
-            <Border StyleNames="PanelBorder">
-                <!-- List of each item in the inventory -->
-                <ListBox Name="ItemsList" ItemType="{x:Type local:InventoryItem}" IsTitleVisible="False" Background="Transparent" 
-                         Margin="10" AlternatingRowBackgrounds="{x:Null}" ItemsPanelBorderThickness="0">
-                    <ListBox.ItemTemplate>
-                        <ContentTemplate>
-                            <DockPanel>
-                                <!-- Name and icon -->
-                                <StackPanel Orientation="Horizontal" Dock="Left" Spacing="5">
-                                    <Image VerticalAlignment="Center" TextureName="FF7ItemIcon" Width="24" Height="22" />
-                                    <TextBlock VerticalAlignment="Center" Text="{PropertyBinding Path=Name, Mode=OneTime}" />
-                                </StackPanel>
-                                
-                                <!-- Quantity -->
-                                <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Right">
-                                    <TextBlock VerticalAlignment="Center" Text=":" IsBold="True" />
-                                    <TextBlock VerticalAlignment="Center" Text="{PropertyBinding Path=Quantity, Mode=OneWay}" 
+            <DockPanel>
+                <Border StyleNames="PanelBorder" Dock="Left">
+                    <!-- List of each party member -->
+                    <ListBox Name="PartyList" ItemType="{x:Type local:PartyMember}" IsTitleVisible="False" Background="Transparent" 
+                             Margin="5" AlternatingRowBackgrounds="{x:Null}" ItemsPanelBorderThickness="0" SelectionMode="None">
+                        <ListBox.ItemContainerStyle>
+                            <Border BorderThickness="0" />
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <ContentTemplate>
+                                <DockPanel Margin="0,5">
+                                    <DockPanel.Styles>
+                                        <Style TargetType="TextBlock" Name="HeaderLabel">
+                                            <Setter Property="IsBold" Value="True" />
+                                            <Setter Property="Foreground" Value="rgb(24,215,215)" />
+                                            <Setter Property="Margin" Value="0,0,1,0" />
+                                            <Setter Property="MinWidth" Value="32" />
+                                            <Setter Property="TextAlignment" Value="Left" />
+                                            <Setter Property="VerticalAlignment" Value="Center" />
+                                        </Style>
+                                    </DockPanel.Styles>
+
+                                    <!-- Character Portrait -->
+                                    <Border BorderBrush="Black" BorderThickness="2" Dock="Left" Margin="0,0,6,0" VerticalAlignment="Center">
+                                        <Image Stretch="None" Texture="{MGBinding Path=Portrait, Mode=OneTime}" />
+                                    </Border>
+
+                                    <StackPanel Margin="8,0,0,0" VerticalAlignment="Center" Orientation="Vertical">
+                                        <!-- Character Name -->
+                                        <TextBlock Text="{MGBinding Path=Name, Mode=OneTime, FallbackValue='&lt;Name&gt;'}" />
+
+                                        <!-- Character Level -->
+                                        <DockPanel>
+                                            <TextBlock StyleNames="HeaderLabel" Dock="Left" Text="LV" />
+                                            <TextBlock Foreground="White" IsBold="True" Text="{MGBinding Path=Level, Mode=OneWay}" />
+                                        </DockPanel>
+
+                                        <!-- Character HP -->
+                                        <DockPanel>
+                                            <TextBlock StyleNames="HeaderLabel" Dock="Left" Text="HP" />
+                                            <DockPanel VerticalAlignment="Center">
+                                                <!-- Tip: If you specify 4 colors, delimited by a '|', it will create an MGGradientBrush using those colors as the 4 corners of the gradient -->
+                                                <ProgressBar Dock="Bottom" Height="4" BorderThickness="0,0,0,1" BorderBrush="Black"
+                                                         Minimum="0" Maximum="{MGBinding Path=MaxHP, Mode=OneWay}" Value="{MGBinding Path=CurrentHP, Mode=OneWay}"
+                                                         CompletedBrush="rgb(56,114,217)|rgb(155,178,220)|rgb(155,178,220)|rgb(56,114,217)" 
+                                                         IncompleteBrush="rgb(60,0,0)" />
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{MGBinding Path=CurrentHP, Mode=OneWay}" />
+                                                    <TextBlock Margin="3,0" Text="/" FontSize="12" />
+                                                    <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{MGBinding Path=MaxHP, Mode=OneWay}" />
+                                                </StackPanel>
+                                            </DockPanel>
+                                        </DockPanel>
+
+                                        <!-- Character MP -->
+                                        <DockPanel>
+                                            <TextBlock StyleNames="HeaderLabel" Dock="Left" Text="MP" />
+                                            <DockPanel VerticalAlignment="Center">
+                                                <ProgressBar Dock="Bottom" Height="4" BorderThickness="0,0,0,1" BorderBrush="Black"
+                                                         Minimum="0" Maximum="{MGBinding Path=MaxMP, Mode=OneWay}" Value="{MGBinding Path=CurrentMP, Mode=OneWay}"
+                                                         CompletedBrush="rgb(65,217,152)|rgb(170,205,196)|rgb(170,205,196)|rgb(65,217,152)" 
+                                                         IncompleteBrush="rgb(60,0,0)" />
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{MGBinding Path=CurrentMP, Mode=OneWay}" />
+                                                    <TextBlock Margin="3,0" Text="/" FontSize="12" />
+                                                    <TextBlock Foreground="White" IsBold="True" FontSize="12" Text="{MGBinding Path=MaxMP, Mode=OneWay}" />
+                                                </StackPanel>
+                                            </DockPanel>
+                                        </DockPanel>
+                                    </StackPanel>
+                                </DockPanel>
+                            </ContentTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+
+                <Border StyleNames="PanelBorder">
+                    <!-- List of each item in the inventory -->
+                    <ListBox Name="ItemsList" ItemType="{x:Type local:InventoryItem}" IsTitleVisible="False" Background="Transparent" 
+                             Margin="10" AlternatingRowBackgrounds="{x:Null}" ItemsPanelBorderThickness="0">
+                        <ListBox.ItemTemplate>
+                            <ContentTemplate>
+                                <DockPanel>
+                                    <!-- Name and icon -->
+                                    <StackPanel Orientation="Horizontal" Dock="Left" Spacing="5">
+                                        <Image VerticalAlignment="Center" TextureName="FF7ItemIcon" Width="24" Height="22" />
+                                        <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Name, Mode=OneTime}" />
+                                    </StackPanel>
+
+                                    <!-- Quantity -->
+                                    <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Right">
+                                        <TextBlock VerticalAlignment="Center" Text=":" IsBold="True" />
+                                        <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Quantity, Mode=OneWay}" 
                                                MinWidth="24" TextAlignment="Right" IsBold="True" />
-                                </StackPanel>
-                            </DockPanel>
-                        </ContentTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </Border>
+                                    </StackPanel>
+                                </DockPanel>
+                            </ContentTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+            </DockPanel>
         </DockPanel>
-    </DockPanel>
+
+        <!-- Button in the top-right corner that closes the dialog -->
+        <Button Name="CloseButton" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8" Background="Transparent" BorderThickness="0" Padding="2,0">
+            <TextBlock IsBold="True" Text="x" Foreground="Crimson" />
+        </Button>
+    </OverlayPanel>
 </Window>
 ```
 </details>
@@ -493,9 +518,6 @@ public class Game1 : Game, IObservableUpdate
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
-
         PreviewUpdate?.Invoke(this, gameTime.TotalGameTime);
 
         Desktop.Update();
@@ -523,36 +545,7 @@ public class Game1 : Game, IObservableUpdate
   
 # Multi-Platform
 
-MGUI.Core targets `net6.0-windows` by default. If you wish to use MGUI on another OS, open `MGUI\MGUI.Core\MGUI.Core.csproj` and change `<TargetFramework>net6.0-windows</TargetFramework>` to `<TargetFramework>net6.0</TargetFramework>`. XAML parsing is only available if targeting `net6.0-windows` with `<UseWPF>True</UseWPF>`.
-
-The following is valid if targeting `net6.0-windows` with `<UseWPF>True</UseWPF>`:
-```c#
-string XAMLString =
-@"<Window xmlns=""clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core""
-          xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
-          Left=""50"" Top=""100"" Width=""150"" Height=""150"" Background=""Orange"" Padding=""10"">
-    <Button Padding=""10,5"" HorizontalAlignment=""Center"" VerticalAlignment=""Center"" Content=""Hello World"" />
-</Window>";
-MGWindow Window1 = XAMLParser.LoadRootWindow(Desktop, XAMLString);
-Desktop.Windows.Add(Window1);
-```
-
-If targeting `net6.0`, you would instead have to use c# code to define your UI:
-```c#
-MGWindow Window1 = new(Desktop, 50, 100, 150, 150);
-Window1.BackgroundBrush.NormalValue = new MGSolidFillBrush(Color.Orange);
-Window1.Padding = new(10);
-MGButton Button = new(Window1);
-Button.Padding = new(10, 5);
-Button.HorizontalAlignment = HorizontalAlignment.Center;
-Button.VerticalAlignment = VerticalAlignment.Center;
-Button.SetContent("Hello World");
-Window1.SetContent(Button);
-Desktop.Windows.Add(Window1);
-```
-<sub>Everything that can be done in XAML can be also done with c# code, but not everything that can be done with c# can be done with XAML. XAML is generally more concise and convenient to use though.</sub>
-
-[More details about working with XAML](https://github.com/Videogamers0/MGUI/wiki/XAML)
+MGUI.Core targets `net6.0-windows` by default. If you wish to use MGUI on another OS, open `MGUI\MGUI.Core\MGUI.Core.csproj` and change `<TargetFramework>net6.0-windows</TargetFramework>` to `<TargetFramework>net6.0</TargetFramework>`. Some features have better implementations when targeting `net6.0-windows`, but everything probably™ works fine when targeting `net6.0`. In particular, targeting `net6.0` breaks some intellisense related to `MarkupExtensions` (such as `MGBinding`) when using the Visual Studio Xaml designer (but it still works at runtime).
 
 # Input Handling
 
@@ -637,9 +630,6 @@ public class Game1 : Game, IObservableUpdate, IKeyboardHandlerHost
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
-
         PreviewUpdate?.Invoke(this, gameTime.TotalGameTime);
 
         Desktop.Update();
