@@ -15,7 +15,7 @@ namespace MGUI.Core.UI.Data_Binding
 
         private static readonly Dictionary<object, List<DataBinding>> _BindingsByTargetObject = new();
 
-        public static DataBinding AddBinding(MGBinding Config, object TargetObject)
+        public static DataBinding AddBinding(BindingConfig Config, object TargetObject)
         {
             if (TargetObject == null)
                 throw new ArgumentNullException(nameof(TargetObject));

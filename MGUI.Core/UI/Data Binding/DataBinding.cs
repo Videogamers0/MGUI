@@ -61,7 +61,7 @@ namespace MGUI.Core.UI.Data_Binding
         //https://learn.microsoft.com/en-us/dotnet/desktop/wpf/events/weak-event-patterns?view=netdesktop-7.0&redirectedfrom=MSDN
         //https://learn.microsoft.com/en-us/dotnet/api/system.componentmodel.propertychangedeventmanager?redirectedfrom=MSDN&view=windowsdesktop-7.0
 
-        public readonly MGBinding Config;
+        public readonly BindingConfig Config;
 
         public readonly object TargetObject;
         public readonly string TargetPropertyName;
@@ -78,9 +78,9 @@ namespace MGUI.Core.UI.Data_Binding
         private readonly ConverterConfig? ConvertBackSettings;
 
         private object _SourceRoot;
-        /// <summary>The root of the source object, as determined by <see cref="MGBinding.SourceResolver"/> and <see cref="MGBinding.DataContextResolver"/>.<para/>
-        /// This might not be the same as <see cref="SourceObject"/> if the <see cref="MGBinding.SourcePath"/> must recurse nested objects.<br/>
-        /// For example, if the <see cref="MGBinding.SourcePath"/> is "Foo.Bar", then the <see cref="SourceRoot"/> would be the object containing the Foo property, 
+        /// <summary>The root of the source object, as determined by <see cref="BindingConfig.SourceResolver"/> and <see cref="BindingConfig.DataContextResolver"/>.<para/>
+        /// This might not be the same as <see cref="SourceObject"/> if the <see cref="BindingConfig.SourcePath"/> must recurse nested objects.<br/>
+        /// For example, if the <see cref="BindingConfig.SourcePath"/> is "Foo.Bar", then the <see cref="SourceRoot"/> would be the object containing the Foo property, 
         /// and the <see cref="SourceObject"/> would be the Foo object itself. ("Bar" would be the Source Property's Name)</summary>
         public object SourceRoot
         {
@@ -282,8 +282,8 @@ namespace MGUI.Core.UI.Data_Binding
         private static Type GetUnderlyingType(PropertyInfo PropInfo) =>
             PropInfo == null ? null : Nullable.GetUnderlyingType(PropInfo.PropertyType) ?? PropInfo.PropertyType;
 
-        /// <param name="Object">The object which the property paths (<see cref="MGBinding.TargetPath"/>, <see cref="MGBinding.SourcePath"/>) should be retrieved from.</param>
-        internal DataBinding(MGBinding Config, object Object)
+        /// <param name="Object">The object which the property paths (<see cref="BindingConfig.TargetPath"/>, <see cref="BindingConfig.SourcePath"/>) should be retrieved from.</param>
+        internal DataBinding(BindingConfig Config, object Object)
         {
             this.Config = Config;
             ConvertSettings = Config.Converter == null ? null : new(Config.Converter, Config.ConverterParameter, false);
