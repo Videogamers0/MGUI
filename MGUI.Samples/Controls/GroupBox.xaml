@@ -14,7 +14,7 @@
             <Setter Property="Background" Value="White" />
             <Setter Property="Opacity" Value="0.25" />
         </Style>
-        <Style TargetType="Expander">
+        <Style TargetType="Expander" Name="ExpanderStyle">
             <Setter Property="Padding" Value="4" />
             <Setter Property="Background" Value="White * 0.1" />
         </Style>
@@ -25,18 +25,152 @@
             <TextBlock StyleNames="Header1" Text="GroupBox:" HorizontalAlignment="Center" />
             <Separator/>
             <TextBlock>
-
+                GroupBoxes are bordered controls that wrap around their Content. 
+                Unlike a simple [c=Turquoise]Border[/c], GroupBoxes also allow hosting a [c=Turquoise]Header[/c] Content inside the top portion of the border.
             </TextBlock>
             <Separator />
+            <GroupBox>
+                <GroupBox.Header>
+                    <TextBlock>{Header}</TextBlock>
+                </GroupBox.Header>
+                <TextBlock>{Content}</TextBlock>
+            </GroupBox>
+            
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise]Header[/c] to customize the Content displayed in the top portion of the border.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <StackPanel.Styles>
+                        <Style TargetType="GroupBox">
+                            <Setter Property="Background" Value="MediumPurple * 0.7" />
+                            <Setter Property="IsExpandable" Value="False" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <GroupBox HorizontalAlignment="Left">
+                        <GroupBox.Header>
+                            <Image Width="16" Height="16" RegionName="Backpack" />
+                        </GroupBox.Header>
+                        <TextBlock TextAlignment="Center" Text="This [c=Turquoise]GroupBox[/c] displays\nan [c=Turquoise]Image[/c] in its [c=Turquoise]Header[/c]" />
+                    </GroupBox>
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        Set [c=Turquoise]HeaderHorizontalMargin[/c] to customize how much space is reserved around the [c=Turquoise]Header[/c].
+                    </TextBlock>
+                    <GroupBox HeaderHorizontalMargin="25">
+                        <GroupBox.Header>
+                            <Image Width="16" Height="16" RegionName="Backpack" />
+                        </GroupBox.Header>
+                        <TextBlock TextAlignment="Center" Text="This [c=Turquoise]GroupBox[/c] uses [c=Turquoise]HeaderHorizontalMargin[/c]=[c=LightBlue][s=Blue]25[/s][/c]" />
+                    </GroupBox>
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        Set [c=Turquoise]HeaderHorizontalPadding[/c] to customize how far the [c=Turquoise]Header[/c] is shifted from the topleft corner of the border
+                    </TextBlock>
+                    <GroupBox HeaderHorizontalPadding="25">
+                        <GroupBox.Header>
+                            <Image Width="16" Height="16" RegionName="Backpack" />
+                        </GroupBox.Header>
+                        <TextBlock TextAlignment="Center" Text="This [c=Turquoise]GroupBox[/c] uses [c=Turquoise]HeaderHorizontalPadding[/c]=[c=LightBlue][s=Blue]25[/s][/c]" />
+                    </GroupBox>
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        Or set both properties:
+                    </TextBlock>
+                    <GroupBox HeaderHorizontalMargin="25" HeaderHorizontalPadding="25">
+                        <GroupBox.Header>
+                            <Image Width="16" Height="16" RegionName="Backpack" />
+                        </GroupBox.Header>
+                        <TextBlock TextAlignment="Center" Text="This [c=Turquoise]GroupBox[/c] uses [c=Turquoise]HeaderHorizontalMargin[/c]=[c=LightBlue][s=Blue]25[/s][/c]\nand [c=Turquoise]HeaderHorizontalPadding[/c]=[c=LightBlue][s=Blue]25[/s][/c]" />
+                    </GroupBox>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
 
             <DockPanel>
                 <TextBlock Dock="Top">
-
+                    Set [c=Turquoise]Content[/c] to customize the Content displayed inside the border.
                 </TextBlock>
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
-                    <TextBlock>
+                    <GroupBox HorizontalAlignment="Left" IsExpandable="False" HorizontalContentAlignment="Center">
+                        <GroupBox.Background>
+                            <DiagonalGradientFillBrush Color1="rgb(160,100,0)" Color2="rgb(80,50,0)" />
+                        </GroupBox.Background>
+                        <GroupBox.Header>
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <Image Width="16" Height="16" RegionName="Save" />
+                                <TextBlock VerticalAlignment="Center" FontSize="9" Text="Choose a Save Slot:" IsShadowed="True" ShadowColor="Black * 0.5" />
+                            </StackPanel>
+                        </GroupBox.Header>
+                        <StackPanel Orientation="Vertical" Spacing="3">
+                            <StackPanel.Styles>
+                                <Style TargetType="RadioButton">
+                                    <Setter Property="BubbleComponentBackground" Value="Brown" />
+                                    <Setter Property="BubbleCheckedColor" Value="rgb(24,30,32)" />
+                                </Style>
+                            </StackPanel.Styles>
+                            <RadioButton GroupName="Slot" Content="Slot 1" IsChecked="True" />
+                            <RadioButton GroupName="Slot" Content="Slot 2" />
+                            <RadioButton GroupName="Slot" Content="Slot 3" />
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
 
-                    </TextBlock>
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise]BorderBrush[/c] and [c=Turquoise]BorderThickness[/c] to customize the border.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <GroupBox IsExpandable="False" BorderThickness="4" Background="#2980B9" Header="Header Content">
+                        <GroupBox.BorderBrush>
+                            <UniformBorderBrush Brush="LightCoral" />
+                        </GroupBox.BorderBrush>
+                        <TextBlock>
+                            This [c=Turquoise]GroupBox[/c] has a 4px thick [c=LightCoral][s=Black]LightCoral[/s][/c] border.
+                        </TextBlock>
+                    </GroupBox>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise]IsExpandable[/c] to control the [c=Turquoise]Visibility[/c] of the [c=Turquoise]GroupBox's[/c] built-in [c=Turquoise]Expander[/c]
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <GroupBox IsExpandable="True" Background="Olive">
+                        <TextBlock Text="This [c=Turquoise]GroupBox[/c] sets [c=Turquoise]IsExpandable[/c]=[c=LightBlue][s=Blue]true[/s][/c]." />
+                    </GroupBox>
+                    <Spacer Height="5" />
+                    <TextBlock Text="Set [c=Turquoise]Expander[/c] to customize the Expander's graphics." />
+                    <GroupBox IsExpandable="True" Background="Olive">
+                        <GroupBox.Expander>
+                            <Expander ExpanderButtonExpandedBackgroundBrush="rgb(140,140,140)" ExpanderButtonCollapsedBackgroundBrush="rgb(100,100,100)" 
+                                      ExpanderDropdownArrowColor="Purple" ExpanderDropdownArrowSize="10" ExpanderButtonSize="12" />
+                        </GroupBox.Expander>
+                        <TextBlock Text="This [c=Turquoise]GroupBox[/c] uses a customized [c=Turquoise]Expander[/c]" />
+                    </GroupBox>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    If the [c=Turquoise]GroupBox[/c] is displaying [c=Turquoise]Header[/c] Content and an [c=Turquoise]Expander[/c],
+                    you can set [c=Turquoise]OuterHeaderPresenter[/c] to rearrange them.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <GroupBox HorizontalAlignment="Left" IsExpandable="True">
+                        <GroupBox.Header>
+                            <Image Width="16" Height="16" RegionName="Computer" />
+                        </GroupBox.Header>
+                        <GroupBox.OuterHeaderPresenter>
+                            <HeaderedContentPresenter HeaderPosition="Right" Spacing="10" />
+                        </GroupBox.OuterHeaderPresenter>
+                        <TextBlock Text="This [c=Turquoise]GroupBox[/c] arranges its [c=Turquoise]Expander[/c] on the right side of the [c=Turquoise]Header[/c] Content." />
+                    </GroupBox>
                 </StackPanel>
             </DockPanel>
             <Separator/>

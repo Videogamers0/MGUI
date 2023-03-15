@@ -494,6 +494,7 @@ namespace MGUI.Core.UI.XAML
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
         public Expander Expander { get; set; } = new();
+        public HeaderedContentPresenter OuterHeaderPresenter { get; set; } = new();
         public ContentPresenter HeaderPresenter { get; set; } = new();
 
         [Category("Behavior")]
@@ -515,6 +516,7 @@ namespace MGUI.Core.UI.XAML
             MGGroupBox GroupBox = Element as MGGroupBox;
 
             Expander.ApplySettings(GroupBox, GroupBox.Expander, true);
+            OuterHeaderPresenter.ApplySettings(GroupBox, GroupBox.OuterHeaderPresenter, false);
             HeaderPresenter.ApplySettings(GroupBox, GroupBox.HeaderPresenter, false);
 
             if (BorderBrush != null)
@@ -806,7 +808,9 @@ namespace MGUI.Core.UI.XAML
             if (BubbleComponentBorderThickness.HasValue)
                 RadioButton.BubbleComponentBorderThickness = BubbleComponentBorderThickness.Value;
             if (BubbleComponentBackground.HasValue)
-                RadioButton.BubbleComponentBackground = new VisualStateColorBrush(BubbleComponentBackground.Value.ToXNAColor());
+                RadioButton.BubbleComponentBackground.NormalValue = BubbleComponentBackground.Value.ToXNAColor();
+            if (HoveredHighlightColor.HasValue)
+                RadioButton.BubbleComponentBackground.FocusedColor = HoveredHighlightColor.Value.ToXNAColor();
             if (BubbleCheckedColor.HasValue)
                 RadioButton.BubbleCheckedColor = BubbleCheckedColor.Value.ToXNAColor();
             if (SpacingWidth.HasValue)
