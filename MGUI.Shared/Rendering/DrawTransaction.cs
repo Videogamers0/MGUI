@@ -763,7 +763,7 @@ namespace MGUI.Shared.Rendering
             if (Bounds != CurrentBounds || IsScissorTesting != ShouldScissorTest)
             {
                 EndDraw(CurrentContext);
-                SB.GraphicsDevice.ScissorRectangle = Bounds ?? default(Rectangle);
+                SB.GraphicsDevice.ScissorRectangle = Bounds ?? Renderer.GetViewport(0);
                 if (ShouldScissorTest && !IsScissorTesting)
                     SetDrawSettings(CurrentSettings with { RasterizerType = RasterizerType.SolidScissorTest });
                 else if (!ShouldScissorTest && IsScissorTesting)

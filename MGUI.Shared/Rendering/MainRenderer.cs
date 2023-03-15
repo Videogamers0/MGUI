@@ -44,7 +44,6 @@ namespace MGUI.Shared.Rendering
         where TObservableGame : Game, IObservableUpdate
     {
         public TObservableGame Game { get; }
-        public IObservableUpdate Test { get; }
 
         public Rectangle GetBounds() => new(0, 0, Game.Window.ClientBounds.Width, Game.Window.ClientBounds.Height);
 
@@ -58,11 +57,21 @@ namespace MGUI.Shared.Rendering
         public event EventHandler<TimeSpan> PreviewUpdate;
         public event EventHandler<EventArgs> EndUpdate;
 
+        private Rectangle PreviousClientBounds;
+
         public GameRenderHost(TObservableGame Game)
         {
             this.Game = Game;
             this.Game.PreviewUpdate += (sender, e) => this.PreviewUpdate?.Invoke(Game, e);
             this.Game.EndUpdate += (sender, e) => this.EndUpdate?.Invoke(Game, e);
+
+            PreviousClientBounds = GetBounds();
+            Game.Window.ClientSizeChanged += (sender, e) =>
+            {
+                if (GraphicsDevice.ScissorRectangle == PreviousClientBounds)
+                    GraphicsDevice.ScissorRectangle = GetBounds();
+                PreviousClientBounds = GetBounds();
+            };
         }
     }
 
