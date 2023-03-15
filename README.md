@@ -663,3 +663,28 @@ if (Keyboard.GetState().IsKeyDown(Keys.W) && (W_PressEvent == null || !W_PressEv
 }
 ```
 </details>
+
+# DataBinding
+
+MGUI has its own DataBinding engine to allow you to bind UI data to data in your `DataContext`. Set `MGWindow.WindowDataContext` or `MGElement.DataContextOverride`. Then you can use the `MGBinding` markup extension in XAML to configure your bindings.
+
+```xaml
+<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        SizeToContent="WidthAndHeight" TitleText="DataBindings" Padding="10">
+        <TextBlock Text="{MGBinding Path=SomeSampleString, Mode=OneWay}" />
+</Window>
+```
+
+`{MGBinding Path=SomeSampleString, Mode=OneWay}` creates a `DataBinding` that will automatically set `TextBlock.Text = TextBlock.DataContext.SomeSampleString;`
+
+MGUI's DataBinding engine supports several features such as:
+- Binding Modes (`OneTime`, `OneWay`, `OneWayToSource`, `TwoWay`)
+- Binding to nested properties (`{MGBinding Path=Foo.Bar}`)
+- Binding to specific named elements (`{MGBinding ElementName=SomeNamedCheckBox, Path=IsChecked}`)
+- Binding with a `Converter` (`{MGBinding Path=SomeValue, Converter={local:BoolToVisibilityConverter}}`)
+- Binding with a `StringFormat` (`{MGBinding Path=SomeFloatValue, StringFormat={}{0:0.0}}`)
+- and more. Check the DataBinding window in the Samples project for detailed documentation:
+
+![DataBindings_1](https://user-images.githubusercontent.com/9426230/225460788-5002d58a-86c8-44bc-9924-ff8207aa1532.png)
+
+Because MGUI uses its own DataBinding engine, DataBindings will work even on non-Windows platforms. (Though you will need to change `MGUI.Core` to target `net6.0` instead of `net6.0-windows`, and some intellisense won't work in the Visual Studio Xaml designer.)
