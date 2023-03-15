@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	<IsWindowsOS Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindowsOS>
 	<OutputType>Library</OutputType>
