@@ -219,7 +219,7 @@ namespace MGUI.Shared.Input.Mouse
                 Vector2 Offset = Owner.GetOffset();
 
                 //  Invoke Scrolled event
-                if (Scrolled != null && Tracker.CurrentScrollEvent != null && IsInside(Tracker.CurrentScrollEvent.Position, Offset))
+                if (Tracker.CurrentScrollEvent != null && Scrolled != null && IsInside(Tracker.CurrentScrollEvent.Position, Offset))
                 {
                     if (InvokeEvenIfHandled || !Tracker.CurrentScrollEvent.IsHandled)
                     {
@@ -230,7 +230,7 @@ namespace MGUI.Shared.Input.Mouse
                 }
 
                 //  Invoke mouse moved events
-                if (IsMonitoringMovement && Tracker.CurrentMoveEvent != null)
+                if (Tracker.CurrentMoveEvent != null && IsMonitoringMovement)
                 {
                     bool WasHovering = IsInside(Tracker.CurrentMoveEvent.PreviousPosition, Offset);
                     bool IsHovering = IsInside(Tracker.CurrentMoveEvent.CurrentPosition, Offset);
@@ -246,10 +246,10 @@ namespace MGUI.Shared.Input.Mouse
                         Exited?.Invoke(this, Tracker.CurrentMoveEvent);
                 }
 
-                if (IsMonitoringClicks)
+                if (Tracker.HasCurrentButtonEvents && IsMonitoringClicks)
                 {
                     //  Invoke mouse pressed events
-                    if (PressedEvents.Any(x => x != null))
+                    if (Tracker.HasCurrentButtonPressedEvents && PressedEvents.Any(x => x != null))
                     {
                         foreach (MouseButton Button in MouseButtons)
                         {
@@ -311,7 +311,7 @@ namespace MGUI.Shared.Input.Mouse
                     }
 
                     //  Invoke mouse released events
-                    if (ReleasedEvents.Any(x => x != null))
+                    if (Tracker.HasCurrentButtonReleasedEvents && ReleasedEvents.Any(x => x != null))
                     {
                         foreach (MouseButton Button in MouseButtons)
                         {
@@ -373,7 +373,7 @@ namespace MGUI.Shared.Input.Mouse
                     }
 
                     //  Invoke mouse clicked events
-                    if (ClickedEvents.Any(x => x != null))
+                    if (Tracker.HasCurrentButtonClickedEvents && ClickedEvents.Any(x => x != null))
                     {
                         foreach (MouseButton Button in MouseButtons)
                         {
@@ -436,7 +436,7 @@ namespace MGUI.Shared.Input.Mouse
                 }
 
                 //  Invoke mouse drag events
-                if (IsMonitoringDrag)
+                if (Tracker.HasCurrentDragEvents && IsMonitoringDrag)
                 {
                     List<DragStartCondition> Conditions = new();
                     if (DragStartCondition == DragStartCondition.Both)

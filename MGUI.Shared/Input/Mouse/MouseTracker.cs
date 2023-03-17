@@ -162,6 +162,7 @@ namespace MGUI.Shared.Input.Mouse
         };
         /// <summary>The MouseButton Press events that occurred on the current Update tick, or null if the button's <see cref="ButtonState"/> wasn't just set to <see cref="ButtonState.Pressed"/> on the current Update tick.</summary>
         public IReadOnlyDictionary<MouseButton, BaseMousePressedEventArgs> CurrentButtonPressedEvents => _CurrentButtonPressedEvents;
+        internal bool HasCurrentButtonPressedEvents;
 
         private readonly Dictionary<MouseButton, BaseMouseReleasedEventArgs> _CurrentButtonReleasedEvents = new()
         {
@@ -171,6 +172,7 @@ namespace MGUI.Shared.Input.Mouse
         };
         /// <summary>The MouseButton Release events that occurred on the current Update tick, or null if the button's <see cref="ButtonState"/> wasn't just set to <see cref="ButtonState.Released"/> on the current Update tick.</summary>
         public IReadOnlyDictionary<MouseButton, BaseMouseReleasedEventArgs> CurrentButtonReleasedEvents => _CurrentButtonReleasedEvents;
+        internal bool HasCurrentButtonReleasedEvents;
 
         /// <summary>The MouseButton Click events that occurred on the current Update tick, or null if the button didn't just finish clicking on the current Update tick.</summary>
         private readonly Dictionary<MouseButton, BaseMouseClickedEventArgs> _CurrentButtonClickedEvents = new()
@@ -181,6 +183,7 @@ namespace MGUI.Shared.Input.Mouse
         };
         /// <summary>The MouseButton Click events that occurred on the current Update tick, or null if the button didn't just finish clicking on the current Update tick.</summary>
         public IReadOnlyDictionary<MouseButton, BaseMouseClickedEventArgs> CurrentButtonClickedEvents => _CurrentButtonClickedEvents;
+        internal bool HasCurrentButtonClickedEvents;
 
         /// <summary>The most recent DragStart events that have occurred, even if they occurred on a prior Update tick. These values are set back to null when the DragEnd event is detected.</summary>
         private readonly Dictionary<DragStartCondition, Dictionary<MouseButton, BaseMouseDragStartEventArgs>> RecentDragStartEvents = new()
@@ -228,6 +231,7 @@ namespace MGUI.Shared.Input.Mouse
         };
         /// <summary>The Mouse DragStart events that occurred on the current Update tick, or null if a DragStart didn't just occur the current Update tick.</summary>
         public IReadOnlyDictionary<DragStartCondition, Dictionary<MouseButton, BaseMouseDragStartEventArgs>> CurrentDragStartEvents => _CurrentDragStartEvents;
+        internal bool HasCurrentDragStartEvents;
 
         private readonly Dictionary<DragStartCondition, Dictionary<MouseButton, BaseMouseDraggedEventArgs>> _CurrentDraggedEvents = new()
         {
@@ -252,6 +256,7 @@ namespace MGUI.Shared.Input.Mouse
         };
         /// <summary>The Mouse Dragged events that occurred on the current Update tick, or null if a Dragged event didn't just occur the current Update tick.</summary>
         public IReadOnlyDictionary<DragStartCondition, Dictionary<MouseButton, BaseMouseDraggedEventArgs>> CurrentDraggedEvents => _CurrentDraggedEvents;
+        internal bool HasCurrentDraggedEvents;
 
         private readonly Dictionary<DragStartCondition, Dictionary<MouseButton, BaseMouseDragEndEventArgs>> _CurrentDragEndEvents = new()
         {
@@ -276,6 +281,10 @@ namespace MGUI.Shared.Input.Mouse
         };
         /// <summary>The Mouse DragEnd events that occurred on the current Update tick, or null if a DragEnd didn't just occur the current Update tick.</summary>
         public IReadOnlyDictionary<DragStartCondition, Dictionary<MouseButton, BaseMouseDragEndEventArgs>> CurrentDragEndEvents => _CurrentDragEndEvents;
+        internal bool HasCurrentDragEndEvents;
+
+        internal bool HasCurrentButtonEvents;
+        internal bool HasCurrentDragEvents;
         #endregion Events
 
         public Point CurrentPosition { get; private set; }
@@ -402,6 +411,15 @@ namespace MGUI.Shared.Input.Mouse
                     }
                 }
             }
+
+            HasCurrentButtonPressedEvents = _CurrentButtonPressedEvents.Any(x => x.Value != null);
+            HasCurrentButtonReleasedEvents = _CurrentButtonReleasedEvents.Any(x => x.Value != null);
+            HasCurrentButtonClickedEvents = _CurrentButtonClickedEvents.Any(x => x.Value != null);
+            HasCurrentButtonEvents = HasCurrentButtonPressedEvents || HasCurrentButtonReleasedEvents || HasCurrentButtonClickedEvents;
+            HasCurrentDragStartEvents = _CurrentDragStartEvents.Any(x => x.Value != null);
+            HasCurrentDraggedEvents = _CurrentDraggedEvents.Any(x => x.Value != null);
+            HasCurrentDragEndEvents = _CurrentDragEndEvents.Any(x => x.Value != null);
+            HasCurrentDragEvents = HasCurrentDragStartEvents || HasCurrentDraggedEvents || HasCurrentDragEndEvents;
         }
 
         /// <summary>Should be invoked exactly once per Update tick.<para/>

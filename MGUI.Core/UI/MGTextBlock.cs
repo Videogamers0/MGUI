@@ -770,7 +770,7 @@ namespace MGUI.Core.UI
             IDisposable TemporaryDrawTransform = null;
             bool UseScaledSpriteFont = false;
             float ImageSizeScalar = 1.0f;
-#if NEVER 
+#if NEVER
             //  This logic *almost* works but not quite :( Seems like there's minor issues with the measured text width, so the X-positioning is slightly inaccurate
             //  Maybe issues due to truncating floating point positions to an int?
             //  Maybe issues related to Kerning? 

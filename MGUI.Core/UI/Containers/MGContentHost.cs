@@ -147,7 +147,7 @@ namespace MGUI.Core.UI.Containers
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         protected ObservableCollection<MGElement> _Children { get; }
         public IReadOnlyList<MGElement> Children => _Children;
-        public override IEnumerable<MGElement> GetChildren() => Children;
+        public override IEnumerable<MGElement> GetChildren() => _Children;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool HasContent => _Children.Any();

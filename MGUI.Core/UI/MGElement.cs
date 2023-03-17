@@ -19,15 +19,38 @@ using MGUI.Core.UI.Data_Binding;
 
 namespace MGUI.Core.UI
 {
+#if true
     public readonly record struct ElementUpdateArgs(UpdateBaseArgs BA, bool IsEnabled, bool IsSelected, bool IsHitTestVisible, Point Offset, Rectangle ActualLayoutBounds)
     {
-        public TimeSpan TotalElapsed => BA.TotalElapsed;
-        public TimeSpan FrameElapsed => BA.FrameElapsed;
-        public MouseState MouseState => BA.MouseState;
-        public KeyboardState KeyboardState => BA.KeyboardState;
-
         public ElementUpdateArgs AsZeroOffset() => this with { Offset = Point.Zero };
+        public ElementUpdateArgs ChangeOffset(Point Value) => Offset == Value ? this : this with { Offset = Value };
+        public ElementUpdateArgs ChangeHitTestVisible(bool Value) => IsHitTestVisible == Value ? this : this with { IsHitTestVisible = Value };
     };
+#else
+    public class ElementUpdateArgs
+    {
+        public readonly UpdateBaseArgs BA;
+        public readonly bool IsEnabled;
+        public readonly bool IsSelected;
+        public readonly bool IsHitTestVisible;
+        public readonly Point Offset;
+        public readonly Rectangle ActualLayoutBounds;
+
+        public ElementUpdateArgs(UpdateBaseArgs BA, bool IsEnabled, bool IsSelected, bool IsHitTestVisible, Point Offset, Rectangle ActualLayoutBounds)
+        {
+            this.BA = BA;
+            this.IsEnabled = IsEnabled;
+            this.IsSelected = IsSelected;
+            this.IsHitTestVisible = IsHitTestVisible;
+            this.Offset = Offset;
+            this.ActualLayoutBounds = ActualLayoutBounds;
+        }
+
+        public ElementUpdateArgs AsZeroOffset() => new(BA, IsEnabled, IsSelected, IsHitTestVisible, Point.Zero, ActualLayoutBounds);
+        public ElementUpdateArgs ChangeOffset(Point Value) => Offset == Value ? this : new(BA, IsEnabled, IsSelected, IsHitTestVisible, Value, ActualLayoutBounds);
+        public ElementUpdateArgs ChangeHitTestVisible(bool Value) => IsHitTestVisible == Value ? this : new(BA, IsEnabled, IsSelected, Value, Offset, ActualLayoutBounds);
+    }
+#endif
 
     public readonly record struct ElementDrawArgs(DrawBaseArgs BA, VisualState VisualState, Point Offset)
     {
@@ -654,11 +677,25 @@ namespace MGUI.Core.UI
 				{
 					MGContextMenu Previous = ContextMenu;
 					_ContextMenu = value;
+
+                    if (Previous != null && ContextMenu == null)
+                        MouseHandler.RMBReleasedInside -= TryOpenContextMenuOnRightClick;
+                    else if (Previous == null && ContextMenu != null)
+                        MouseHandler.RMBReleasedInside += TryOpenContextMenuOnRightClick;
+
                     NPC(nameof(ContextMenu));
 					ContextMenuChanged?.Invoke(this, new(Previous, ContextMenu));
 				}
 			}
 		}
+
+        private void TryOpenContextMenuOnRightClick(object sender, BaseMouseReleasedEventArgs e)
+        {
+            if (ContextMenu.TryOpenContextMenu(e.Position) == true)
+            {
+                e.SetHandledBy(ContextMenu, false);
+            }
+        }
 
 		/// <summary>Invoked when <see cref="ContextMenu"/> is set to a new value. (Not invoked when the content within <see cref="ContextMenu"/> is modified)<para/>
 		/// See also: <see cref="MGDesktop.ActiveContextMenu"/>, <see cref="MGDesktop.ContextMenuClosing"/>, <see cref="MGDesktop.ContextMenuClosed"/>, <see cref="MGDesktop.ContextMenuOpening"/>, <see cref="MGDesktop.ContextMenuOpened"/></summary>
@@ -1080,14 +1117,6 @@ namespace MGUI.Core.UI
 					Point Offset = new(e.NewValue.Left - e.PreviousValue.Left, e.NewValue.Top - e.PreviousValue.Top);
                     TranslateAllBounds(Offset);
 				};
-
-				this.MouseHandler.RMBReleasedInside += (sender, e) =>
-				{
-					if (ContextMenu?.TryOpenContextMenu(e.Position) == true)
-					{
-						e.SetHandledBy(ContextMenu, false);
-					}
-				};
             }
 		}
 
@@ -1334,7 +1363,7 @@ namespace MGUI.Core.UI
         }
 
         public void Update(ElementUpdateArgs UA)
-		{ 
+		{
             bool ComputedIsEnabled = UA.IsEnabled && this.IsEnabled;
             bool ComputedIsSelected = UA.IsSelected || this.IsSelected;
             bool ComputedIsHitTestVisible = UA.IsHitTestVisible && this.IsHitTestVisible;
@@ -1362,6 +1391,7 @@ namespace MGUI.Core.UI
                 IsHitTestVisible = ComputedIsHitTestVisible, 
                 ActualLayoutBounds = this.ActualLayoutBounds
             };
+            //UA = new(UA.BA, ComputedIsEnabled, ComputedIsSelected, ComputedIsHitTestVisible, UA.Offset, this.ActualLayoutBounds);
 
             PrimaryVisualState PrimaryVisualState = !ComputedIsEnabled ? PrimaryVisualState.Disabled : ComputedIsSelected ? PrimaryVisualState.Selected : PrimaryVisualState.Normal;
             SecondaryVisualState SecondaryVisualState = 
@@ -1398,10 +1428,10 @@ namespace MGUI.Core.UI
                 }
 			}
 
-			bool BaseCanReceiveInput = (Visibility == Visibility.Visible || (Visibility == Visibility.Hidden && CanHandleInputsWhileHidden)) && ComputedIsEnabled && ComputedIsHitTestVisible
-				&& (!RecentDrawWasClipped || (Visibility == Visibility.Hidden && CanHandleInputsWhileHidden));
+            bool BaseCanReceiveInput = (Visibility == Visibility.Visible || (Visibility == Visibility.Hidden && CanHandleInputsWhileHidden)) && ComputedIsEnabled && ComputedIsHitTestVisible
+            	&& (!RecentDrawWasClipped || (Visibility == Visibility.Hidden && CanHandleInputsWhileHidden));
             this._CanReceiveMouseInput = BaseCanReceiveInput && (Parent?._CanReceiveMouseInput ?? true);
-			this._CanReceiveKeyboardInput = BaseCanReceiveInput && (Parent?._CanReceiveKeyboardInput ?? true);
+            this._CanReceiveKeyboardInput = BaseCanReceiveInput && (Parent?._CanReceiveKeyboardInput ?? true);
 
             OnBeginUpdateContents?.Invoke(this, UpdateEventArgs);
 			foreach (MGElement Component in Components.Where(x => x.UpdateBeforeContents).Select(x => x.BaseElement))
@@ -1413,8 +1443,25 @@ namespace MGUI.Core.UI
 
             if (ComputedIsHitTestVisible)
 			{
-				MouseHandler.ManualUpdate();
+                //TODO: Need to improve performance of this method
+                //  Open the samples project, and open every single window. You'll notice it starts to lag considerably when updating several thousand elements each frame.
+                //  The lag is specifically due to calling Update, not from calling Draw (tested only drawing the last window when numerous windows are open. The only drawn window still lags)
+                //  Most of the lag seems to come from MouseHandler.ManualUpdate/KeyboardHandler.ManualUpdate
+                //  Maybe MouseHandler.HasSubscribedEvents should be cached and updated whenever an event if subscribed/unsubscribed
+                //  This would allow MouseHandler.InvokeQueuedEvents() to return immediately in most cases after a trivial boolean check
+
+#if NEVER//DEBUG
+                //  Testing performance of not handling inputs on certain common elements that typically don't need to track inputs
+                //  Seems to make some difference...
+                if (!(ElementType is MGElementType.StackPanel or MGElementType.DockPanel or MGElementType.TextBlock or MGElementType.ContentPresenter or MGElementType.Border))
+                {
+                    MouseHandler.ManualUpdate();
+                    KeyboardHandler.ManualUpdate();
+                }
+#else
+                MouseHandler.ManualUpdate();
 				KeyboardHandler.ManualUpdate();
+#endif
 			}
             UpdateSelf(UA);
 
@@ -1430,7 +1477,7 @@ namespace MGUI.Core.UI
 		protected virtual void UpdateContents(ElementUpdateArgs UA)
         {
             foreach (MGElement InactiveChild in GetVisualTreeChildren(true, false).Reverse().ToList())
-                InactiveChild.Update(UA with { IsHitTestVisible = false });
+                InactiveChild.Update(UA.ChangeHitTestVisible(false));
             foreach (MGElement ActiveChild in GetVisualTreeChildren(false, true).Reverse().ToList())
                 ActiveChild.Update(UA);
         }
@@ -1441,7 +1488,7 @@ namespace MGUI.Core.UI
         public event EventHandler<ElementUpdateEventArgs> OnEndUpdateContents;
 
 		public virtual void UpdateSelf(ElementUpdateArgs UA) { }
-        #endregion Update
+#endregion Update
 
         #region Draw
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

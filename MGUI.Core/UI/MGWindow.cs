@@ -1011,7 +1011,7 @@ namespace MGUI.Core.UI
 
                 OnBeginUpdateContents += (sender, e) =>
                 {
-                    ElementUpdateArgs UpdateArgs = e.UA with { Offset = this.Origin };
+                    ElementUpdateArgs UpdateArgs = e.UA.ChangeOffset(this.Origin);
 
                     //TODO does this order make sense?
                     //What if this window has both a ModalWindow and a NestedWindow, and the NestedWindow has a ModalWindow.

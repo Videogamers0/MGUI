@@ -245,7 +245,7 @@ namespace MGUI.Core.UI.Data_Binding
             object Current = Root;
             for (int i = 0; i < PropertyNames.Count; i++)
             {
-                if (Current == null || ExcludeLast && i == PropertyNames.Count - 1)
+                if (Current == null || (ExcludeLast && i == PropertyNames.Count - 1))
                     break;
 
                 string PropertyName = PropertyNames[i];

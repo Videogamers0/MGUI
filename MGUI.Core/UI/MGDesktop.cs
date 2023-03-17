@@ -469,7 +469,7 @@ namespace MGUI.Core.UI
             ElementUpdateArgs UA = new(BA, true, false, true, Point.Zero, ValidScreenBounds);
 
             ActiveContextMenu?.Update(UA);
-            ActiveToolTip?.Update(UA with { IsHitTestVisible = ActiveToolTip.ParentWindow.IsHitTestVisible });
+            ActiveToolTip?.Update(UA.ChangeHitTestVisible(ActiveToolTip.ParentWindow.IsHitTestVisible));
 
             foreach (MGWindow Window in Windows.Reverse<MGWindow>())
             {
