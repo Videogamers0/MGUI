@@ -675,8 +675,8 @@ namespace MGUI.Core.UI
                     if (PressedItem != null)
                     {
                         bool IsPressedItemAlreadySelected = SelectedItems?.Contains(PressedItem) == true;
-                        bool IsShiftDown = KeyboardHandler.Tracker.IsShiftDown;
-                        bool IsControlDown = KeyboardHandler.Tracker.IsControlDown;
+                        bool IsShiftDown = InputTracker.Keyboard.IsShiftDown;
+                        bool IsControlDown = InputTracker.Keyboard.IsControlDown;
 
                         void SelectSingle()
                         {

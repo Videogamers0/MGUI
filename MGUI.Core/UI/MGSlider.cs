@@ -657,7 +657,7 @@ namespace MGUI.Core.UI
             base.UpdateSelf(UA);
             if (IsHitTestVisible && !RecentDrawWasClipped)
             {
-                Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, MouseHandler.Tracker.CurrentPosition);
+                Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, InputTracker.Mouse.CurrentPosition);
                 IsHoveringNumberLine = RecentStretchedNumberLineBounds.ContainsInclusive(LayoutSpacePosition);
                 IsHoveringThumb = RecentThumbBounds.GetExpanded(5).ContainsInclusive(LayoutSpacePosition);
             }

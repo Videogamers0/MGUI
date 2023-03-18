@@ -13,6 +13,7 @@ using MonoGame.Extended;
 using MGUI.Shared.Text;
 using MGUI.Shared.Rendering;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
+using MGUI.Shared.Input.Mouse;
 
 namespace MGUI.Core.UI
 {
@@ -321,10 +322,61 @@ namespace MGUI.Core.UI
             }
         }
 
+        private bool _IsTrackingMouseClicks;
+        private bool IsTrackingMouseClicks
+        {
+            get => _IsTrackingMouseClicks;
+            set
+            {
+                if (_IsTrackingMouseClicks != value)
+                {
+                    _IsTrackingMouseClicks = value;
+
+                    if (IsTrackingMouseClicks)
+                        MouseHandler.ReleasedInside += Mouse_ReleasedInside;
+                    else if (_MouseHandler != null)
+                        MouseHandler.ReleasedInside -= Mouse_ReleasedInside;
+                }
+            }
+        }
+
+        private void Mouse_ReleasedInside(object sender, BaseMouseReleasedEventArgs e)
+        {
+            if (e.IsLMB)
+            {
+                //  Handle the '[Action]' inlined formatting code
+                //  EX: Text="[Action=Action1]Click here[/Action] but not here"
+                //  Then clicking the substring "Click here" should invoke the action named "Action1" (in MGWindow.NamedActions)
+                if (ActionBounds.Any())
+                {
+                    Point MousePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, InputTracker.Mouse.CurrentPosition);
+
+                    foreach (var KVP in ActionBounds)
+                    {
+                        string ActionName = KVP.Key;
+                        if (ParentWindow.NamedActions.TryGetValue(ActionName, out var Delegate))
+                        {
+                            foreach (Rectangle Bounds in KVP.Value)
+                            {
+                                if (Bounds.Contains(MousePosition))
+                                {
+                                    Delegate(this);
+                                    e.SetHandledBy(this, false);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private void UpdateRuns()
         {
             if (AllowsInlineFormatting)
             {
+                bool WasTrackingMouseClicks = IsTrackingMouseClicks;
+
                 MGDesktop Desktop = GetDesktop();
 
                 IEnumerable<MGTextRun> ParsedRuns = MGTextRun.ParseRuns(Text, DefaultTextRunSettings);
@@ -353,6 +405,8 @@ namespace MGUI.Core.UI
                 List<FTTokenMatch> Tokens = FTTokenizer.TokenizeLineBreaks(Text, true).ToList();
                 Runs = MGTextRun.ParseRuns(Tokens, DefaultTextRunSettings).ToList().AsReadOnly();
             }
+
+            IsTrackingMouseClicks = AllowsInlineFormatting && Runs.Any(x => x.HasAction);
 
             NPC(nameof(Runs));
         }
@@ -479,34 +533,6 @@ namespace MGUI.Core.UI
                 this.TextAlignment = HorizontalAlignment.Left;
                 this.Padding = new(1,2,1,1);
                 this.VerticalContentAlignment = VerticalAlignment.Center;
-
-                //  Handle the '[Action]' inlined formatting code
-                //  EX: Text="[Action=Action1]Click here[/Action] but not here"
-                //  Then clicking the substring "Click here" should invoke the action named "Action1" (in MGWindow.NamedActions)
-                MouseHandler.ReleasedInside += (sender, e) =>
-                {
-                    if (ActionBounds.Any())
-                    {
-                        Point MousePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, MouseHandler.Tracker.CurrentPosition);
-
-                        foreach (var KVP in ActionBounds)
-                        {
-                            string ActionName = KVP.Key;
-                            if (ParentWindow.NamedActions.TryGetValue(ActionName, out var Delegate))
-                            {
-                                foreach (Rectangle Bounds in KVP.Value)
-                                {
-                                    if (Bounds.Contains(MousePosition))
-                                    {
-                                        Delegate(this);
-                                        e.SetHandledBy(this, false);
-                                        return;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                };
 
                 OnLayoutUpdated += (sender, e) => { UpdateLines(); };
             }
@@ -657,7 +683,7 @@ namespace MGUI.Core.UI
             {
                 try
                 {
-                    Point MousePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, MouseHandler.Tracker.CurrentPosition);
+                    Point MousePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, InputTracker.Mouse.CurrentPosition);
 
                     foreach (var KVP in ToolTipBounds)
                     {

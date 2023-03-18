@@ -704,23 +704,27 @@ namespace MGUI.Core.UI
 
         #region Input
         protected InputTracker InputTracker => GetDesktop().InputTracker;
-		public MouseHandler MouseHandler { get; }
+
+        protected MouseHandler _MouseHandler;
+        public MouseHandler MouseHandler => _MouseHandler ??= InputTracker.Mouse.CreateHandler(this, null);
+
+        protected KeyboardHandler _KeyboardHandler;
         /// <summary>Warning - the events within this handler might never be invoked if <see cref="IKeyboardHandlerHost.CanReceiveKeyboardInput"/> or <see cref="CanHandleKeyboardInput"/> are false.<para/>
         /// See also: <see cref="MGDesktop.FocusedKeyboardHandler"/></summary>
-        public KeyboardHandler KeyboardHandler { get; }
+        public KeyboardHandler KeyboardHandler => _KeyboardHandler ??= InputTracker.Keyboard.CreateHandler(this, null);
 
         /// <summary>True if <see cref="MouseButton.Left"/> was pressed overtop of this <see cref="MGElement"/> and has not been released yet.<para/>
         /// This property can be true even if the mouse isn't overtop of this <see cref="MGElement"/> (if pressed overtop, but then moved outside and not yet released)<para/>
         /// You may want to consider checking for <see cref="VisualState"/>'s <see cref="SecondaryVisualState.Pressed"/> instead.<para/>
         /// See also: <see cref="MGWindow.PressedElement"/> (You might also want to call <see cref="IsSelfOrAncestorOf(MGElement)"/> on the <see cref="MGWindow.PressedElement"/>)</summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public bool IsLMBPressed => MouseHandler.IsButtonPressedInside(MouseButton.Left);
+        public bool IsLMBPressed => InputTracker.Mouse.IsPressedInside(MouseButton.Left, this);
 
         /// <summary>Warning - this property can be true even if this <see cref="MGElement"/> is entirely occluded by another <see cref="MGElement"/> overtop it.<para/>
         /// You may want to consider checking for <see cref="VisualState"/>'s <see cref="SecondaryVisualState.Hovered"/> instead.<para/>
         /// See also: <see cref="MGWindow.HoveredElement"/> (You might also want to call <see cref="IsSelfOrAncestorOf(MGElement)"/> on the <see cref="MGWindow.HoveredElement"/>)</summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public bool IsHovered => MouseHandler.IsHovered;
+        public bool IsHovered => AsIMouseHandlerHost().IsInside(InputTracker.Mouse.CurrentPosition.ToVector2());
 
         protected IMouseViewport AsIViewport() => this;
         protected IMouseHandlerHost AsIMouseHandlerHost() => this;
@@ -1090,9 +1094,6 @@ namespace MGUI.Core.UI
 
                 MGTheme ActualTheme = Theme ?? ParentWindow?.Theme ?? Desktop.Theme;
 
-                this.MouseHandler = Desktop.InputTracker.Mouse.CreateHandler(this, null);
-                this.KeyboardHandler = Desktop.InputTracker.Keyboard.CreateHandler(this, null);
-
                 this.Margin = new(0);
 				this.Padding = new(0);
 
@@ -1442,26 +1443,15 @@ namespace MGUI.Core.UI
             OnEndUpdateContents?.Invoke(this, UpdateEventArgs);
 
             if (ComputedIsHitTestVisible)
-			{
+            {
                 //TODO: Need to improve performance of this method
-                //  Open the samples project, and open every single window. You'll notice it starts to lag considerably when updating several thousand elements each frame.
-                //  The lag is specifically due to calling Update, not from calling Draw (tested only drawing the last window when numerous windows are open. The only drawn window still lags)
-                //  Most of the lag seems to come from MouseHandler.ManualUpdate/KeyboardHandler.ManualUpdate
                 //  Maybe MouseHandler.HasSubscribedEvents should be cached and updated whenever an event if subscribed/unsubscribed
                 //  This would allow MouseHandler.InvokeQueuedEvents() to return immediately in most cases after a trivial boolean check
-
-#if NEVER//DEBUG
-                //  Testing performance of not handling inputs on certain common elements that typically don't need to track inputs
-                //  Seems to make some difference...
-                if (!(ElementType is MGElementType.StackPanel or MGElementType.DockPanel or MGElementType.TextBlock or MGElementType.ContentPresenter or MGElementType.Border))
-                {
-                    MouseHandler.ManualUpdate();
-                    KeyboardHandler.ManualUpdate();
-                }
-#else
-                MouseHandler.ManualUpdate();
-				KeyboardHandler.ManualUpdate();
-#endif
+                //  Some more testing shows that having 3k elements to draw and update seems fine on my computer if there's only about 500 input handlers to update
+                //Maybe can also do something about ListBox/ContextMenu/ComboBox
+                //      to consolidate their input handling into a single MouseHandler instead of separate ones for each list item
+                _MouseHandler?.ManualUpdate();
+                _KeyboardHandler?.ManualUpdate();
 			}
             UpdateSelf(UA);
 

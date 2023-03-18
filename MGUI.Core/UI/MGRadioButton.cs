@@ -318,11 +318,11 @@ namespace MGUI.Core.UI
 
             if (!ParentWindow.HasModalWindow)
             {
-                Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, MouseHandler.Tracker.CurrentPosition);
+                Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, InputTracker.Mouse.CurrentPosition);
                 bool IsBubblePartPressed;
-                if (MouseHandler.Tracker.RecentButtonPressedEvents[MouseButton.Left] != null)
+                if (InputTracker.Mouse.RecentButtonPressedEvents[MouseButton.Left] != null)
                 {
-                    Point PressPositionScreenSpace = MouseHandler.Tracker.RecentButtonPressedEvents[MouseButton.Left].Position;
+                    Point PressPositionScreenSpace = InputTracker.Mouse.RecentButtonPressedEvents[MouseButton.Left].Position;
                     Point PressPositionLayoutSpace = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, PressPositionScreenSpace);
                     IsBubblePartPressed = BubblePartBounds.ContainsInclusive(PressPositionLayoutSpace);
                 }

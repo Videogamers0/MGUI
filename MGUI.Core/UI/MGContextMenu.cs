@@ -356,7 +356,7 @@ namespace MGUI.Core.UI
         /// <summary>True if the current mouse position is hovering any nested submenu in <see cref="Submenus"/>. See also: <see cref="ActiveContextMenu"/></summary>
         public bool IsHoveringSubmenu(int Padding)
         {
-            Point CurrentMousePosition = this.MouseHandler.Tracker.CurrentState.Position;
+            Point CurrentMousePosition = InputTracker.Mouse.CurrentPosition;
             foreach (MGContextMenu Submenu in Submenus)
             {
                 Point LayoutSpacePosition = Submenu.ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, CurrentMousePosition);
