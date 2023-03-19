@@ -104,6 +104,9 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
+    //Fix DataBinding to properties that dont have a corresponding property in their XAML class or where the property setter isn't public.
+    //      Also some properties aren't exposed on the XAML classes like MGListBox.SelectedItem, so should make a property like SelectedItemBinding or something
+    //      (so you can't explicitly set the value, but you can still initialize an MGBinding for it)
     //Fix issue where tooltips appear while hovering objects in occluded windows.
     //      So if mouse is hovering a window that appears earlier in the MGDesktop.Windows list, and that window doesn't allow clickthrough and has opacity>=1.0f,
     //      then ignore the hover action on windows underneath it.

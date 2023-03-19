@@ -43,7 +43,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Rectangle? _SourceRect;
-        public Rectangle? SourceRect { get => _SourceRect; }
+        public Rectangle? SourceRect { get => _SourceRect; set => SetTexture(Texture, SourceRect); }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Color? _TextureColor;
@@ -72,10 +72,24 @@ namespace MGUI.Core.UI
                 int PreviousWidth = UnstretchedWidth;
                 int PreviousHeight = UnstretchedHeight;
 
-                _Texture = Texture;
-                _SourceRect = SourceRect;
-                NPC(nameof(Texture));
-                NPC(nameof(SourceRect));
+                bool TextureChanged = false;
+                if (_Texture != Texture)
+                {
+                    _Texture = Texture;
+                    TextureChanged = true;
+                }
+
+                bool SourceRectChanged = false;
+                if (_SourceRect != SourceRect)
+                {
+                    _SourceRect = SourceRect;
+                    SourceRectChanged = true;
+                }
+
+                if (TextureChanged)
+                    NPC(nameof(Texture));
+                if (SourceRectChanged)
+                    NPC(nameof(SourceRect));
 
                 if (PreviousWidth != UnstretchedWidth || PreviousHeight != UnstretchedHeight)
                     LayoutChanged(this, true);

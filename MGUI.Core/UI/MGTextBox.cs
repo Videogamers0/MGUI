@@ -65,7 +65,11 @@ namespace MGUI.Core.UI
         /// <summary>To set this value, use <see cref="SetText(string)"/>.<para/>
         /// If this <see cref="MGTextBox"/> is an <see cref="MGPasswordBox"/>, this value will only contain <see cref="MGPasswordBox.PasswordCharacter"/>s (and special characters such as \n).<para/>
         /// See also: <see cref="MGPasswordBox.Password"/></summary>
-        public string Text { get => _Text ?? string.Empty; }
+        public string Text { 
+            get => _Text ?? string.Empty;
+            //  This setter is mainly intended for use by XAML DataBindings
+            set => SetText(value);
+        }
 
         /// <returns>True if <see cref="Text"/> value was changed.</returns>
         public virtual bool SetText(string Value) => SetText(Value, false);

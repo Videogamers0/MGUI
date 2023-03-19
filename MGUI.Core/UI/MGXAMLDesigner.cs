@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using System.Diagnostics;
 
 #if WINDOWS
 using Microsoft.Win32;
@@ -38,6 +39,9 @@ namespace MGUI.Core.UI
 
         public MGCheckBox FromFileAutoRefreshCheckBox { get; }
         public bool IsAutoRefreshing => FromFileAutoRefreshCheckBox.IsChecked == true;
+
+        /// <summary>Optional. The default DataContext to apply to the Content immediately after it's been parsed</summary>
+        public object ParsedContentDataContext { get; set; }
 
         public MGXAMLDesigner(MGWindow ParentWindow)
             : base(ParentWindow, MGElementType.XAMLDesigner)
@@ -187,7 +191,7 @@ namespace MGUI.Core.UI
             }
         }
 
-        private bool TryBrowseFilePath(string InitialDirectory, out string FilePath)
+        private static bool TryBrowseFilePath(string InitialDirectory, out string FilePath)
         {
 #if WINDOWS
             OpenFileDialog FileBrowser = new();
@@ -206,6 +210,8 @@ namespace MGUI.Core.UI
                 return false;
             }
 #else
+            //TODO: Implement this
+            Debug.WriteLine($"This feature is not implemented on non-Windows platforms: {nameof(MGXAMLDesigner)}.{nameof(TryBrowseFilePath)}");
             FilePath = null;
             return false;
 #endif
@@ -222,6 +228,7 @@ namespace MGUI.Core.UI
                 else
                     Markup = FromStringTextBoxComponent.Text;
                 Result = XAMLParser.Load<MGElement>(SelfOrParentWindow, Markup, !IsReadingInputFromFile, true);
+                Result.DataContextOverride = ParsedContentDataContext;
             }
             catch (Exception ex)
             {
@@ -235,6 +242,7 @@ namespace MGUI.Core.UI
 
             using (MarkupPresenter.AllowChangingContentTemporarily())
             {
+                MarkupPresenter.Content?.RemoveDataBindings(true);
                 MarkupPresenter.SetContent(Result);
             }
         }

@@ -22,30 +22,64 @@ namespace MGUI.Core.UI
         private float _Minimum;
         /// <summary>The inclusive minimum that <see cref="Value"/> can be set to.<para/>
         /// To set this value, use <see cref="SetRange(float, float)"/></summary>
-        public float Minimum { get => _Minimum; }
+        public float Minimum {
+            get => _Minimum;
+            //  This setter is mainly intended for use by XAML DataBindings
+            set => SetRange(value, Maximum, false);
+        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private float _Maximum;
         /// <summary>The inclusive maximum that <see cref="Value"/> can be set to.<para/>
         /// To set this value, use <see cref="SetRange(float, float)"/></summary>
-        public float Maximum { get => _Maximum; }
+        public float Maximum {
+            get => _Maximum;
+            //  This setter is mainly intended for use by XAML DataBindings
+            set => SetRange(Minimum, value, false);
+        }
 
-        public void SetRange(float Minimum, float Maximum)
+        public void SetRange(float Minimum, float Maximum) => SetRange(Minimum, Maximum, true);
+        private void SetRange(float Minimum, float Maximum, bool ValidateNotGreaterThanMax)
         {
             if (this.Minimum != Minimum || this.Maximum != Maximum)
             {
-                if (Minimum > Maximum)
+                if (ValidateNotGreaterThanMax && Minimum > Maximum)
                     throw new ArgumentException($"{nameof(MGSlider)}.{nameof(Minimum)} cannot be greater than {nameof(MGSlider)}.{nameof(Maximum)}");
 
-                _Minimum = Minimum;
-                _Maximum = Maximum;
-                _ = SetValue(Value);
-                NPC(nameof(Minimum));
-                NPC(nameof(Maximum));
+                float PreviousMin = this.Minimum;
+                float PreviousMax = this.Maximum;
+
+                bool MinimumChanged = false;
+                if (_Minimum != Minimum)
+                {
+                    _Minimum = Minimum;
+                    MinimumChanged = true;
+                }
+
+                bool MaximumChanged = false;
+                if (_Maximum != Maximum)
+                {
+                    _Maximum = Maximum;
+                    MaximumChanged = true;
+                }
+
+                if (this.Minimum <= this.Maximum)
+                    _ = SetValue(Value);
+
+                if (MinimumChanged)
+                    NPC(nameof(Minimum));
+                if (MaximumChanged)
+                    NPC(nameof(Maximum));
+
                 NPC(nameof(Interval));
                 NPC(nameof(CanDrawTickMarks));
+
+                IntervalChanged?.Invoke(this, new(new(PreviousMin, PreviousMax), new(this.Minimum, this.Maximum)));
             }
         }
+
+        /// <summary>Invoked when either <see cref="Minimum"/> or <see cref="Maximum"/> changes.</summary>
+        public event EventHandler<EventArgs<FloatRange>> IntervalChanged;
 
         /// <summary>Convenience property that simply returns: <see cref="Maximum"/> - <see cref="Minimum"/></summary>
         public float Interval => Maximum - Minimum;
