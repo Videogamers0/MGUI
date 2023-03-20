@@ -322,7 +322,7 @@ namespace MGUI.Core.UI.Text
             return false;
         }
 
-        public override string ToString() => $"{nameof(MGTextRunLineBreak)}: {Text?.Truncate(50) ?? ""} ({Settings})";
+        public override string ToString() => $"{nameof(MGTextRunText)}: {Text?.Truncate(50) ?? ""} ({Settings})";
     }
 
     /// <summary>An <see cref="MGTextRun"/> that instructs the renderer to move to the start of a new line.</summary>

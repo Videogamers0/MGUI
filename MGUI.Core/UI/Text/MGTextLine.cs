@@ -360,7 +360,7 @@ namespace MGUI.Core.UI.Text
 
                             //  Measure the next chunk to calculate word-wrapping on
                             //  This may be several consecutive items.
-                            //  EX: "Hello[b]World" results in 2 runs: Run1="Hello", Run2="World" but there is no word delimiter (space) between them so it's a single world "HelloWorld"
+                            //  EX: "Hello[b]World" results in 2 runs: Run1="Hello", Run2="World" but there is no word delimiter (space) between them so it's a single word "HelloWorld"
                             List<Vector2> Measurements = CurrentAndNext.Select((Word, Index) =>
                                 Measurer.MeasureText(Word.Text, Word.IsBold, Word.IsItalic, CurrentLine.Count == 0 && Index == 0 && UnwrappedText.Length == 0)).ToList();
                             float CurrentWidth = Measurements[0].X;

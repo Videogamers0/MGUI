@@ -375,13 +375,6 @@ namespace MGUI.Core.UI
                     VSBBounds = ActualVSBWidth == 0 ? null : new(LayoutBounds.Right - ActualVSBWidth, LayoutBounds.Top, ActualVSBWidth, LayoutBounds.Height - ActualHSBHeight);
                     HSBBounds = ActualHSBHeight == 0 ? null : new(LayoutBounds.Left, LayoutBounds.Bottom - ActualHSBHeight, LayoutBounds.Width - ActualVSBWidth, ActualHSBHeight);
 
-                    //  TODO: There's a bug somewhere with this logic when using both a Vertical and Horizontal scrollbar.
-                    //  Maybe Content.AllocatedBounds is wrong because it doesn't account for the size of visible scrollbars or something
-                    //  To see the error, open the Samples project and show the Styles.xaml window. Then look at the TextBox with the same XAML in it.
-                    //  The content didn't receive enough width to prevent any text from wrapping
-                    //  (The longest line gets wrapped roughly 16px from the end of the line, coincidentally as much width as the vertical scroll bar consumes)
-                    //  and since that longest line wrapped, it makes the vertical scrollable region too small as well so you can't see the last line of text.
-
                     MaxVerticalOffset = Math.Max(0, ContentSize.Height - ContentViewport.Height);
                     MaxHorizontalOffset = Math.Max(0, ContentSize.Width - ContentViewport.Width);
 #else
@@ -432,16 +425,19 @@ namespace MGUI.Core.UI
 
                 MouseHandler.DragStart += (sender, e) =>
                 {
-                    if (IsHoveringVSB)
+                    if (e.IsLMB)
                     {
-                        e.SetHandledBy(this, false);
-                        IsDraggingVSB = true;
-                    }
+                        if (IsHoveringVSB)
+                        {
+                            e.SetHandledBy(this, false);
+                            IsDraggingVSB = true;
+                        }
 
-                    if (IsHoveringHSB)
-                    {
-                        e.SetHandledBy(this, false);
-                        IsDraggingHSB = true;
+                        if (IsHoveringHSB)
+                        {
+                            e.SetHandledBy(this, false);
+                            IsDraggingHSB = true;
+                        }
                     }
                 };
 
@@ -468,13 +464,19 @@ namespace MGUI.Core.UI
                     }
                 };
 
-                //  Pre-emptively handle mouse release events if user was dragging a scrollbar
-                //  so that the child content doesn't also react to the mouse release
+                //  Pre-emptively handle mouse events if user was dragging a scrollbar so that the child content doesn't also react to the mouse event
                 OnBeginUpdateContents += (sender, e) => // TODO should probably apply similar logic to anything that handles dragging, such as MGSlider/MGResizeGrip
                 {
                     if (IsDraggingVSB || IsDraggingHSB)
                     {
                         MouseHandler.Tracker.CurrentButtonReleasedEvents[MouseButton.Left]?.SetHandledBy(this, false);
+                        foreach (DragStartCondition StartCondition in MouseHandler.DragStartConditions)
+                            MouseHandler.Tracker.CurrentDragStartEvents[StartCondition][MouseButton.Left]?.SetHandledBy(this, false);
+                    }
+
+                    if (IsHoveringVSB || IsHoveringHSB)
+                    {
+                        MouseHandler.Tracker.CurrentButtonPressedEvents[MouseButton.Left]?.SetHandledBy(this, false);
                     }
                 };
 

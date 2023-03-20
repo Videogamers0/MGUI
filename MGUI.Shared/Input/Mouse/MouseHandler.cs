@@ -27,6 +27,8 @@ namespace MGUI.Shared.Input.Mouse
     /// This class is instantiated via: <see cref="MouseTracker.CreateHandler{T}(T, double?, bool, bool)"/></summary>
     public class MouseHandler
     {
+        /// <summary>Only includes distinct values. Does not include combined values such as <see cref="DragStartCondition.Both"/></summary>
+        public static readonly IReadOnlyList<DragStartCondition> DragStartConditions = Enum.GetValues(typeof(DragStartCondition)).Cast<DragStartCondition>().Where(x => x != DragStartCondition.Both).ToList();
         public static readonly ReadOnlyCollection<MouseButton> MouseButtons = Enum.GetValues(typeof(MouseButton)).Cast<MouseButton>().ToList().AsReadOnly();
 
         public MouseTracker Tracker { get; }

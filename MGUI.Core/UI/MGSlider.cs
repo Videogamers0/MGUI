@@ -523,7 +523,6 @@ namespace MGUI.Core.UI
         public bool IsVertical => Orientation == Orientation.Vertical;
         #endregion Orientation
 
-
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private VisualStateFillBrush _FocusBrush;
         /// <summary>A brush that is rendered overtop of this <see cref="MGSlider"/> while hovering, dragging, or pressing it.<br/>

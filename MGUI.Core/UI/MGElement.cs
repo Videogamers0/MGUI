@@ -104,6 +104,7 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
+    //Fix issue where the parsed lines of text get screwed up when selecting empty lines of text in a TextBox.
     //Fix DataBinding to properties that dont have a corresponding property in their XAML class or where the property setter isn't public.
     //      Also some properties aren't exposed on the XAML classes like MGListBox.SelectedItem, so should make a property like SelectedItemBinding or something
     //      (so you can't explicitly set the value, but you can still initialize an MGBinding for it)

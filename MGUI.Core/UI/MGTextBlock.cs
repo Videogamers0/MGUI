@@ -547,7 +547,7 @@ namespace MGUI.Core.UI
 
             SpriteFont SF = GetFont(IsBold, IsItalic, out Dictionary<char, SpriteFont.Glyph> Glyphs);
 
-#if false
+#if true
             //  Referenced SpriteFont.MeasureString source code from:
             //  https://github.com/MonoGame/MonoGame/blob/develop/MonoGame.Framework/Graphics/SpriteFont.cs
 
@@ -557,10 +557,14 @@ namespace MGUI.Core.UI
             float CurrentXOffset = 0;
             bool IsFirstCharacter = true;
 
+            if (SF.Spacing != 0)
+                throw new NotImplementedException($"{nameof(MGTextBlock)}.{nameof(MeasureText)} currently does not handle {nameof(SpriteFont)}s with a non-zero Spacing.");
+
             foreach (char c in Text)
             {
                 SpriteFont.Glyph Glyph = Glyphs[c];
 
+#if NEVER
                 if (IsFirstCharacter)
                     IsFirstCharacter = false;
                 else
@@ -575,19 +579,22 @@ namespace MGUI.Core.UI
                     CurrentXOffset += Glyph.LeftSideBearing;
 
                 CurrentXOffset += Glyph.Width;
-
-                float ProposedWidth = CurrentXOffset + Math.Max(Glyph.RightSideBearing, 0);
-                if (ProposedWidth > Width)
-                    Width = ProposedWidth;
-
+                Width = Math.Max(Width, CurrentXOffset + Math.Max(Glyph.RightSideBearing, 0));
                 CurrentXOffset += Glyph.RightSideBearing;
-
-                if (Glyph.Cropping.Height > Height)
-                    Height = Glyph.Cropping.Height;
+                Height = Math.Max(Height, Glyph.Cropping.Height);
+#else
+                //TODO figure out why MonoGame's SpriteFont.cs uses Math.Max when adding the left/right bearings, then fix this logic accordingly
+                CurrentXOffset += Glyph.WidthIncludingBearings;
+                Width += Glyph.WidthIncludingBearings;
+                Height = Math.Max(Height, Glyph.Cropping.Height);
+#endif
             }
 
             return new Vector2(Width, FontHeight) * FontScale;
 #else
+            //  The problem with this logic is that it doesn't always result in the same total width when measuring a string versus measuring the sum of its substrings
+            //  EX: [Measure("HelloWorld").Width] isn't always equivalent to [Measure("Hello").Width + Measure("World").Width]
+            //  Which can cause a ton of issues in MGTextLine.ParseRuns(...)
             return new Vector2(SF.MeasureString(Text).X, FontHeight) * FontScale;
 #endif
         }

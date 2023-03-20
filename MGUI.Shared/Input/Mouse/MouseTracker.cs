@@ -359,11 +359,8 @@ namespace MGUI.Shared.Input.Mouse
             }
 
             //  Detect mouse drag events
-            foreach (DragStartCondition Condition in Enum.GetValues(typeof(DragStartCondition)).Cast<DragStartCondition>())
+            foreach (DragStartCondition Condition in MouseHandler.DragStartConditions)
             {
-                if (Condition == DragStartCondition.Both)
-                    continue;
-
                 foreach (MouseButton Button in MouseButtons)
                 {
                     if (Condition != DragStartCondition.MousePressed)
