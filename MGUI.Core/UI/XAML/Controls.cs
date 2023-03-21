@@ -1598,6 +1598,9 @@ namespace MGUI.Core.UI.XAML
         public XAMLColor? UnfocusedSelectionBackgroundColor { get; set; }
 
         [Category("Behavior")]
+        public bool? AllowsTextSelection { get; set; }
+
+        [Category("Behavior")]
         public int? UndoRedoHistorySize { get; set; }
 
         [Category("Behavior")]
@@ -1663,6 +1666,9 @@ namespace MGUI.Core.UI.XAML
                 TextBox.UnfocusedSelectionForegroundColor = UnfocusedSelectionForegroundColor.Value.ToXNAColor();
             if (UnfocusedSelectionBackgroundColor != null)
                 TextBox.UnfocusedSelectionBackgroundColor = UnfocusedSelectionBackgroundColor.Value.ToXNAColor();
+
+            if (AllowsTextSelection.HasValue)
+                TextBox.AllowsTextSelection = AllowsTextSelection.Value;
 
             if (UndoRedoHistorySize.HasValue)
                 TextBox.UndoRedoHistorySize = UndoRedoHistorySize.Value;

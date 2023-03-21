@@ -117,6 +117,10 @@
                     <TextBlock IsItalic="True">
                         (Click+Drag to select text. You can also double-click to select a single word, triple-click to select an entire line, or quadruple-click to select all)
                     </TextBlock>
+                    <Spacer Height="5" />
+                    <TextBlock Text="Set [c=Turquoise][i]AllowsTextSelection[/i][/c]=[c=LightBlue][s=Blue]false[/s][/c] to disallow text selection." />
+                    <TextBox AcceptsReturn="False" AcceptsTab="False" Text="You cannot select text in this TextBox" 
+                             Background="rgb(78,12,18)" BorderBrush="DarkGray" BorderThickness="1" AllowsTextSelection="False" />
                 </StackPanel>
             </DockPanel>
             <Separator/>

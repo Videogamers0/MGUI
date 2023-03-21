@@ -465,7 +465,7 @@ namespace MGUI.Core.UI
                 };
 
                 //  Pre-emptively handle mouse events if user was dragging a scrollbar so that the child content doesn't also react to the mouse event
-                OnBeginUpdateContents += (sender, e) => // TODO should probably apply similar logic to anything that handles dragging, such as MGSlider/MGResizeGrip
+                OnBeginUpdateContents += (sender, e) =>
                 {
                     if (IsDraggingVSB || IsDraggingHSB)
                     {

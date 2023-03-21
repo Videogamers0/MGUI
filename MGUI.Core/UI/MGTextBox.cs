@@ -412,6 +412,24 @@ namespace MGUI.Core.UI
         #endregion Text
 
         #region Selection
+        private bool _AllowsTextSelection = true;
+        /// <summary>True if the user should be able to click+drag to select Text.<para/>
+        /// Default value: true</summary>
+        public bool AllowsTextSelection
+        {
+            get => _AllowsTextSelection;
+            set
+            {
+                if (_AllowsTextSelection != value)
+                {
+                    _AllowsTextSelection = value;
+                    NPC(nameof(AllowsTextSelection));
+                    if (!AllowsTextSelection)
+                        CurrentSelection = null;
+                }
+            }
+        }
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool IsDraggingSelection { get; set; } = false;
 
@@ -436,10 +454,11 @@ namespace MGUI.Core.UI
             get => _CurrentSelection;
             set
             {
-                if (_CurrentSelection != value)
+                TextSelection? ActualValue = !AllowsTextSelection ? null : value;
+                if (_CurrentSelection != ActualValue)
                 {
                     TextSelection? Previous = CurrentSelection;
-                    _CurrentSelection = value;
+                    _CurrentSelection = ActualValue;
                     UpdateFormattedText(true);
                     //if (CurrentSelection.HasValue)
                     //    CurrentCursorPosition = null;
@@ -1098,7 +1117,7 @@ namespace MGUI.Core.UI
 
                 MouseHandler.DragStart += (sender, e) =>
                 {
-                    if (e.IsLMB)
+                    if (e.IsLMB && AllowsTextSelection)
                     {
                         Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
                         if (TextRenderInfo.TryGetCharAtScreenPosition(LayoutSpacePosition.ToVector2(), out CharRenderInfo CharInfo))
@@ -1120,7 +1139,7 @@ namespace MGUI.Core.UI
 
                 MouseHandler.Dragged += (sender, e) =>
                 {
-                    if (e.IsLMB && IsDraggingSelection && (Text?.Length ?? 0) > 0 && CurrentSelection.HasValue)
+                    if (e.IsLMB && IsDraggingSelection && (Text?.Length ?? 0) > 0 && CurrentSelection.HasValue && AllowsTextSelection)
                     {
                         Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
 
