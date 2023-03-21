@@ -109,6 +109,7 @@
                         <ToggleButton Content="FF7 Inventory" IsChecked="{MGBinding Path=FF7Inventory.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="Stardew Valley" IsChecked="{MGBinding Path=SDVInventory.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="Registration" IsChecked="{MGBinding Path=Registration.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="HUD" IsChecked="{MGBinding Path=HUD.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="XAML Designer" IsChecked="{MGBinding Path=XAMLDesignerWindow.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="Debug1" IsChecked="{MGBinding Path=Debug1.IsVisible, Mode=TwoWay}" TextForeground="Yellow" Opacity="0.7" />
                         <ToggleButton Content="Debug2" IsChecked="{MGBinding Path=Debug2.IsVisible, Mode=TwoWay}" TextForeground="Yellow" Opacity="0.7" />

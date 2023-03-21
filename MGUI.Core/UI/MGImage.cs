@@ -43,7 +43,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Rectangle? _SourceRect;
-        public Rectangle? SourceRect { get => _SourceRect; set => SetTexture(Texture, SourceRect); }
+        public Rectangle? SourceRect { get => _SourceRect; set => SetTexture(Texture, value); }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Color? _TextureColor;
@@ -269,32 +269,33 @@ namespace MGUI.Core.UI
             if (Texture == null)
                 return;
 
+            Rectangle PaddedBounds = LayoutBounds.GetCompressed(Padding);
             double AspectRatio = UnstretchedAspectRatio;
 
             Rectangle Bounds;
             if (Stretch == Stretch.None)
             {
-                Bounds = ApplyAlignment(LayoutBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new Size(UnstretchedWidth, UnstretchedHeight));
+                Bounds = ApplyAlignment(PaddedBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new Size(UnstretchedWidth, UnstretchedHeight));
             }
             else if (Stretch == Stretch.Uniform)
             {
-                int AvailableWidth = LayoutBounds.Width;
-                int AvailableHeight = LayoutBounds.Height;
+                int AvailableWidth = PaddedBounds.Width;
+                int AvailableHeight = PaddedBounds.Height;
                 int ConsumedWidth = Math.Min(AvailableWidth, GetWidthByAspectRatio(AvailableHeight, AspectRatio));
                 int ConsumedHeight = Math.Min(AvailableHeight, GetHeightByAspectRatio(AvailableWidth, AspectRatio));
-                Bounds = ApplyAlignment(LayoutBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new Size(ConsumedWidth, ConsumedHeight));
+                Bounds = ApplyAlignment(PaddedBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new Size(ConsumedWidth, ConsumedHeight));
             }
             else if (Stretch == Stretch.UniformToFill)
             {
-                int AvailableWidth = LayoutBounds.Width;
-                int AvailableHeight = LayoutBounds.Height;
+                int AvailableWidth = PaddedBounds.Width;
+                int AvailableHeight = PaddedBounds.Height;
                 int ConsumedWidth = Math.Max(AvailableWidth, GetWidthByAspectRatio(AvailableHeight, AspectRatio));
                 int ConsumedHeight = Math.Max(AvailableHeight, GetHeightByAspectRatio(AvailableWidth, AspectRatio));
-                Bounds = ApplyAlignment(LayoutBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new Size(ConsumedWidth, ConsumedHeight));
+                Bounds = ApplyAlignment(PaddedBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new Size(ConsumedWidth, ConsumedHeight));
             }
             else if (Stretch == Stretch.Fill)
             {
-                Bounds = LayoutBounds;
+                Bounds = PaddedBounds;
             }
             else
             {

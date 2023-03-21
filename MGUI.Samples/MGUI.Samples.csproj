@@ -47,6 +47,7 @@
     <None Remove="Dialogs\Debugging\Debug2.xaml" />
     <None Remove="Dialogs\FF7\FF7Inventory.xaml" />
     <None Remove="Dialogs\Registration.xaml" />
+    <None Remove="Dialogs\SampleHUD.xaml" />
     <None Remove="Dialogs\Stardew Valley\SDVInventory.xaml" />
     <None Remove="Dialogs\XAMLDesignerWindow.xaml" />
     <None Remove="Features\DataBindings.xaml" />
@@ -128,6 +129,7 @@
     <EmbeddedResource Include="Dialogs\Registration.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\SampleHUD.xaml" />
     <EmbeddedResource Include="Dialogs\Stardew Valley\SDVInventory.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>

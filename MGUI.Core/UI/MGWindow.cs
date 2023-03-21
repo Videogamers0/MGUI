@@ -389,8 +389,9 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly List<MGWindow> _NestedWindows;
-        /// <summary>The last element represents the <see cref="MGWindow"/> that will be drawn last (I.E., rendered overtop of everything else), and 
-        /// updated first (I.E., has the first chance to handle inputs)<para/>
+        /// <summary>The last element represents the <see cref="MGWindow"/> that will be 
+        /// drawn last (I.E., rendered overtop of everything else), and updated first (I.E., has the first chance to handle inputs)<br/>
+        /// except in cases where a Topmost window is prioritized (See: <see cref="IsTopmost"/>)<para/>
         /// This list does not include <see cref="ModalWindow"/>, which is always prioritized over all <see cref="NestedWindows"/></summary>
         public IReadOnlyList<MGWindow> NestedWindows => _NestedWindows;
         public void AddNestedWindow(MGWindow NestedWindow)
@@ -405,7 +406,8 @@ namespace MGUI.Core.UI
         }
         public bool RemoveNestedWindow(MGWindow NestedWindow) => _NestedWindows.Remove(NestedWindow);
 
-        /// <summary>Moves the given <paramref name="NestedWindow"/> to the end of <see cref="NestedWindows"/> list. It will be rendered overtop of all other <see cref="NestedWindows"/><para/>
+        /// <summary>Moves the given <paramref name="NestedWindow"/> to the end of <see cref="NestedWindows"/> list.<br/>
+        /// It will typically be rendered overtop of all other <see cref="NestedWindows"/>, unless another nested window is Topmost (See: <see cref="IsTopmost"/>).<para/>
         /// If there is a <see cref="ModalWindow"/>, then the <see cref="ModalWindow"/> will be rendered overtop of the front-most <paramref name="NestedWindow"/></summary>
         /// <param name="NestedWindow"></param>
         /// <returns>True if the <paramref name="NestedWindow"/> was brought to the front. False if it was not a valid element in <see cref="NestedWindows"/>.</returns>
@@ -426,7 +428,8 @@ namespace MGUI.Core.UI
             }
         }
 
-        /// <summary>Moves the given <paramref name="NestedWindow"/> to the start of <see cref="NestedWindows"/> list. It will be rendered underneath of all other <see cref="NestedWindows"/></summary>
+        /// <summary>Moves the given <paramref name="NestedWindow"/> to the start of <see cref="NestedWindows"/> list.<br/>
+        /// It will typically be rendered underneath of all other <see cref="NestedWindows"/>, unless it is Topmost (See: <see cref="IsTopmost"/>)</summary>
         /// <param name="NestedWindow"></param>
         /// <returns>True if the <paramref name="NestedWindow"/> was moved to the back. False if it was not a valid element in <see cref="NestedWindows"/>.</returns>
         public bool BringToBack(MGWindow NestedWindow)
@@ -694,6 +697,26 @@ namespace MGUI.Core.UI
             }
         }
 
+        private bool _IsTopmost;
+        /// <summary>If true, this <see cref="MGWindow"/> will always be updated first (so that it has first-chance to receive and handle inputs)
+        /// and drawn last (so that it appears overtop of all other <see cref="MGWindow"/>s).<para/>
+        /// This property is only respected within the window's scope.<br/>
+        /// If this window is topmost, but is also a nested window of a non-topmost window, it will only be on top of it's siblings (the other nested windows of its parent)<para/>
+        /// If multiple windows are topmost, their draw/update priority depends on their index in <see cref="MGDesktop.Windows"/> and <see cref="NestedWindows"/><para/>
+        /// <see cref="ModalWindow"/>s will still take priority even over topmost windows.</summary>
+        public bool IsTopmost
+        {
+            get => _IsTopmost;
+            set
+            {
+                if (_IsTopmost != value)
+                {
+                    _IsTopmost = value;
+                    NPC(nameof(IsTopmost));
+                }
+            }
+        }
+
         private MGElement PressedElementAtBeginUpdate { get; set; }
         private MGElement HoveredElementAtBeginUpdate { get; set; }
 
@@ -764,7 +787,8 @@ namespace MGUI.Core.UI
                     NPC(nameof(DataContextOverride));
                     NPC(nameof(DataContext));
                     WindowDataContextChanged?.Invoke(this, WindowDataContext);
-                    HandleWindowDataContextChanged();
+                    //  Changing the DataContext may have changed the sizes of elements on this window, so attempt to resize the window to its contents
+                    //RevalidateSizeToContent(false);
                 }
             }
         }
@@ -777,13 +801,12 @@ namespace MGUI.Core.UI
 
         public event EventHandler<object> WindowDataContextChanged;
 
-        private void HandleWindowDataContextChanged()
+        private void RevalidateSizeToContent(bool UpdateImmediately)
         {
-            //  Changing the DataContext may have changed the sizes of elements on this window, so attempt to resize the window to its contents
             if (RecentSizeToContentSettings.HasValue)
             {
                 ApplySizeToContent(RecentSizeToContentSettings.Value.Type, RecentSizeToContentSettings.Value.MinWidth, RecentSizeToContentSettings.Value.MinHeight,
-                    RecentSizeToContentSettings.Value.MaxWidth, RecentSizeToContentSettings.Value.MaxHeight, false);
+                    RecentSizeToContentSettings.Value.MaxWidth, RecentSizeToContentSettings.Value.MaxHeight, UpdateImmediately);
             }
         }
         #endregion Data Context
@@ -950,7 +973,10 @@ namespace MGUI.Core.UI
                     if (!IsLayoutValid || QueueLayoutRefresh)
                     {
                         QueueLayoutRefresh = false;
-                        UpdateLayout(new(this.Left, this.Top, this.WindowWidth, this.WindowHeight));
+                        if (RecentSizeToContentSettings.HasValue)
+                            RevalidateSizeToContent(true);
+                        else
+                            UpdateLayout(new(this.Left, this.Top, this.WindowWidth, this.WindowHeight));
                     }
 
                     if (ShouldUpdateHoveredElement)
@@ -1018,7 +1044,7 @@ namespace MGUI.Core.UI
                     //Should we update the ModalWindow of the NestedWindow before we update the ModalWindow of this Window?
                     ModalWindow?.Update(UpdateArgs);
 
-                    foreach (MGWindow Nested in _NestedWindows.Reverse<MGWindow>())
+                    foreach (MGWindow Nested in _NestedWindows.Reverse<MGWindow>().OrderByDescending(x => x.IsTopmost))
                         Nested.Update(UpdateArgs);
                 };
 
@@ -1039,7 +1065,7 @@ namespace MGUI.Core.UI
                             NPC(nameof(DataContextOverride));
                             NPC(nameof(DataContext));
                             WindowDataContextChanged?.Invoke(this, WindowDataContext);
-                            HandleWindowDataContextChanged();
+                            RevalidateSizeToContent(false);
                         }
                     };
                 }
@@ -1162,7 +1188,7 @@ namespace MGUI.Core.UI
             if (e.ToolTip != null)
             {
                 MGToolTip TT = e.ToolTip;
-                foreach (MGElement Element in TT.TraverseVisualTree(true, false, TreeTraversalMode.Preorder))
+                foreach (MGElement Element in TT.TraverseVisualTree(true, false, false, false, TreeTraversalMode.Preorder))
                 {
                     Element_Added(TT, Element);
                 }
@@ -1171,7 +1197,7 @@ namespace MGUI.Core.UI
             if (e.ContextMenu != null)
             {
                 MGContextMenu CM = e.ContextMenu;
-                foreach (MGElement Element in CM.TraverseVisualTree(true, false, TreeTraversalMode.Preorder))
+                foreach (MGElement Element in CM.TraverseVisualTree(true, false, false, false, TreeTraversalMode.Preorder))
                 {
                     Element_Added(CM, Element);
                 }
@@ -1190,7 +1216,7 @@ namespace MGUI.Core.UI
             if (e.ToolTip != null)
             {
                 MGToolTip TT = e.ToolTip;
-                foreach (MGElement Element in TT.TraverseVisualTree(true, false, TreeTraversalMode.Preorder))
+                foreach (MGElement Element in TT.TraverseVisualTree(true, false, false, false, TreeTraversalMode.Preorder))
                 {
                     Element_Removed(TT, Element);
                 }
@@ -1199,7 +1225,7 @@ namespace MGUI.Core.UI
             if (e.ContextMenu != null)
             {
                 MGContextMenu CM = e.ContextMenu;
-                foreach (MGElement Element in CM.TraverseVisualTree(true, false, TreeTraversalMode.Preorder))
+                foreach (MGElement Element in CM.TraverseVisualTree(true, false, false, false, TreeTraversalMode.Preorder))
                 {
                     Element_Removed(CM, Element);
                 }
@@ -1228,7 +1254,7 @@ namespace MGUI.Core.UI
                 Previous.OnDirectOrNestedContentAdded -= Element_Added;
                 Previous.OnDirectOrNestedContentRemoved -= Element_Removed;
 
-                foreach (MGElement Element in Previous.TraverseVisualTree(true, false, TreeTraversalMode.Preorder))
+                foreach (MGElement Element in Previous.TraverseVisualTree(true, false, false, false, TreeTraversalMode.Preorder))
                 {
                     Element_Removed(Previous, Element);
                 }
@@ -1239,7 +1265,7 @@ namespace MGUI.Core.UI
                 New.OnDirectOrNestedContentAdded += Element_Added;
                 New.OnDirectOrNestedContentRemoved += Element_Removed;
 
-                foreach (MGElement Element in New.TraverseVisualTree(true, false, TreeTraversalMode.Preorder))
+                foreach (MGElement Element in New.TraverseVisualTree(true, false, false, false, TreeTraversalMode.Preorder))
                 {
                     Element_Added(New, Element);
                 }
@@ -1342,7 +1368,7 @@ namespace MGUI.Core.UI
             if (ModalWindow != null)
                 DA.DT.FillRectangle(DA.Offset.ToVector2(), this.LayoutBounds, Color.Black * 0.5f);
 
-            foreach (MGWindow Nested in _NestedWindows)
+            foreach (MGWindow Nested in _NestedWindows.OrderBy(x => x.IsTopmost))
                 Nested.Draw(DA);
             ModalWindow?.Draw(DA);
 

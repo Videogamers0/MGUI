@@ -16,6 +16,7 @@ using MGUI.Shared.Input;
 using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Containers.Grids;
 using MGUI.Core.UI.Data_Binding;
+using System.ComponentModel;
 
 namespace MGUI.Core.UI
 {
@@ -2098,21 +2099,17 @@ namespace MGUI.Core.UI
             return false;
         }
 
-        //TODO maybe we should have parameters like:
-        //bool IncludeToolTips to check MGElement.ToolTip and its descendents
-        //bool IncludeContextMenus, to check MGElement.ContextMenu and its descendents
-        //if you do add that, might need to modify MGWindow.Element_Added/MGWindow.Element_Removed since then MGContentHost would already be notifying on those elements
+        /// <param name="IncludeSelf">If true, may return a reference to this element, or to one of this element's components (if <paramref name="IncludeComponents"/> is also true).</param>
+        /// <param name="IncludeComponents">If true, may returns a reference to a component of an element, such as the button part of an <see cref="MGCheckBox"/>.</param>
+        /// <param name="TraversalMode">The order to visit the nodes in.</param>
+        public IEnumerable<MGElement> TraverseVisualTree(bool IncludeSelf = true, bool IncludeComponents = true, bool IncludeToolTips = true, bool IncludeContextMenus = true, TreeTraversalMode TraversalMode = TreeTraversalMode.Preorder)
+            => TraverseVisualTree<MGElement>(IncludeSelf, IncludeComponents, IncludeToolTips, IncludeContextMenus, TraversalMode);
 
         /// <param name="IncludeSelf">If true, may return a reference to this element, or to one of this element's components (if <paramref name="IncludeComponents"/> is also true).</param>
         /// <param name="IncludeComponents">If true, may returns a reference to a component of an element, such as the button part of an <see cref="MGCheckBox"/>.</param>
         /// <param name="TraversalMode">The order to visit the nodes in.</param>
-        public IEnumerable<MGElement> TraverseVisualTree(bool IncludeSelf = true, bool IncludeComponents = true, TreeTraversalMode TraversalMode = TreeTraversalMode.Preorder)
-            => TraverseVisualTree<MGElement>(IncludeSelf, IncludeComponents, TraversalMode);
-
-        /// <param name="IncludeSelf">If true, may return a reference to this element, or to one of this element's components (if <paramref name="IncludeComponents"/> is also true).</param>
-        /// <param name="IncludeComponents">If true, may returns a reference to a component of an element, such as the button part of an <see cref="MGCheckBox"/>.</param>
-        /// <param name="TraversalMode">The order to visit the nodes in.</param>
-        public IEnumerable<T> TraverseVisualTree<T>(bool IncludeSelf = true, bool IncludeComponents = true, TreeTraversalMode TraversalMode = TreeTraversalMode.Preorder)
+        public IEnumerable<T> TraverseVisualTree<T>(bool IncludeSelf = true, bool IncludeComponents = true,
+            bool IncludeToolTips = true, bool IncludeContextMenus = true, TreeTraversalMode TraversalMode = TreeTraversalMode.Preorder)
             where T : MGElement
         {
             if (TraversalMode == TreeTraversalMode.Preorder && IncludeSelf)
@@ -2124,15 +2121,27 @@ namespace MGUI.Core.UI
 				{
 					foreach (MGComponentBase Component in this.Components)
 					{
-						foreach (T Item in Component.BaseElement.TraverseVisualTree<T>(true, IncludeComponents, TraversalMode))
+						foreach (T Item in Component.BaseElement.TraverseVisualTree<T>(true, IncludeComponents, IncludeToolTips, IncludeContextMenus, TraversalMode))
 							yield return Item;
 					}
 				}
+
+                if (IncludeToolTips && ToolTip != null)
+                {
+                    foreach (T Item in ToolTip.TraverseVisualTree<T>(true, IncludeComponents, IncludeToolTips, IncludeContextMenus, TraversalMode))
+                        yield return Item;
+                }
+
+                if (IncludeContextMenus && ContextMenu != null)
+                {
+                    foreach (T Item in ContextMenu.TraverseVisualTree<T>(true, IncludeComponents, IncludeToolTips, IncludeContextMenus, TraversalMode))
+                        yield return Item;
+                }
             }
 
             foreach (MGElement Child in GetVisualTreeChildren(true, true))
 			{
-				foreach (T Item in Child.TraverseVisualTree<T>(true, IncludeComponents, TraversalMode))
+				foreach (T Item in Child.TraverseVisualTree<T>(true, IncludeComponents, IncludeToolTips, IncludeContextMenus, TraversalMode))
 					yield return Item;
 			}
 
@@ -2142,9 +2151,21 @@ namespace MGUI.Core.UI
                 {
                     foreach (MGComponentBase Component in this.Components)
                     {
-                        foreach (T Item in Component.BaseElement.TraverseVisualTree<T>(true, IncludeComponents, TraversalMode))
+                        foreach (T Item in Component.BaseElement.TraverseVisualTree<T>(true, IncludeComponents, IncludeToolTips, IncludeContextMenus, TraversalMode))
                             yield return Item;
                     }
+                }
+
+                if (IncludeToolTips && ToolTip != null)
+                {
+                    foreach (T Item in ToolTip.TraverseVisualTree<T>(true, IncludeComponents, IncludeToolTips, IncludeContextMenus, TraversalMode))
+                        yield return Item;
+                }
+
+                if (IncludeContextMenus && ContextMenu != null)
+                {
+                    foreach (T Item in ContextMenu.TraverseVisualTree<T>(true, IncludeComponents, IncludeToolTips, IncludeContextMenus, TraversalMode))
+                        yield return Item;
                 }
 
                 if (this is T TypedItem)
@@ -2157,32 +2178,36 @@ namespace MGUI.Core.UI
         /// <param name="IncludeComponents">If true, may returns a reference to a component of an element, such as the button part of an <see cref="MGCheckBox"/>.</param>
         /// <param name="TraversalMode">The order to visit the nodes and evaluate the <paramref name="Predicate"/> in.</param>
         /// <returns>The first match, or null if no valid match was found.</returns>
-        public MGElement FindElement(Predicate<MGElement> Predicate, bool IncludeSelf = true, bool IncludeComponents = true, TreeTraversalMode TraversalMode = TreeTraversalMode.Preorder)
-            => TraverseVisualTree<MGElement>(IncludeSelf, IncludeComponents, TraversalMode).FirstOrDefault(x => Predicate(x));
+        public MGElement FindElement(Predicate<MGElement> Predicate, bool IncludeSelf = true, bool IncludeComponents = true,
+            bool IncludeToolTips = true, bool IncludeContextMenus = true, TreeTraversalMode TraversalMode = TreeTraversalMode.Preorder)
+            => TraverseVisualTree<MGElement>(IncludeSelf, IncludeComponents, IncludeToolTips, IncludeContextMenus, TraversalMode).FirstOrDefault(x => Predicate(x));
 
         /// <summary>Returns the first element in the visual tree of type=<typeparamref name="T"/> that satisfies the given <paramref name="Predicate"/></summary>
         /// <param name="IncludeSelf">If true, may return a reference to this element, or to one of this element's components (if <paramref name="IncludeComponents"/> is also true).</param>
         /// <param name="IncludeComponents">If true, may returns a reference to a component of an element, such as the button part of an <see cref="MGCheckBox"/>.</param>
         /// <param name="TraversalMode">The order to visit the nodes and evaluate the <paramref name="Predicate"/> in.</param>
         /// <returns>The first match, or null if no valid match was found.</returns>
-        public T FindElement<T>(Predicate<T> Predicate, bool IncludeSelf = true, bool IncludeComponents = true, TreeTraversalMode TraversalMode = TreeTraversalMode.Preorder)
+        public T FindElement<T>(Predicate<T> Predicate, bool IncludeSelf = true, bool IncludeComponents = true,
+            bool IncludeToolTips = true, bool IncludeContextMenus = true, TreeTraversalMode TraversalMode = TreeTraversalMode.Preorder)
 			where T : MGElement
-			=> TraverseVisualTree<T>(IncludeSelf, IncludeComponents, TraversalMode).FirstOrDefault(x => Predicate(x));
+			=> TraverseVisualTree<T>(IncludeSelf, IncludeComponents, IncludeToolTips, IncludeContextMenus, TraversalMode).FirstOrDefault(x => Predicate(x));
 
         /// <summary>Returns all elements in the visual tree that satisfy the given <paramref name="Predicate"/></summary>
         /// <param name="IncludeSelf">If true, may return a reference to this element, or to one of this element's components (if <paramref name="IncludeComponents"/> is also true).</param>
         /// <param name="IncludeComponents">If true, may returns a reference to a component of an element, such as the button part of an <see cref="MGCheckBox"/>.</param>
         /// <param name="TraversalMode">The order to visit the nodes and evaluate the <paramref name="Predicate"/> in.</param>
-        public IEnumerable<MGElement> GetElements(Predicate<MGElement> Predicate, bool IncludeSelf = true, bool IncludeComponents = true, TreeTraversalMode TraversalMode = TreeTraversalMode.Preorder)
-            => TraverseVisualTree<MGElement>(IncludeSelf, IncludeComponents, TraversalMode).Where(x => Predicate(x));
+        public IEnumerable<MGElement> GetElements(Predicate<MGElement> Predicate, bool IncludeSelf = true, bool IncludeComponents = true,
+            bool IncludeToolTips = true, bool IncludeContextMenus = true, TreeTraversalMode TraversalMode = TreeTraversalMode.Preorder)
+            => TraverseVisualTree<MGElement>(IncludeSelf, IncludeComponents, IncludeToolTips, IncludeContextMenus, TraversalMode).Where(x => Predicate(x));
 
         /// <summary>Returns all elements in the visual tree of type=<typeparamref name="T"/> that satisfy the given <paramref name="Predicate"/></summary>
         /// <param name="IncludeSelf">If true, may return a reference to this element, or to one of this element's components (if <paramref name="IncludeComponents"/> is also true).</param>
         /// <param name="IncludeComponents">If true, may returns a reference to a component of an element, such as the button part of an <see cref="MGCheckBox"/>.</param>
         /// <param name="TraversalMode">The order to visit the nodes and evaluate the <paramref name="Predicate"/> in.</param>
-        public IEnumerable<T> GetElements<T>(Predicate<T> Predicate, bool IncludeSelf = true, bool IncludeComponents = true, TreeTraversalMode TraversalMode = TreeTraversalMode.Preorder)
+        public IEnumerable<T> GetElements<T>(Predicate<T> Predicate, bool IncludeSelf = true, bool IncludeComponents = true,
+            bool IncludeToolTips = true, bool IncludeContextMenus = true, TreeTraversalMode TraversalMode = TreeTraversalMode.Preorder)
             where T : MGElement
-            => TraverseVisualTree<T>(IncludeSelf, IncludeComponents, TraversalMode).Where(x => Predicate(x));
+            => TraverseVisualTree<T>(IncludeSelf, IncludeComponents, IncludeToolTips, IncludeContextMenus, TraversalMode).Where(x => Predicate(x));
         #endregion Visual Tree
 	}
 }

@@ -141,6 +141,7 @@ namespace MGUI.Samples
         public FF7Inventory FF7Inventory { get; }
         public Registration Registration { get; }
         public SDVInventory SDVInventory { get; }
+        public SampleHUD HUD { get; }
         public XAMLDesignerWindow XAMLDesignerWindow { get; }
         public Debug1 Debug1 { get; }
         public Debug2 Debug2 { get; }
@@ -187,13 +188,14 @@ namespace MGUI.Samples
             FF7Inventory = new(Content, Desktop) { IsVisible = true };
             SDVInventory = new(Content, Desktop);
             Registration = new(Content, Desktop);
+            HUD = new(Content, Desktop);
             XAMLDesignerWindow = new(Content, Desktop);
             Debug1 = new(Content, Desktop);
             Debug2 = new(Content, Desktop);
             #endregion Dialogs
 
 #if DEBUG
-            //DataBindingSamples.Show();
+            //HUD.Show();
 #endif
 
             Window.WindowDataContext = this;

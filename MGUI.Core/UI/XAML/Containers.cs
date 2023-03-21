@@ -196,8 +196,13 @@ namespace MGUI.Core.UI.XAML
             if (ColumnSpacing.HasValue)
                 Grid.ColumnSpacing = ColumnSpacing.Value;
 
-            if (IncludeContent)
+            if (IncludeContent && Children.Any())
             {
+                if (string.IsNullOrEmpty(RowLengths) && RowDefinitions.Count == 0)
+                    Grid.AddRow(GridLength.Auto);
+                if (string.IsNullOrEmpty(ColumnLengths) && ColumnDefinitions.Count == 0)
+                    Grid.AddColumn(GridLength.Auto);
+
                 foreach (Element Child in Children)
                 {
                     MGElement ChildElement = Child.ToElement<MGElement>(Grid.SelfOrParentWindow, Grid);

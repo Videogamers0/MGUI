@@ -39,7 +39,7 @@ namespace MGUI.Core.UI
         private string _CommandName;
         /// <summary>The name of the command to execute when this <see cref="MGButton"/> is left-clicked, or null if no named command should be executed when left-clicked.<para/>
         /// If <see cref="Command"/> is also specified, <see cref="Command"/> will take priority and be executed first.<br/>
-        /// (Which may result in the <see cref="CommandName"/> logic not being executed if this <see cref="Command"/> returns true)<para/>
+        /// (Which may result in the <see cref="CommandName"/> logic not being executed if <see cref="Command"/> returns true)<para/>
         /// See also: <see cref="Command"/>, <see cref="MGWindow.NamedActions"/>, <see cref="MGWindow.AddNamedAction(string, Action{MGElement})"/></summary>
         public string CommandName
         {
@@ -110,9 +110,15 @@ namespace MGUI.Core.UI
                 MouseHandler.ReleasedInside += (sender, e) =>
                 {
                     if (e.IsLMB)
+                    {
                         OnLeftClicked?.Invoke(this, e);
+                        e.SetHandledBy(this, false);
+                    }
                     else if (e.IsRMB)
+                    {
                         OnRightClicked?.Invoke(this, e);
+                        //e.SetHandledBy(this, false);
+                    }
                 };
 
                 if (HandleLeftClick != null)

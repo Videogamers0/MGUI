@@ -690,7 +690,7 @@ namespace MGUI.Core.UI.XAML
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
         [Category("Value")]
-        public TextBlock ValueTextBlock { get; set; } = new();
+        public TextBlock ValueTextBlock { get; set; }
         [Category("Value")]
         public bool? ShowValue { get; set; }
         [Category("Value")]
@@ -726,7 +726,7 @@ namespace MGUI.Core.UI.XAML
 
             MGProgressBar ProgressBar = Element as MGProgressBar;
             Border.ApplySettings(Parent, ProgressBar.BorderComponent.Element, false);
-            ValueTextBlock.ApplySettings(Parent, ProgressBar.ValueComponent.Element, false);
+            (ValueTextBlock ?? new()).ApplySettings(Parent, ProgressBar.ValueComponent.Element, false);
 
             if (ShowValue.HasValue)
                 ProgressBar.ShowValue = ShowValue.Value;
@@ -759,6 +759,7 @@ namespace MGUI.Core.UI.XAML
         protected internal override IEnumerable<Element> GetChildren()
         {
             yield return Border;
+            ValueTextBlock ??= new();
             yield return ValueTextBlock;
         }
     }
@@ -1730,6 +1731,8 @@ namespace MGUI.Core.UI.XAML
         public string ValueDisplayFormat { get; set; }
         [Category("Value")]
         public TimeSpan? RemainingDuration { get; set; }
+        [Category("Appearance")]
+        public string RemainingDurationStringFormat { get; set; }
 
         [Category("Behavior")]
         public bool? AllowsNegativeDuration { get; set; }
@@ -1753,6 +1756,8 @@ namespace MGUI.Core.UI.XAML
                 Timer.ValueDisplayFormat = ValueDisplayFormat;
             if (RemainingDuration.HasValue)
                 Timer.RemainingDuration = RemainingDuration.Value;
+            if (RemainingDurationStringFormat != null)
+                Timer.RemainingDurationToString = TimeSpan => TimeSpan.ToString(RemainingDurationStringFormat);
 
             //if (AllowsNegativeDuration.HasValue)
             //    Timer.AllowsNegativeDuration = AllowsNegativeDuration.Value;
@@ -1944,6 +1949,9 @@ namespace MGUI.Core.UI.XAML
         public bool? CanCloseWindow { get; set; }
 
         [Category("Behavior")]
+        public bool? IsTopmost { get; set; }
+
+        [Category("Behavior")]
         public bool? AllowsClickThrough { get; set; }
 
         [Category("Behavior")]
@@ -1991,6 +1999,9 @@ namespace MGUI.Core.UI.XAML
 
             if (CanCloseWindow.HasValue)
                 Window.CanCloseWindow = CanCloseWindow.Value;
+
+            if (IsTopmost.HasValue)
+                Window.IsTopmost = IsTopmost.Value;
 
             if (AllowsClickThrough.HasValue)
                 Window.AllowsClickThrough = AllowsClickThrough.Value;

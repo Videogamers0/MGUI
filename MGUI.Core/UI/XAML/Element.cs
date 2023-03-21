@@ -299,7 +299,7 @@ namespace MGUI.Core.UI.XAML
         {
             if (RecurseChildren)
             {
-                foreach (MGElement Child in Element.TraverseVisualTree(true, true, MGElement.TreeTraversalMode.Preorder))
+                foreach (MGElement Child in Element.TraverseVisualTree(true, true, true, true, MGElement.TreeTraversalMode.Preorder))
                 {
                     ProcessBindings(Child, false, DataContextOverride);
                 }

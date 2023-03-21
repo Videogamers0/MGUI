@@ -1,0 +1,143 @@
+<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MGUI.Samples.Dialogs;assembly=MGUI.Samples"
+        Left="0" Top="0" SizeToContent="WidthAndHeight" WindowStyle="None" AllowsClickThrough="True" IsTopmost="True">
+    <Grid RowLengths="*" ColumnLengths="*">
+        
+        <!-- HP/MP/Stamina/XP bars in top-left corner -->
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Padding="8" Spacing="3" Orientation="Vertical" Background="White * 0.1">
+            <StackPanel.Styles>
+                <Style TargetType="Image">
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="HorizontalAlignment" Value="Left" />
+                    <Setter Property="Width" Value="16" />
+                    <Setter Property="Height" Value="16" />
+                    <Setter Property="Margin" Value="3,0,0,0" />
+                    <Setter Property="Padding" Value="2" />
+                    <Setter Property="Background" Value="Black * 0.15" />
+                </Style>
+                <Style TargetType="ProgressBar">
+                    <Setter Property="Orientation" Value="Horizontal" />
+                    <Setter Property="HorizontalAlignment" Value="Left" />
+                    <Setter Property="Size" Value="18" />
+                    <Setter Property="ShowValue" Value="True" />
+                    <Setter Property="ValueDisplayFormat" Value="{}{{Value}} / {{Maximum}}" />
+                    <Setter Property="NumberFormat" Value="0" />
+                    <Setter Property="Minimum" Value="0" />
+                    <Setter Property="BorderThickness" Value="2,2,3,3" />
+                    <Setter Property="BorderBrush">
+                        <Setter.Value>
+                            <DockedBorderBrush Left="rgb(120,120,120)" Top="rgb(160,160,160)" Right="Black" Bottom="Black" />
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Background" Value="rgb(82,82,82)|rgb(92,92,92)" />
+                    <Setter Property="IncompleteBrush" Value="Transparent" />
+                    <Setter Property="ValueTextBlock">
+                        <Setter.Value>
+                            <TextBlock FontSize="9" IsBold="True" IsShadowed="True" ShadowColor="Black" Foreground="rgb(240,180,60)" />
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </StackPanel.Styles>
+            
+            <!-- HP -->
+            <OverlayPanel>
+                <ProgressBar Maximum="{MGBinding Path=MaxHP}" Value="{MGBinding Path=CurrentHP}" Width="{MGBinding Path=HPBarWidth}">
+                    <ProgressBar.CompletedBrush>
+                        <GradientFillBrush TopLeftColor="rgb(200,34,6)" BottomLeftColor="rgb(200,34,6)" TopRightColor="rgb(222,44,12)" BottomRightColor="rgb(222,44,12)" />
+                    </ProgressBar.CompletedBrush>
+                </ProgressBar>
+                <Image RegionName="HUD_HP" />
+            </OverlayPanel>
+            
+            <!-- MP -->
+            <OverlayPanel>
+                <ProgressBar Maximum="{MGBinding Path=MaxMP}" Value="{MGBinding Path=CurrentMP}" Width="{MGBinding Path=MPBarWidth}">
+                    <ProgressBar.CompletedBrush>
+                        <GradientFillBrush TopLeftColor="rgb(25,47,208)" BottomLeftColor="rgb(25,47,208)" TopRightColor="rgb(58,77,240)" BottomRightColor="rgb(58,77,240)" />
+                    </ProgressBar.CompletedBrush>
+                </ProgressBar>
+                <Image RegionName="HUD_MP" />
+            </OverlayPanel>
+            
+            <!-- Stamina -->
+            <OverlayPanel>
+                <ProgressBar Maximum="{MGBinding Path=MaxStamina}" Value="{MGBinding Path=CurrentStamina}" Width="{MGBinding Path=StaminaBarWidth}">
+                    <ProgressBar.CompletedBrush>
+                        <GradientFillBrush TopLeftColor="rgb(27,168,23)" BottomLeftColor="rgb(27,168,23)" TopRightColor="rgb(33,205,30)" BottomRightColor="rgb(33,205,30)" />
+                    </ProgressBar.CompletedBrush>
+                </ProgressBar>
+                <Image RegionName="HUD_Stamina" />
+            </OverlayPanel>
+            
+            <!-- XP -->
+            <ProgressBar Maximum="{MGBinding Path=NextLevelXP}" Value="{MGBinding Path=CurrentXP}" HorizontalAlignment="Stretch" ShowValue="False" Size="4" BorderThickness="0" Background="Transparent">
+                <ProgressBar.CompletedBrush>
+                    <GradientFillBrush TopLeftColor="rgb(230,220,20)" BottomLeftColor="rgb(230,220,20)" TopRightColor="rgb(240,230,40)" BottomRightColor="rgb(240,230,40)" />
+                </ProgressBar.CompletedBrush>
+            </ProgressBar>
+        </StackPanel>
+
+        <!-- Minimap -->
+        <!-- Note: InputConsumers are a simple control that just ensures all mouse-related input events that occur overtop of it are handled -->
+        <!-- I.E. the event doesn't 'fall through' to whatever is underneath -->
+        <InputConsumer HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8" Background="White * 0.25" Width="200" Height="200">
+            <!-- This Border reserves space on the UI. You could then retrieve the Border via Window.GetElementByName<MGBorder>("MinimapPresenter") -->
+            <!-- and subscribe to its OnEndingDraw event to draw your own custom minimap graphics or something. Or maybe you'd use an Image as its Content and update the Image's Texture every frame  -->
+            <Border Name="MinimapPresenter" BorderBrush="Black" BorderThickness="2" Padding="10">
+                <TextBlock Text="Minimap Placeholder" FontSize="11" IsBold="True" HorizontalAlignment="Center" VerticalAlignment="Center" IsShadowed="True" ShadowColor="Gray" />
+            </Border>
+        </InputConsumer>
+
+        <!-- Player Active Buffs -->
+        <Border BorderThickness="0" Padding="6" Margin="8" Background="Black * 0.6" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <ListBox Name="BuffsList" ItemType="{x:Type local:PlayerBuff}" SelectionMode="None" Background="Transparent"
+                     OuterBorderThickness="0" InnerBorderThickness="0" ItemsPanelBorderThickness="0">
+                <ListBox.AlternatingRowBackgrounds>
+                    <SolidFillBrush Color="White * 0.15" />
+                </ListBox.AlternatingRowBackgrounds>
+                <ListBox.TitleBorder>
+                    <Border Background="Transparent" BackgroundFocusedColor="Transparent" BorderThickness="0" />
+                </ListBox.TitleBorder>
+                <ListBox.Header>
+                    <TextBlock IsBold="True" FontSize="11" HorizontalAlignment="Center" Text="Active Buffs:" Foreground="rgb(240,180,60)" IsShadowed="True" ShadowColor="Black" />
+                </ListBox.Header>
+                <ListBox.ItemContainerStyle>
+                    <Border BorderThickness="0" Margin="0,2" Padding="5,1" BackgroundFocusedColor="White * 0.1" />
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <ContentTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <StackPanel.Styles>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="rgb(240,180,60)" />
+                                    <Setter Property="IsShadowed" Value="True" />
+                                    <Setter Property="ShadowColor" Value="Black" />
+                                </Style>
+                            </StackPanel.Styles>
+
+                            <StackPanel.ToolTip>
+                                <ToolTip SizeToContent="WidthAndHeight" Background="rgb(56,56,56,212)" Padding="6,3" 
+                                         TextForeground="rgb(240,240,240)" ShowDelay="0:00:00.065">
+                                    <TextBlock FontSize="9" IsBold="True" Text="{MGBinding Path=Description}" />
+                                </ToolTip>
+                            </StackPanel.ToolTip>
+                            
+                            <Image VerticalAlignment="Center" Width="16" Height="16" Texture="{MGBinding Path=IconTexture, Mode=OneTime}" SourceRect="{MGBinding Path=IconSourceRect, Mode=OneTime}" />
+                            <Timer VerticalAlignment="Center" ValueDisplayFormat="{}{{RemainingDuration}}" RemainingDurationStringFormat="m\:ss"
+                                   RemainingDuration="{MGBinding Path=RemainingDuration}" Background="Transparent" BorderThickness="0" IsPaused="False" MinWidth="40"
+                                   HorizontalContentAlignment="Right">
+                                <Timer.Value>
+                                    <TextBlock IsBold="True" FontSize="9" />
+                                </Timer.Value>
+                            </Timer>
+                            <TextBlock VerticalAlignment="Center" IsBold="True" FontSize="9" Text="{MGBinding Path=Name}" />
+                        </StackPanel>
+                    </ContentTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <!-- TODO samples such as toolbar in bottom center, game time clock above minimap, recent item drops bottomright, special abilities with cooldowns bottom-left etc -->
+    </Grid>
+</Window>

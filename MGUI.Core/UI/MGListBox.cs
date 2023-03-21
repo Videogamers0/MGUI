@@ -630,13 +630,13 @@ namespace MGUI.Core.UI
                 TitleBorder.SetContent(TitlePresenter);
                 TitleBorder.CanChangeContent = false;
                 TitlePresenter.CanChangeContent = false;
-                this.TitleComponent = new(TitleBorder, true, false, true, true, false, false, false,
+                this.TitleComponent = new(TitleBorder, true, false, false, true, false, false, false,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Top, ComponentSize.Size));
                 AddComponent(TitleComponent);
 
                 //  Create the inner border
                 this.InnerBorder = new(ParentWindow);
-                this.InnerBorderComponent = new(InnerBorder, false, false, true, true, true, true, false,
+                this.InnerBorderComponent = new(InnerBorder, true, false, true, true, false, false, false,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Stretch, ComponentSize.Size));
                 AddComponent(InnerBorderComponent);
                 InnerBorder.OnBorderBrushChanged += (sender, e) => { NPC(nameof(InnerBorderBrush)); };

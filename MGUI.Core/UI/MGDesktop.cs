@@ -223,11 +223,14 @@ namespace MGUI.Core.UI
         #endregion Context Menu
 
         #region Windows
-        /// <summary>The last element represents the <see cref="MGWindow"/> that will be drawn last (I.E., rendered overtop of everything else), and 
-        /// updated first (I.E., has the first chance to handle inputs)</summary>
+        /// <summary>The last element represents the <see cref="MGWindow"/> that will be
+        /// drawn last (I.E., rendered overtop of everything else), and updated first (I.E., has the first chance to handle inputs)<para/>
+        /// except in cases where a Topmost window is prioritized (See: <see cref="MGWindow.IsTopmost"/>)<para/></summary>
         public List<MGWindow> Windows { get; }
 
-        /// <summary>Moves the given <paramref name="Window"/> to the end of <see cref="Windows"/> list. It will be rendered overtop of all other <see cref="Windows"/> and have first chance at receiving/handling input.</summary>
+        /// <summary>Moves the given <paramref name="Window"/> to the end of <see cref="Windows"/> list.<br/>
+        /// It will typically be rendered overtop of all other <see cref="Windows"/> and have first chance at receiving/handling input,<br/>
+        /// unless another window is Topmost (See: <see cref="MGWindow.IsTopmost"/>).</summary>
         /// <returns>True if the <paramref name="Window"/> was brought to the front. False if it was not a valid element in <see cref="Windows"/>.</returns>
         public bool BringToFront(MGWindow Window)
         {
@@ -246,7 +249,8 @@ namespace MGUI.Core.UI
             }
         }
 
-        /// <summary>Moves the given <paramref name="Window"/> to the start of <see cref="Windows"/> list. It will be rendered underneath of all other <see cref="Windows"/></summary>
+        /// <summary>Moves the given <paramref name="Window"/> to the start of <see cref="Windows"/> list.<br/>
+        /// It will typically be rendered underneath of all other <see cref="Windows"/>, unless it is Topmost (See: <see cref="MGWindow.IsTopmost"/>)</summary>
         /// <returns>True if the <paramref name="Window"/> was moved to the back. False if it was not a valid element in <see cref="Windows"/>.</returns>
         public bool BringToBack(MGWindow Window)
         {
@@ -471,7 +475,7 @@ namespace MGUI.Core.UI
             ActiveContextMenu?.Update(UA);
             ActiveToolTip?.Update(UA.ChangeHitTestVisible(ActiveToolTip.ParentWindow.IsHitTestVisible));
 
-            foreach (MGWindow Window in Windows.Reverse<MGWindow>())
+            foreach (MGWindow Window in Windows.Reverse<MGWindow>().OrderByDescending(x => x.IsTopmost))
             {
                 Window.Update(UA);
             }
@@ -490,7 +494,7 @@ namespace MGUI.Core.UI
             {
                 using (BA.DT.SetClipTargetTemporary(ScreenBounds, true))
                 {
-                    foreach (MGWindow Window in Windows)
+                    foreach (MGWindow Window in Windows.OrderBy(x => x.IsTopmost))
                     {
                         Window.Draw(DA);
                     }

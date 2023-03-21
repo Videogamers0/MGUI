@@ -58,7 +58,7 @@ namespace MGUI.Core.UI.Containers
                 OnContentAdded?.Invoke(this, Element);
                 OnDirectOrNestedContentAdded?.Invoke(this, Element);
 
-                foreach (MGElement Nested in Element.TraverseVisualTree(false, true))
+                foreach (MGElement Nested in Element.TraverseVisualTree(false, true, false, false))
                 {
                     InvokeNestedContentAdded(this, Nested);
                 }
@@ -96,7 +96,7 @@ namespace MGUI.Core.UI.Containers
                 OnContentRemoved?.Invoke(this, Element);
                 OnDirectOrNestedContentRemoved?.Invoke(this, Element);
 
-                foreach (MGElement Nested in Element.TraverseVisualTree(false, true))
+                foreach (MGElement Nested in Element.TraverseVisualTree(false, true, false, false))
                 {
                     InvokeNestedContentRemoved(this, Nested);
                 }
