@@ -190,6 +190,7 @@ namespace MGUI.Samples.Dialogs
                 new(Desktop, "Reflect", TimeSpan.FromMinutes(5.0), Desktop.NamedRegions["Buff_Reflect"], "+20% Dmg Reflect"),
                 new(Desktop, "Lucky", TimeSpan.FromMinutes(20.0), Desktop.NamedRegions["Diamond"], "+25% Rare item drop rate")
             };
+            //TODO Remove buffs when its RemainingDuration hits zero.
 
             MGListBox<PlayerBuff> BuffsList = Window.GetElementByName<MGListBox<PlayerBuff>>("BuffsList");
             BuffsList.SetItemsSource(ActiveBuffs);

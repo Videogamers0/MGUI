@@ -146,10 +146,11 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsPaused;
+        /// <summary>See also: <see cref="Pause"/>, <see cref="Resume"/>, <see cref="Paused"/>, <see cref="Resumed"/></summary>
         public bool IsPaused
         {
             get => _IsPaused;
-            private set
+            set
             {
                 if (_IsPaused != value)
                 {

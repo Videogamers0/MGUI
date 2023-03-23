@@ -76,6 +76,8 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private TimeSpan _Elapsed;
+        /// <summary>The amount of time that has passed while this <see cref="MGStopwatch"/> was active.<para/>
+        /// See also: <see cref="IsRunning"/></summary>
         public TimeSpan Elapsed
         {
             get => _Elapsed;
@@ -137,10 +139,11 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsRunning;
+        /// <summary>See also: <see cref="Start"/>, <see cref="Stop"/>, <see cref="Started"/>, <see cref="Stopped"/>, <see cref="ResetAndStart"/>, <see cref="ResetAndStop"/></summary>
         public bool IsRunning
         {
             get => _IsRunning;
-            private set
+            set
             {
                 if (_IsRunning != value)
                 {

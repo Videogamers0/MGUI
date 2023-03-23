@@ -83,7 +83,7 @@
         <!-- I.E. the event doesn't 'fall through' to whatever is underneath -->
         <InputConsumer HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8" Background="White * 0.25" Width="200" Height="200">
             <!-- This Border reserves space on the UI. You could then retrieve the Border via Window.GetElementByName<MGBorder>("MinimapPresenter") -->
-            <!-- and subscribe to its OnEndingDraw event to draw your own custom minimap graphics or something. Or maybe you'd use an Image as its Content and update the Image's Texture every frame  -->
+            <!-- and subscribe to its OnEndingDraw event to draw your own custom minimap graphics or something. Or maybe you'd use an Image as its Content and update the Image's Texture every frame -->
             <Border Name="MinimapPresenter" BorderBrush="Black" BorderThickness="2" Padding="10">
                 <TextBlock Text="Minimap Placeholder" FontSize="11" IsBold="True" HorizontalAlignment="Center" VerticalAlignment="Center" IsShadowed="True" ShadowColor="Gray" />
             </Border>

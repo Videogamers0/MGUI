@@ -112,12 +112,12 @@ namespace MGUI.Core.UI
                     if (e.IsLMB)
                     {
                         OnLeftClicked?.Invoke(this, e);
-                        e.SetHandledBy(this, false);
+                        e.SetHandledBy(this, false); // Avoid auto-handling left-clicks because some controls like MGComboBox react to inputs after the child button received it
                     }
                     else if (e.IsRMB)
                     {
                         OnRightClicked?.Invoke(this, e);
-                        //e.SetHandledBy(this, false);
+                        //e.SetHandledBy(this, false); // Avoid auto-handling right-clicks because it may prevent MGElement from opening ContextMenus
                     }
                 };
 
