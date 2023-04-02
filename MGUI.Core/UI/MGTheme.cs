@@ -170,6 +170,8 @@ namespace MGUI.Core.UI
         /// Default value: (6, 6)</summary>
         public Point ToolTipOffset { get; set; }
 
+        public VisualStateSetting<Color?> ToolTipTextForeground { get; set; }
+
         public ThemeFontSettings FontSettings { get; }
 
         public enum BuiltInTheme
@@ -234,7 +236,7 @@ namespace MGUI.Core.UI
 
             if (ThemeType != BuiltInTheme.Light_Gray)
             {
-                Color ToolTipBGColor = new(255, 255, 210);
+                Color ToolTipBGColor = new(56, 56, 56);
 
                 Color ListItemSelectedColor = Color.Yellow;
                 Color ListItemHoveredColor = Color.LightBlue;
@@ -411,10 +413,12 @@ namespace MGUI.Core.UI
                 ThemeManagedVisualStateFillBrush ToolTipBG =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
-                            (ToolTipBGColor * 0.75f).AsFillBrush(),
+                            (ToolTipBGColor * 0.85f).AsFillBrush(),
                             null, PressedModifierType.Darken, 0.06f)
                     );
                 _Backgrounds[MGElementType.ToolTip] = new ThemeManagedVisualStateFillBrush(ToolTipBG.GetValue(true));
+                Color ToolTipForegroundColor = new Color(240, 240, 240);
+                ToolTipTextForeground = new VisualStateSetting<Color?>(ToolTipForegroundColor, ToolTipForegroundColor, ToolTipForegroundColor);
 
                 //  Window
                 ThemeManagedVisualStateFillBrush WindowBG =
@@ -632,10 +636,12 @@ namespace MGUI.Core.UI
                 ThemeManagedVisualStateFillBrush ToolTipBG =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
-                            (new Color(255, 255, 210) * 0.75f).AsFillBrush(),
+                            (new Color(255, 255, 210) * 0.8f).AsFillBrush(),
                             null, PressedModifierType.Darken, 0.06f)
                     );
                 _Backgrounds[MGElementType.ToolTip] = new ThemeManagedVisualStateFillBrush(ToolTipBG.GetValue(true));
+                Color ToolTipForegroundColor = new Color(24, 24, 24);
+                ToolTipTextForeground = new VisualStateSetting<Color?>(ToolTipForegroundColor, ToolTipForegroundColor, ToolTipForegroundColor);
 
                 //  Window
                 IFillBrush DimNeutralBackground = MGSolidFillBrush.LightGray;

@@ -78,14 +78,16 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
+                MGTheme ActualTheme = (this.Theme ?? Window.GetTheme());
+
                 this.Host = Host;
                 this.BorderBrush = Color.Black.AsFillBrush().AsUniformBorderBrush();
                 this.BorderThickness = new(2);
-                this.DrawOffset = (this.Theme ?? Window.GetTheme()).ToolTipOffset;
-                //this.DefaultTextForeground = Color.White;
+                this.DrawOffset = ActualTheme.ToolTipOffset;
                 this.ShowOnDisabled = false;
                 this.ShowDelayOverride = null;
-                this.Padding = new(5);
+                this.DefaultTextForeground = ActualTheme.ToolTipTextForeground.GetCopy();
+                this.Padding = new(6,3);
                 this.MinWidth = 10;
                 this.MinHeight = 10;
                 this.IsUserResizable = false;

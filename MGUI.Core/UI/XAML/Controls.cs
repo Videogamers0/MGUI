@@ -1883,7 +1883,7 @@ namespace MGUI.Core.UI.XAML
                 ToolTip ToolTip = new();
                 ToolTip.Padding = new(6, 3);
                 ToolTip.Content = new TextBlock() { Text = stringValue };
-                ToolTip.Background = new SolidFillBrush(new XAMLColor(56, 56, 56, 212));
+                ToolTip.Background = new SolidFillBrush(new XAMLColor(56, 56, 56, 218));
                 ToolTip.TextForeground = new XAMLColor(240, 240, 240);
                 return ToolTip;
             }

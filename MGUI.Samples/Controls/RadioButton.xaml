@@ -96,13 +96,13 @@
                     <RadioButton Content="c++" />
                     <RadioButton Content="javascript">
                         <RadioButton.ToolTip>
-                            <ToolTip Background="rgb(56,56,56,212)" TextForeground="rgb(240,240,240)" Padding="6,3" 
+                            <ToolTip Background="rgb(56,56,56,218)" TextForeground="rgb(240,240,240)" Padding="6,3" 
                                      Content="If you choose this, you are a psychopath" ShowDelay="00:00:00.03" />
                         </RadioButton.ToolTip>
                     </RadioButton>
                     <RadioButton Content="brainfuck">
                         <RadioButton.ToolTip>
-                            <ToolTip Background="rgb(56,56,56,212)" TextForeground="rgb(240,240,240)" Padding="6,3" 
+                            <ToolTip Background="rgb(56,56,56,218)" TextForeground="rgb(240,240,240)" Padding="6,3" 
                                      Content="If you choose this, you are a psychopath. But at least you didn't pick JavaScript..." ShowDelay="00:00:00.03" />
                         </RadioButton.ToolTip>
                     </RadioButton>

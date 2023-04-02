@@ -60,7 +60,7 @@ namespace MGUI.Core.UI.Data_Binding.Converters
             {
                 MGToolTip ToolTip = new(Host.SelfOrParentWindow, Host, 0, 0);
                 ToolTip.Padding = new(6, 3);
-                ToolTip.BackgroundBrush.NormalValue = new Color(56, 56, 56, 212).AsFillBrush();
+                ToolTip.BackgroundBrush.NormalValue = new Color(56, 56, 56, 218).AsFillBrush();
                 ToolTip.DefaultTextForeground.NormalValue = new(240, 240, 240);
                 MGTextBlock Content = new(Host.SelfOrParentWindow, Value);
                 ToolTip.SetContent(Content);

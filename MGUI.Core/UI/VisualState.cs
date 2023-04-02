@@ -120,6 +120,8 @@ namespace MGUI.Core.UI
             this.SelectedValue = SelectedValue;
             this.DisabledValue = DisabledValue;
         }
+
+        public VisualStateSetting<TDataType> GetCopy() => new(NormalValue, SelectedValue, DisabledValue);
     }
 
     public enum PressedModifierType

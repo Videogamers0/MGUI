@@ -17,12 +17,23 @@ namespace MGUI.Core.UI.Data_Binding.Converters
 {
     public class StringToToolTipConverter : MarkupExtension, IValueConverter
     {
-        //TODO a convenient way to specify a set of common settings:
-        //static readonly Dictionary<string, Action<MGToolTip, MGTextBlock> _Styles
-        //IReadOnlyDictionary<string, Action<MGToolTip, MGTextBlock>> Styles => _Styles
-        //AddNamedStyle(string Name, Action...)
-        //string Preset (uses a named key in Styles, invokes the action on the tooltip/textblock at start of the Convert method.)
+        private static readonly Dictionary<string, Action<MGToolTip, MGTextBlock>> _Styles;
+        /// <summary>See also:<br/>
+        /// <see cref="AddNamedStyle(string, Action{MGToolTip, MGTextBlock})"/><br/>
+        /// <see cref="RemoveNamedStyle(string)"/></summary>
+        public static IReadOnlyDictionary<string, Action<MGToolTip, MGTextBlock>> Styles => _Styles;
+        /// <summary>Adds a named style to <see cref="Styles"/> so that it can be re-used and referenced via <see cref="StylePreset"/>.<para/>
+        /// See also: <see cref="RemoveNamedStyle(string)"/></summary>
+        public static void AddNamedStyle(string Name, Action<MGToolTip, MGTextBlock> Style) => _Styles.Add(Name, Style);
+        public static bool RemoveNamedStyle(string Name) => _Styles.Remove(Name);
 
+        /// <summary>If specified, the style with this name in <see cref="Styles"/> will be applied to the generated <see cref="MGToolTip"/> 
+        /// when converting from a string value to a <see cref="MGToolTip"/>.<para/>
+        /// This style is applied first, before any other properties such as <see cref="Background"/> or <see cref="FontSize"/> are resolved.</summary>
+        public string StylePreset { get; set; }
+
+        //  This property is automatically set when processing the XAML DataBindings in MGUI.Core.UI.XAML.Element.ProcessBindings(...)
+        /// <summary>The UI element that the generated <see cref="MGToolTip"/> will be applied to.</summary>
         public MGElement Host { get; internal set; }
 
         public Thickness? Padding { get; set; }
@@ -66,6 +77,9 @@ namespace MGUI.Core.UI.Data_Binding.Converters
             {
                 MGToolTip ToolTip = StringToToolTipTypeConverter.ToToolTip(Host, StringValue);
                 MGTextBlock TextBlock = ToolTip.Content as MGTextBlock;
+
+                if (!string.IsNullOrEmpty(StylePreset) && _Styles.TryGetValue(StylePreset, out var DefaultStyle))
+                    DefaultStyle?.Invoke(ToolTip, TextBlock);
 
                 if (Padding.HasValue)
                     ToolTip.Padding = Padding.Value.ToThickness();
