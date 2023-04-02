@@ -183,17 +183,28 @@ namespace MGUI.Samples.Dialogs
 
             ActiveBuffs = new()
             {
-                new(Desktop, "Deathtouch", TimeSpan.FromMinutes(10.0), Desktop.NamedRegions["Buff_Deathtouch"], "+5% insta-kill"),
+                new(Desktop, "Deathtouch", TimeSpan.FromMinutes(1.0), Desktop.NamedRegions["Buff_Deathtouch"], "+5% insta-kill"),
                 new(Desktop, "Bone Plating", TimeSpan.FromMinutes(15.0), Desktop.NamedRegions["Buff_BonePlating"], "+25% DEF"),
                 new(Desktop, "Precision", TimeSpan.FromMinutes(8.0), Desktop.NamedRegions["Buff_Precision"], "+15% ACC"),
                 new(Desktop, "Voidguard", TimeSpan.FromMinutes(5.0), Desktop.NamedRegions["Buff_Voidguard"], "+25% M.DEF"),
                 new(Desktop, "Reflect", TimeSpan.FromMinutes(5.0), Desktop.NamedRegions["Buff_Reflect"], "+20% Dmg Reflect"),
                 new(Desktop, "Lucky", TimeSpan.FromMinutes(20.0), Desktop.NamedRegions["Diamond"], "+25% Rare item drop rate")
             };
-            //TODO Remove buffs when its RemainingDuration hits zero.
 
             MGListBox<PlayerBuff> BuffsList = Window.GetElementByName<MGListBox<PlayerBuff>>("BuffsList");
             BuffsList.SetItemsSource(ActiveBuffs);
+
+            //  Remove buffs from the list when they expire
+            //  (Since the ItemsSource is an ObservableCollection, the UI will automatically update to remove from the list when the bound collection changes)
+            void OnBuffExpired(object Sender, PlayerBuff Buff)
+            {
+                ActiveBuffs.Remove(Buff);
+                Buff.OnExpired -= OnBuffExpired;
+            }
+            foreach (PlayerBuff Buff in ActiveBuffs)
+            {
+                Buff.OnExpired += OnBuffExpired;
+            }
 
             Window.WindowDataContext = this;
         }
@@ -211,16 +222,42 @@ namespace MGUI.Samples.Dialogs
     {
         private MGDesktop Desktop { get; }
         public string Name { get; }
-        public TimeSpan RemainingDuration { get; }
+        public string Description { get; }
+
         public NamedTextureRegion Icon { get; }
         public Rectangle? IconSourceRect => Icon.SourceRect;
         public Texture2D IconTexture => Desktop.NamedTextures[Icon.TextureName];
-        public string Description { get; }
+
+        public TimeSpan TotalDuration { get; }
+
+        private TimeSpan _RemainingDuration;
+        public TimeSpan RemainingDuration
+        {
+            get => _RemainingDuration;
+            set
+            {
+                if (_RemainingDuration != value)
+                {
+                    TimeSpan Previous = _RemainingDuration;
+                    _RemainingDuration = value;
+                    NPC(nameof(RemainingDuration));
+                    if (Previous > TimeSpan.Zero && RemainingDuration <= TimeSpan.Zero)
+                    {
+                        OnExpired?.Invoke(this, this);
+                    }
+                }
+            }
+        }
+        
+        /// <summary>Invoked when <see cref="RemainingDuration"/> changes from > 0 to <= 0.<br/>
+        /// This event is not repeatedly invoked if the duration continues to tick down to smaller negative values.</summary>
+        public event EventHandler<PlayerBuff> OnExpired;
 
         public PlayerBuff(MGDesktop Desktop, string Name, TimeSpan Duration, NamedTextureRegion Icon, string Description)
         {
             this.Desktop = Desktop;
             this.Name = Name;
+            this.TotalDuration = Duration;
             this.RemainingDuration = Duration;
             this.Icon = Icon;
             this.Description = Description;

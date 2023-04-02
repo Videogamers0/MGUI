@@ -1,4 +1,5 @@
 ﻿using MGUI.Core.UI.Data_Binding;
+using MGUI.Core.UI.Data_Binding.Converters;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -321,6 +322,9 @@ namespace MGUI.Core.UI.XAML
                         {
                             PostProcessedBinding = Binding with { TargetPath = ActualPath };
                         }
+
+                        if (PostProcessedBinding.Converter is StringToToolTipConverter StringToolTipConverter)
+                            StringToolTipConverter.Host = Element;
 
                         DataBindingManager.AddBinding(PostProcessedBinding, TargetObject);
                     }

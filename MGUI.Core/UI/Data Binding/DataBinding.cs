@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Globalization;
+using MGUI.Core.UI.Data_Binding.Converters;
 
 #if UseWPF
 using System.Windows.Data;
@@ -390,7 +391,10 @@ namespace MGUI.Core.UI.Data_Binding
                 TargetPropertyType ??= GetUnderlyingType(TargetProperty);
 
                 if (ConverterSettings.HasValue)
+                {
                     Value = ConverterSettings.Value.Apply(Value, TargetPropertyType);
+                    SourceType = Value?.GetType() ?? typeof(object);
+                }
 
                 if ((Value == null && !TargetPropertyType.IsValueType) ||
                     (Value != null && IsAssignableOrConvertible(SourceType, TargetPropertyType)))
@@ -419,13 +423,14 @@ namespace MGUI.Core.UI.Data_Binding
 
                 object Value = SourceProperty.GetValue(SourceObject);
                 if (ConverterSettings.HasValue)
-                    Value = ConverterSettings.Value.Apply(Value, TargetPropertyType);
-
-                bool CanAssign = IsAssignable(SourcePropertyType, TargetPropertyType);
-                bool CanConvert = IsConvertible(SourcePropertyType, TargetPropertyType);
-                if (ConverterSettings.HasValue || CanAssign || CanConvert)
                 {
-                    object ActualValue = ConvertValue(Context, SourcePropertyType, TargetPropertyType, Value, CanAssign, StringFormat);
+                    Value = ConverterSettings.Value.Apply(Value, TargetPropertyType);
+                    SourcePropertyType = Value?.GetType() ?? typeof(object);
+                }
+
+                if (ConverterSettings.HasValue || IsAssignableOrConvertible(SourcePropertyType, TargetPropertyType))
+                {
+                    object ActualValue = ConvertValue(Context, SourcePropertyType, TargetPropertyType, Value, null, StringFormat);
                     try { TargetProperty.SetValue(TargetObject, ActualValue); }
                     catch (Exception ex) { Debug.WriteLine(ex); }
                     return true;
@@ -529,9 +534,16 @@ namespace MGUI.Core.UI.Data_Binding
             //  Apply some default TypeConverters such as being able to convert a string to a Microsoft.Xna.Framework.Color
             foreach (KeyValuePair<Type, Type> KVP in BuiltInTypeConverters)
             {
-                TypeDescriptor.AddAttributes(KVP.Key, new TypeConverterAttribute(KVP.Value));
+                RegisterDefaultTypeConverter(KVP.Key, KVP.Value);
             }
         }
+
+        /// <summary>Registers the given <see cref="TypeConverter"/> as the default converter to use when converting to the given <paramref name="TargetType"/></summary>
+        public static void RegisterDefaultTypeConverter(Type TargetType, Type TypeConverter)
+            => RegisterDefaultTypeConverter(TargetType, new TypeConverterAttribute(TypeConverter));
+        /// <summary>Registers the given <see cref="TypeConverter"/> as the default converter to use when converting to the given <paramref name="TargetType"/></summary>
+        public static void RegisterDefaultTypeConverter(Type TargetType, TypeConverterAttribute TypeConverter)
+            => TypeDescriptor.AddAttributes(TargetType, TypeConverter);
 
         private static readonly Dictionary<Type, TypeConverter> CachedConverters = new();
         private static TypeConverter GetConverter(Type Type)

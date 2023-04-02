@@ -31,11 +31,11 @@ namespace MGUI.Core.UI
 
         /// <summary>A <see cref="MouseHandler"/> that is updated at the start of <see cref="Update()"/>, before any <see cref="MGWindow"/>s in <see cref="Windows"/> are updated.<br/>
         /// Objects that subscribe to this handler's mouse events will be the very first to receive and handle the event.<para/>
-        /// Highly recommended to avoid using this unless absolutely necessary, and if you do use it, you probably shouldn't call e.SetHandled(...) so other elements can still receive the input.</summary>
+        /// Highly recommended to avoid using this unless absolutely necessary, and if you do use it, you probably shouldn't call e.SetHandledBy(...) so other elements can still receive the input.</summary>
         public MouseHandler HighPriorityMouseHandler { get; }
         /// <summary>A <see cref="KeyboardHandler"/> that is updated at the start of <see cref="Update()"/>, before any <see cref="MGWindow"/>s in <see cref="Windows"/> are updated.<br/>
         /// Objects that subscribe to this handler's keyboard events will be the very first to receive and handle the event.<para/>
-        /// Highly recommended to avoid using this unless absolutely necessary, and if you do use it, you probably shouldn't call e.SetHandled(...) so other elements can still receive the input.</summary>
+        /// Highly recommended to avoid using this unless absolutely necessary, and if you do use it, you probably shouldn't call e.SetHandledBy(...) so other elements can still receive the input.</summary>
         public KeyboardHandler HighPriorityKeyboardHandler { get; }
 
         bool IMouseViewport.IsInside(Vector2 Position) => ValidScreenBounds.ContainsInclusive(Position);

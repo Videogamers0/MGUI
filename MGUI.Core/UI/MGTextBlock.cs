@@ -22,12 +22,12 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _FontFamily;
         /// <summary>To set this value, use <see cref="TrySetFont(string, int)"/></summary>
-        public string FontFamily { get => _FontFamily; }
+        public string FontFamily { get => _FontFamily; set => _ = TrySetFont(value, FontSize); }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _FontSize;
-        /// <summary>To set this value, use <see cref="TrySetFont(string, int)"/></summary>
-        public int FontSize { get => _FontSize; }
+        /// <summary>To set this value, use <see cref="TrySetFont(string, int)"/> or <see cref="TrySetFontSize(int)"/></summary>
+        public int FontSize { get => _FontSize; set => _ = TrySetFontSize(value); }
 
         internal float FontScale { get; private set; }
         internal Vector2 FontOrigin { get; private set; }
@@ -77,6 +77,9 @@ namespace MGUI.Core.UI
         {
             if (this.FontFamily != FontFamily || this.FontSize != FontSize)
             {
+                string PreviousFontFamily = FontFamily;
+                int PreviousFontSize = FontSize;
+
                 if (!GetDesktop().FontManager.TryGetFont(FontFamily, CustomFontStyles.Normal, FontSize, true, out FontSet FS, out SpriteFont Font, out int Size, out float ExactScale, out float SuggestedScale))
                     return false;
 
@@ -100,8 +103,10 @@ namespace MGUI.Core.UI
 
                 InvokeLayoutChanged();
 
-                NPC(nameof(FontFamily));
-                NPC(nameof(FontSize));
+                if (PreviousFontFamily != this.FontFamily)
+                    NPC(nameof(FontFamily));
+                if (PreviousFontSize != this.FontSize)
+                    NPC(nameof(FontSize));
 
                 return true;
             }

@@ -1,6 +1,7 @@
 <Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:MGUI.Samples.Dialogs;assembly=MGUI.Samples"
+        xmlns:Converters="clr-namespace:MGUI.Core.UI.Data_Binding.Converters;assembly=MGUI.Core"
         Left="0" Top="0" SizeToContent="WidthAndHeight" WindowStyle="None" AllowsClickThrough="True" IsTopmost="True">
     <Grid RowLengths="*" ColumnLengths="*">
         
@@ -107,7 +108,8 @@
                 </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
                     <ContentTemplate>
-                        <StackPanel Orientation="Horizontal" Spacing="5">
+                        <StackPanel Orientation="Horizontal" Spacing="5" 
+                                    ToolTip="{MGBinding Path=Description, Mode=OneWay, Converter={Converters:StringToToolTipConverter ShowDelay='0:00:00.065', FontSize=9, IsBold=True}}">
                             <StackPanel.Styles>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Foreground" Value="rgb(240,180,60)" />
@@ -116,16 +118,9 @@
                                 </Style>
                             </StackPanel.Styles>
 
-                            <StackPanel.ToolTip>
-                                <ToolTip SizeToContent="WidthAndHeight" Background="rgb(56,56,56,212)" Padding="6,3" 
-                                         TextForeground="rgb(240,240,240)" ShowDelay="0:00:00.065">
-                                    <TextBlock FontSize="9" IsBold="True" Text="{MGBinding Path=Description}" />
-                                </ToolTip>
-                            </StackPanel.ToolTip>
-                            
                             <Image VerticalAlignment="Center" Width="16" Height="16" Texture="{MGBinding Path=IconTexture, Mode=OneTime}" SourceRect="{MGBinding Path=IconSourceRect, Mode=OneTime}" />
                             <Timer VerticalAlignment="Center" ValueDisplayFormat="{}{{RemainingDuration}}" RemainingDurationStringFormat="m\:ss"
-                                   RemainingDuration="{MGBinding Path=RemainingDuration}" Background="Transparent" BorderThickness="0" IsPaused="False" MinWidth="40"
+                                   RemainingDuration="{MGBinding Path=RemainingDuration, Mode=TwoWay}" Background="Transparent" BorderThickness="0" IsPaused="False" MinWidth="40"
                                    HorizontalContentAlignment="Right">
                                 <Timer.Value>
                                     <TextBlock IsBold="True" FontSize="9" />

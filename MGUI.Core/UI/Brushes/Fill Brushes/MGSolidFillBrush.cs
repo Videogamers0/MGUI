@@ -10,6 +10,7 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
 {
     public static class ColorExtensions
     {
+        /// <summary>Converts this <see cref="Color"/> into an <see cref="MGSolidFillBrush"/></summary>
         public static MGSolidFillBrush AsFillBrush(this Color @this) => new(@this);
     }
 

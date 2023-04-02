@@ -9,9 +9,11 @@ using System.Linq;
 using MonoGame.Extended;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using System.Diagnostics;
+using MGUI.Core.UI.Data_Binding.Converters;
 
 namespace MGUI.Core.UI
 {
+    [TypeConverter(typeof(StringToToolTipTypeConverter))]
     public class MGToolTip : MGWindow
     {
         public MGElement Host { get; }
