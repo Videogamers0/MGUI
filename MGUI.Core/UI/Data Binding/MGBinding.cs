@@ -56,6 +56,7 @@ namespace MGUI.Core.UI.XAML
             string.IsNullOrEmpty(ElementName) ? ISourceObjectResolver.FromSelf() : ISourceObjectResolver.FromElementName(ElementName);
 
         public MGBinding() { }
+        public MGBinding(string Path) { this.Path = Path; }
 
         //  If binding using ElementName, user probably wants to bind directly to that object instead of to it's DataContext.
         private DataContextResolver ActualDataContextResolver =>

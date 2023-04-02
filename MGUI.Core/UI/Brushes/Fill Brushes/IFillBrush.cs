@@ -140,6 +140,8 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
                 string colorName = Value.Substring(0, asteriskIndex).Trim();
                 DrawingColor color = ParseDrawingColor(colorName);
                 string opacityScalarString = Value.Substring(asteriskIndex + 1).Trim();
+                if (opacityScalarString.EndsWith("f", StringComparison.CurrentCultureIgnoreCase))
+                    opacityScalarString = opacityScalarString[..^1];
                 float opacityScalar = float.Parse(opacityScalarString);
 
                 return new Color(color.R, color.G, color.B, color.A) * opacityScalar;

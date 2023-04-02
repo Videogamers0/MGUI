@@ -133,6 +133,20 @@
             </ListBox>
         </Border>
 
-        <!-- TODO samples such as toolbar in bottom center, game time clock above minimap, recent item drops bottomright, special abilities with cooldowns bottom-left etc -->
+        <!-- ToolBar -->
+        <Border BorderBrush="Black" BorderThickness="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="24">
+            <UniformGrid Name="UniformGrid_ToolBar" Rows="1" Columns="{MGBinding ToolBar.NumSlots, Mode=OneWay}" CellSize="64,64"
+                         SelectionMode="Cell" SelectedBackground="Yellow * 0.15f">
+                <UniformGrid.CellBackground>
+                    <BorderedFillBrush BorderThickness="3" PadFillBoundsByBorderThickness="True" FillBrush="rgb(140,140,140) * 0.8">
+                        <BorderedFillBrush.BorderBrush>
+                            <DockedBorderBrush Left="rgb(112,112,112)" Top="rgb(70,70,70)" Right="rgb(70,70,70)" Bottom="rgb(112,112,112)" />
+                        </BorderedFillBrush.BorderBrush>
+                    </BorderedFillBrush>
+                </UniformGrid.CellBackground>
+            </UniformGrid>
+        </Border>
+
+        <!-- TODO samples such as game time clock above minimap, recent item drops bottomright, special abilities with cooldowns bottom-left, dialoguebox center etc -->
     </Grid>
 </Window>

@@ -250,7 +250,7 @@ namespace MGUI.Shared.Rendering
             => StrokeAndFillRectangle(Origin, Destination, StrokeColor, FillColor, new Thickness(StrokeThickness), PreferredContext);
         public void StrokeAndFillRectangle(Vector2 Origin, RectangleF Destination, Color StrokeColor, Color FillColor, Thickness StrokeThickness, DrawContext? PreferredContext = null)
         {
-            FillRectangle(Origin, Destination, FillColor, PreferredContext);
+            FillRectangle(Origin, Destination.GetCompressed(StrokeThickness), FillColor, PreferredContext);
             StrokeRectangle(Origin, Destination, StrokeColor, StrokeThickness, PreferredContext);
         }
 
@@ -263,27 +263,28 @@ namespace MGUI.Shared.Rendering
             BeginDraw(Ctx);
 
             float LeftEdgeWidth = Math.Min(Thickness.Left, Destination.Width);
+            float TopEdgeHeight = Math.Min(Thickness.Top, Destination.Height);
+            float RightEdgeWidth = Math.Min(Thickness.Right, Destination.Width);
+            float BottomEdgeHeight = Math.Min(Thickness.Bottom, Destination.Height);
+
             if (LeftEdgeWidth > 0.0f && !LeftEdgeWidth.IsAlmostZero())
             {
-                RectangleF LeftEdge = new(Destination.Left, Destination.Top, LeftEdgeWidth, Destination.Height);
+                RectangleF LeftEdge = new(Destination.Left, Destination.Top + TopEdgeHeight, LeftEdgeWidth, Destination.Height - TopEdgeHeight - BottomEdgeHeight);
                 FillRectangle(Origin, LeftEdge, Color, Ctx);
             }
 
-            float TopEdgeHeight = Math.Min(Thickness.Top, Destination.Height);
             if (TopEdgeHeight > 0.0f && !TopEdgeHeight.IsAlmostZero())
             {
                 RectangleF TopEdge = new(Destination.Left, Destination.Top, Destination.Width, TopEdgeHeight);
                 FillRectangle(Origin, TopEdge, Color, Ctx);
             }
 
-            float RightEdgeWidth = Math.Min(Thickness.Right, Destination.Width);
             if (RightEdgeWidth > 0.0f && !RightEdgeWidth.IsAlmostZero())
             {
-                RectangleF RightEdge = new(Destination.Right - RightEdgeWidth, Destination.Top, RightEdgeWidth, Destination.Height);
+                RectangleF RightEdge = new(Destination.Right - RightEdgeWidth, Destination.Top + TopEdgeHeight, RightEdgeWidth, Destination.Height - TopEdgeHeight - BottomEdgeHeight);
                 FillRectangle(Origin, RightEdge, Color, Ctx);
             }
 
-            float BottomEdgeHeight = Math.Min(Thickness.Bottom, Destination.Height);
             if (BottomEdgeHeight > 0.0f && !BottomEdgeHeight.IsAlmostZero())
             {
                 RectangleF BottomEdge = new(Destination.Left, Destination.Bottom - BottomEdgeHeight, Destination.Width, BottomEdgeHeight);

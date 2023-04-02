@@ -600,7 +600,7 @@ namespace MGUI.Core.UI.Containers.Grids
             }
         }
 
-        private GridSelection? PreviousSelection = null;
+        private GridSelection? SelectionAtStartOfMousePress = null;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private GridSelection? _CurrentSelection;
@@ -649,9 +649,9 @@ namespace MGUI.Core.UI.Containers.Grids
             if (Cell.HasValue)
             {
                 bool ClickedExistingSelection = false;
-                if (HasSelection && PreviousSelection.HasValue)
+                if (HasSelection && SelectionAtStartOfMousePress.HasValue)
                 {
-                    GridCell PreviousCell = PreviousSelection.Value.Cell;
+                    GridCell PreviousCell = SelectionAtStartOfMousePress.Value.Cell;
                     GridCell CurrentCell = CurrentSelection.Value.Cell;
                     GridCell ClickedCell = Cell.Value;
 
@@ -897,7 +897,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     if (!ParentWindow.HasModalWindow)
                     {
-                        PreviousSelection = CurrentSelection;
+                        SelectionAtStartOfMousePress = CurrentSelection;
                         Point Position = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
                         UpdateSelection(Position, false);
                     }

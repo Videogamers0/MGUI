@@ -391,8 +391,25 @@ namespace MGUI.Core.UI.Containers.Grids
             }
         }
 
-        private StaticGridSelection? PreviousSelection = null;
-        public StaticGridSelection? CurrentSelection = null;
+        private StaticGridSelection? SelectionAtStartOfMousePress = null;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private StaticGridSelection? _CurrentSelection;
+        public StaticGridSelection? CurrentSelection
+        {
+            get => _CurrentSelection;
+            set
+            {
+                if (_CurrentSelection != value)
+                {
+                    _CurrentSelection = value;
+                    NPC(nameof(CurrentSelection));
+                    SelectionChanged?.Invoke(this, CurrentSelection);
+                }
+            }
+        }
+
+        public event EventHandler<StaticGridSelection?> SelectionChanged;
         public bool HasSelection => CurrentSelection.HasValue;
 
         private void UpdateSelection(Point MousePosition, bool AllowDeselect)
@@ -420,9 +437,9 @@ namespace MGUI.Core.UI.Containers.Grids
             if (Cell.HasValue)
             {
                 bool ClickedExistingSelection = false;
-                if (HasSelection && PreviousSelection.HasValue)
+                if (HasSelection && SelectionAtStartOfMousePress.HasValue)
                 {
-                    GridCellIndex PreviousCell = PreviousSelection.Value.Cell;
+                    GridCellIndex PreviousCell = SelectionAtStartOfMousePress.Value.Cell;
                     GridCellIndex CurrentCell = CurrentSelection.Value.Cell;
                     GridCellIndex ClickedCell = Cell.Value;
 
@@ -685,7 +702,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     if (!ParentWindow.HasModalWindow)
                     {
-                        PreviousSelection = CurrentSelection;
+                        SelectionAtStartOfMousePress = CurrentSelection;
                         Point Position = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
                         UpdateSelection(Position, false);
                     }

@@ -12,6 +12,9 @@ using System.Runtime.CompilerServices;
 using MGUI.Shared.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.ObjectModel;
+using MGUI.Core.UI.Containers.Grids;
+using MonoGame.Extended;
+using MGUI.Shared.Text;
 
 namespace MGUI.Samples.Dialogs
 {
@@ -142,12 +145,34 @@ namespace MGUI.Samples.Dialogs
 
         public ObservableCollection<PlayerBuff> ActiveBuffs { get; }
 
+        public PlayerToolBar ToolBar { get; }
+        private MGUniformGrid UIToolBar { get; }
+
         private static void InitializeResources(ContentManager Content, MGDesktop Desktop)
         {
-            const int TextureSpacing = 1;
-            const int TextureTopMargin = 166;
-            const int TextureIconSize = 12;
+            int TextureTopMargin = 6;
+            int TextureSpacing = 1;
+            int TextureIconSize = 16;
+
             List<(string Name, int Row, int Column)> Icons = new()
+            {
+                ("ToolBar_Dagger", 4, 5),
+                ("ToolBar_PickaxeShovel", 5, 9),
+                ("ToolBar_Backpack", 1, 11),
+                ("ToolBar_Medkit", 0, 6)
+            };
+
+            foreach (var (Name, Row, Column) in Icons)
+            {
+                Rectangle SourceRect = new(Column * (TextureIconSize + TextureSpacing), TextureTopMargin + Row * (TextureIconSize + TextureSpacing), TextureIconSize, TextureIconSize);
+                Desktop.AddNamedRegion(new("AngryMeteor", Name, SourceRect, null));
+            }
+
+            TextureSpacing = 1;
+            TextureTopMargin = 166;
+            TextureIconSize = 12;
+
+            Icons = new()
             {
                 ("HUD_HP", 1, 6),
                 ("HUD_MP", 1, 3),
@@ -158,6 +183,7 @@ namespace MGUI.Samples.Dialogs
                 ("Buff_Voidguard", 0, 3),
                 ("Buff_Reflect", 2, 6)
             };
+
             foreach (var (Name, Row, Column) in Icons)
             {
                 Rectangle SourceRect = new(Column * (TextureIconSize + TextureSpacing), TextureTopMargin + Row * (TextureIconSize + TextureSpacing), TextureIconSize, TextureIconSize);
@@ -205,6 +231,75 @@ namespace MGUI.Samples.Dialogs
             {
                 Buff.OnExpired += OnBuffExpired;
             }
+
+            this.ToolBar = new(Desktop, 10);
+
+            //  Create a few sample items and add them to the toolbar
+            Item Dagger = new(Desktop, "Diamond", "A small blade.", Desktop.NamedRegions["ToolBar_Dagger"]);
+            Item PickaxeShovel = new(Desktop, "Pickaxe and Shovel", "A set of useful tools.", Desktop.NamedRegions["ToolBar_PickaxeShovel"]);
+            Item Backpack = new(Desktop, "Knapsack", "A small pouch (Can hold up to 6 items).", Desktop.NamedRegions["ToolBar_Backpack"]);
+            Item Medkit = new(Desktop, "First-Aid kit", "Restores 50 HP", Desktop.NamedRegions["ToolBar_Medkit"]);
+            Item Diamond = new(Desktop, "Diamond", "A rare gem.", Desktop.NamedRegions["Diamond"]);
+            ToolBar.Slots[0].Item = new(Dagger, 1);
+            ToolBar.Slots[1].Item = new(PickaxeShovel, 1);
+            ToolBar.Slots[2].Item = new(Backpack, 1);
+            ToolBar.Slots[6].Item = new(Medkit, 2);
+            ToolBar.Slots[9].Item = new(Diamond, 5);
+
+            this.UIToolBar = Window.GetElementByName<MGUniformGrid>("UniformGrid_ToolBar");
+
+            UIToolBar.SelectionChanged += (sender, e) =>
+            {
+                if (!e.HasValue)
+                    ToolBar.SelectedSlot = null;
+                else
+                {
+                    int Index = e.Value.Cell.Row * UIToolBar.Rows + e.Value.Cell.Column;
+                    ToolBarSlot SelectedSlot = ToolBar.Slots[Index];
+                    SelectedSlot.IsSelected = true;
+                }
+            };
+
+            //  Apply custom drawing logic to each Cell in the ToolBar
+            UIToolBar.OnRenderCell += (sender, e) =>
+            {
+                DrawTransaction DT = e.DrawArgs.DT;
+
+                Rectangle ActualCellBounds = e.CellBounds.GetTranslated(e.DrawArgs.Offset);
+
+                int Index = e.CellIndex.Row * UIToolBar.Rows + e.CellIndex.Column;
+                ToolBarSlot Slot = ToolBar.Slots[Index];
+
+                //  Draw the item in this slot
+                if (Slot.Item != null)
+                {
+                    const int SlotBorderSize = 3;
+                    const int SlotPadding = 5;
+                    Rectangle ItemBounds = ActualCellBounds.GetCompressed(SlotBorderSize + SlotPadding);
+
+                    Desktop.TryDrawNamedRegion(DT, Slot.Item.Item.Icon.RegionName, ItemBounds);
+
+                    //  Draw the quantity in the bottom-right corner
+                    if (Slot.Item.Quantity > 1)
+                    {
+                        const string FontFamily = "Arial";
+                        const CustomFontStyles FontStyle = CustomFontStyles.Bold;
+                        const int FontSize = 11;
+
+                        string Text = Slot.Item.Quantity.ToString();
+                        Vector2 TextSize = DT.MeasureText(FontFamily, FontStyle, Text, FontSize);
+                        Vector2 Position = ActualCellBounds.GetCompressed(SlotBorderSize).BottomRight().ToVector2().Translate(-TextSize.X - 1, -TextSize.Y + 1);
+
+                        DT.DrawShadowedText(FontFamily, FontStyle, Text, Position, Color.White, new Color(40,40,40), FontSize);
+                    }
+                }
+
+                //  Draw a yellow border around the selected cell
+                if (Slot.IsSelected)
+                {
+                    DT.StrokeRectangle(e.DrawArgs.Offset.ToVector2(), e.CellBounds, Color.Yellow * 0.8f, new Thickness(3));
+                }
+            };
 
             Window.WindowDataContext = this;
         }
@@ -261,6 +356,105 @@ namespace MGUI.Samples.Dialogs
             this.RemainingDuration = Duration;
             this.Icon = Icon;
             this.Description = Description;
+        }
+    }
+
+    public class PlayerToolBar : ViewModelBase
+    {
+        public MGDesktop Desktop { get; }
+
+        public ReadOnlyCollection<ToolBarSlot> Slots { get; }
+        public int NumSlots => Slots.Count;
+
+        private ToolBarSlot _SelectedSlot;
+        public ToolBarSlot SelectedSlot
+        {
+            get => _SelectedSlot;
+            set
+            {
+                if (_SelectedSlot != value)
+                {
+                    ToolBarSlot Previous = SelectedSlot;
+                    _SelectedSlot = value;
+                    NPC(nameof(SelectedSlot));
+                    Previous?.NPC(nameof(ToolBarSlot.IsSelected));
+                    SelectedSlot?.NPC(nameof(ToolBarSlot.IsSelected));
+                }
+            }
+        }
+
+        public PlayerToolBar(MGDesktop Desktop, int Size)
+        {
+            this.Desktop = Desktop;
+            this.Slots = Enumerable.Range(0, Size).Select(x => new ToolBarSlot(this)).ToList().AsReadOnly();
+        }
+    }
+
+    public class ToolBarSlot : ViewModelBase
+    {
+        public PlayerToolBar ToolBar { get; }
+        public int Index => ToolBar.Slots.IndexOf(this);
+
+        public bool IsSelected
+        {
+            get => ToolBar.SelectedSlot == this;
+            set
+            {
+                if (value)
+                    ToolBar.SelectedSlot = this;
+                else if (!value && IsSelected)
+                    ToolBar.SelectedSlot = null;
+            }
+        }
+
+        private PlayerItem _Item;
+        public PlayerItem Item
+        {
+            get => _Item;
+            set
+            {
+                if (_Item != value)
+                {
+                    _Item = value;
+                    NPC(nameof(Item));
+                }
+            }
+        }
+
+        public ToolBarSlot(PlayerToolBar ToolBar)
+        {
+            this.ToolBar = ToolBar;
+        }
+    }
+
+    public readonly record struct Item(MGDesktop Desktop, string Name, string Description, NamedTextureRegion Icon)
+    {
+        public Rectangle? IconSourceRect => Icon.SourceRect;
+        public Texture2D IconTexture => Desktop.NamedTextures[Icon.TextureName];
+    }
+
+    public class PlayerItem : ViewModelBase
+    {
+        public Item Item { get; }
+
+        private int _Quantity;
+        public int Quantity
+        {
+            get => _Quantity;
+            set
+            {
+                if (_Quantity != value)
+                {
+                    _Quantity = value;
+                    NPC(nameof(Quantity));
+                }
+            }
+        }
+
+        public PlayerItem(Item Item, int Quantity)
+        {
+            this.Item = Item;
+            this.Quantity = Quantity;
         }
     }
 }
