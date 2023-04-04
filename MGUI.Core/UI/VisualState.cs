@@ -37,6 +37,7 @@ namespace MGUI.Core.UI
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]public bool IsPressed => Secondary == SecondaryVisualState.Pressed;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]public bool IsHovered => Secondary == SecondaryVisualState.Hovered;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]public bool IsPressedOrHovered => IsPressed || IsHovered;
 
         public SecondaryVisualState GetSecondaryState(bool SpoofIsPressed, bool SpoofIsHovered)
         {

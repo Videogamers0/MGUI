@@ -105,14 +105,11 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
+    //Make SelectedItems bindable in combobox/listbox/listview/grid/unfiromgrid
     //Fix issue where the parsed lines of text get screwed up when selecting empty lines of text in a TextBox.
     //Fix DataBinding to properties that dont have a corresponding property in their XAML class or where the property setter isn't public.
     //      Also some properties aren't exposed on the XAML classes like MGListBox.SelectedItem, so should make a property like SelectedItemBinding or something
     //      (so you can't explicitly set the value, but you can still initialize an MGBinding for it)
-    //Fix issue where tooltips appear while hovering objects in occluded windows.
-    //      So if mouse is hovering a window that appears earlier in the MGDesktop.Windows list, and that window doesn't allow clickthrough and has opacity>=1.0f,
-    //      then ignore the hover action on windows underneath it.
-    //make a default TypeConverter to convert strings to MGToolTips in XAML
     //maybe a way to register your own custom text markdown?
     //      RegisterFormattingCode(string Name, settings...)
     //'Resources' class? MGDesktop would have 1 reference to this instance.

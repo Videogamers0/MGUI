@@ -1081,28 +1081,31 @@ namespace MGUI.Core.UI
                             else if (IsDoublePress)
                             {
                                 int Index = CharInfo.IndexInOriginalText;
-                                bool ClickedWordCharacter = Regex.IsMatch(Text[Index].ToString(), @"\w");
-                                if (ClickedWordCharacter)
+                                if (Index >= 0 && Index < Text.Length)
                                 {
-                                    //  Get all word-characters to the left of the pressed character
-                                    int PreviousCharacters = Text.Substring(0, Index).Reverse().TakeWhile(x => Regex.IsMatch(x.ToString(), @"\w")).Count();
-                                    //  Get all word-characters to the right of the pressed character
-                                    int NextCharacters = Text.Skip(Index).TakeWhile(x => Regex.IsMatch(x.ToString(), @"\w")).Count();
+                                    bool ClickedWordCharacter = Regex.IsMatch(Text[Index].ToString(), @"\w");
+                                    if (ClickedWordCharacter)
+                                    {
+                                        //  Get all word-characters to the left of the pressed character
+                                        int PreviousCharacters = Text.Substring(0, Index).Reverse().TakeWhile(x => Regex.IsMatch(x.ToString(), @"\w")).Count();
+                                        //  Get all word-characters to the right of the pressed character
+                                        int NextCharacters = Text.Skip(Index).TakeWhile(x => Regex.IsMatch(x.ToString(), @"\w")).Count();
 
-                                    //  Also include the next space if it's the first non-word character we find while traversing to the right
-                                    if (CharInfo.IndexInOriginalText + NextCharacters < Text.Length && Text[CharInfo.IndexInOriginalText + NextCharacters] == ' ')
-                                        NextCharacters++;
+                                        //  Also include the next space if it's the first non-word character we find while traversing to the right
+                                        if (CharInfo.IndexInOriginalText + NextCharacters < Text.Length && Text[CharInfo.IndexInOriginalText + NextCharacters] == ' ')
+                                            NextCharacters++;
 
-                                    this.CurrentSelection = new(CharInfo.IndexInOriginalText - PreviousCharacters, Math.Min(Text.Length, CharInfo.IndexInOriginalText + NextCharacters));
-                                }
-                                else
-                                {
-                                    //  Get all non-word characters to the left of the pressed character
-                                    int PreviousCharacters = Text.Substring(0, Index).Reverse().TakeWhile(x => Regex.IsMatch(x.ToString(), @"\W")).Count();
-                                    //  Get all non-word characters to the right of the pressed character
-                                    int NextCharacters = Text.Skip(Index).TakeWhile(x => Regex.IsMatch(x.ToString(), @"\W")).Count();
+                                        this.CurrentSelection = new(CharInfo.IndexInOriginalText - PreviousCharacters, Math.Min(Text.Length, CharInfo.IndexInOriginalText + NextCharacters));
+                                    }
+                                    else
+                                    {
+                                        //  Get all non-word characters to the left of the pressed character
+                                        int PreviousCharacters = Text.Substring(0, Index).Reverse().TakeWhile(x => Regex.IsMatch(x.ToString(), @"\W")).Count();
+                                        //  Get all non-word characters to the right of the pressed character
+                                        int NextCharacters = Text.Skip(Index).TakeWhile(x => Regex.IsMatch(x.ToString(), @"\W")).Count();
 
-                                    this.CurrentSelection = new(CharInfo.IndexInOriginalText - PreviousCharacters, Math.Min(Text.Length, CharInfo.IndexInOriginalText + NextCharacters));
+                                        this.CurrentSelection = new(CharInfo.IndexInOriginalText - PreviousCharacters, Math.Min(Text.Length, CharInfo.IndexInOriginalText + NextCharacters));
+                                    }
                                 }
                             }
                         }
@@ -1113,6 +1116,12 @@ namespace MGUI.Core.UI
                     {
                         Debug.WriteLine(ex.Message + "\n" + ex.ToString());
                     }
+                };
+
+                MouseHandler.LMBReleasedInside += (sender, e) =>
+                {
+                    if (e.PressedArgs.HandledBy == this)
+                        e.SetHandledBy(this, false);
                 };
 
                 MouseHandler.DragStart += (sender, e) =>
@@ -1189,8 +1198,6 @@ namespace MGUI.Core.UI
                         LastKeyPress = null;
                     }
                 };
-
-
             }
         }
 

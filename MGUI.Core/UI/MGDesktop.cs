@@ -93,7 +93,7 @@ namespace MGUI.Core.UI
         internal MGToolTip QueuedToolTip { get; set; } = null;
 
         /// <summary>Default value: 0.4s</summary>
-        public static TimeSpan DefaultToolTipShowDelay { get; set; } = TimeSpan.FromSeconds(0.40);
+        public static TimeSpan DefaultToolTipShowDelay { get; set; } = TimeSpan.FromSeconds(0.30);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private TimeSpan _ToolTipShowDelay;
@@ -475,13 +475,51 @@ namespace MGUI.Core.UI
             ActiveContextMenu?.Update(UA);
             ActiveToolTip?.Update(UA.ChangeHitTestVisible(ActiveToolTip.ParentWindow.IsHitTestVisible));
 
+            bool IsWindowOccludedAtMousePos = false;
+
             foreach (MGWindow Window in Windows.Reverse<MGWindow>().OrderByDescending(x => x.IsTopmost))
             {
+                MGToolTip PreviousQueuedToolTip = QueuedToolTip;
+
                 Window.Update(UA);
+
+                //  Disallow occluded windows from overriding the active ToolTip
+                //  TODO probably also need similar logic in MGWindow.OnBeginUpdateContents in case it has nested window(s)
+                QueuedToolTip = IsWindowOccludedAtMousePos ? PreviousQueuedToolTip : QueuedToolTip;
+
+                //  The next window that we update is visually occluded at the current mouse position if the current window is being hovered,
+                //  since that means the mouse is hovering a window that is drawn overtop of the next window
+                if (!IsWindowOccludedAtMousePos && Window.VisualState.IsPressedOrHovered)
+                {
+                    if (!Window.AllowsClickThrough)
+                        IsWindowOccludedAtMousePos = true;
+                    else
+                    {
+                        //  Since this window DOES allow click-through, validate that at least one opaque element is being hovered
+                        MGElement OpaqueHoveredElement = FindFirstOpaqueParent(Window.HoveredElement, true);
+                        if (OpaqueHoveredElement != null && OpaqueHoveredElement != Window)
+                            IsWindowOccludedAtMousePos = true;
+                    }
+                }
             }
 
             this.ActiveToolTip = QueuedToolTip;
             this.FocusedKeyboardHandler = QueuedFocusedKeyboardHandler;
+        }
+
+        /// <summary>Traverses up the visual tree, starting from the given <paramref name="Element"/>, looking for an <see cref="MGElement"/> that is fully opaque (<see cref="MGElement.Opacity"/> >= 1.0f)</summary>
+        /// <param name="IncludeSelf">If true, this method may return the input <paramref name="Element"/>. If false, starts checking for valid matches from the input's <see cref="MGElement.Parent"/></param>
+        private static MGElement FindFirstOpaqueParent(MGElement Element, bool IncludeSelf)
+        {
+            MGElement Current = IncludeSelf ? Element : Element?.Parent;
+            while (Current != null)
+            {
+                if (Current.Opacity >= 1f || Current.Opacity.IsAlmostEqual(1f))
+                    return Current;
+                else
+                    Current = Current.Parent;
+            }
+            return null;
         }
 
         public void Draw(DrawTransaction DT, float Opacity = 1.0f)

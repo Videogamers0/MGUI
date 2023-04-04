@@ -91,61 +91,65 @@
         </InputConsumer>
 
         <!-- Player Active Buffs -->
-        <Border BorderThickness="0" Padding="6" Margin="8" Background="Black * 0.6" HorizontalAlignment="Left" VerticalAlignment="Center">
-            <ListBox Name="BuffsList" ItemType="{x:Type local:PlayerBuff}" SelectionMode="None" Background="Transparent"
+        <InputConsumer HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8">
+            <Border BorderThickness="0" Padding="6" Background="Black * 0.6">
+                <ListBox Name="BuffsList" ItemType="{x:Type local:PlayerBuff}" SelectionMode="None" Background="Transparent"
                      OuterBorderThickness="0" InnerBorderThickness="0" ItemsPanelBorderThickness="0">
-                <ListBox.AlternatingRowBackgrounds>
-                    <SolidFillBrush Color="White * 0.15" />
-                </ListBox.AlternatingRowBackgrounds>
-                <ListBox.TitleBorder>
-                    <Border Background="Transparent" BackgroundFocusedColor="Transparent" BorderThickness="0" />
-                </ListBox.TitleBorder>
-                <ListBox.Header>
-                    <TextBlock IsBold="True" FontSize="11" HorizontalAlignment="Center" Text="Active Buffs:" Foreground="rgb(240,180,60)" IsShadowed="True" ShadowColor="Black" />
-                </ListBox.Header>
-                <ListBox.ItemContainerStyle>
-                    <Border BorderThickness="0" Margin="0,2" Padding="5,1" BackgroundFocusedColor="White * 0.1" />
-                </ListBox.ItemContainerStyle>
-                <ListBox.ItemTemplate>
-                    <ContentTemplate>
-                        <StackPanel Orientation="Horizontal" Spacing="5" 
-                                    ToolTip="{MGBinding Path=Description, Mode=OneWay, Converter={Converters:StringToToolTipConverter ShowDelay='0:00:00.065', FontSize=9, IsBold=True}}">
-                            <StackPanel.Styles>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="rgb(240,180,60)" />
-                                    <Setter Property="IsShadowed" Value="True" />
-                                    <Setter Property="ShadowColor" Value="Black" />
-                                </Style>
-                            </StackPanel.Styles>
+                    <ListBox.AlternatingRowBackgrounds>
+                        <SolidFillBrush Color="White * 0.15" />
+                    </ListBox.AlternatingRowBackgrounds>
+                    <ListBox.TitleBorder>
+                        <Border Background="Transparent" BackgroundFocusedColor="Transparent" BorderThickness="0" />
+                    </ListBox.TitleBorder>
+                    <ListBox.Header>
+                        <TextBlock IsBold="True" FontSize="11" HorizontalAlignment="Center" Text="Active Buffs:" Foreground="rgb(240,180,60)" IsShadowed="True" ShadowColor="Black" />
+                    </ListBox.Header>
+                    <ListBox.ItemContainerStyle>
+                        <Border BorderThickness="0" Margin="0,2" Padding="5,1" BackgroundFocusedColor="White * 0.1" />
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <ContentTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="5" 
+                                        ToolTip="{MGBinding Path=Description, Mode=OneWay, Converter={Converters:StringToToolTipConverter ShowDelay='0:00:00.065', FontSize=9, IsBold=True}}">
+                                <StackPanel.Styles>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="rgb(240,180,60)" />
+                                        <Setter Property="IsShadowed" Value="True" />
+                                        <Setter Property="ShadowColor" Value="Black" />
+                                    </Style>
+                                </StackPanel.Styles>
 
-                            <Image VerticalAlignment="Center" Width="16" Height="16" Texture="{MGBinding Path=IconTexture, Mode=OneTime}" SourceRect="{MGBinding Path=IconSourceRect, Mode=OneTime}" />
-                            <Timer VerticalAlignment="Center" ValueDisplayFormat="{}{{RemainingDuration}}" RemainingDurationStringFormat="m\:ss"
-                                   RemainingDuration="{MGBinding Path=RemainingDuration, Mode=TwoWay}" Background="Transparent" BorderThickness="0" IsPaused="False" MinWidth="40"
-                                   HorizontalContentAlignment="Right">
-                                <Timer.Value>
-                                    <TextBlock IsBold="True" FontSize="9" />
-                                </Timer.Value>
-                            </Timer>
-                            <TextBlock VerticalAlignment="Center" IsBold="True" FontSize="9" Text="{MGBinding Path=Name}" />
-                        </StackPanel>
-                    </ContentTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </Border>
+                                <Image VerticalAlignment="Center" Width="16" Height="16" Texture="{MGBinding Path=IconTexture, Mode=OneTime}" SourceRect="{MGBinding Path=IconSourceRect, Mode=OneTime}" />
+                                <Timer VerticalAlignment="Center" ValueDisplayFormat="{}{{RemainingDuration}}" RemainingDurationStringFormat="m\:ss"
+                                       RemainingDuration="{MGBinding Path=RemainingDuration, Mode=TwoWay}" Background="Transparent" BorderThickness="0" IsPaused="False" MinWidth="40"
+                                       HorizontalContentAlignment="Right">
+                                    <Timer.Value>
+                                        <TextBlock IsBold="True" FontSize="9" />
+                                    </Timer.Value>
+                                </Timer>
+                                <TextBlock VerticalAlignment="Center" IsBold="True" FontSize="9" Text="{MGBinding Path=Name}" />
+                            </StackPanel>
+                        </ContentTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+        </InputConsumer>
 
         <!-- ToolBar -->
-        <Border BorderBrush="Black" BorderThickness="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="24">
-            <UniformGrid Name="UniformGrid_ToolBar" Rows="1" Columns="{MGBinding ToolBar.NumSlots, Mode=OneWay}" CellSize="64,64"
+        <InputConsumer HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="24">
+            <Border BorderBrush="Black" BorderThickness="2">
+                <UniformGrid Name="UniformGrid_ToolBar" Rows="1" Columns="{MGBinding ToolBar.NumSlots, Mode=OneWay}" CellSize="64,64"
                          SelectionMode="Cell" SelectedBackground="Yellow * 0.15f">
-                <UniformGrid.CellBackground>
-                    <BorderedFillBrush BorderThickness="3" PadFillBoundsByBorderThickness="True" FillBrush="rgb(140,140,140) * 0.8">
-                        <BorderedFillBrush.BorderBrush>
-                            <DockedBorderBrush Left="rgb(112,112,112)" Top="rgb(70,70,70)" Right="rgb(70,70,70)" Bottom="rgb(112,112,112)" />
-                        </BorderedFillBrush.BorderBrush>
-                    </BorderedFillBrush>
-                </UniformGrid.CellBackground>
-            </UniformGrid>
-        </Border>
+                    <UniformGrid.CellBackground>
+                        <BorderedFillBrush BorderThickness="3" PadFillBoundsByBorderThickness="True" FillBrush="rgb(140,140,140) * 0.8">
+                            <BorderedFillBrush.BorderBrush>
+                                <DockedBorderBrush Left="rgb(112,112,112)" Top="rgb(70,70,70)" Right="rgb(70,70,70)" Bottom="rgb(112,112,112)" />
+                            </BorderedFillBrush.BorderBrush>
+                        </BorderedFillBrush>
+                    </UniformGrid.CellBackground>
+                </UniformGrid>
+            </Border>
+        </InputConsumer>
 
         <!-- TODO samples such as game time clock above minimap, recent item drops bottomright, special abilities with cooldowns bottom-left, dialoguebox center etc -->
     </Grid>
