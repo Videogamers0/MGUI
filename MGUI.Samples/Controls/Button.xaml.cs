@@ -58,6 +58,26 @@ namespace MGUI.Samples.Controls
             Window.AddNamedAction("OuterButtonCommand", x => TextBlock1Text = "Clicked the [b]outer[/b] button");
             Window.AddNamedAction("InnerButtonCommand", x => TextBlock1Text = "Clicked the [b]inner[/b] button");
 
+            int RepeatCounter1 = 0;
+            Window.AddNamedAction("RepeatButtonSample1", x =>
+            {
+                RepeatCounter1++;
+                MGButton Button = (MGButton)x;
+                MGTextBlock TextBlock = Button.Content as MGTextBlock;
+                string NewText = $"Execution count: [b]{RepeatCounter1}[/b]";
+                TextBlock.SetText(NewText, NewText.Length == TextBlock.Text.Length);
+            });
+
+            int RepeatCounter2 = 0;
+            Window.AddNamedAction("RepeatButtonSample2", x =>
+            {
+                RepeatCounter2++;
+                MGButton Button = (MGButton)x;
+                MGTextBlock TextBlock = Button.Content as MGTextBlock;
+                string NewText = $"Execution count: [b]{RepeatCounter2}[/b]";
+                TextBlock.SetText(NewText, NewText.Length == TextBlock.Text.Length);
+            });
+
             Window.WindowDataContext = this;
         }
     }

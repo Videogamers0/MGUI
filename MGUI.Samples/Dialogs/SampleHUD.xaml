@@ -94,7 +94,7 @@
         <InputConsumer HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8">
             <Border BorderThickness="0" Padding="6" Background="Black * 0.6">
                 <ListBox Name="BuffsList" ItemType="{x:Type local:PlayerBuff}" SelectionMode="None" Background="Transparent"
-                     OuterBorderThickness="0" InnerBorderThickness="0" ItemsPanelBorderThickness="0">
+                         OuterBorderThickness="0" InnerBorderThickness="0" ItemsPanelBorderThickness="0">
                     <ListBox.AlternatingRowBackgrounds>
                         <SolidFillBrush Color="White * 0.15" />
                     </ListBox.AlternatingRowBackgrounds>

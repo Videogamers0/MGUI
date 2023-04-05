@@ -74,6 +74,67 @@ namespace MGUI.Core.UI
             }
         }
 
+        private bool HasCommand => !string.IsNullOrEmpty(CommandName) || Command != null;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _IsRepeatButton;
+        /// <summary>If true, this <see cref="MGButton"/>'s <see cref="CommandName"/> and/or <see cref="Command"/> will be repeatedly fired while the mouse is held pressed overtop it.<para/>
+        /// See also: <see cref="InitialRepeatInterval"/>, <see cref="RepeatInterval"/></summary>
+        public bool IsRepeatButton
+        {
+            get => _IsRepeatButton;
+            set
+            {
+                if (_IsRepeatButton != value)
+                {
+                    _IsRepeatButton = value;
+                    NPC(nameof(IsRepeatButton));
+                }
+            }
+        }
+
+        /// <summary>0.5s</summary>
+        public static readonly TimeSpan DefaultInitialRepeatInterval = TimeSpan.FromSeconds(0.5);
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private TimeSpan _InitialRepeatInterval = DefaultInitialRepeatInterval;
+        /// <summary>Only relevant if <see cref="IsRepeatButton"/> is true.<para/>
+        /// The initial delay before this <see cref="MGButton"/>'s <see cref="CommandName"/> and/or <see cref="Command"/> will be repeatedly fired while the mouse is held pressed overtop it.<br/>
+        /// Default value: <see cref="DefaultInitialRepeatInterval"/><para/>
+        /// See also: <see cref="IsRepeatButton"/>, <see cref="RepeatInterval"/></summary>
+        public TimeSpan InitialRepeatInterval
+        {
+            get => _InitialRepeatInterval;
+            set
+            {
+                if (_InitialRepeatInterval != value)
+                {
+                    _InitialRepeatInterval = value;
+                    NPC(nameof(InitialRepeatInterval));
+                }
+            }
+        }
+
+        /// <summary>10 repetitions per second</summary>
+        public static readonly TimeSpan DefaultRepeatInterval = TimeSpan.FromSeconds(1.0 / 10);
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private TimeSpan _RepeatInterval = DefaultRepeatInterval;
+        /// <summary>Only relevant if <see cref="IsRepeatButton"/> is true.<para/>
+        /// How often to repeatedly fire this <see cref="MGButton"/>'s <see cref="CommandName"/> and/or <see cref="Command"/> while the mouse is held pressed overtop it.<br/>
+        /// Default value: <see cref="DefaultRepeatInterval"/><para/>
+        /// See also: <see cref="IsRepeatButton"/>, <see cref="InitialRepeatInterval"/></summary>
+        public TimeSpan RepeatInterval
+        {
+            get => _RepeatInterval;
+            set
+            {
+                if (_RepeatInterval != value)
+                {
+                    _RepeatInterval = value;
+                    NPC(nameof(RepeatInterval));
+                }
+            }
+        }
+
         /// <param name="HandleLeftClick">An <see cref="Action"/> to invoke when this <see cref="MGButton"/> is left-clicked.<para/>
         /// This handler will only be invoked if <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> is false.<br/>
         /// This handler will also set <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> to true after being invoked.<para/>
@@ -107,6 +168,12 @@ namespace MGUI.Core.UI
                 this.VerticalContentAlignment = VerticalAlignment.Center;
                 this.Padding = new(4,2,4,2);
 
+                MouseHandler.PressedInside += (sender, e) =>
+                { 
+                    PressedArgs = e;
+                    if (IsRepeatButton)
+                        e.SetHandledBy(this, false);
+                };
                 MouseHandler.ReleasedInside += (sender, e) =>
                 {
                     if (e.IsLMB)
@@ -132,21 +199,72 @@ namespace MGUI.Core.UI
 
                 OnLeftClicked += (sender, e) =>
                 {
-                    if (!e.IsHandled && this.Command != null)
-                    {
-                        bool Handled = this.Command(this);
-                        if (Handled)
-                            e.SetHandledBy(this, false);
-                    }
-
-                    if (!e.IsHandled && !string.IsNullOrEmpty(this.CommandName) && 
-                        ParentWindow.NamedActions.TryGetValue(this.CommandName, out Action<MGElement> Command))
-                    {
-                        e.SetHandledBy(this, true);
-                        Command(this);
-                    }
+                    //  For repeat buttons, I avoid invoking the commands on mouse released because it feels a bit strange.
+                    //  EX: RepeatInterval=1s. Press at t=0, Repeat at t=1, Release at t=1.2 - this would fire the commands twice, once at t=1 and again at t=1.2,
+                    //  which just seems weird for the last execution to have an unpredictable interval compared to every prior execution
+                    if (!IsRepeatButton || !RepeatedAt.HasValue)
+                        TryInvokeCommands(e, false);
                 };
             }
+        }
+
+        private bool TryInvokeCommands(HandledByEventArgs<IMouseHandlerHost> args, bool IsRepeating)
+        {
+            bool CanInvoke() => !args.IsHandled || (IsRepeating && args.HandledBy == this);
+
+            bool Invoked = false;
+
+            if (CanInvoke() && this.Command != null)
+            {
+                bool Handled = this.Command(this);
+                if (Handled)
+                    args.SetHandledBy(this, false);
+                Invoked = true;
+            }
+
+            if (CanInvoke() && !string.IsNullOrEmpty(CommandName) &&
+                ParentWindow.NamedActions.TryGetValue(CommandName, out Action<MGElement> Command))
+            {
+                args.SetHandledBy(this, false);
+                Command(this);
+                Invoked = true;
+            }
+
+            return Invoked;
+        }
+
+        private BaseMousePressedEventArgs PressedArgs { get; set; }
+        /// <summary>Only relevant if <see cref="IsRepeatButton"/> is true.<para/>
+        /// The last time that this <see cref="MGButton"/> was pressed.</summary>
+        private DateTime? PressedAt { get; set; }
+        /// <summary>Only relevant if <see cref="IsRepeatButton"/> is true.<para/>
+        /// The last time that this <see cref="MGButton"/>'s <see cref="CommandName"/> and/or <see cref="Command"/> was repeated.</summary>
+        private DateTime? RepeatedAt { get; set; }
+
+        private bool IsRepeatPending(DateTime Now) => 
+            (!RepeatedAt.HasValue && Now.Subtract(PressedAt.Value) >= InitialRepeatInterval) ||
+            (RepeatedAt.HasValue && Now.Subtract(RepeatedAt.Value) >= RepeatInterval);
+
+        public override void UpdateSelf(ElementUpdateArgs UA)
+        {
+            if (IsRepeatButton && VisualState.IsPressed)
+            {
+                DateTime Now = DateTime.Now;
+                if (!PressedAt.HasValue)
+                    PressedAt = Now;
+                else if (HasCommand && IsRepeatPending(Now) && PressedArgs != null)
+                {
+                    RepeatedAt = Now;
+                    _ = TryInvokeCommands(PressedArgs, true);
+                }
+            }
+            else
+            {
+                PressedAt = null;
+                RepeatedAt = null;
+            }
+
+            base.UpdateSelf(UA);
         }
 
         /// <summary>Helper method to subscribe to <see cref="OnLeftClicked"/>.<para/>

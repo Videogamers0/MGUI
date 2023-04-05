@@ -157,6 +157,13 @@ namespace MGUI.Core.UI.XAML
         [Category("Behavior")]
         public string CommandName { get; set; }
 
+        [Category("Behavior")]
+        public bool? IsRepeatButton { get; set; }
+        [Category("Behavior")]
+        public TimeSpan? InitialRepeatInterval { get; set; }
+        [Category("Behavior")]
+        public TimeSpan? RepeatInterval { get; set; }
+
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGButton(Window);
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
@@ -168,6 +175,13 @@ namespace MGUI.Core.UI.XAML
 
             if (CommandName != null)
                 Button.CommandName = CommandName;
+
+            if (IsRepeatButton.HasValue)
+                Button.IsRepeatButton = IsRepeatButton.Value;
+            if (InitialRepeatInterval.HasValue)
+                Button.InitialRepeatInterval = InitialRepeatInterval.Value;
+            if (RepeatInterval.HasValue)
+                Button.RepeatInterval = RepeatInterval.Value;
 
             base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }

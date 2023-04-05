@@ -235,7 +235,7 @@ namespace MGUI.Samples.Dialogs
             this.ToolBar = new(Desktop, 10);
 
             //  Create a few sample items and add them to the toolbar
-            Item Dagger = new(Desktop, "Diamond", "A small blade.", Desktop.NamedRegions["ToolBar_Dagger"]);
+            Item Dagger = new(Desktop, "Dagger", "A small blade.", Desktop.NamedRegions["ToolBar_Dagger"]);
             Item PickaxeShovel = new(Desktop, "Pickaxe and Shovel", "A set of useful tools.", Desktop.NamedRegions["ToolBar_PickaxeShovel"]);
             Item Backpack = new(Desktop, "Knapsack", "A small pouch (Can hold up to 6 items).", Desktop.NamedRegions["ToolBar_Backpack"]);
             Item Medkit = new(Desktop, "First-Aid kit", "Restores 50 HP", Desktop.NamedRegions["ToolBar_Medkit"]);
@@ -254,7 +254,7 @@ namespace MGUI.Samples.Dialogs
                     ToolBar.SelectedSlot = null;
                 else
                 {
-                    int Index = e.Value.Cell.Row * UIToolBar.Rows + e.Value.Cell.Column;
+                    int Index = e.Value.Cell.Row * UIToolBar.Columns + e.Value.Cell.Column;
                     ToolBarSlot SelectedSlot = ToolBar.Slots[Index];
                     SelectedSlot.IsSelected = true;
                 }
@@ -267,7 +267,7 @@ namespace MGUI.Samples.Dialogs
 
                 Rectangle ActualCellBounds = e.CellBounds.GetTranslated(e.DrawArgs.Offset);
 
-                int Index = e.CellIndex.Row * UIToolBar.Rows + e.CellIndex.Column;
+                int Index = e.CellIndex.Row * UIToolBar.Columns + e.CellIndex.Column;
                 ToolBarSlot Slot = ToolBar.Slots[Index];
 
                 //  Draw the item in this slot
@@ -277,7 +277,7 @@ namespace MGUI.Samples.Dialogs
                     const int SlotPadding = 5;
                     Rectangle ItemBounds = ActualCellBounds.GetCompressed(SlotBorderSize + SlotPadding);
 
-                    Desktop.TryDrawNamedRegion(DT, Slot.Item.Item.Icon.RegionName, ItemBounds);
+                    Desktop.TryDrawNamedRegion(DT, Slot.Item.Item.Icon.RegionName, ItemBounds, e.DrawArgs.Opacity);
 
                     //  Draw the quantity in the bottom-right corner
                     if (Slot.Item.Quantity > 1)
@@ -290,14 +290,14 @@ namespace MGUI.Samples.Dialogs
                         Vector2 TextSize = DT.MeasureText(FontFamily, FontStyle, Text, FontSize);
                         Vector2 Position = ActualCellBounds.GetCompressed(SlotBorderSize).BottomRight().ToVector2().Translate(-TextSize.X - 1, -TextSize.Y + 1);
 
-                        DT.DrawShadowedText(FontFamily, FontStyle, Text, Position, Color.White, new Color(40,40,40), FontSize);
+                        DT.DrawShadowedText(FontFamily, FontStyle, Text, Position, Color.White, new Color(40,40,40) * e.DrawArgs.Opacity, FontSize);
                     }
                 }
 
                 //  Draw a yellow border around the selected cell
                 if (Slot.IsSelected)
                 {
-                    DT.StrokeRectangle(e.DrawArgs.Offset.ToVector2(), e.CellBounds, Color.Yellow * 0.8f, new Thickness(3));
+                    DT.StrokeRectangle(e.DrawArgs.Offset.ToVector2(), e.CellBounds, Color.Yellow * 0.8f * e.DrawArgs.Opacity, new Thickness(3));
                 }
             };
 

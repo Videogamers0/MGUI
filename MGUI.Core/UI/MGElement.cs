@@ -105,7 +105,13 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
-    //Make SelectedItems bindable in combobox/listbox/listview/grid/unfiromgrid
+    //Make ItemsSource bindable in combobox/listbox/listview/grid/unfiromgrid
+    //      for example: ComboBox could have "public MGBinding ItemsSource"
+    //      then in MGComboBox.LoadSettings, if ItemsSource binding is not null,
+    //      create a new kind of DataBinding that allows you to pass in a delegate for setting the target object's property (so it would just ignore bindingconfig.targetpath i guess)
+    //      the delegate would be: "x => this.SetItemsSource(x as ICollection<TDataType>);"
+    //          and remove the ItemsSourceBinding from the PendingBindings list in XAML/Element.cs -> ProcessBindings()
+    //      also make SelectedItem(s) and SelectedIndex bindable
     //Fix issue where the parsed lines of text get screwed up when selecting empty lines of text in a TextBox.
     //Fix DataBinding to properties that dont have a corresponding property in their XAML class or where the property setter isn't public.
     //      Also some properties aren't exposed on the XAML classes like MGListBox.SelectedItem, so should make a property like SelectedItemBinding or something

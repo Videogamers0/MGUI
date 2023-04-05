@@ -28,7 +28,7 @@
                 Buttons are rectangular clickable controls that can host arbitrary Content inside them.
             </TextBlock>
             <Separator />
-            <Button Name="Button1" Content="Click me!" HorizontalAlignment="Left" Padding="15,5" />
+            <Button Name="Button1" Content="Click me!" HorizontalAlignment="Left" Padding="15,5" IsRepeatButton="True" />
 
             <DockPanel>
                 <TextBlock Dock="Top">
@@ -94,6 +94,41 @@
                         </Button>
                     </Button>
                     <TextBlock Text="{MGBinding Path=TextBlock1Text, Mode=OneWay}" MinHeight="30" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise]IsRepeatButton[/c] to [c=LightBlue][s=Blue]True[/s][/c] to allow 
+                    the button's [c=Turquoise]Command[/c] and/or [c=Turquoise]CommandName[/c] to execute repeatedly while the button is pressed and held (by the Left MouseButton).
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <Button CommandName="RepeatButtonSample1" Content="Press and Hold me!" IsRepeatButton="True" HorizontalAlignment="Left" Padding="15,5" Background="DarkBlue" />
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        Set [c=Turquoise]InitialRepeatInterval[/c] and [c=Turquoise]RepeatInterval[/c] to control how often the RepeatButton repeatedly fires.
+                    </TextBlock>
+                    <Button CommandName="RepeatButtonSample2" HorizontalAlignment="Stretch" Padding="15,5" Background="DarkBlue"
+                            Content="1.5s initial interval, then repeats 30 times per second" 
+                            IsRepeatButton="True" InitialRepeatInterval="00:00:01.5" RepeatInterval="00:00:00.034" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise]RenderScale[/c] to make the Button larger or smaller when hovered
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <Button HorizontalAlignment="Center" RenderScale="1.1">
+                        <TextBlock TextAlignment="Center" Text="This [c=Turquoise]Button[/c] uses [c=Turquoise]RenderScale[/c]=[c=LightBlue][s=Blue]1.1[/c][/s]\nHover it to see it appear 10% larger" />
+                    </Button>
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        [c=Turquoise]RenderScale[/c] can also be applied to other types of Content, such as this [c=Turquoise]Image[/c]:
+                    </TextBlock>
+                    <Image HorizontalAlignment="Center" Stretch="Uniform" Width="40" Height="40" RegionName="SkullAndCrossbones" RenderScale="1.25" />
                 </StackPanel>
             </DockPanel>
             <Separator/>
