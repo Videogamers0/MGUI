@@ -54,15 +54,15 @@ namespace MGUI.Samples
         public void Hide() => IsVisible = false;
 
         /// <param name="Initialize">Optional. This delegate is invoked before the XAML content is parsed, 
-        /// so you may wish to use this delegate to add resources to the <paramref name="Desktop"/> that may be required in order to parse the XAML.</param>
-        protected SampleBase(ContentManager Content, MGDesktop Desktop, string ProjectFolderName, string XAMLFilename, MGTheme Theme = null, Action Initialize = null)
+        /// so you may wish to use this delegate to add resources to <see cref="MGDesktop.Resources"/> that may be required in order to parse the XAML.</param>
+        protected SampleBase(ContentManager Content, MGDesktop Desktop, string ProjectFolderName, string XAMLFilename, Action Initialize = null)
         {
             this.Content = Content;
             this.Desktop = Desktop;
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.{(ProjectFolderName == null ? "" : ProjectFolderName + ".")}{XAMLFilename}";
             string XAML = GeneralUtils.ReadEmbeddedResourceAsString(Assembly.GetExecutingAssembly(), ResourceName);
             Initialize?.Invoke();
-            Window = XAMLParser.LoadRootWindow(Desktop, XAML, false, true, Theme);
+            Window = XAMLParser.LoadRootWindow(Desktop, XAML, false, true);
             Window.WindowClosed += (sender, e) => IsVisible = false;
         }
 

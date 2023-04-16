@@ -124,6 +124,12 @@ public class MyDataContext
                     </TextBlock>
                     <TextBox Background="rgb(12,16,82)" IsReadonly="True" Text='&lt;TextBlock ToolTip="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" /&gt;' />
                     <Spacer Height="5" />
+                    <Border HorizontalAlignment="Left" Background="White * 0.15" BorderBrush="Black * 0.5" BorderThickness="1" Padding="4,2">
+                        <TextBlock Text="Hover me! This [c=Turquoise]TextBlock[/c]'s [c=Turquoise]ToolTip[/c] is bound directly to the [c=Turquoise]Text[/c] property on itself."
+                                   ToolTip="{MGBinding DataContextResolver=Self, Path=Text}" />
+                    </Border>
+                    <Spacer Height="5" />
+
                     <TextBlock>
                         Each [c=Turquoise]Window[/c] instance has a property: [c=Turquoise]WindowDataContext[/c]. The [c=Turquoise]DataContext[/c] of every child element is
                         automatically set to the window's [c=Turquoise]WindowDataContext[/c]. If you want a particular element to use a different [c=Turquoise]DataContext[/c],
@@ -178,7 +184,7 @@ public class MyDataContext
 
             <Expander>
                 <Expander.Header>
-                    <TextBlock StyleNames="Header1" Text="ElementName" />
+                    <TextBlock StyleNames="Header1" Text="ElementName / ResourceName" />
                 </Expander.Header>
                 <StackPanel Orientation="Vertical" Spacing="2" Padding="4">
                     <TextBlock>
@@ -218,6 +224,12 @@ public class MyDataContext
                     <TextBlock>
                         Also notice that we didn't need to specify [c=Turquoise]DataContextResolver[/c]=[c=LightBlue][s=Blue]Self[/s][/c] because
                         that's already the default value when using an [c=Turquoise]ElementName[/c] binding. (Usually the default value is [c=LightBlue][s=Blue]DataContext[/s][/c])
+                    </TextBlock>
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        Set [c=Turquoise]ResourceName[/c] to make the [c=Turquoise]SourceObject[/c] be computed relative to a particular StaticResource 
+                        that exists in [c=Turquoise]MGResources.StaticResources[/c] dictionary.
+                        (The [c=Turquoise]MGResources[/c] instance is obtained via [c=Turquoise]MGElement.GetDesktop().Resources[/c])
                     </TextBlock>
                 </StackPanel>
             </Expander>
@@ -386,6 +398,8 @@ The Converter is specified using:
         Start from the [c=Turquoise]TargetObject[/c]
     If [c=Turquoise]SourceObjectResolver[/c]=[c=LightBlue][s=Blue]ElementName[/s][/c]
         Start from a particular named element in the [c=Turquoise]TargetObject[/c]'s [c=Turquoise]Window[/c] ([c=Turquoise]MGelement.SelfOrParentWindow[/c])
+    If [c=Turquoise]SourceObjectResolver[/c]=[c=LightBlue][s=Blue]ResourceName[/s][/c]
+        Start from a particular named resource located at: [c=Turquoise]TargetObject.GetDesktop().Resources.StaticResources[/c]
     If [c=Turquoise]SourceObjectResolver[/c]=[c=LightBlue][s=Blue]ElementAncestor[/s][/c]
         Start from a particular parent element of the [c=Turquoise]TargetObject[/c], based on the [c=Turquoise]AncestorLevel[/c] / [c=Turquoise]AncestorType[/c]
     If [c=Turquoise]SourceObjectResolver[/c]=[c=LightBlue][s=Blue]Desktop[/s][/c]
@@ -468,6 +482,21 @@ The Converter is specified using:
                                 While it is fully Turing complete, it is not intended for practical use, but to challenge and amuse programmers.
                             </TextBlock.Text>
                         </TextBlock>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Spacing="2" Padding="4" Background="White * 0.1">
+                        <TextBlock>
+                            This example shows a [c=Turquoise]TextBlock[/c] whose [c=Turquoise]ToolTip[/c] is bound directly to the [c=Turquoise]TextBlock[/c]'s [c=Turquoise]Text[/c] property.
+                            This is achieved by using [c=Turquoise]DataContextResolver[/c]=[c=LightBlue][s=Blue]Self[/s][/c], so that the source object of the binding is retrieved directly from
+                            the target object, rather than from a nested 'DataContext' property.
+                            Hover the [c=Turquoise]TextBlock[/c] to see the [c=Turquoise]ToolTip[/c] value.
+                        </TextBlock>
+                        <Separator/>
+                        <Spacer Height="3" />
+                        <Border BorderThickness="0" Background="White * 0.15" HorizontalAlignment="Left" Padding="4,2">
+                            <TextBlock Text="My [c=Turquoise]ToolTip[/c] is bound to this [c=Turquoise]Text[/c] value."
+                                       ToolTip="{MGBinding DataContextResolver=Self, Path=Text}" />
+                        </Border>
                     </StackPanel>
 
                     <TextBlock Text="Mode samples coming soon... probably..." />

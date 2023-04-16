@@ -18,15 +18,15 @@ namespace MGUI.Samples.Dialogs.Debugging
 {
     public class Debug1 : SampleBase
     {
-        private static MGTheme GetTheme(MGDesktop Desktop)
+        private static void InitializeResources(ContentManager Content, MGDesktop Desktop)
         {
             MGTheme Theme = new(MGTheme.BuiltInTheme.Dark_Blue, Desktop.Theme.FontSettings.DefaultFontFamily);
             Theme.FontSettings.AdjustAllFontSizes(-2);
-            return Theme;
+            Desktop.Resources.AddTheme("Debug1_Theme", Theme);
         }
 
         public Debug1(ContentManager Content, MGDesktop Desktop)
-            : base(Content, Desktop, $"{nameof(Dialogs)}.{nameof(Debugging)}", $"{nameof(Debug1)}.xaml", GetTheme(Desktop))
+            : base(Content, Desktop, $"{nameof(Dialogs)}.{nameof(Debugging)}", $"{nameof(Debug1)}.xaml", () => { InitializeResources(Content, Desktop); })
         {
             Window.Scale = 2f;
 
@@ -41,12 +41,12 @@ namespace MGUI.Samples.Dialogs.Debugging
             Test2.ApplySizeToContent(SizeToContent.Height);
             Window.AddNamedToolTip("Test2", Test2);
 
-            Action<MGElement> TestAction = element =>
+            Action<MGElement> Debug1_TestAction = element =>
             {
                 Window.Opacity -= 0.05f;
                 //Window.BackgroundBrush.NormalValue = MGSolidFillBrush.SemiBlack;
             };
-            Window.AddNamedAction("TestAction", TestAction);
+            Window.GetResources().AddCommand("Debug1_TestAction", Debug1_TestAction);
 
             if (Window.TryGetElementByName("Test_Presenter1", out MGContentPresenter ContentPresenter))
             {

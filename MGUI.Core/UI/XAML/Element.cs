@@ -353,7 +353,11 @@ namespace MGUI.Core.UI.XAML
 
         protected internal abstract IEnumerable<Element> GetChildren();
 
-        protected internal void ProcessStyles() => ProcessStyles(new Dictionary<string, Style>(), new Dictionary<MGElementType, Dictionary<string, List<object>>>());
+        protected internal void ProcessStyles(MGResources Resources)
+        {
+            Dictionary<string, Style> StylesByName = Resources.Styles.ToDictionary(x => x.Key, x => x.Value);
+            ProcessStyles(StylesByName, new Dictionary<MGElementType, Dictionary<string, List<object>>>());
+        }
         private void ProcessStyles(Dictionary<string, Style> StylesByName, Dictionary<MGElementType, Dictionary<string, List<object>>> StylesByType)
         {
             Dictionary<string, List<object>> ValuesByProperty;
@@ -432,7 +436,7 @@ namespace MGUI.Core.UI.XAML
                 if (StyleNames != null)
                 {
                     string[] Names = StyleNames.Split(',');
-                    List<Style> ExplicitStyles = Names.Select(x => StylesByName[x]).ToList();
+                    List<Style> ExplicitStyles = Names.Select(x => StylesByName[x]).Where(x => x.TargetType == this.ElementType).ToList();
 
                     //  Get all the properties that the explicit styles will modify
                     HashSet<string> PropertyNames = ExplicitStyles.SelectMany(x => x.Setters).Select(x => x.Property).ToHashSet();

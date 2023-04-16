@@ -63,7 +63,7 @@
 
                                     <!-- Character Portrait -->
                                     <Border BorderBrush="Black" BorderThickness="2" Dock="Left" Margin="0,0,6,0" VerticalAlignment="Center">
-                                        <Image Stretch="None" Texture="{MGBinding Path=Portrait, Mode=OneTime}" />
+                                        <Image Stretch="None" Source="{MGBinding Path=Portrait, Mode=OneTime}" />
                                     </Border>
 
                                     <StackPanel Margin="8,0,0,0" VerticalAlignment="Center" Orientation="Vertical">
@@ -124,7 +124,7 @@
                                 <DockPanel>
                                     <!-- Name and icon -->
                                     <StackPanel Orientation="Horizontal" Dock="Left" Spacing="5">
-                                        <Image VerticalAlignment="Center" TextureName="FF7ItemIcon" Width="24" Height="22" />
+                                        <Image VerticalAlignment="Center" SourceName="FF7ItemIcon" Width="24" Height="22" />
                                         <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Name, Mode=OneTime}" />
                                     </StackPanel>
 

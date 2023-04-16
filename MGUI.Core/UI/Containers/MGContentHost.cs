@@ -300,11 +300,28 @@ namespace MGUI.Core.UI.Containers
             {
                 if (HeaderPresenter.Content != value)
                 {
+                    MGElement Previous = Header;
+
+                    if (HeaderChanging != null)
+                    {
+                        CancelEventArgs<MGElement> CancelArgs = new(value);
+                        HeaderChanging(this, CancelArgs);
+                        if (CancelArgs.Cancel)
+                            return;
+                    }
+
                     HeaderPresenter.SetContent(value);
                     NPC(nameof(Header));
+
+                    HeaderChanged?.Invoke(this, new(Previous, Header));
                 }
             }
         }
+
+        /// <summary>Invoked just before <see cref="Header"/>'s value changes. The parameter is the new value that it is about to be set to. Allows cancellation.</summary>
+        public event EventHandler<CancelEventArgs<MGElement>> HeaderChanging;
+        /// <summary>Invoked just after <see cref="Header"/>'s value has changed.</summary>
+        public event EventHandler<EventArgs<MGElement>> HeaderChanged;
 
         private Dock _HeaderPosition;
         public Dock HeaderPosition
@@ -317,6 +334,16 @@ namespace MGUI.Core.UI.Containers
         {
             if (_HeaderPosition != Value || IsInitializing)
             {
+                Dock Previous = HeaderPosition;
+
+                if (HeaderPositionChanging != null)
+                {
+                    CancelEventArgs<Dock> CancelArgs = new(Value);
+                    HeaderPositionChanging(this, CancelArgs);
+                    if (CancelArgs.Cancel)
+                        return;
+                }
+
                 _HeaderPosition = Value;
 
                 switch (HeaderPosition)
@@ -359,8 +386,15 @@ namespace MGUI.Core.UI.Containers
                 UpdateHeaderMargin();
                 LayoutChanged(this, true);
                 NPC(nameof(HeaderPosition));
+
+                HeaderPositionChanged?.Invoke(this, new(Previous, HeaderPosition));
             }
         }
+
+        /// <summary>Invoked just before <see cref="HeaderPosition"/>'s value changes. The parameter is the new value that it is about to be set to. Allows cancellation.</summary>
+        public event EventHandler<CancelEventArgs<Dock>> HeaderPositionChanging;
+        /// <summary>Invoked just after <see cref="HeaderPosition"/>'s value has changed.</summary>
+        public event EventHandler<EventArgs<Dock>> HeaderPositionChanged;
 
         public const int DefaultSpacing = 5;
 
@@ -397,7 +431,9 @@ namespace MGUI.Core.UI.Containers
         public MGContentPresenter HeaderPresenter { get; }
 
         public MGHeaderedContentPresenter(MGWindow Window, MGElement Header = null, MGElement Content = null)
-            : base(Window, MGElementType.HeaderedContentPresenter)
+            : this(Window, MGElementType.HeaderedContentPresenter, Header, Content) { }
+        protected MGHeaderedContentPresenter(MGWindow Window, MGElementType ElementType, MGElement Header = null, MGElement Content = null)
+            : base(Window, ElementType)
         {
             using (BeginInitializing())
             {

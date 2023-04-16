@@ -16,7 +16,7 @@ namespace MGUI.Samples.Dialogs.FF7
         private List<PartyMember> _Members { get; }
         public IReadOnlyList<PartyMember> Members => _Members;
 
-        public PartyMember AddMember(string Name, Texture2D Portrait, int XP = 0, int MaxHP = 100, int MaxMP = 10)
+        public PartyMember AddMember(string Name, MGTextureData Portrait, int XP = 0, int MaxHP = 100, int MaxMP = 10)
         {
             PartyMember NewMember = new(this, Name, Portrait, XP, MaxHP, MaxMP);
             _Members.Add(NewMember);
@@ -39,7 +39,7 @@ namespace MGUI.Samples.Dialogs.FF7
 
         public Party Party { get; }
         public string Name { get; }
-        public Texture2D Portrait { get; }
+        public MGTextureData Portrait { get; }
 
         #region XP / Level
         private int _XP;
@@ -162,7 +162,7 @@ namespace MGUI.Samples.Dialogs.FF7
         public event EventHandler<EventArgs<int>> MPChanged;
         #endregion HP / MP
 
-        public PartyMember(Party Party, string Name, Texture2D Portrait, int XP = 0, int MaxHP = 100, int MaxMP = 10)
+        public PartyMember(Party Party, string Name, MGTextureData Portrait, int XP = 0, int MaxHP = 100, int MaxMP = 10)
         {
             this.Party = Party;
             this.Name = Name;

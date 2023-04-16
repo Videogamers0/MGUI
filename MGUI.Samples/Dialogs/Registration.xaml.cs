@@ -19,7 +19,7 @@ namespace MGUI.Samples.Dialogs
         {
             //  Create an action that is executed when clicking the "Terms of Service" link
             //  (XAML: '<TextBlock Text="I agree to the [Action=OpenTOS][color=#3483eb][i][u]Terms of service[/u][/i][/color][/Action]" />')
-            Window.AddNamedAction("OpenTOS", x =>
+            Window.GetResources().AddCommand("OpenTOS", x =>
             {
                 string SampleTOSWebpage = @"https://www.google.com";
                 Process.Start(new ProcessStartInfo()

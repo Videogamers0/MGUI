@@ -24,12 +24,19 @@ namespace MGUI.Core.UI.XAML
         /// <summary>The path to the source property. Separate nested object properties with a '.'.<para/>
         /// EX: "Location.City" retrieve the value of the "Location" property. Then look for the value of the "City" property on that inner object.</summary>
         public string Path { get; set; } = "";
-        /// <summary>If specified, the binding will use <see cref="SourceObjectResolverElementName"/> to find the source object.<para/>
-        /// If not specified, the binding will use <see cref="SourceObjectResolverSelf"/>.</summary>
-        public string ElementName { get; set; }
+
         public DataBindingMode Mode { get; set; } = DataBindingMode.OneWay;
-        /// <summary>If not specified, defaults to <see cref="DataContextResolver.Self"/> when binding using <see cref="ElementName"/>,<br/>
-        /// uses <see cref="DataContextResolver.DataContext"/> in all other cases.</summary>
+
+        /// <summary>If specified, the binding will use <see cref="SourceObjectResolverElementName"/> to find the source object.<para/>
+        /// See also: <see cref="SourceObjectResolver"/></summary>
+        public string ElementName { get; set; }
+
+        /// <summary>If specified, the binding will use <see cref="SourceObjectResolverStaticResource"/> to find the source object.<para/>
+        /// See also: <see cref="SourceObjectResolver"/></summary>
+        public string ResourceName { get; set; }
+
+        /// <summary>If not specified, defaults to <see cref="DataContextResolver.Self"/> when binding using <see cref="ElementName"/> or <see cref="ResourceName"/>.<br/>
+        /// Uses <see cref="DataContextResolver.DataContext"/> in all other cases.</summary>
         public DataContextResolver? DataContextResolver { get; set; }
 
         /// <summary>Optional. Converts values of the source or target property before setting them to the other property.<para/>
@@ -49,18 +56,31 @@ namespace MGUI.Core.UI.XAML
 
         /// <summary>This value is automatically determined by the name of the property that the binding is attached to.<para/>
         /// However, some properties on <see cref="XAML"/> objects (such as <see cref="Button"/>) don't have the same name as their corresponding property on the
-        /// <see cref="UI"/> objects (such as <see cref="MGButton"/>), so you can override the TargetPropertyName if needed.</summary>
-        public string TargetPropertyNameOverride { get; set; }
+        /// <see cref="UI"/> objects (such as <see cref="MGButton"/>), so you can override the <see cref="BindingConfig.TargetPath"/> if needed.</summary>
+        public string TargetPathOverride { get; set; }
 
-        public ISourceObjectResolver SourceObjectResolver =>
-            string.IsNullOrEmpty(ElementName) ? ISourceObjectResolver.FromSelf() : ISourceObjectResolver.FromElementName(ElementName);
+        /// <summary>Uses <see cref="SourceObjectResolverSelf"/> if neither <see cref="ElementName"/> nor <see cref="ResourceName"/> are specified.</summary>
+        public ISourceObjectResolver SourceObjectResolver
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(ElementName) && !string.IsNullOrEmpty(ResourceName))
+                    throw new InvalidOperationException($"Invalid {nameof(MGBinding)}: You cannot specify values for both '{nameof(ElementName)}' and '{nameof(ResourceName)}'.");
+                else if (!string.IsNullOrEmpty(ElementName))
+                    return ISourceObjectResolver.FromElementName(ElementName);
+                else if (!string.IsNullOrEmpty(ResourceName))
+                    return ISourceObjectResolver.FromResourceName(ResourceName);
+                else
+                    return ISourceObjectResolver.FromSelf();
+            }
+        }
 
         public MGBinding() { }
         public MGBinding(string Path) { this.Path = Path; }
 
         //  If binding using ElementName, user probably wants to bind directly to that object instead of to it's DataContext.
         private DataContextResolver ActualDataContextResolver =>
-            DataContextResolver ?? (!string.IsNullOrEmpty(ElementName) ? Data_Binding.DataContextResolver.Self : Data_Binding.DataContextResolver.DataContext);
+            DataContextResolver ?? (!string.IsNullOrEmpty(ElementName) || !string.IsNullOrEmpty(ResourceName) ? Data_Binding.DataContextResolver.Self : Data_Binding.DataContextResolver.DataContext);
 
         private BindingConfig ToBinding(string TargetPropertyName)
             => new(TargetPropertyName, Path, Mode, SourceObjectResolver, ActualDataContextResolver, Converter, ConverterParameter, FallbackValue, StringFormat);
@@ -71,7 +91,7 @@ namespace MGUI.Core.UI.XAML
             if (ProvideValueTarget.TargetProperty is PropertyInfo TargetProperty && ProvideValueTarget.TargetObject is Element TargetObject)
             {
                 //  Save the binding info onto the target object so it can be evaluated later on (once we've instantiated the MGElement instance from the Element object)
-                TargetObject.Bindings.Add(ToBinding(TargetPropertyNameOverride ?? TargetProperty.Name));
+                TargetObject.Bindings.Add(ToBinding(TargetPathOverride ?? TargetProperty.Name));
 
                 //  Return the fallbackvalue or default for now. The actual value will be evaluated later
                 if (FallbackValue != null && FallbackValue.GetType().IsAssignableTo(TargetProperty.PropertyType))

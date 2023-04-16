@@ -24,7 +24,7 @@ namespace MGUI.Core.UI.XAML
         /// This value should never contain commas, because commas are used to delimit multiple style names in <see cref="Element.StyleNames"/></summary>
         public string Name { get; set; }
 
-        //TODO maybe a bool, 'AffectsComponents'? Default=true. If true, the style affects components of elements, such as XAMLCheckBox.Button
+        //TODO maybe a bool, 'AffectsComponents'? Default=true. If true, the style affects components of elements, such as MGUI.Core/UI/XAML/CheckBox.Button
         //      If false, the style only affects elements that are explicitly defined in the visual tree, such as the Content of a SingleContentHost
     }
 

@@ -9,6 +9,7 @@ namespace MGUI.Core.UI.Data_Binding
     /// <summary>For concrete implementations, use:<br/>
     /// <see cref="SourceObjectResolverSelf"/><br/>
     /// <see cref="SourceObjectResolverElementName"/><br/>
+    /// <see cref="SourceObjectResolverStaticResource"/><br/>
     /// <see cref="SourceObjectResolverElementAncestor{T}"/><br/>
     /// <see cref="SourceObjectResolverDesktop"/></summary>
     public interface ISourceObjectResolver
@@ -22,6 +23,10 @@ namespace MGUI.Core.UI.Data_Binding
         /// <summary>Indicates that the source object of the binding should be retrieved via <see cref="MGWindow.GetElementByName(string)"/><br/>
         /// (assuming the target object is of type <see cref="MGElement"/> and belongs to a <see cref="MGWindow"/>)</summary>
         public static ISourceObjectResolver FromElementName(string ElementName) => new SourceObjectResolverElementName(ElementName);
+
+        /// <summary>Indicates that the source object of the binding should be retrieved via a particular named resource in <see cref="MGResources.StaticResources"/><br/>
+        /// (assuming the target object is of type <see cref="MGElement"/> so that the resources can obtained from <see cref="MGDesktop.Resources"/>)</summary>
+        public static ISourceObjectResolver FromResourceName(string ResourceName) => new SourceObjectResolverStaticResource(ResourceName);
 
         /// <summary>Indicates that the source object of the binding should be retrieved by traversing up the visual tree 
         /// by a certain number of hierarchical levels and looking for a parent of a particular <typeparamref name="T"/> type.<br/>
@@ -63,6 +68,28 @@ namespace MGUI.Core.UI.Data_Binding
         }
 
         public override string ToString() => $"{nameof(SourceObjectResolverElementName)}: {ElementName}";
+    }
+
+    /// <summary>Indicates that the source object of the binding should be retrieved via <see cref="MGResources.StaticResources"/> using the given <see cref="ResourceName"/><br/>
+    /// (assuming the target object is of type <see cref="MGElement"/> so that the resources can obtained from <see cref="MGDesktop.Resources"/>)</summary>
+    public class SourceObjectResolverStaticResource : ISourceObjectResolver
+    {
+        public readonly string ResourceName;
+
+        public SourceObjectResolverStaticResource(string ResourceName)
+        {
+            this.ResourceName = ResourceName ?? throw new ArgumentNullException(nameof(ResourceName));
+        }
+
+        public object ResolveSourceObject(object TargetObject)
+        {
+            if (TargetObject is MGElement Element && Element.GetResources().StaticResources.TryGetValue(ResourceName, out object Resource))
+                return Resource;
+            else
+                return null;
+        }
+
+        public override string ToString() => $"{nameof(SourceObjectResolverStaticResource)}: {ResourceName}";
     }
 
     /// <summary>Indicates that the source object of the binding should be retrieved by traversing up the visual tree 
@@ -128,8 +155,4 @@ namespace MGUI.Core.UI.Data_Binding
 
         public override string ToString() => $"{nameof(SourceObjectResolverDesktop)}";
     }
-
-    //TODO: After you make a 'Resources' class, it could have a Dictionary<string, object> or something that DataBindings could reference by string key
-    //public class SourceObjectResolverNamedResource : ISourceObjectResolver
-    //		or could call it SourceObjectResolverStaticResource
 }

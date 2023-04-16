@@ -317,7 +317,7 @@ namespace MGUI.Core.UI
 
         #region Item Template
         /// <summary>The default amount of padding in each item within the dropdown.</summary>
-        public static Thickness DefaultDropdownItemPadding = new(8, 5, 8, 5);
+        public static Thickness DefaultDropdownItemPadding { get; set; } = new(8, 5, 8, 5);
 
         /// <summary>See also: <see cref="ApplyDefaultDropdownButtonSettings(MGButton)"/></summary>
         public MGButton CreateDefaultDropdownButton()

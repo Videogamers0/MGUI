@@ -49,7 +49,7 @@
                     </StackPanel.Styles>
                     <GroupBox HorizontalAlignment="Left">
                         <GroupBox.Header>
-                            <Image Width="16" Height="16" RegionName="Backpack" />
+                            <Image Width="16" Height="16" SourceName="Backpack" />
                         </GroupBox.Header>
                         <TextBlock TextAlignment="Center" Text="This [c=Turquoise]GroupBox[/c] displays\nan [c=Turquoise]Image[/c] in its [c=Turquoise]Header[/c]" />
                     </GroupBox>
@@ -59,7 +59,7 @@
                     </TextBlock>
                     <GroupBox HeaderHorizontalMargin="25">
                         <GroupBox.Header>
-                            <Image Width="16" Height="16" RegionName="Backpack" />
+                            <Image Width="16" Height="16" SourceName="Backpack" />
                         </GroupBox.Header>
                         <TextBlock TextAlignment="Center" Text="This [c=Turquoise]GroupBox[/c] uses [c=Turquoise]HeaderHorizontalMargin[/c]=[c=LightBlue][s=Blue]25[/s][/c]" />
                     </GroupBox>
@@ -69,7 +69,7 @@
                     </TextBlock>
                     <GroupBox HeaderHorizontalPadding="25">
                         <GroupBox.Header>
-                            <Image Width="16" Height="16" RegionName="Backpack" />
+                            <Image Width="16" Height="16" SourceName="Backpack" />
                         </GroupBox.Header>
                         <TextBlock TextAlignment="Center" Text="This [c=Turquoise]GroupBox[/c] uses [c=Turquoise]HeaderHorizontalPadding[/c]=[c=LightBlue][s=Blue]25[/s][/c]" />
                     </GroupBox>
@@ -79,7 +79,7 @@
                     </TextBlock>
                     <GroupBox HeaderHorizontalMargin="25" HeaderHorizontalPadding="25">
                         <GroupBox.Header>
-                            <Image Width="16" Height="16" RegionName="Backpack" />
+                            <Image Width="16" Height="16" SourceName="Backpack" />
                         </GroupBox.Header>
                         <TextBlock TextAlignment="Center" Text="This [c=Turquoise]GroupBox[/c] uses [c=Turquoise]HeaderHorizontalMargin[/c]=[c=LightBlue][s=Blue]25[/s][/c]\nand [c=Turquoise]HeaderHorizontalPadding[/c]=[c=LightBlue][s=Blue]25[/s][/c]" />
                     </GroupBox>
@@ -98,7 +98,7 @@
                         </GroupBox.Background>
                         <GroupBox.Header>
                             <StackPanel Orientation="Horizontal" Spacing="5">
-                                <Image Width="16" Height="16" RegionName="Save" />
+                                <Image Width="16" Height="16" SourceName="Save" />
                                 <TextBlock VerticalAlignment="Center" FontSize="9" Text="Choose a Save Slot:" IsShadowed="True" ShadowColor="Black * 0.5" />
                             </StackPanel>
                         </GroupBox.Header>
@@ -164,7 +164,7 @@
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <GroupBox HorizontalAlignment="Left" IsExpandable="True">
                         <GroupBox.Header>
-                            <Image Width="16" Height="16" RegionName="Computer" />
+                            <Image Width="16" Height="16" SourceName="Computer" />
                         </GroupBox.Header>
                         <GroupBox.OuterHeaderPresenter>
                             <HeaderedContentPresenter HeaderPosition="Right" Spacing="10" />

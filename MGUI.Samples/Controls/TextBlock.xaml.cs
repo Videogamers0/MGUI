@@ -17,7 +17,7 @@ namespace MGUI.Samples.Controls
         public TextBlockSamples(ContentManager Content, MGDesktop Desktop)
             : base(Content, Desktop, nameof(Controls), "TextBlock.xaml")
         {
-            Window.AddNamedAction("OpenTextBlockFormattingWiki", x =>
+            Window.GetResources().AddCommand("OpenTextBlockFormattingWiki", x =>
             {
                 const string Url = @"https://github.com/Videogamers0/MGUI/wiki/Text-Formatting";
                 OpenURL(Url);

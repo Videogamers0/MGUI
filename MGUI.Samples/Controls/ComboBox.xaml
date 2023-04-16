@@ -228,7 +228,7 @@
                               SelectedIndex="0" Background="Purple">
                         <ComboBox.DropdownArrow>
                             <ContentPresenter>
-                                <Image Width="16" Height="16" RegionName="ArrowDownGreen" />
+                                <Image Width="16" Height="16" SourceName="ArrowDownGreen" />
                             </ContentPresenter>
                         </ComboBox.DropdownArrow>
                         <System:String>Option 1</System:String>

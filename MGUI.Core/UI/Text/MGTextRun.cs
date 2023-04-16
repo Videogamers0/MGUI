@@ -251,8 +251,8 @@ namespace MGUI.Core.UI.Text
                     yield return new MGTextRunLineBreak(CurrentAction.Parameter?.Length ?? 1);
                 else if (CurrentAction.ActionType == FTActionType.Image)
                 {
-                    var (RegionName, TargetWidth, TargetHeight) = FTTokenizer.ParseImageValue(CurrentAction.Parameter.Substring(1));
-                    yield return new MGTextRunImage(RegionName, TargetWidth ?? 0, TargetHeight ?? 0, CurrentToolTipId, CurrentActionId);
+                    var (SourceName, TargetWidth, TargetHeight) = FTTokenizer.ParseImageValue(CurrentAction.Parameter.Substring(1));
+                    yield return new MGTextRunImage(SourceName, TargetWidth ?? 0, TargetHeight ?? 0, CurrentToolTipId, CurrentActionId);
                 }
                 else if (CurrentAction.ActionType == FTActionType.SetToolTip)
                 {
@@ -346,20 +346,20 @@ namespace MGUI.Core.UI.Text
     /// <summary>An <see cref="MGTextRun"/> that renders a specific portion of a <see cref="Texture2D"/> with a given size.</summary>
     public class MGTextRunImage : MGTextRun
     {
-        /// <summary>The name of the <see cref="NamedTextureRegion"/> to render.<para/>
-        /// See also:<br/><see cref="MGDesktop.NamedRegions"/><br/><see cref="MGDesktop.AddNamedRegion(NamedTextureRegion)"/><br/><see cref="MGDesktop.TryDrawNamedRegion(DrawTransaction, string, Point, int?, int?, float, Color?)"/></summary>
-        public readonly string RegionName;
+        /// <summary>The name of the <see cref="MGTextureData"/> to render. This name should exist in <see cref="MGResources.Textures"/><para/>
+        /// See also:<br/><see cref="MGDesktop.Resources"/><br/><see cref="MGElement.GetResources"/><br/><see cref="MGResources.Textures"/><br/><see cref="MGResources.AddTexture(string, MGTextureData)"/></summary>
+        public readonly string SourceName;
         public readonly int TargetWidth;
         public readonly int TargetHeight;
 
-        public MGTextRunImage(string RegionName, int TargetWidth, int TargetHeight, string ToolTipId, string ActionId)
+        public MGTextRunImage(string SourceName, int TargetWidth, int TargetHeight, string ToolTipId, string ActionId)
             : base(TextRunType.Image, ToolTipId, ActionId)
         {
-            this.RegionName = RegionName;
+            this.SourceName = SourceName;
             this.TargetWidth = TargetWidth;
             this.TargetHeight = TargetHeight;
         }
 
-        public override string ToString() => $"{nameof(MGTextRunImage)}: {RegionName} - {TargetWidth},{TargetHeight}";
+        public override string ToString() => $"{nameof(MGTextRunImage)}: {SourceName} - {TargetWidth},{TargetHeight}";
     }
 }

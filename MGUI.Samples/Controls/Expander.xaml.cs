@@ -24,7 +24,7 @@ namespace MGUI.Samples.Controls
                 string TextureName = CustomIconExpander.IsExpanded ? "ArrowUpGreen" : "ArrowDownGreen";
                 const int Size = 16;
                 Point Position = CustomIconExpander.ExpanderToggleButton.LayoutBounds.Center - new Point(Size / 2, Size / 2) + e.DA.Offset;
-                Desktop.TryDrawNamedRegion(e.DA.DT, TextureName, Position, Size, Size);
+                Desktop.Resources.TryDrawTexture(e.DA.DT, TextureName, Position, Size, Size);
             };
 #endif
         }

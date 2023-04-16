@@ -385,18 +385,18 @@ namespace MGUI.Core.UI.Text
 
         //  The name to reference the texture by, followed by an optional target size X Y
         //  EX: "[img=Gold.png 32x16]" would reference a texture by name="Gold.png", and draw it with Width=32, Height=16
-        private static readonly string ImageValuePattern = $@"(?<RegionName>.+?)( (?<Width>\d{{1,4}})( |,|x|X)(?<Height>\d{{1,4}}))?{CloseTagOrEndOfStringLookahead}";
+        private static readonly string ImageValuePattern = $@"(?<SourceName>.+?)( (?<Width>\d{{1,4}})( |,|x|X)(?<Height>\d{{1,4}}))?{CloseTagOrEndOfStringLookahead}";
         private static readonly Regex ImageValueParser = new(ImageValuePattern);
 
-        internal static (string RegionName, int? TargetWidth, int? TargetHeight) ParseImageValue(string Value)
+        internal static (string SourceName, int? TargetWidth, int? TargetHeight) ParseImageValue(string Value)
         {
             Match Match = ImageValueParser.Match(Value);
 
-            string RegionName = Match.Groups["RegionName"].Value;
+            string SourceName = Match.Groups["SourceName"].Value;
             int? Width = Match.Groups["Width"].Success ? int.Parse(Match.Groups["Width"].Value) : null;
             int? Height = Match.Groups["Height"].Success ? int.Parse(Match.Groups["Height"].Value) : null;
 
-            return (RegionName, Width, Height);
+            return (SourceName, Width, Height);
         }
 
         /// <summary>Removes all formatted text markdown from the given <paramref name="Text"/> by prefixing all instances of <see cref="OpenTagChar"/> with <see cref="EscapeOpenTagChar"/>.<para/>

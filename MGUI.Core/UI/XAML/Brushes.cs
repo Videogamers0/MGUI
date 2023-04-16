@@ -161,23 +161,21 @@ namespace MGUI.Core.UI.XAML
 
     public class TextureFillBrush : FillBrush
     {
-        public string TextureRegionName { get; set; }
+        public string SourceName { get; set; }
         public Stretch Stretch { get; set; } = Stretch.Fill;
-        public float Opacity { get; set; } = 1.0f;
         public XAMLColor Color { get; set; } = new XAMLColor();
 
-        public TextureFillBrush() : this(null, Stretch.Fill, 1.0f, new XAMLColor()) { }
-        public TextureFillBrush(string TextureRegionName, Stretch Stretch, float Opacity, XAMLColor Color)
+        public TextureFillBrush() : this(null, Stretch.Fill, new XAMLColor()) { }
+        public TextureFillBrush(string SourceName, Stretch Stretch, XAMLColor Color)
         {
-            this.TextureRegionName = TextureRegionName;
+            this.SourceName = SourceName;
             this.Stretch = Stretch;
-            this.Opacity = Opacity;
             this.Color = Color;
         }
 
-        public override string ToString() => $"{nameof(TextureFillBrush)}: {TextureRegionName} ({Stretch})";
+        public override string ToString() => $"{nameof(TextureFillBrush)}: {SourceName} ({Stretch})";
 
-        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGTextureFillBrush(Desktop, TextureRegionName, Stretch, Opacity, Color.ToXNAColor());
+        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGTextureFillBrush(Desktop, SourceName, Stretch, Color.ToXNAColor());
     }
 
     [ContentProperty(nameof(FillBrush))]
@@ -355,9 +353,9 @@ namespace MGUI.Core.UI.XAML
 
     public class TexturedBorderBrush : BorderBrush
     {
-        public string EdgeTextureRegionName { get; set; }
+        public string EdgeTextureName { get; set; }
         public XAMLColor? EdgeColor { get; set; }
-        public string CornerTextureRegionName { get; set; }
+        public string CornerTextureName { get; set; }
         public XAMLColor? CornerColor { get; set; }
         public float Opacity { get; set; } = 1.0f;
 
@@ -366,19 +364,19 @@ namespace MGUI.Core.UI.XAML
         private TextureTransforms Transforms => EdgeBasis.HasValue && CornerBasis.HasValue ? TextureTransforms.CreateStandardRotated(EdgeBasis.Value, CornerBasis.Value) : new();
 
         public TexturedBorderBrush() : this(null, null, null, null, 1.0f) { }
-        public TexturedBorderBrush(string EdgeTextureRegionName, XAMLColor? EdgeColor, string CornerTextureRegionName, XAMLColor? CornerColor, float Opacity)
+        public TexturedBorderBrush(string EdgeTextureName, XAMLColor? EdgeColor, string CornerTextureName, XAMLColor? CornerColor, float Opacity)
         {
-            this.EdgeTextureRegionName = EdgeTextureRegionName;
+            this.EdgeTextureName = EdgeTextureName;
             this.EdgeColor = EdgeColor;
-            this.CornerTextureRegionName = CornerTextureRegionName;
+            this.CornerTextureName = CornerTextureName;
             this.CornerColor = CornerColor;
             this.Opacity = Opacity;
         }
 
-        public override string ToString() => $"{nameof(TexturedBorderBrush)}: {EdgeTextureRegionName} / {CornerTextureRegionName}";
+        public override string ToString() => $"{nameof(TexturedBorderBrush)}: {EdgeTextureName} / {CornerTextureName}";
 
         public override IBorderBrush ToBorderBrush(MGDesktop Desktop)
-            => new MGTexturedBorderBrush(Desktop, EdgeTextureRegionName, CornerTextureRegionName, EdgeColor?.ToXNAColor(), CornerColor?.ToXNAColor(), Transforms, Opacity);
+            => new MGTexturedBorderBrush(Desktop, EdgeTextureName, CornerTextureName, EdgeColor?.ToXNAColor(), CornerColor?.ToXNAColor(), Transforms, Opacity);
     }
     #endregion Border Brush
 }

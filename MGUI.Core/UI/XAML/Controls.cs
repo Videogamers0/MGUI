@@ -151,9 +151,9 @@ namespace MGUI.Core.UI.XAML
         [Browsable(false)]
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
 
-        /// <summary>The name of the delegate to invoke when clicking this <see cref="Button"/>.<br/>
-        /// This name should exist in <see cref="MGWindow.NamedActions"/>, otherwise nothing will be invoked when clicking this <see cref="Button"/><para/>
-        /// See also: <see cref="MGWindow.AddNamedAction(string, Action{MGElement})"/></summary>
+        /// <summary>The name of the command to execute when this <see cref="Button"/> is left-clicked, or null if no named command should be executed when left-clicked.<para/>
+        /// This name should exist in <see cref="MGResources.Commands"/>, otherwise nothing will be invoked when clicking this <see cref="Button"/><para/>
+        /// See also:<br/><see cref="MGElement.GetResources"/><br/><see cref="MGResources.Commands"/><br/><see cref="MGResources.AddCommand(string, Action{MGElement})"/></summary>
         [Category("Behavior")]
         public string CommandName { get; set; }
 
@@ -568,31 +568,17 @@ namespace MGUI.Core.UI.XAML
         public override MGElementType ElementType => MGElementType.Image;
 
         [Category("Data")]
-        public string TextureName { get; set; }
+        public string SourceName { get; set; }
         [Category("Data")]
-        public string RegionName { get; set; }
-        [Category("Data")]
-        public Texture2D Texture { get; set; }
+        public MGTextureData? Source { get; set; }
 
         [Category("Appearance")]
         public XAMLColor? TextureColor { get; set; }
-        public XAMLRectangle? SourceRect { get; set; }
         [Category("Layout")]
         public Stretch? Stretch { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
-        {
-            if (!string.IsNullOrEmpty(RegionName))
-                return new MGImage(Window, RegionName);
-            else
-            {
-                MGDesktop Desktop = Window.GetDesktop();
-                if (!string.IsNullOrEmpty(TextureName))
-                    return new MGImage(Window, Desktop.NamedTextures[TextureName], SourceRect?.ToRectangle());
-                else
-                    return new MGImage(Window, Texture, SourceRect?.ToRectangle(), TextureColor?.ToXNAColor(), Stretch ?? UI.Stretch.Uniform);
-            }
-        }
+            => Source.HasValue ? new MGImage(Window, Source.Value) : new MGImage(Window, SourceName);
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
@@ -600,8 +586,6 @@ namespace MGUI.Core.UI.XAML
 
             if (TextureColor.HasValue)
                 Image.TextureColor = TextureColor.Value.ToXNAColor();
-            if (SourceRect.HasValue)
-                Image.SetTexture(Image.Texture, SourceRect.Value.ToRectangle());
             if (Stretch.HasValue)
                 Image.Stretch = Stretch.Value;
         }
@@ -622,7 +606,7 @@ namespace MGUI.Core.UI.XAML
         {
             if (value is string stringValue)
             {
-                Image Image = new() { RegionName = stringValue };
+                Image Image = new() { SourceName = stringValue };
                 return Image;
             }
 
@@ -1910,6 +1894,11 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.Window;
 
+        /// <summary>The name of the <see cref="MGTheme"/> to use when parsing this XAML content.<br/>
+        /// Themes are retrieved via <see cref="MGResources.Themes"/>. Uses <see cref="MGResources.DefaultTheme"/> if no name is specified.</summary>
+        [Category("Appearance")]
+        public string ThemeName { get; set; }
+
         [Category("Layout")]
         public int? Left { get; set; }
         [Category("Layout")]
@@ -1976,21 +1965,26 @@ namespace MGUI.Core.UI.XAML
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
+            MGTheme Theme = Window.GetResources().GetThemeOrDefault(ThemeName, Window.Theme);
             int WindowWidth = Math.Clamp(Width ?? 0, MinWidth ?? 0, MaxWidth ?? int.MaxValue);
             int WindowHeight = Math.Clamp(Height ?? 0, MinHeight ?? 0, MaxHeight ?? int.MaxValue);
-            MGWindow Instance = new(Window, Left ?? 0, Top ?? 0, WindowWidth, WindowHeight, Window.Theme);
+            MGWindow Instance = new(Window, Left ?? 0, Top ?? 0, WindowWidth, WindowHeight, Theme);
             foreach (Window Nested in NestedWindows)
                 Instance.AddNestedWindow(Nested.ToElement<MGWindow>(Window, Window));
             return Instance;
         }
 
-        public MGWindow ToElement(MGDesktop Desktop, MGTheme Theme)
+        public MGWindow ToElement(MGDesktop Desktop)
         {
+            MGResources Resources = Desktop.Resources;
+            MGTheme Theme = Resources.GetThemeOrDefault(ThemeName);
+
             int WindowWidth = Math.Clamp(Width ?? 0, MinWidth ?? 0, MaxWidth ?? int.MaxValue);
             int WindowHeight = Math.Clamp(Height ?? 0, MinHeight ?? 0, MaxHeight ?? int.MaxValue);
             MGWindow Window = new(Desktop, Left ?? 0, Top ?? 0, WindowWidth, WindowHeight, Theme);
             ApplySettings(null, Window, true);
             ProcessBindings(Window, true, null);
+
             return Window;
         }
 

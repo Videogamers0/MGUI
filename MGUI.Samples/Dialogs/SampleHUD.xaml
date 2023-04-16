@@ -48,7 +48,7 @@
                         <GradientFillBrush TopLeftColor="rgb(200,34,6)" BottomLeftColor="rgb(200,34,6)" TopRightColor="rgb(222,44,12)" BottomRightColor="rgb(222,44,12)" />
                     </ProgressBar.CompletedBrush>
                 </ProgressBar>
-                <Image RegionName="HUD_HP" />
+                <Image SourceName="HUD_HP" />
             </OverlayPanel>
             
             <!-- MP -->
@@ -58,7 +58,7 @@
                         <GradientFillBrush TopLeftColor="rgb(25,47,208)" BottomLeftColor="rgb(25,47,208)" TopRightColor="rgb(58,77,240)" BottomRightColor="rgb(58,77,240)" />
                     </ProgressBar.CompletedBrush>
                 </ProgressBar>
-                <Image RegionName="HUD_MP" />
+                <Image SourceName="HUD_MP" />
             </OverlayPanel>
             
             <!-- Stamina -->
@@ -68,7 +68,7 @@
                         <GradientFillBrush TopLeftColor="rgb(27,168,23)" BottomLeftColor="rgb(27,168,23)" TopRightColor="rgb(33,205,30)" BottomRightColor="rgb(33,205,30)" />
                     </ProgressBar.CompletedBrush>
                 </ProgressBar>
-                <Image RegionName="HUD_Stamina" />
+                <Image SourceName="HUD_Stamina" />
             </OverlayPanel>
             
             <!-- XP -->
@@ -92,7 +92,7 @@
 
         <!-- Player Active Buffs -->
         <InputConsumer HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8">
-            <Border BorderThickness="0" Padding="6" Background="Black * 0.6">
+            <Border BorderThickness="0" Padding="6" Background="Black * 0.8">
                 <ListBox Name="BuffsList" ItemType="{x:Type local:PlayerBuff}" SelectionMode="None" Background="Transparent"
                          OuterBorderThickness="0" InnerBorderThickness="0" ItemsPanelBorderThickness="0">
                     <ListBox.AlternatingRowBackgrounds>
@@ -119,7 +119,7 @@
                                     </Style>
                                 </StackPanel.Styles>
 
-                                <Image VerticalAlignment="Center" Width="16" Height="16" Texture="{MGBinding Path=IconTexture, Mode=OneTime}" SourceRect="{MGBinding Path=IconSourceRect, Mode=OneTime}" />
+                                <Image VerticalAlignment="Center" Width="16" Height="16" Source="{MGBinding Path=Icon, Mode=OneTime}" />
                                 <Timer VerticalAlignment="Center" ValueDisplayFormat="{}{{RemainingDuration}}" RemainingDurationStringFormat="m\:ss"
                                        RemainingDuration="{MGBinding Path=RemainingDuration, Mode=TwoWay}" Background="Transparent" BorderThickness="0" IsPaused="False" MinWidth="40"
                                        HorizontalContentAlignment="Right">

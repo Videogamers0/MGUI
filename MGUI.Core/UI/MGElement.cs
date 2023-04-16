@@ -105,6 +105,11 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
+    //Allow changing the position of tab headers in an MGTabControl
+    //      maybe MGTabControl should extend MGHeaderedContentPResenter instead of MGSingleContentHost
+    //      and subscribe to HCP.HeaderChanging to always cancel if not setting the header in the ctor
+    //      and subscribe to HCP.HeaderPositionChanged to update the HeadersPanelElement.Orientation accordingly
+    //          (and would also need to change things like default border thicknesses and paddings/margins of the tab header button styles)
     //Make ItemsSource bindable in combobox/listbox/listview/grid/unfiromgrid
     //      for example: ComboBox could have "public MGBinding ItemsSource"
     //      then in MGComboBox.LoadSettings, if ItemsSource binding is not null,
@@ -118,17 +123,6 @@ namespace MGUI.Core.UI
     //      (so you can't explicitly set the value, but you can still initialize an MGBinding for it)
     //maybe a way to register your own custom text markdown?
     //      RegisterFormattingCode(string Name, settings...)
-    //'Resources' class? MGDesktop would have 1 reference to this instance.
-    //		Contains things like Dictionary<string, MGTheme> Themes (so you can specify a ThemeId when parsing XAML)
-    //      Dictionary<string, StyleSet> a StyleSet just contains a name/Id and a List<Style>
-    //          so you could have a window opt-in to a set to styles and you wouldnt have to duplicate code like
-    //          <Window><Window.Styles>...</Window.Styles>...</Window> on each of your windows
-    //		refactor the named textures and textureregions to be stored here instead of in MGDesktop
-    //		could also have Dictionary<string, Action> Commands and refactor MGWindow.NamedActions
-    //      maybe also something like:
-    //          TemplatedElement: string Name/Id, Func<Window, MGElement> Template, bool IsShared (if shared, only 1 instance created? if not, creates an instance everytime its referenced)
-    //          So then you could do things like: <ContentPresenter ContentTemplateId="Foo" /> and it would find the TemplatedElement with Name="Foo", and invoke it's Template method
-    //          to create an instance (assuming its not shared) and set te ContentPresenter's Content to the instance, so it basically allows you to re-use chunks of visual tree content
     //In Element.ProcessStyles method, we need a better way to detect which properties do or don't have an explicit value in the XAML.
     //      maybe there's a way to be notified by the XAML processor when it sets a value?
     //      in XAMLParser.cs we could try using XamlServices.Load(XamlReader) instead of XamlServices.Parse, maybe that somehow lets us detect StartMember xml nodes or something
@@ -182,6 +176,7 @@ namespace MGUI.Core.UI
 		public MGDesktop GetDesktop() => SelfOrParentWindow.Desktop;
         /// <summary>Prioritizes <see cref="MGWindow.Theme"/>. If null, falls back to <see cref="MGDesktop.Theme"/></summary>
         public MGTheme GetTheme() => SelfOrParentWindow.Theme ?? GetDesktop().Theme;
+        public MGResources GetResources() => GetDesktop().Resources;
 
 		/// <summary>The <see cref="MGWindow"/> that this <see cref="MGElement"/> belongs to. This value is only null if this <see cref="MGElement"/> is an <see cref="MGWindow"/> with no parent.</summary>
 		public MGWindow ParentWindow { get; }

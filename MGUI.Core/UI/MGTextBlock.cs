@@ -358,14 +358,14 @@ namespace MGUI.Core.UI
 
                     foreach (var KVP in ActionBounds)
                     {
-                        string ActionName = KVP.Key;
-                        if (ParentWindow.NamedActions.TryGetValue(ActionName, out var Delegate))
+                        string CommandName = KVP.Key;
+                        if (GetResources().TryGetCommand(CommandName, out Action<MGElement> Command))
                         {
                             foreach (Rectangle Bounds in KVP.Value)
                             {
                                 if (Bounds.Contains(MousePosition))
                                 {
-                                    Delegate(this);
+                                    Command(this);
                                     e.SetHandledBy(this, false);
                                     return;
                                 }
@@ -396,8 +396,8 @@ namespace MGUI.Core.UI
                     if (Run.RunType == TextRunType.Image && Run is MGTextRunImage ImageRun && 
                         ImageRun.TargetWidth <= 0 && ImageRun.TargetHeight <= 0)
                     {
-                        (int? DefaultWidth, int? DefaultHeight) = Desktop.GetNamedRegionDimensions(ImageRun.RegionName);
-                        CurrentRun = new MGTextRunImage(ImageRun.RegionName, DefaultWidth ?? 0, DefaultHeight ?? 0, ImageRun.ToolTipId, ImageRun.ActionId);
+                        (int? DefaultWidth, int? DefaultHeight) = Desktop.Resources.GetTextureDimensions(ImageRun.SourceName);
+                        CurrentRun = new MGTextRunImage(ImageRun.SourceName, DefaultWidth ?? 0, DefaultHeight ?? 0, ImageRun.ToolTipId, ImageRun.ActionId);
                     }
 
                     Temp.Add(CurrentRun);
@@ -749,7 +749,7 @@ namespace MGUI.Core.UI
                         int ImgWidth = ImageRun.TargetWidth;
                         int ImgHeight = ImageRun.TargetHeight;
                         int YPosition = ApplyAlignment(LineBounds, HorizontalAlignment.Center, VerticalContentAlignment, new Size(ImgWidth, ImgHeight)).Top;
-                        Desktop.TryDrawNamedRegion(DT, ImageRun.RegionName, new Point((int)CurrentX, YPosition), ImgWidth, ImgHeight);
+                        Desktop.Resources.TryDrawTexture(DT, ImageRun.RegionName, new Point((int)CurrentX, YPosition), ImgWidth, ImgHeight);
                         CurrentX += ImgWidth;
                     }
                     else if (Run.RunType == TextRunType.Text && Run is MGTextRunText TextRun)
@@ -857,7 +857,7 @@ namespace MGUI.Core.UI
                         int ImgHeight = ImageRun.TargetHeight;
                         int YPosition = ApplyAlignment(LineBounds, HorizontalAlignment.Center, VerticalContentAlignment, new Size(ImgWidth, ImgHeight)).Top;
                         Point Position = new Vector2((int)CurrentX, YPosition).TransformBy(Transform).ToPoint();
-                        Desktop.TryDrawNamedRegion(DT, ImageRun.RegionName, Position, (int)(ImgWidth * ImageSizeScalar), (int)(ImgHeight * ImageSizeScalar), DA.Opacity);
+                        Desktop.Resources.TryDrawTexture(DT, ImageRun.SourceName, Position, (int)(ImgWidth * ImageSizeScalar), (int)(ImgHeight * ImageSizeScalar), DA.Opacity);
                         RunBounds = new(CurrentX, YPosition, ImgWidth, ImgHeight);
                         CurrentX += ImgWidth;
                     }

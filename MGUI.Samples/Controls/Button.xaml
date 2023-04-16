@@ -28,7 +28,7 @@
                 Buttons are rectangular clickable controls that can host arbitrary Content inside them.
             </TextBlock>
             <Separator />
-            <Button Name="Button1" Content="Click me!" HorizontalAlignment="Left" Padding="15,5" IsRepeatButton="True" />
+            <Button Name="Button1" Content="Click me!" HorizontalAlignment="Left" Padding="15,5" />
 
             <DockPanel>
                 <TextBlock Dock="Top">
@@ -81,7 +81,7 @@
                                 <BorderBand Brush="rgb(130,130,130)" />
                             </BandedBorderBrush>
                         </Button.BorderBrush>
-                        <Image Width="24" Height="24" RegionName="Computer" />
+                        <Image Width="24" Height="24" SourceName="Computer" />
                     </Button>
                     <Spacer Height="5" />
                     <TextBlock>
@@ -128,7 +128,7 @@
                     <TextBlock>
                         [c=Turquoise]RenderScale[/c] can also be applied to other types of Content, such as this [c=Turquoise]Image[/c]:
                     </TextBlock>
-                    <Image HorizontalAlignment="Center" Stretch="Uniform" Width="40" Height="40" RegionName="SkullAndCrossbones" RenderScale="1.25" />
+                    <Image HorizontalAlignment="Center" Stretch="Uniform" Width="40" Height="40" SourceName="SkullAndCrossbones" RenderScale="1.25" />
                 </StackPanel>
             </DockPanel>
             <Separator/>

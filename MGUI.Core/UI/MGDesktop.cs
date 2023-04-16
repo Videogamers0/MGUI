@@ -19,8 +19,6 @@ using System.IO;
 
 namespace MGUI.Core.UI
 {
-    public readonly record struct NamedTextureRegion(string TextureName, string RegionName, Rectangle? SourceRect, Color? Color);
-
     /// <summary>Represents a Rectanglular screen bounds that you can add or remove <see cref="MGWindow"/>s to/from, 
     /// and handles mutual exclusion with things like input handling or ensuring there is only 1 <see cref="MGToolTip"/> or <see cref="MGContextMenu"/> on the user interface at a time.</summary>
     public class MGDesktop : ViewModelBase, IMouseHandlerHost, IKeyboardHandlerHost, IContextMenuHost
@@ -270,6 +268,7 @@ namespace MGUI.Core.UI
         }
         #endregion Windows
 
+        #region Keyboard Focus
         internal MGElement QueuedFocusedKeyboardHandler { get; set; } = null;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -308,91 +307,28 @@ namespace MGUI.Core.UI
         }
 
         public event EventHandler<EventArgs<MGElement>> FocusedKeyboardHandlerChanged;
+        #endregion Keyboard Focus
 
         /// <summary>Represents the screen space that can be occupied with <see cref="MGElement"/>s.<para/>
         /// For example, an <see cref="MGContextMenu"/> will attempt to position itself such that it is not rendered outside of these bounds.</summary>
         public Rectangle ValidScreenBounds => Renderer.Host.GetBounds();
 
-        public MGTheme Theme { get; }
-
-        #region Named Textures / Regions
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Dictionary<string, Texture2D> _NamedTextures { get; }
-        /// <summary>This dictionary is commonly used by <see cref="MGImage"/> to reference textures by a string key value.<para/>
-        /// See also:<br/><see cref="AddNamedTexture(string, Texture2D)"/><br/><see cref="RemoveNamedTexture(string)"/><br/><see cref="NamedRegions"/></summary>
-        public IReadOnlyDictionary<string, Texture2D> NamedTextures => _NamedTextures;
-
-        public void AddNamedTexture(string Name, Texture2D Texture) => _NamedTextures.Add(Name, Texture);
-        public void RemoveNamedTexture(string Name)
-        {
-            _NamedTextures.Remove(Name);
-            List<NamedTextureRegion> DerivedRegions = _NamedRegions.Values.Where(x => x.TextureName == Name).ToList();
-            foreach (NamedTextureRegion Region in DerivedRegions)
-                RemoveNamedRegion(Region.RegionName);
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Dictionary<string, NamedTextureRegion> _NamedRegions { get; }
-        /// <summary>This dictionary is commonly used by <see cref="MGImage"/> to reference textures and various other texture settings by a string key value.<para/>
-        /// See also:<br/><see cref="AddNamedRegion(NamedTextureRegion)"/><br/><see cref="RemoveNamedRegion(string)"/><br/><see cref="NamedTextures"/></summary>
-        public IReadOnlyDictionary<string, NamedTextureRegion> NamedRegions => _NamedRegions;
-
-        /// <param name="Region">Recommended to avoid <see cref="NamedTextureRegion.RegionName"/>s containing <see cref="Text.FTTokenizer.CloseTagChar"/>,<br/>
-        /// since the parsing logic in <see cref="Text.FTTokenizer.Tokenize(string, bool)"/> isn't robust enough to handle such cases unambiguously.</param>
-        public void AddNamedRegion(NamedTextureRegion Region)
-        {
-            if (!_NamedTextures.ContainsKey(Region.TextureName))
-                throw new InvalidOperationException($"{nameof(MGDesktop)}.{nameof(NamedTextures)} does not contain an entry for {nameof(NamedTextureRegion.TextureName)}={Region.TextureName}");
-            _NamedRegions.Add(Region.RegionName, Region);
-        }
-        public void RemoveNamedRegion(string RegionName) => _NamedRegions.Remove(RegionName);
-
-        internal (int? Width, int? Height) GetNamedRegionDimensions(string RegionName)
-        {
-            if (_NamedRegions.TryGetValue(RegionName, out NamedTextureRegion Region) && _NamedTextures.TryGetValue(Region.TextureName, out Texture2D Texture))
-            {
-                int Width = Region.SourceRect?.Width ?? Texture.Width;
-                int Height = Region.SourceRect?.Height ?? Texture.Height;
-                return (Width, Height);
-            }
-            else
-                return (null, null);
-        }
-
-        public bool TryDrawNamedRegion(DrawTransaction DT, string RegionName, Rectangle TargetBounds, float Opacity = 1.0f, Color? Color = null)
-            => TryDrawNamedRegion(DT, RegionName, TargetBounds.TopLeft(), TargetBounds.Width, TargetBounds.Height, Opacity, Color);
-        public bool TryDrawNamedRegion(DrawTransaction DT, string RegionName, Point Position, int? Width, int? Height, float Opacity = 1.0f, Color? Color = null)
-        {
-            if (_NamedRegions.TryGetValue(RegionName, out NamedTextureRegion Region) && _NamedTextures.TryGetValue(Region.TextureName, out Texture2D Texture))
-            {
-                int ActualWidth = Width ?? Texture.Width;
-                int ActualHeight = Height ?? Texture.Height;
-                Rectangle Destination = new(Position.X, Position.Y, ActualWidth, ActualHeight);
-
-                DT.DrawTextureTo(Texture, Region.SourceRect, Destination, (Color ?? Region.Color ?? Microsoft.Xna.Framework.Color.White) * Opacity);
-
-                return true;
-            }
-            else
-                return false;
-        }
-        #endregion Named Textures / Regions
+        public MGResources Resources { get; }
+        /// <summary>Convenience property that just returns <see cref="Resources"/>.<see cref="MGResources.DefaultTheme"/></summary>
+        public MGTheme Theme => Resources.DefaultTheme;
 
         public MGDesktop(MainRenderer Renderer)
         {
             this.Renderer = Renderer;
             this.Windows = new();
-            this.Theme = new(Renderer.FontManager.DefaultFontFamily);
-
-            this._NamedTextures = new();
-            this._NamedRegions = new();
+            this.Resources = new(new MGTheme(Renderer.FontManager.DefaultFontFamily));
 
             #region Sample Icons
             Texture2D CheckMark_64x64 = Renderer.Content.Load<Texture2D>(Path.Combine("Icons", "CheckMark_64x64"));
-            _NamedTextures.Add("CheckMark_64x64", CheckMark_64x64);
+            Resources.AddTexture("CheckMark_64x64", new(CheckMark_64x64));
 
             Texture2D AngryMeteor_MilitaryIconsSet = Renderer.Content.Load<Texture2D>(Path.Combine("Icons", "AngryMeteor_MilitaryIconsSet"));
-            _NamedTextures.Add("AngryMeteor", AngryMeteor_MilitaryIconsSet);
+            Resources.AddTexture("AngryMeteor", new(AngryMeteor_MilitaryIconsSet));
 
             int TextureTopMargin = 6;
             int TextureSpacing = 1;
@@ -436,7 +372,8 @@ namespace MGUI.Core.UI
             foreach (var (Name, Row, Column) in Icons)
             {
                 Rectangle SourceRect = new(Column * (TextureIconSize + TextureSpacing), TextureTopMargin + Row * (TextureIconSize + TextureSpacing), TextureIconSize, TextureIconSize);
-                AddNamedRegion(new("AngryMeteor", Name, SourceRect, null));
+                MGTextureData TextureData = new(AngryMeteor_MilitaryIconsSet, SourceRect);
+                Resources.AddTexture(Name, TextureData);
             }
 
             TextureTopMargin = 166;
@@ -448,7 +385,8 @@ namespace MGUI.Core.UI
             foreach (var (Name, Row, Column) in Icons)
             {
                 Rectangle SourceRect = new(Column * (TextureIconSize + TextureSpacing), TextureTopMargin + Row * (TextureIconSize + TextureSpacing), TextureIconSize, TextureIconSize);
-                AddNamedRegion(new("AngryMeteor", Name, SourceRect, null));
+                MGTextureData TextureData = new(AngryMeteor_MilitaryIconsSet, SourceRect);
+                Resources.AddTexture(Name, TextureData);
             }
             #endregion Sample Icons
 

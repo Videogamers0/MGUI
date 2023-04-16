@@ -593,35 +593,6 @@ namespace MGUI.Core.UI
         }
         #endregion RadioButton Groups
 
-        #region Named Actions
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Dictionary<string, Action<MGElement>> _NamedActions { get; }
-        /// <summary>This dictionary is commonly used by <see cref="MGTextBlock"/> to reference delegates by a string key value.<para/>
-        /// See also:<br/><see cref="AddNamedAction(string, Action{MGElement})"/><br/><see cref="RemoveNamedAction(string)"/><para/>
-        /// EX: If you create an <see cref="MGTextBlock"/> and set its text to:
-        /// <code>[Action=ABC]This text invokes a delegate when clicked[/Action] but this text doesn't</code>
-        /// then the <see cref="Action{MGElement}"/> with the name "ABC" will be invoked when clicking the substring "This text invokes a delegate when clicked"</summary>
-        public IReadOnlyDictionary<string, Action<MGElement>> NamedActions => _NamedActions;
-
-        public void AddNamedAction(string Name, Action<MGElement> Action)
-        {
-            _NamedActions.Add(Name, Action);
-            OnActionRegistered?.Invoke(this, Name);
-        }
-        public void RemoveNamedAction(string Name)
-        {
-            _NamedActions.Remove(Name);
-            OnActionUnregistered?.Invoke(this, Name);
-        }
-
-        /// <summary>Invoked when a new value is added to <see cref="NamedActions"/> via <see cref="AddNamedAction(string, Action{MGElement})"/><para/>
-        /// See also: <see cref="OnActionUnregistered"/></summary>
-        public event EventHandler<string> OnActionRegistered;
-        /// <summary>Invoked when a value is removed from <see cref="NamedActions"/> via <see cref="RemoveNamedAction(string)"/><para/>
-        /// See also: <see cref="OnActionRegistered"/></summary>
-        public event EventHandler<string> OnActionUnregistered;
-        #endregion Named Actions
-
         #region Named ToolTips
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Dictionary<string, MGToolTip> _NamedToolTips { get; }
@@ -774,7 +745,8 @@ namespace MGUI.Core.UI
 
         #region Data Context
         private object _WindowDataContext;
-        /// <summary>The default <see cref="MGElement.DataContext"/> for all elements that do not explicitly define a <see cref="MGElement.DataContextOverride"/></summary>
+        /// <summary>The default <see cref="MGElement.DataContext"/> for all elements that do not explicitly define a <see cref="MGElement.DataContextOverride"/>.<para/>
+        /// If not specified, this value is automatically inherited from the <see cref="MGElement.ParentWindow"/> if there is one.</summary>
         public object WindowDataContext
         {
             get => _WindowDataContext ?? ParentWindow?.WindowDataContext;
@@ -847,7 +819,6 @@ namespace MGUI.Core.UI
 
                 this.RadioButtonGroups = new();
                 this._NestedWindows = new();
-                this._NamedActions = new();
                 this._NamedToolTips = new();
                 this.ModalWindow = null;
 

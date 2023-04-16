@@ -40,7 +40,7 @@ namespace MGUI.Core.UI
         /// <summary>The name of the command to execute when this <see cref="MGButton"/> is left-clicked, or null if no named command should be executed when left-clicked.<para/>
         /// If <see cref="Command"/> is also specified, <see cref="Command"/> will take priority and be executed first.<br/>
         /// (Which may result in the <see cref="CommandName"/> logic not being executed if <see cref="Command"/> returns true)<para/>
-        /// See also: <see cref="Command"/>, <see cref="MGWindow.NamedActions"/>, <see cref="MGWindow.AddNamedAction(string, Action{MGElement})"/></summary>
+        /// See also:<br/><see cref="Command"/><br/><see cref="MGElement.GetResources"/><br/><see cref="MGResources.Commands"/><br/><see cref="MGResources.AddCommand(string, Action{MGElement})"/></summary>
         public string CommandName
         {
             get => _CommandName;
@@ -222,8 +222,7 @@ namespace MGUI.Core.UI
                 Invoked = true;
             }
 
-            if (CanInvoke() && !string.IsNullOrEmpty(CommandName) &&
-                ParentWindow.NamedActions.TryGetValue(CommandName, out Action<MGElement> Command))
+            if (CanInvoke() && GetResources().TryGetCommand(CommandName, out Action<MGElement> Command))
             {
                 args.SetHandledBy(this, false);
                 Command(this);

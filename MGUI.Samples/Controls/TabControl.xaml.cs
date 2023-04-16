@@ -17,7 +17,7 @@ namespace MGUI.Samples.Controls
         {
             TabControl1 = Window.GetElementByName<MGTabControl>("TabControl1");
 
-            Window.AddNamedAction("CloseTab3", x =>
+            Window.GetResources().AddCommand("CloseTab3", x =>
             {
                 if (TabControl1.Tabs.Count == 3)
                 {

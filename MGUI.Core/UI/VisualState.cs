@@ -115,6 +115,9 @@ namespace MGUI.Core.UI
             this.NormalValue = Value;
         }
 
+        public VisualStateSetting(TDataType Value)
+            : this(Value, Value, Value) { }
+
         public VisualStateSetting(TDataType NormalValue, TDataType SelectedValue, TDataType DisabledValue)
         {
             this.NormalValue = NormalValue;

@@ -2,7 +2,7 @@
         Left="440" Top="20" MinHeight="0" SizeToContent="WidthAndHeight" WindowStyle="None">
     <Border BorderThickness="12" Background="DarkBlue" Padding="10">
         <Border.BorderBrush>
-            <TexturedBorderBrush EdgeTextureRegionName="BorderEdgeRegion1" CornerTextureRegionName="BorderCornerRegion1" EdgeBasis="Right" CornerBasis="BottomRight" />
+            <TexturedBorderBrush EdgeTextureName="BorderEdgeRegion1" CornerTextureName="BorderCornerRegion1" EdgeBasis="Right" CornerBasis="BottomRight" />
         </Border.BorderBrush>
 
         <Grid RowLengths="*,auto" ColumnLengths="auto,auto" RowSpacing="10" ColumnSpacing="20">

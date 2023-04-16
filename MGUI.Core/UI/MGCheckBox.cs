@@ -281,8 +281,8 @@ namespace MGUI.Core.UI
             }
 #else
             Rectangle CheckMarkBounds = Bounds.GetScaledFromCenter(0.75f).GetTranslated(Offset);
-            //Desktop.TryDrawNamedRegion(DT, "CheckMarkGreen_12x12", CheckMarkBounds, Opacity, Color);
-            DT.DrawTextureTo(Desktop.NamedTextures["CheckMark_64x64"], null, CheckMarkBounds, Color);
+            //Desktop.Resources.TryDrawTexture(DT, "CheckMarkGreen_12x12", CheckMarkBounds, Opacity, Color);
+            DT.DrawTextureTo(Desktop.Resources.Textures["CheckMark_64x64"], null, CheckMarkBounds, Color);
 #endif
         }
 

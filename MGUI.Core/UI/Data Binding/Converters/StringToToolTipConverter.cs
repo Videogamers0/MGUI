@@ -17,7 +17,7 @@ namespace MGUI.Core.UI.Data_Binding.Converters
 {
     public class StringToToolTipConverter : MarkupExtension, IValueConverter
     {
-        private static readonly Dictionary<string, Action<MGToolTip, MGTextBlock>> _Styles;
+        private static readonly Dictionary<string, Action<MGToolTip, MGTextBlock>> _Styles = new();
         /// <summary>See also:<br/>
         /// <see cref="AddNamedStyle(string, Action{MGToolTip, MGTextBlock})"/><br/>
         /// <see cref="RemoveNamedStyle(string)"/></summary>

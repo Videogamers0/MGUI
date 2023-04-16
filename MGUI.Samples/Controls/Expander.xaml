@@ -68,10 +68,10 @@
                         <ContextualContentPresenter Value="{MGBinding ElementName=CustomIconExpander, DataContextResolver=Self, Path=IsExpanded, Mode=OneWay}"
                                                     HorizontalAlignment="Center" VerticalAlignment="Center">
                             <ContextualContentPresenter.TrueContent>
-                                <Image Width="16" Height="16" RegionName="ArrowUpGreen" />
+                                <Image Width="16" Height="16" SourceName="ArrowUpGreen" />
                             </ContextualContentPresenter.TrueContent>
                             <ContextualContentPresenter.FalseContent>
-                                <Image Width="16" Height="16" RegionName="ArrowDownGreen" />
+                                <Image Width="16" Height="16" SourceName="ArrowDownGreen" />
                             </ContextualContentPresenter.FalseContent>
                         </ContextualContentPresenter>
                     </ToggleButton>

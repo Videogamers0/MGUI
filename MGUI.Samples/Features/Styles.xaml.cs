@@ -15,7 +15,7 @@ namespace MGUI.Samples.Features
         {
             MGTextBox ExampleTextBox = Window.GetElementByName<MGTextBox>("Example_TextBox");
 
-            Window.AddNamedAction("OpenStylesWiki", x =>
+            Window.GetResources().AddCommand("OpenStylesWiki", x =>
             {
                 const string Url = @"https://github.com/Videogamers0/MGUI/wiki/XAML#styles";
                 OpenURL(Url);

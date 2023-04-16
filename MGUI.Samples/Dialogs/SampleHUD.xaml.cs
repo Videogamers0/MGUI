@@ -15,6 +15,9 @@ using System.Collections.ObjectModel;
 using MGUI.Core.UI.Containers.Grids;
 using MonoGame.Extended;
 using MGUI.Shared.Text;
+using MGUI.Core.UI.XAML;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using Thickness = MonoGame.Extended.Thickness;
 
 namespace MGUI.Samples.Dialogs
 {
@@ -150,6 +153,10 @@ namespace MGUI.Samples.Dialogs
 
         private static void InitializeResources(ContentManager Content, MGDesktop Desktop)
         {
+            MGResources Resources = Desktop.Resources;
+
+            Texture2D AngryMeteor = Resources.Textures["AngryMeteor"].Texture;
+
             int TextureTopMargin = 6;
             int TextureSpacing = 1;
             int TextureIconSize = 16;
@@ -165,7 +172,7 @@ namespace MGUI.Samples.Dialogs
             foreach (var (Name, Row, Column) in Icons)
             {
                 Rectangle SourceRect = new(Column * (TextureIconSize + TextureSpacing), TextureTopMargin + Row * (TextureIconSize + TextureSpacing), TextureIconSize, TextureIconSize);
-                Desktop.AddNamedRegion(new("AngryMeteor", Name, SourceRect, null));
+                Resources.AddTexture(Name, new MGTextureData(AngryMeteor, SourceRect));
             }
 
             TextureSpacing = 1;
@@ -187,16 +194,18 @@ namespace MGUI.Samples.Dialogs
             foreach (var (Name, Row, Column) in Icons)
             {
                 Rectangle SourceRect = new(Column * (TextureIconSize + TextureSpacing), TextureTopMargin + Row * (TextureIconSize + TextureSpacing), TextureIconSize, TextureIconSize);
-                Desktop.AddNamedRegion(new("AngryMeteor", Name, SourceRect, null));
+                Resources.AddTexture(Name, new MGTextureData(AngryMeteor, SourceRect));
             }
         }
 
         public SampleHUD(ContentManager Content, MGDesktop Desktop)
-            : base(Content, Desktop, $"{nameof(Dialogs)}", $"{nameof(SampleHUD)}.xaml", null, () => InitializeResources(Content, Desktop))
+            : base(Content, Desktop, $"{nameof(Dialogs)}", $"{nameof(SampleHUD)}.xaml", () => InitializeResources(Content, Desktop))
         {
             UpdateWindowBounds();
             if (Desktop.Renderer.Host is GameRenderHost<Game1> Host)
                 Host.Game.Window.ClientSizeChanged += (sender, e) => UpdateWindowBounds();
+
+            MGResources Resources = Desktop.Resources;
 
             MaxHP = 120;
             CurrentHP = 80;
@@ -209,12 +218,12 @@ namespace MGUI.Samples.Dialogs
 
             ActiveBuffs = new()
             {
-                new(Desktop, "Deathtouch", TimeSpan.FromMinutes(1.0), Desktop.NamedRegions["Buff_Deathtouch"], "+5% insta-kill"),
-                new(Desktop, "Bone Plating", TimeSpan.FromMinutes(15.0), Desktop.NamedRegions["Buff_BonePlating"], "+25% DEF"),
-                new(Desktop, "Precision", TimeSpan.FromMinutes(8.0), Desktop.NamedRegions["Buff_Precision"], "+15% ACC"),
-                new(Desktop, "Voidguard", TimeSpan.FromMinutes(5.0), Desktop.NamedRegions["Buff_Voidguard"], "+25% M.DEF"),
-                new(Desktop, "Reflect", TimeSpan.FromMinutes(5.0), Desktop.NamedRegions["Buff_Reflect"], "+20% Dmg Reflect"),
-                new(Desktop, "Lucky", TimeSpan.FromMinutes(20.0), Desktop.NamedRegions["Diamond"], "+25% Rare item drop rate")
+                new(Desktop, "Deathtouch", TimeSpan.FromMinutes(1.0), Resources.Textures["Buff_Deathtouch"], "+5% insta-kill"),
+                new(Desktop, "Bone Plating", TimeSpan.FromMinutes(15.0), Resources.Textures["Buff_BonePlating"], "+25% DEF"),
+                new(Desktop, "Precision", TimeSpan.FromMinutes(8.0), Resources.Textures["Buff_Precision"], "+15% ACC"),
+                new(Desktop, "Voidguard", TimeSpan.FromMinutes(5.0), Resources.Textures["Buff_Voidguard"], "+25% M.DEF"),
+                new(Desktop, "Reflect", TimeSpan.FromMinutes(5.0), Resources.Textures["Buff_Reflect"], "+20% Dmg Reflect"),
+                new(Desktop, "Lucky", TimeSpan.FromMinutes(20.0), Resources.Textures["Diamond"], "+25% Rare item drop rate")
             };
 
             MGListBox<PlayerBuff> BuffsList = Window.GetElementByName<MGListBox<PlayerBuff>>("BuffsList");
@@ -235,11 +244,11 @@ namespace MGUI.Samples.Dialogs
             this.ToolBar = new(Desktop, 10);
 
             //  Create a few sample items and add them to the toolbar
-            Item Dagger = new(Desktop, "Dagger", "A small blade.", Desktop.NamedRegions["ToolBar_Dagger"]);
-            Item PickaxeShovel = new(Desktop, "Pickaxe and Shovel", "A set of useful tools.", Desktop.NamedRegions["ToolBar_PickaxeShovel"]);
-            Item Backpack = new(Desktop, "Knapsack", "A small pouch (Can hold up to 6 items).", Desktop.NamedRegions["ToolBar_Backpack"]);
-            Item Medkit = new(Desktop, "First-Aid kit", "Restores 50 HP", Desktop.NamedRegions["ToolBar_Medkit"]);
-            Item Diamond = new(Desktop, "Diamond", "A rare gem.", Desktop.NamedRegions["Diamond"]);
+            Item Dagger = new(Desktop, "Dagger", "A small blade.", Resources.Textures["ToolBar_Dagger"]);
+            Item PickaxeShovel = new(Desktop, "Pickaxe and Shovel", "A set of useful tools.", Resources.Textures["ToolBar_PickaxeShovel"]);
+            Item Backpack = new(Desktop, "Knapsack", "A small pouch (Can hold up to 6 items).", Resources.Textures["ToolBar_Backpack"]);
+            Item Medkit = new(Desktop, "First-Aid kit", "Restores 50 HP", Resources.Textures["ToolBar_Medkit"]);
+            Item Diamond = new(Desktop, "Diamond", "A rare gem.", Resources.Textures["Diamond"]);
             ToolBar.Slots[0].Item = new(Dagger, 1);
             ToolBar.Slots[1].Item = new(PickaxeShovel, 1);
             ToolBar.Slots[2].Item = new(Backpack, 1);
@@ -277,7 +286,7 @@ namespace MGUI.Samples.Dialogs
                     const int SlotPadding = 5;
                     Rectangle ItemBounds = ActualCellBounds.GetCompressed(SlotBorderSize + SlotPadding);
 
-                    Desktop.TryDrawNamedRegion(DT, Slot.Item.Item.Icon.RegionName, ItemBounds, e.DrawArgs.Opacity);
+                    Resources.TryDrawTexture(DT, Slot.Item.Item.Icon, ItemBounds, e.DrawArgs.Opacity);
 
                     //  Draw the quantity in the bottom-right corner
                     if (Slot.Item.Quantity > 1)
@@ -319,9 +328,9 @@ namespace MGUI.Samples.Dialogs
         public string Name { get; }
         public string Description { get; }
 
-        public NamedTextureRegion Icon { get; }
+        public MGTextureData Icon { get; }
+        public Texture2D IconTexture => Icon.Texture;
         public Rectangle? IconSourceRect => Icon.SourceRect;
-        public Texture2D IconTexture => Desktop.NamedTextures[Icon.TextureName];
 
         public TimeSpan TotalDuration { get; }
 
@@ -348,7 +357,7 @@ namespace MGUI.Samples.Dialogs
         /// This event is not repeatedly invoked if the duration continues to tick down to smaller negative values.</summary>
         public event EventHandler<PlayerBuff> OnExpired;
 
-        public PlayerBuff(MGDesktop Desktop, string Name, TimeSpan Duration, NamedTextureRegion Icon, string Description)
+        public PlayerBuff(MGDesktop Desktop, string Name, TimeSpan Duration, MGTextureData Icon, string Description)
         {
             this.Desktop = Desktop;
             this.Name = Name;
@@ -427,10 +436,10 @@ namespace MGUI.Samples.Dialogs
         }
     }
 
-    public readonly record struct Item(MGDesktop Desktop, string Name, string Description, NamedTextureRegion Icon)
+    public readonly record struct Item(MGDesktop Desktop, string Name, string Description, MGTextureData Icon)
     {
+        public Texture2D IconTexture => Icon.Texture;
         public Rectangle? IconSourceRect => Icon.SourceRect;
-        public Texture2D IconTexture => Desktop.NamedTextures[Icon.TextureName];
     }
 
     public class PlayerItem : ViewModelBase

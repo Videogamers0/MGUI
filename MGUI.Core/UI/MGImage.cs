@@ -38,12 +38,88 @@ namespace MGUI.Core.UI
     public class MGImage : MGElement
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Texture2D _Texture;
-        public Texture2D Texture { get => _Texture; set => SetTexture(value, SourceRect); }
+        private string _SourceName;
+        /// <summary>The name of the <see cref="MGTextureData"/> resource to draw, 
+        /// or null if the <see cref="MGTextureData"/> is explicitly specified via <see cref="Source"/>.<br/>
+        /// This resource is retrieved from <see cref="MGResources.Textures"/><para/>
+        /// See also:<br/><see cref="MGElement.GetResources"/><br/><see cref="MGResources.Textures"/><br/><see cref="MGResources.AddTexture(string, MGTextureData)"/></summary>
+        public string SourceName
+        {
+            get => _SourceName;
+            set
+            {
+                if (_SourceName != value)
+                {
+                    MGResources Resources = GetResources();
+                    if (SourceName != null)
+                    {
+                        Resources.OnTextureAdded -= Resources_OnTextureAddedRemoved;
+                        Resources.OnTextureRemoved -= Resources_OnTextureAddedRemoved;
+                    }
+                    _SourceName = value;
+                    NPC(nameof(SourceName));
+                    if (SourceName != null)
+                    {
+                        Resources.OnTextureAdded += Resources_OnTextureAddedRemoved;
+                        Resources.OnTextureRemoved += Resources_OnTextureAddedRemoved;
+                    }
+                    UpdateActualSource();
+                }
+            }
+        }
+
+        private void Resources_OnTextureAddedRemoved(object sender, (string Name, MGTextureData Data) e)
+        {
+            if (Name == SourceName)
+                UpdateActualSource();
+        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Rectangle? _SourceRect;
-        public Rectangle? SourceRect { get => _SourceRect; set => SetTexture(Texture, value); }
+        private MGTextureData? _Source;
+        /// <summary>The <see cref="MGTextureData"/> resource to draw,
+        /// or null if the <see cref="MGTextureData"/> is instead referenced by name via <see cref="SourceName"/>.<para/>
+        /// See also: <see cref="SourceName"/>, <see cref="ActualSource"/></summary>
+        public MGTextureData? Source
+        {
+            get => _Source;
+            set
+            {
+                if (_Source != value)
+                {
+                    _Source = value;
+                    NPC(nameof(Source));
+                    UpdateActualSource();
+                }
+            }
+        }
+
+        private void UpdateActualSource()
+        {
+            if (Source != null)
+                _ActualSource = Source;
+            else if (GetResources().TryGetTexture(SourceName, out MGTextureData Texture))
+                _ActualSource = Texture;
+            else
+                _ActualSource = null;
+        }
+
+        private MGTextureData? _ActualSource;
+        /// <summary>Prioritizes <see cref="Source"/> if specified, otherwise attempts to retrieve the named texture resource from <see cref="MGResources.Textures"/> based on <see cref="SourceName"/></summary>
+        public MGTextureData? ActualSource
+        {
+            get => _ActualSource;
+            private set
+            {
+                if (ActualSource != value)
+                {
+                    Size? PreviousSize = ActualSource?.RenderSize;
+                    _ActualSource = value;
+                    NPC(nameof(ActualSource));
+                    if (ActualSource?.RenderSize != PreviousSize)
+                        LayoutChanged(this, true);
+                }
+            }
+        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Color? _TextureColor;
@@ -61,40 +137,9 @@ namespace MGUI.Core.UI
             }
         }
 
-        private int UnstretchedWidth => SourceRect?.Width ?? Texture?.Width ?? 0;
-        private int UnstretchedHeight => SourceRect?.Height ?? Texture?.Height ?? 0;
+        private int UnstretchedWidth => ActualSource?.RenderSize.Width ?? 0;
+        private int UnstretchedHeight => ActualSource?.RenderSize.Height ?? 0;
         private double UnstretchedAspectRatio => UnstretchedHeight == 0 ? 1.0 : UnstretchedWidth * 1.0 / UnstretchedHeight;
-
-        public void SetTexture(Texture2D Texture, Rectangle? SourceRect)
-        {
-            if (_Texture != Texture || _SourceRect != SourceRect)
-            {
-                int PreviousWidth = UnstretchedWidth;
-                int PreviousHeight = UnstretchedHeight;
-
-                bool TextureChanged = false;
-                if (_Texture != Texture)
-                {
-                    _Texture = Texture;
-                    TextureChanged = true;
-                }
-
-                bool SourceRectChanged = false;
-                if (_SourceRect != SourceRect)
-                {
-                    _SourceRect = SourceRect;
-                    SourceRectChanged = true;
-                }
-
-                if (TextureChanged)
-                    NPC(nameof(Texture));
-                if (SourceRectChanged)
-                    NPC(nameof(SourceRect));
-
-                if (PreviousWidth != UnstretchedWidth || PreviousHeight != UnstretchedHeight)
-                    LayoutChanged(this, true);
-            }
-        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Stretch _Stretch;
@@ -129,28 +174,28 @@ namespace MGUI.Core.UI
             }
         }*/
 
-        /// <param name="RegionName">The name of the <see cref="NamedTextureRegion"/> used to reference the texture settings by. This name must exist in <see cref="MGDesktop.NamedRegions"/><para/>
-        /// See also: <see cref="MGDesktop.NamedTextures"/>, <see cref="MGDesktop.NamedRegions"/></param>
-        public MGImage(MGWindow Window, string RegionName, Stretch Stretch = Stretch.Uniform)
+        /// <param name="SourceName">The name of the <see cref="MGTextureData"/> in <see cref="MGResources.Textures"/> that should be drawn by this <see cref="MGImage"/>.<para/>
+        /// See also: <see cref="MGElement.GetResources"/>, <see cref="MGResources.Textures"/>, <see cref="MGImage.SourceName"/></param>
+        public MGImage(MGWindow Window, string SourceName, Stretch Stretch = Stretch.Uniform)
             : base(Window, MGElementType.Image)
         {
             using (BeginInitializing())
             {
-                MGDesktop Desktop = Window.GetDesktop();
-                NamedTextureRegion Region = Desktop.NamedRegions[RegionName];
-
-                SetTexture(Desktop.NamedTextures[Region.TextureName], Region.SourceRect);
-                this.TextureColor = Region.Color;
+                this.SourceName = SourceName;
+                this.TextureColor = null;
                 this.Stretch = Stretch;
             }
         }
 
         public MGImage(MGWindow Window, Texture2D Texture, Rectangle? SourceRect = null, Color? TextureColor = null, Stretch Stretch = Stretch.Uniform)
+            : this(Window, new MGTextureData(Texture, SourceRect), TextureColor, Stretch) { }
+
+        public MGImage(MGWindow Window, MGTextureData Source, Color? TextureColor = null, Stretch Stretch = Stretch.Uniform)
             : base(Window, MGElementType.Image)
         {
             using (BeginInitializing())
             {
-                SetTexture(Texture, SourceRect);
+                this.Source = Source;
                 this.TextureColor = TextureColor;
                 this.Stretch = Stretch;
             }
@@ -266,7 +311,7 @@ namespace MGUI.Core.UI
 
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
         {
-            if (Texture == null)
+            if (ActualSource?.Texture == null)
                 return;
 
             Rectangle PaddedBounds = LayoutBounds.GetCompressed(Padding);
@@ -302,7 +347,7 @@ namespace MGUI.Core.UI
                 throw new NotImplementedException($"Unrecognized {nameof(Stretch)}: {Stretch}");
             }
 
-            DA.DT.DrawTextureTo(Texture, SourceRect, Bounds.GetTranslated(DA.Offset), (this.TextureColor ?? Color.White) * DA.Opacity);
+            DA.DT.DrawTextureTo(ActualSource.Value.Texture, ActualSource.Value.SourceRect, Bounds.GetTranslated(DA.Offset), (this.TextureColor ?? Color.White) * DA.Opacity);
         }
     }
 }

@@ -85,13 +85,13 @@
                     <DockPanel Dock="Top" HorizontalAlignment="Left">
                         <TextBlock Dock="Left" Margin="0,0,8,0" Text="Using this texture:" VerticalAlignment="Center" />
                         <Border BorderBrush="Black" BorderThickness="1">
-                            <Image Dock="Top" TextureName="AngryMeteor" RegionName="BorderlessSteelFloor" Stretch="Uniform" Width="40" Height="40" />
+                            <Image Dock="Top" SourceName="BorderlessSteelFloor" Stretch="Uniform" Width="40" Height="40" />
                         </Border>
                     </DockPanel>
 
                     <ProgressBar Name="ProgressBar3" Minimum="0" Maximum="100" Value="0" Margin="0,3,0,6">
                         <ProgressBar.IncompleteBrush>
-                            <TextureFillBrush TextureRegionName="BorderlessSteelFloor" Stretch="Fill" />
+                            <TextureFillBrush SourceName="BorderlessSteelFloor" Stretch="Fill" />
                         </ProgressBar.IncompleteBrush>
                     </ProgressBar>
                 </DockPanel>
@@ -113,7 +113,7 @@
 
                     <ProgressBar Name="ProgressBar4" Minimum="0" Maximum="100" Value="0" Margin="0,3,0,6" IncompleteBrush="Transparent">
                         <ProgressBar.Background>
-                            <TextureFillBrush TextureRegionName="BorderlessSteelFloor" Stretch="Fill" />
+                            <TextureFillBrush SourceName="BorderlessSteelFloor" Stretch="Fill" />
                         </ProgressBar.Background>
                     </ProgressBar>
                 </DockPanel>

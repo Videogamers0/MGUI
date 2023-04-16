@@ -115,7 +115,7 @@
                     <Separator />
                     <TextBlock>
                         Wrap your text in [c=yellow]\[Image={Name}][/c] to put an image [Image=ArrowRightGreen] inline with the text content. 
-                        To reference a texture for {Name}, you must first add it to [c=Turquoise][i]Desktop.NamedRegions[/i][/c].
+                        To reference a texture for {Name}, you must first add it to [c=Turquoise][i]Desktop.Resources.Textures[/i][/c].
                         You may also specify optional dimensions, such as [c=yellow]\[Image=ArrowRightGreen 24,16][/c] ([Image=ArrowRightGreen 24,16]).
                     </TextBlock>
                     <Separator />

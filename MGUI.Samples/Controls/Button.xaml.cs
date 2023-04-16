@@ -39,7 +39,7 @@ namespace MGUI.Samples.Controls
                 return true;
             };
 
-            Window.AddNamedAction("ReduceOpacity", x => x.Opacity -= 0.1f);
+            Window.GetResources().AddCommand("ReduceOpacity", x => x.Opacity -= 0.1f);
 
             List<Color> Colors = new()
             {
@@ -55,11 +55,11 @@ namespace MGUI.Samples.Controls
                 return true;
             };
 
-            Window.AddNamedAction("OuterButtonCommand", x => TextBlock1Text = "Clicked the [b]outer[/b] button");
-            Window.AddNamedAction("InnerButtonCommand", x => TextBlock1Text = "Clicked the [b]inner[/b] button");
+            Window.GetResources().AddCommand("OuterButtonCommand", x => TextBlock1Text = "Clicked the [b]outer[/b] button");
+            Window.GetResources().AddCommand("InnerButtonCommand", x => TextBlock1Text = "Clicked the [b]inner[/b] button");
 
             int RepeatCounter1 = 0;
-            Window.AddNamedAction("RepeatButtonSample1", x =>
+            Window.GetResources().AddCommand("RepeatButtonSample1", x =>
             {
                 RepeatCounter1++;
                 MGButton Button = (MGButton)x;
@@ -69,7 +69,7 @@ namespace MGUI.Samples.Controls
             });
 
             int RepeatCounter2 = 0;
-            Window.AddNamedAction("RepeatButtonSample2", x =>
+            Window.GetResources().AddCommand("RepeatButtonSample2", x =>
             {
                 RepeatCounter2++;
                 MGButton Button = (MGButton)x;
