@@ -30,7 +30,7 @@ namespace MGUI.Core.UI.Containers
         private bool _CanChangeContent = true;
         /// <summary>If false, attempting to add or remove children to this <see cref="MGContentHost"/> will throw an exception.<para/>
         /// This is typically only false in rare cases where a control has built-in logic to micro-manage its children,<br/>
-        /// such as the <see cref="MGTabControl"/>'s <see cref="MGTabControl.HeadersPanelComponent"/>, or the <see cref="MGSingleContentHost.Content"/> of a <see cref="MGComboBox{TItemType}"/> 
+        /// such as the <see cref="MGTabControl"/>'s <see cref="MGTabControl.HeadersPanelElement"/>, or the <see cref="MGSingleContentHost.Content"/> of a <see cref="MGComboBox{TItemType}"/> 
         /// (which is derived from <see cref="MGComboBox{TItemType}.SelectedItemTemplate"/>)</summary>
         public bool CanChangeContent
         {

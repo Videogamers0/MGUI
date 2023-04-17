@@ -16,7 +16,7 @@ using System.Diagnostics;
 
 namespace MGUI.Core.UI
 {
-    public class MGTabControl : MGSingleContentHost
+    public class MGTabControl : MGHeaderedContentPresenter
     {
         protected override void SetContentVirtual(MGElement Value)
         {
@@ -68,9 +68,15 @@ namespace MGUI.Core.UI
         #endregion Border
 
         #region Tab Headers
-        /// <summary>Provides direct access to to the stackpanel component that the tab headers are placed in at the top of this tabcontrol.</summary>
-        public MGComponent<MGStackPanel> HeadersPanelComponent { get; }
-        private MGStackPanel HeadersPanelElement { get; }
+        /// <summary>The <see cref="MGStackPanel"/> that contains the tab headers.<para/>
+        /// See also: <see cref="TabHeaderPosition"/></summary>
+        public MGStackPanel HeadersPanelElement { get; }
+
+        public Dock TabHeaderPosition
+        {
+            get => HeaderPosition;
+            set => HeaderPosition = value;
+        }
 
         /// <summary>The background brush of the entire header region of this <see cref="MGTabControl"/>. This is rendered behind the tab headers.<para/>
         /// To change the background of a specific tab, consider setting the <see cref="UnselectedTabHeaderTemplate"/> and <see cref="SelectedTabHeaderTemplate"/>.</summary>
@@ -113,22 +119,60 @@ namespace MGUI.Core.UI
 
         public void ApplyDefaultSelectedTabHeaderStyle(MGButton Button)
         {
-            Button.BorderThickness = new(1, 1, 1, 0);
             Button.BorderBrush = MGUniformBorderBrush.Black;
             Button.Padding = new(8, 5, 8, 5);
             Button.BackgroundBrush = GetTheme().SelectedTabHeaderBackground.GetValue(true);
             //Button.DefaultTextForeground.SetAll(Color.Black);
-            Button.VerticalAlignment = VerticalAlignment.Bottom;
+
+            switch (TabHeaderPosition)
+            {
+                case Dock.Left:
+                    Button.BorderThickness = new(1, 1, 0, 1);
+                    Button.HorizontalAlignment = HorizontalAlignment.Right;
+                    break;
+                case Dock.Top:
+                    Button.BorderThickness = new(1, 1, 1, 0);
+                    Button.VerticalAlignment = VerticalAlignment.Bottom;
+                    break;
+                case Dock.Right:
+                    Button.BorderThickness = new(0, 1, 1, 1);
+                    Button.HorizontalAlignment = HorizontalAlignment.Left;
+                    break;
+                case Dock.Bottom:
+                    Button.BorderThickness = new(1, 0, 1, 1);
+                    Button.VerticalAlignment = VerticalAlignment.Top;
+                    break;
+                default: throw new NotImplementedException($"Unrecognized {nameof(Dock)}: {TabHeaderPosition}");
+            }
         }
 
         public void ApplyDefaultUnselectedTabHeaderStyle(MGButton Button)
         {
-            Button.BorderThickness = new(1, 1, 1, 0);
             Button.BorderBrush = MGUniformBorderBrush.Gray;
             Button.Padding = new(8, 3, 8, 3);
             Button.BackgroundBrush = GetTheme().UnselectedTabHeaderBackground.GetValue(true);
             //Button.DefaultTextForeground.SetAll(Color.Black);
-            Button.VerticalAlignment = VerticalAlignment.Bottom;
+
+            switch (TabHeaderPosition)
+            {
+                case Dock.Left:
+                    Button.BorderThickness = new(1, 1, 0, 1);
+                    Button.HorizontalAlignment = HorizontalAlignment.Right;
+                    break;
+                case Dock.Top:
+                    Button.BorderThickness = new(1, 1, 1, 0);
+                    Button.VerticalAlignment = VerticalAlignment.Bottom;
+                    break;
+                case Dock.Right:
+                    Button.BorderThickness = new(0, 1, 1, 1);
+                    Button.HorizontalAlignment = HorizontalAlignment.Left;
+                    break;
+                case Dock.Bottom:
+                    Button.BorderThickness = new(1, 0, 1, 1);
+                    Button.VerticalAlignment = VerticalAlignment.Top;
+                    break;
+                default: throw new NotImplementedException($"Unrecognized {nameof(Dock)}: {TabHeaderPosition}");
+            }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -321,15 +365,56 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
+                //  Create the StackPanel that hosts the Tab Headers
                 this.HeadersPanelElement = new(Window, Orientation.Horizontal);
                 this.HeadersPanelElement.CanChangeContent = false;
                 this.HeadersPanelElement.Spacing = 0;
-                this.HeadersPanelElement.VerticalAlignment = VerticalAlignment.Bottom;
-                this.HeadersPanelElement.HorizontalContentAlignment = HorizontalAlignment.Left;
-                this.HeadersPanelComponent = new(HeadersPanelElement, ComponentUpdatePriority.BeforeContents, ComponentDrawPriority.AfterContents,
-                    true, false, true, true, false, false, false,
-                    (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Top, ComponentSize.Size));
-                AddComponent(HeadersPanelComponent);
+                this.Header = HeadersPanelElement;
+                HeaderChanging += (sender, e) => { e.Cancel = true; }; // Disallow changing the Header
+
+                void ApplyHeadersPanelSettings()
+                {
+                    Dock Position = TabHeaderPosition;
+                    switch (Position)
+                    {
+                        case Dock.Left:
+                            HeadersPanelElement.Orientation = Orientation.Vertical;
+                            HeadersPanelElement.HorizontalAlignment = HorizontalAlignment.Right;
+                            HeadersPanelElement.VerticalAlignment = VerticalAlignment.Stretch;
+                            HeadersPanelElement.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+                            HeadersPanelElement.VerticalContentAlignment = VerticalAlignment.Top;
+                            break;
+                        case Dock.Top:
+                            HeadersPanelElement.Orientation = Orientation.Horizontal;
+                            HeadersPanelElement.HorizontalAlignment = HorizontalAlignment.Stretch;
+                            HeadersPanelElement.VerticalAlignment = VerticalAlignment.Bottom;
+                            HeadersPanelElement.HorizontalContentAlignment = HorizontalAlignment.Left;
+                            HeadersPanelElement.VerticalContentAlignment = VerticalAlignment.Stretch;
+                            break;
+                        case Dock.Right:
+                            HeadersPanelElement.Orientation = Orientation.Vertical;
+                            HeadersPanelElement.HorizontalAlignment = HorizontalAlignment.Left;
+                            HeadersPanelElement.VerticalAlignment = VerticalAlignment.Stretch;
+                            HeadersPanelElement.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+                            HeadersPanelElement.VerticalContentAlignment = VerticalAlignment.Top;
+                            break;
+                        case Dock.Bottom:
+                            HeadersPanelElement.Orientation = Orientation.Horizontal;
+                            HeadersPanelElement.HorizontalAlignment = HorizontalAlignment.Stretch;
+                            HeadersPanelElement.VerticalAlignment = VerticalAlignment.Top;
+                            HeadersPanelElement.HorizontalContentAlignment = HorizontalAlignment.Left;
+                            HeadersPanelElement.VerticalContentAlignment = VerticalAlignment.Stretch;
+                            break;
+                    }
+                }
+
+                HeaderPresenter.HorizontalAlignment = HorizontalAlignment.Stretch;
+                HeaderPresenter.VerticalAlignment = VerticalAlignment.Stretch;
+                Spacing = 0;
+
+                HeaderPosition = Dock.Top;
+                ApplyHeadersPanelSettings();
+                HeaderPositionChanged += (sender, e) => { ApplyHeadersPanelSettings(); };
 
                 this.BorderElement = new(Window);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
@@ -394,7 +479,14 @@ namespace MGUI.Core.UI
             //  The background only spans the content region of this TabControl,
             //  Does not fill the region with the tab headers
             Rectangle TabHeadersBounds = HeadersPanelElement.LayoutBounds;
-            Rectangle TabContentBounds = new(LayoutBounds.Left, TabHeadersBounds.Bottom, LayoutBounds.Width, LayoutBounds.Height - TabHeadersBounds.Height);
+            Rectangle TabContentBounds = TabHeaderPosition switch
+            {
+                Dock.Left => new(TabHeadersBounds.Right, LayoutBounds.Top, LayoutBounds.Width - TabHeadersBounds.Width, LayoutBounds.Height),
+                Dock.Top => new(LayoutBounds.Left, TabHeadersBounds.Bottom, LayoutBounds.Width, LayoutBounds.Height - TabHeadersBounds.Height),
+                Dock.Right => new(LayoutBounds.Left, LayoutBounds.Top, LayoutBounds.Width - TabHeadersBounds.Width, LayoutBounds.Height),
+                Dock.Bottom => new(LayoutBounds.Left, LayoutBounds.Top, LayoutBounds.Width, LayoutBounds.Height - TabHeadersBounds.Height),
+                _ => throw new NotImplementedException($"Unrecognized {nameof(Dock)}: {TabHeaderPosition}")
+            };
             base.DrawBackground(DA, TabContentBounds);
         }
 

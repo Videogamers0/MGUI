@@ -103,6 +103,7 @@ namespace MGUI.Core.UI
                 _ActualSource = null;
         }
 
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private MGTextureData? _ActualSource;
         /// <summary>Prioritizes <see cref="Source"/> if specified, otherwise attempts to retrieve the named texture resource from <see cref="MGResources.Textures"/> based on <see cref="SourceName"/></summary>
         public MGTextureData? ActualSource

@@ -1343,6 +1343,8 @@ namespace MGUI.Core.UI.XAML
         public StackPanel HeadersPanel { get; set; } = new();
         [Category("Appearance")]
         public FillBrush HeaderAreaBackground { get; set; }
+        [Category("Appearance")]
+        public Dock? TabHeaderPosition { get; set; }
 
         [Category("Appearance")]
         public Button SelectedTabHeaderTemplate { get; set; }
@@ -1360,10 +1362,12 @@ namespace MGUI.Core.UI.XAML
 
             MGTabControl TabControl = Element as MGTabControl;
             Border.ApplySettings(Parent, TabControl.BorderComponent.Element, false);
-            HeadersPanel.ApplySettings(TabControl, TabControl.HeadersPanelComponent.Element, false);
+            HeadersPanel.ApplySettings(TabControl, TabControl.HeadersPanelElement, false);
 
             if (HeaderAreaBackground != null)
                 TabControl.HeaderAreaBackground.NormalValue = HeaderAreaBackground.ToFillBrush(Desktop);
+            if (TabHeaderPosition.HasValue)
+                TabControl.TabHeaderPosition = TabHeaderPosition.Value;
 
             if (SelectedTabHeaderTemplate != null)
             {

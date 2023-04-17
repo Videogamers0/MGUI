@@ -81,6 +81,76 @@
 
             <DockPanel>
                 <TextBlock Dock="Top">
+                    Set [c=Turquoise][i]TabHeaderPosition[/i][/c] to change which edge the tab headers are anchored to.
+                </TextBlock>
+                <StackPanel Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="4">
+                    <Grid RowLengths="80,110,80" ColumnLengths="140,140,140">
+                        <TabControl Row="0" Column="1" TabHeaderPosition="Top">
+                            <TabItem Header="A" Content="Content (A)" />
+                            <TabItem Header="B" Content="Content (B)" />
+                            <TabItem Header="C" Content="Content (C)" />
+                        </TabControl>
+
+                        <TabControl Row="1" Column="0" TabHeaderPosition="Left">
+                            <TabItem Header="A" Content="Content (A)" />
+                            <TabItem Header="B" Content="Content (B)" />
+                            <TabItem Header="C" Content="Content (C)" />
+                        </TabControl>
+
+                        <TabControl Row="1" Column="2" TabHeaderPosition="Right">
+                            <TabItem Header="A" Content="Content (A)" />
+                            <TabItem Header="B" Content="Content (B)" />
+                            <TabItem Header="C" Content="Content (C)" />
+                        </TabControl>
+
+                        <TabControl Row="2" Column="1" TabHeaderPosition="Bottom">
+                            <TabItem Header="A" Content="Content (A)" />
+                            <TabItem Header="B" Content="Content (B)" />
+                            <TabItem Header="C" Content="Content (C)" />
+                        </TabControl>
+
+                        <TextBlock Row="1" Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" WrapText="True" Margin="8" TextAlignment="Center"
+                                   Text="These 4 [c=Turquoise]TabControls[/c] each dock their tab headers to a different edge." />
+                    </Grid>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    You may want to customize the Horizontal/Vertical alignments of the tab header buttons.
+                </TextBlock>
+                <StackPanel Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="4">
+                    <TextBlock>
+                        This [c=Turquoise]TabControl[/c] sets [c=Turquoise]TabHeaderPosition[/c]=[c=LightBlue][s=Blue]Left[/s][/c]. 
+                        Notice that the tab headers are aligned to the Right.
+                    </TextBlock>
+                    <TabControl Row="0" Column="1" TabHeaderPosition="Left">
+                        <TabItem Header="1st tab, medium length" Content="Content (A)" />
+                        <TabItem Header="2nd tab, very long header content" Content="Content (B)" />
+                        <TabItem Header="3rd tab" Content="Content (C)" />
+                    </TabControl>
+                    <TextBlock>
+                        This [c=Turquoise]TabControl[/c] also sets [c=Turquoise]TabHeaderPosition[/c]=[c=LightBlue][s=Blue]Left[/s][/c] 
+                        but customizes the Tab Header buttons to use [c=Turquoise]HorizontalAlignment[/c]=[c=LightBlue][s=Blue]Stretch[/s][/c]
+                    </TextBlock>
+                    <TabControl Row="0" Column="1" TabHeaderPosition="Left">
+                        <TabControl.SelectedTabHeaderTemplate>
+                            <Button HorizontalAlignment="Stretch" />
+                        </TabControl.SelectedTabHeaderTemplate>
+                        <TabControl.UnselectedTabHeaderTemplate>
+                            <Button HorizontalAlignment="Stretch" />
+                        </TabControl.UnselectedTabHeaderTemplate>
+                        <TabItem Header="1st tab, medium length" Content="Content (A)" />
+                        <TabItem Header="2nd tab, very long header content" Content="Content (B)" />
+                        <TabItem Header="3rd tab" Content="Content (C)" />
+                    </TabControl>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
                     The [c=Turquoise][i]Background[/i][/c] of a TabControl only spans the bounds of the selected tab's Content. It does not affect the background of the header area.
                 </TextBlock>
                 <StackPanel Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="4">

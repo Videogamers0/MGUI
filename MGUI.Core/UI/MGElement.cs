@@ -105,11 +105,8 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
-    //Allow changing the position of tab headers in an MGTabControl
-    //      maybe MGTabControl should extend MGHeaderedContentPResenter instead of MGSingleContentHost
-    //      and subscribe to HCP.HeaderChanging to always cancel if not setting the header in the ctor
-    //      and subscribe to HCP.HeaderPositionChanged to update the HeadersPanelElement.Orientation accordingly
-    //          (and would also need to change things like default border thicknesses and paddings/margins of the tab header button styles)
+    //Fix bug with measurement logic of the tab headers in an MGTabControl when the TabHeaderPosition is set to Left/Right
+    //      It's currently being measured too tall, as if it thinks some of the tab header content is vertically wrapping or something
     //Make ItemsSource bindable in combobox/listbox/listview/grid/unfiromgrid
     //      for example: ComboBox could have "public MGBinding ItemsSource"
     //      then in MGComboBox.LoadSettings, if ItemsSource binding is not null,
