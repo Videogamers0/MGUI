@@ -125,7 +125,7 @@
                         This [c=Turquoise]TabControl[/c] sets [c=Turquoise]TabHeaderPosition[/c]=[c=LightBlue][s=Blue]Left[/s][/c]. 
                         Notice that the tab headers are aligned to the Right.
                     </TextBlock>
-                    <TabControl Row="0" Column="1" TabHeaderPosition="Left">
+                    <TabControl TabHeaderPosition="Left">
                         <TabItem Header="1st tab, medium length" Content="Content (A)" />
                         <TabItem Header="2nd tab, very long header content" Content="Content (B)" />
                         <TabItem Header="3rd tab" Content="Content (C)" />
@@ -134,7 +134,7 @@
                         This [c=Turquoise]TabControl[/c] also sets [c=Turquoise]TabHeaderPosition[/c]=[c=LightBlue][s=Blue]Left[/s][/c] 
                         but customizes the Tab Header buttons to use [c=Turquoise]HorizontalAlignment[/c]=[c=LightBlue][s=Blue]Stretch[/s][/c]
                     </TextBlock>
-                    <TabControl Row="0" Column="1" TabHeaderPosition="Left">
+                    <TabControl TabHeaderPosition="Left">
                         <TabControl.SelectedTabHeaderTemplate>
                             <Button HorizontalAlignment="Stretch" />
                         </TabControl.SelectedTabHeaderTemplate>

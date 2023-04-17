@@ -149,25 +149,28 @@ namespace MGUI.Core.UI
         public void ApplyDefaultUnselectedTabHeaderStyle(MGButton Button)
         {
             Button.BorderBrush = MGUniformBorderBrush.Gray;
-            Button.Padding = new(8, 3, 8, 3);
             Button.BackgroundBrush = GetTheme().UnselectedTabHeaderBackground.GetValue(true);
             //Button.DefaultTextForeground.SetAll(Color.Black);
 
             switch (TabHeaderPosition)
             {
                 case Dock.Left:
+                    Button.Padding = new(6, 5, 6, 5);
                     Button.BorderThickness = new(1, 1, 0, 1);
                     Button.HorizontalAlignment = HorizontalAlignment.Right;
                     break;
                 case Dock.Top:
+                    Button.Padding = new(8, 3, 8, 3);
                     Button.BorderThickness = new(1, 1, 1, 0);
                     Button.VerticalAlignment = VerticalAlignment.Bottom;
                     break;
                 case Dock.Right:
+                    Button.Padding = new(6, 5, 6, 5);
                     Button.BorderThickness = new(0, 1, 1, 1);
                     Button.HorizontalAlignment = HorizontalAlignment.Left;
                     break;
                 case Dock.Bottom:
+                    Button.Padding = new(8, 3, 8, 3);
                     Button.BorderThickness = new(1, 0, 1, 1);
                     Button.VerticalAlignment = VerticalAlignment.Top;
                     break;

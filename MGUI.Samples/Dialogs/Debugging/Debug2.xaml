@@ -1,5 +1,9 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         Left="440" Top="20" MinHeight="0" SizeToContent="WidthAndHeight" WindowStyle="None">
+    <!--<TabControl TabHeaderPosition="Left" Padding="10,20">
+        <TabItem Header="Tab Header" />
+    </TabControl>-->
+
     <Border BorderThickness="12" Background="DarkBlue" Padding="10">
         <Border.BorderBrush>
             <TexturedBorderBrush EdgeTextureName="BorderEdgeRegion1" CornerTextureName="BorderCornerRegion1" EdgeBasis="Right" CornerBasis="BottomRight" />

@@ -105,8 +105,20 @@ namespace MGUI.Core.UI
     }
 
     //TODO:
-    //Fix bug with measurement logic of the tab headers in an MGTabControl when the TabHeaderPosition is set to Left/Right
-    //      It's currently being measured too tall, as if it thinks some of the tab header content is vertically wrapping or something
+    //Fix bug with measurement logic of components
+    //      MGElement.MeasureSelf and MGElement.UpdateLayout both have 2 bugs when dealing with components
+    //      1. Some components may need to share their size with other components rather than just with the Content
+    //              EX: A ListBox contains a component for its header, and a component for the scrollable Grid content,
+    //                  rather than a component for its header, and putting everything else in the Content property
+    //                  (Because MGListBox extends MGelement, not MGSingleContentHost, which was kind of a dumb implementation on my part)
+    //                  So the width of the listbox should be Max(TitleComponent.Width, InnerBorderComponent.Width)
+    //                  but components are currently only coded to share their dimensions with Content, not with other components
+    //              So when measuring components, instead of summing their dimensions, we probably need logic that will
+    //              do some Math.Max on dimensions of components that have the same IsWidthSharedWithContent/IsHeightSharedWithContent settings
+    //      2. There's a bug where components aren't able to share their size with the Padding
+    //              This probably only matters in cases where the component doesn't use the owner's padding (like MGTabControl)
+    //              So it's causing the total measured dimensions to be Sum(Padding, UnsharedComponentSize, Max(ContentSize, SharedComponentSize)
+    //              instead of something like: Sum(Max(Padding, UnsharedComponentSize), Max(ContentSize, SharedComponentSize))
     //Make ItemsSource bindable in combobox/listbox/listview/grid/unfiromgrid
     //      for example: ComboBox could have "public MGBinding ItemsSource"
     //      then in MGComboBox.LoadSettings, if ItemsSource binding is not null,
@@ -1939,7 +1951,7 @@ namespace MGUI.Core.UI
 
             if (!TryGetRecentSelfMeasurement(RemainingSize, out SelfSize, out SharedSize, out ContentSize))
 			{
-				SelfSize = MeasureSelf(RemainingSize, out SharedSize);
+                SelfSize = MeasureSelf(RemainingSize, out SharedSize);
                 ElementMeasurement SelfMeasurement = new(AvailableSize, SelfSize, SharedSize, ContentSize);
                 CacheSelfMeasurement(SelfMeasurement);
             }
@@ -1996,6 +2008,7 @@ namespace MGUI.Core.UI
 			Total = Total.Add(Overridden);
 			RemainingSize = RemainingSize.Subtract(Overridden.Size, 0, 0);
 
+            Thickness TotalComponentSize = new(0);
 			foreach (MGComponentBase Component in Components)
 			{
 				Size RemainingSizeForComponent = Component.UsesOwnersPadding ? RemainingSize.Subtract(PaddingSize, 0, 0) : RemainingSize;
@@ -2011,9 +2024,11 @@ namespace MGUI.Core.UI
 					Component.IsHeightSharedWithContent ? ActualComponentSize.Bottom : 0);
 				SharedSize = SharedSize.Add(ComponentSharedSize);
 
-                Total = Total.Add(ActualComponentSize);
+                TotalComponentSize = TotalComponentSize.Add(ActualComponentSize);
                 RemainingSize = RemainingSize.Subtract(ActualComponentSize.Size, 0, 0);
 			}
+
+            Total = Total.Add(TotalComponentSize);
 
             if (Total.Width <= 0 && Total.Height <= 0)
 				Total = new(0);
