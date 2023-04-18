@@ -24,7 +24,7 @@ namespace MGUI.Shared.Input.Mouse
     }
 
     /// <summary>Exposes several mouse-related events that you can subscribe and respond to, such as <see cref="MouseHandler.Entered"/>, <see cref="MouseHandler.Dragged"/>, <see cref="MouseHandler.LMBPressedInside"/> etc.<para/>
-    /// This class is instantiated via: <see cref="MouseTracker.CreateHandler{T}(T, double?, bool, bool)"/></summary>
+    /// This class is instantiated via: <see cref="MouseTracker.CreateHandler{T}(T, double?, bool, bool, bool)"/></summary>
     public class MouseHandler
     {
         /// <summary>Only includes distinct values. Does not include combined values such as <see cref="DragStartCondition.Both"/></summary>
@@ -40,18 +40,22 @@ namespace MGUI.Shared.Input.Mouse
         private bool AlwaysHandlesEvents { get; }
         /// <summary>If true, events will still be invoked even if <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> is true.</summary>
         private bool InvokeEvenIfHandled { get; }
+        /// <summary>If true, events will still be invoked even if <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> is true, 
+        /// as long as the handler is the same as <see cref="Owner"/></summary>
+        private bool InvokeIfHandledBySelf { get; }
 
         public DragStartCondition DragStartCondition { get; set; } = DragStartCondition.MouseMovedAfterPress;
 
         public override string ToString() => $"{nameof(MouseHandler)}: {nameof(Owner)} = {Owner}";
 
-        internal MouseHandler(MouseTracker Tracker, IMouseHandlerHost Owner, double? UpdatePriority, bool AlwaysHandlesEvents, bool InvokeEvenIfHandled)
+        internal MouseHandler(MouseTracker Tracker, IMouseHandlerHost Owner, double? UpdatePriority, bool AlwaysHandlesEvents, bool InvokeEvenIfHandled, bool InvokeIfHandledBySelf)
         {
             this.Tracker = Tracker;
             this.Owner = Owner;
             this.UpdatePriority = UpdatePriority;
             this.AlwaysHandlesEvents = AlwaysHandlesEvents;
             this.InvokeEvenIfHandled = InvokeEvenIfHandled;
+            this.InvokeIfHandledBySelf = InvokeIfHandledBySelf;
         }
 
         private bool IsInside(Vector2 Position) => IsInside(Position, Owner.GetOffset());
@@ -261,14 +265,14 @@ namespace MGUI.Shared.Input.Mouse
                                 bool IsPressedInside = IsInside(Args.Position, Offset);
                                 if (IsPressedInside)
                                 {
-                                    if ((InvokeEvenIfHandled || !Args.IsHandled) && PressedInside != null)
+                                    if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && PressedInside != null)
                                     {
                                         PressedInside.Invoke(this, Args);
                                         if (AlwaysHandlesEvents)
                                             Args.SetHandledBy(Owner, false);
                                     }
 
-                                    if (InvokeEvenIfHandled || !Args.IsHandled)
+                                    if (InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner))
                                     {
                                         switch (Button)
                                         {
@@ -301,7 +305,7 @@ namespace MGUI.Shared.Input.Mouse
                                 }
                                 else
                                 {
-                                    if ((InvokeEvenIfHandled || !Args.IsHandled) && PressedOutside != null)
+                                    if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && PressedOutside != null)
                                     {
                                         PressedOutside.Invoke(this, Args);
                                         if (AlwaysHandlesEvents)
@@ -323,14 +327,14 @@ namespace MGUI.Shared.Input.Mouse
                                 bool IsReleasedInside = IsInside(Args.Position, Offset);
                                 if (IsReleasedInside)
                                 {
-                                    if ((InvokeEvenIfHandled || !Args.IsHandled) && ReleasedInside != null)
+                                    if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && ReleasedInside != null)
                                     {
                                         ReleasedInside.Invoke(this, Args);
                                         if (AlwaysHandlesEvents)
                                             Args.SetHandledBy(Owner, false);
                                     }
 
-                                    if (InvokeEvenIfHandled || !Args.IsHandled)
+                                    if (InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner))
                                     {
                                         switch (Button)
                                         {
@@ -363,7 +367,7 @@ namespace MGUI.Shared.Input.Mouse
                                 }
                                 else
                                 {
-                                    if ((InvokeEvenIfHandled || !Args.IsHandled) && ReleasedOutside != null)
+                                    if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && ReleasedOutside != null)
                                     {
                                         ReleasedOutside.Invoke(this, Args);
                                         if (AlwaysHandlesEvents)
@@ -385,14 +389,14 @@ namespace MGUI.Shared.Input.Mouse
                                 bool IsClickedInside = IsInside(Args.Position, Offset);
                                 if (IsClickedInside)
                                 {
-                                    if ((InvokeEvenIfHandled || !Args.IsHandled) && (InvokeEvenIfHandled || !Args.ReleasedArgs.IsHandled || Args.ReleasedArgs.HandledBy == Owner) && ClickedInside != null)
+                                    if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && (InvokeEvenIfHandled || !Args.ReleasedArgs.IsHandled || Args.ReleasedArgs.HandledBy == Owner) && ClickedInside != null)
                                     {
                                         ClickedInside.Invoke(this, Args);
                                         if (AlwaysHandlesEvents)
                                             Args.SetHandledBy(Owner, false);
                                     }
 
-                                    if ((InvokeEvenIfHandled || !Args.IsHandled) && (InvokeEvenIfHandled || !Args.ReleasedArgs.IsHandled || Args.ReleasedArgs.HandledBy == Owner))
+                                    if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && (InvokeEvenIfHandled || !Args.ReleasedArgs.IsHandled || Args.ReleasedArgs.HandledBy == Owner))
                                     {
                                         switch (Button)
                                         {
@@ -425,7 +429,7 @@ namespace MGUI.Shared.Input.Mouse
                                 }
                                 else
                                 {
-                                    if ((InvokeEvenIfHandled || !Args.IsHandled) && (InvokeEvenIfHandled || !Args.ReleasedArgs.IsHandled || Args.ReleasedArgs.HandledBy == Owner) && ClickedOutside != null)
+                                    if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && (InvokeEvenIfHandled || !Args.ReleasedArgs.IsHandled || Args.ReleasedArgs.HandledBy == Owner) && ClickedOutside != null)
                                     {
                                         ClickedOutside.Invoke(this, Args);
                                         if (AlwaysHandlesEvents)
@@ -459,7 +463,7 @@ namespace MGUI.Shared.Input.Mouse
                             if (DragStart != null || DragStartOutside != null)
                             {
                                 BaseMouseDragStartEventArgs DragStartPressed = Tracker.CurrentDragStartEvents[DragStartCondition.MousePressed][Button];
-                                if (DragStartPressed != null && Condition == DragStartCondition.MousePressed && (InvokeEvenIfHandled || !DragStartPressed.IsHandled))
+                                if (DragStartPressed != null && Condition == DragStartCondition.MousePressed && (InvokeEvenIfHandled || !DragStartPressed.IsHandled || (InvokeIfHandledBySelf && DragStartPressed.HandledBy == Owner)))
                                 {
                                     bool IsMouseInsideViewport = IsInside(DragStartPressed.Position, Offset);
 
@@ -478,7 +482,7 @@ namespace MGUI.Shared.Input.Mouse
                                 }
 
                                 BaseMouseDragStartEventArgs DragStartMovedAfterPress = Tracker.CurrentDragStartEvents[DragStartCondition.MouseMovedAfterPress][Button];
-                                if (DragStartMovedAfterPress != null && Condition == DragStartCondition.MouseMovedAfterPress && (InvokeEvenIfHandled || !DragStartMovedAfterPress.IsHandled))
+                                if (DragStartMovedAfterPress != null && Condition == DragStartCondition.MouseMovedAfterPress && (InvokeEvenIfHandled || !DragStartMovedAfterPress.IsHandled || (InvokeIfHandledBySelf && DragStartMovedAfterPress.HandledBy == Owner)))
                                 {
                                     bool IsMouseInsideViewport = IsInside(DragStartMovedAfterPress.Position, Offset);
 

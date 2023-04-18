@@ -66,7 +66,7 @@ namespace MGUI.Shared.Input.Mouse
     }
 
     /// <summary>Detects changes to the mouse state between the previous and current Update ticks, but does not invoke the events. Instead, events are subscribed to and fired by <see cref="MouseHandler"/>.<br/>
-    /// See: <see cref="MouseTracker.CreateHandler{T}(T, double?, bool, bool)"/>, <see cref="MouseTracker.CreateHandler{T}(T, InputUpdatePriority, bool, bool)"/><para/>
+    /// See: <see cref="MouseTracker.CreateHandler{T}(T, double?, bool, bool, bool)"/>, <see cref="MouseTracker.CreateHandler{T}(T, InputUpdatePriority, bool, bool)"/><para/>
     /// This class is automatically instantiated when creating an instance of <see cref="InputTracker"/>. See: <see cref="InputTracker.Mouse"/></summary>
     public class MouseTracker
     {
@@ -84,7 +84,7 @@ namespace MGUI.Shared.Input.Mouse
         public InputTracker InputTracker { get; }
 
         private List<MouseHandler> _Handlers { get; }
-        /// <summary>To create a <see cref="MouseHandler"/>, use <see cref="CreateHandler{T}(T, double?, bool, bool)"/> or <see cref="CreateHandler{T}(T, InputUpdatePriority, bool, bool)"/></summary>
+        /// <summary>To create a <see cref="MouseHandler"/>, use <see cref="CreateHandler{T}(T, double?, bool, bool, bool)"/> or <see cref="CreateHandler{T}(T, InputUpdatePriority, bool, bool)"/></summary>
         public IReadOnlyList<MouseHandler> Handlers => _Handlers;
 
         internal void RemoveHandler(MouseHandler Handler) => _Handlers.Remove(Handler);
@@ -122,10 +122,12 @@ namespace MGUI.Shared.Input.Mouse
         /// Minimum Value = 0. Maximum Value = 100. Recommended to use preset values from <see cref="InputUpdatePriority"/>.</param>
         /// <param name="AlwaysHandlesEvents">If true, the handler will always set <see cref="HandledByEventArgs{THandlerType}.HandledBy"/> to <paramref name="Owner"/> when receiving the mouse event.</param>
         /// <param name="InvokeEvenIfHandled">If true, the handler will still receive the mouse event even if <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> is true.</param>
-        public MouseHandler CreateHandler<T>(T Owner, double? UpdatePriority, bool AlwaysHandlesEvents = false, bool InvokeEvenIfHandled = false)
+        /// <param name="InvokeIfHandledBySelf">If true, the handler will still receive the mouse event even if <see cref="HandledByEventArgs{THandlerType}.IsHandled"/> is true, 
+        /// as long as the handler is the same as <see cref="MouseHandler.Owner"/></param>
+        public MouseHandler CreateHandler<T>(T Owner, double? UpdatePriority, bool AlwaysHandlesEvents = false, bool InvokeEvenIfHandled = false, bool InvokeIfHandledBySelf = true)
             where T : IMouseHandlerHost
         {
-            MouseHandler Handler = new(this, Owner, UpdatePriority, AlwaysHandlesEvents, InvokeEvenIfHandled);
+            MouseHandler Handler = new(this, Owner, UpdatePriority, AlwaysHandlesEvents, InvokeEvenIfHandled, InvokeIfHandledBySelf);
             _Handlers.Add(Handler);
             return Handler;
         }

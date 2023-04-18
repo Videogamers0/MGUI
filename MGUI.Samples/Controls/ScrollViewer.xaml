@@ -73,12 +73,12 @@
                     </Border>
 
                     <TextBlock>
-                        These ScrollViewers sets [c=Turquoise][i]VerticalScrollBarVisibility[/i][/c]=[c=LightBlue][s=Blue]Auto[/s][/c]. 
-                        A Vertical ScrollBar will be contextually visible depending on if the Content requests more height than the viewport.
+                        These ScrollViewers set [c=Turquoise][i]VerticalScrollBarVisibility[/i][/c]=[c=LightBlue][s=Blue]Auto[/s][/c]. 
+                        A Vertical ScrollBar will be contextually visible depending on if the Content requests more height than the viewport has.
                     </TextBlock>
                     <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Left">
                         <Border Background="White * 0.1" BorderThickness="0" Padding="5">
-                            <ScrollViewer Width="100" Height="100" VerticalScrollBarVisibility="Auto">
+                            <ScrollViewer Width="100" Height="100" VerticalScrollBarVisibility="Auto" Name="ABC">
                                 <Border Height="200" Background="LightGreen|Red">
                                     <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="This Content requested 200px height" />
                                 </Border>
@@ -97,7 +97,7 @@
                         This ScrollViewer sets [c=Turquoise][i]VerticalScrollBarVisibility[/i][/c]=[c=LightBlue][s=Blue]Hidden[/s][/c]. 
                         A Vertical ScrollBar will never be visible, but will always consume space on the right edge of the viewport.
                         This option is typically only used if you want to render your own completely custom scroll bar graphics.
-                        Notice that the ScrollViewer is still scrollable (using the Mouse Wheel).
+                        Notice that the ScrollViewer is still scrollable (using the Mouse Wheel, or by clicking+dragging where the ScrollBar would normally be).
                     </TextBlock>
                     <Border Background="White * 0.1" BorderThickness="0" HorizontalAlignment="Left" Padding="5">
                         <ScrollViewer Width="100" Height="100" VerticalScrollBarVisibility="Hidden">
