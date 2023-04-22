@@ -28,7 +28,7 @@ namespace MGUI.Core.UI.Text
             set
             {
                 _Position = value;
-                Debug.WriteLine($"{nameof(MGTextCaret)}: Position={(Position == null ? "null" : $"({Position.Value.IndexInOriginalText}|{Position.Value.IndexInParsedText})")}");
+                //Debug.WriteLine($"{nameof(MGTextCaret)}: Position={(Position == null ? "null" : $"({Position.Value.IndexInOriginalText}|{Position.Value.IndexInParsedText})")}");
             }
         }
         public bool HasPosition => Position.HasValue;
@@ -72,7 +72,7 @@ namespace MGUI.Core.UI.Text
         /// <param name="CharIndex">The index in the original text, before it was parsed into <see cref="MGTextLine"/>s.</param>
         public bool MoveToOriginalCharacterIndexOrLeft(int CharIndex, bool LeftSide)
         {
-            Debug.WriteLine($"{nameof(MGTextCaret)}: Move to original index or left: {CharIndex} (Left={LeftSide})");
+            //Debug.WriteLine($"{nameof(MGTextCaret)}: Move to original index or left: {CharIndex} (Left={LeftSide})");
             int FirstIndex = TextRenderInfo.GetFirstChar().IndexInOriginalText;
             int CurrentIndex = CharIndex;
 
@@ -94,7 +94,7 @@ namespace MGUI.Core.UI.Text
         /// <param name="CharIndex">The index in the original text, before it was parsed into <see cref="MGTextLine"/>s.</param>
         public bool MoveToOriginalCharacterIndexOrRight(int CharIndex, bool LeftSide)
         {
-            Debug.WriteLine($"{nameof(MGTextCaret)}: Move to original index or right: {CharIndex} (Left={LeftSide})");
+            //Debug.WriteLine($"{nameof(MGTextCaret)}: Move to original index or right: {CharIndex} (Left={LeftSide})");
             int LastIndex = TextRenderInfo.GetLastChar().IndexInOriginalText;
             int CurrentIndex = CharIndex;
 
@@ -116,7 +116,7 @@ namespace MGUI.Core.UI.Text
         /// <param name="CharIndex">The index in the original text, before it was parsed into <see cref="MGTextLine"/>s.</param>
         public bool MoveToOriginalCharacterIndexOrEnd(int CharIndex, bool LeftSide)
         {
-            Debug.WriteLine($"{nameof(MGTextCaret)}: Move to original index or end: {CharIndex} (Left={LeftSide})");
+            //Debug.WriteLine($"{nameof(MGTextCaret)}: Move to original index or end: {CharIndex} (Left={LeftSide})");
             if (TextRenderInfo.TryGetCharAtOriginalIndex(CharIndex, out CharRenderInfo CharInfo))
                 return MoveToCharacter(CharInfo, LeftSide);
             else
@@ -128,7 +128,7 @@ namespace MGUI.Core.UI.Text
         /// <param name="CharIndex">The index in the parsed text (after it was converted into <see cref="MGTextLine"/>s)</param>
         public bool MoveToParsedCharacterIndexOrLeft(int CharIndex, bool LeftSide)
         {
-            Debug.WriteLine($"{nameof(MGTextCaret)}: Move to parsed index or left: {CharIndex} (Left={LeftSide})");
+            //Debug.WriteLine($"{nameof(MGTextCaret)}: Move to parsed index or left: {CharIndex} (Left={LeftSide})");
             int FirstIndex = TextRenderInfo.GetFirstChar().IndexInParsedText;
             int CurrentIndex = CharIndex;
 
@@ -150,7 +150,7 @@ namespace MGUI.Core.UI.Text
         /// <param name="CharIndex">The index in the parsed text (after it was converted into <see cref="MGTextLine"/>s)</param>
         public bool MoveToParsedCharacterIndexOrRight(int CharIndex, bool LeftSide)
         {
-            Debug.WriteLine($"{nameof(MGTextCaret)}: Move to parsed index or right: {CharIndex} (Left={LeftSide})");
+            //Debug.WriteLine($"{nameof(MGTextCaret)}: Move to parsed index or right: {CharIndex} (Left={LeftSide})");
             int LastIndex = TextRenderInfo.GetLastChar().IndexInParsedText;
             int CurrentIndex = CharIndex;
 
@@ -172,7 +172,7 @@ namespace MGUI.Core.UI.Text
         /// <param name="CharIndex">The index in the parsed text (after it was converted into <see cref="MGTextLine"/>s)</param>
         public bool MoveToParsedCharacterIndexOrEnd(int CharIndex, bool LeftSide)
         {
-            Debug.WriteLine($"{nameof(MGTextCaret)}: Move to parsed index or end: {CharIndex} (Left={LeftSide})");
+            //Debug.WriteLine($"{nameof(MGTextCaret)}: Move to parsed index or end: {CharIndex} (Left={LeftSide})");
             if (TextRenderInfo.TryGetCharAtParsedIndex(CharIndex, out CharRenderInfo CharInfo))
                 return MoveToCharacter(CharInfo, LeftSide);
             else
@@ -181,7 +181,7 @@ namespace MGUI.Core.UI.Text
 
         public bool MoveToApproximateScreenPosition(Vector2 ScreenPosition)
         {
-            Debug.WriteLine($"{nameof(MGTextCaret)}: Move to screen position: {ScreenPosition}");
+            //Debug.WriteLine($"{nameof(MGTextCaret)}: Move to screen position: {ScreenPosition}");
             if (TextRenderInfo.TryGetCharAtScreenPosition(ScreenPosition, out CharRenderInfo CharInfo))
             {
                 bool IsLeftEdge = ScreenPosition.X <= CharInfo.CenterX || !CharInfo.Line.HasCharacters || CharInfo.Line.Source == null;
@@ -197,14 +197,14 @@ namespace MGUI.Core.UI.Text
         {
             if (LeftSide)
             {
-                Debug.WriteLine($"{nameof(MGTextCaret)}: Move to left side of ({CharInfo.IndexInOriginalText}|{CharInfo.IndexInParsedText})");
+                //Debug.WriteLine($"{nameof(MGTextCaret)}: Move to left side of ({CharInfo.IndexInOriginalText}|{CharInfo.IndexInParsedText})");
                 Rectangle Bounds = new((int)CharInfo.MinX, (int)CharInfo.Line.MinY, (int)CharInfo.Width, (int)CharInfo.Line.Height);
                 Position = new(CharInfo.Line.LineIndex, CharInfo.IndexInOriginalText, CharInfo.IndexInParsedText, Bounds);
                 return true;
             }
             else
             {
-                Debug.WriteLine($"{nameof(MGTextCaret)}: Move to right side of ({CharInfo.IndexInOriginalText}|{CharInfo.IndexInParsedText})");
+                //Debug.WriteLine($"{nameof(MGTextCaret)}: Move to right side of ({CharInfo.IndexInOriginalText}|{CharInfo.IndexInParsedText})");
                 Rectangle Bounds = new((int)CharInfo.MaxX, (int)CharInfo.Line.MinY, (int)TextRenderInfo.DefaultCharacterWidth, (int)CharInfo.Line.Height);
                 Position = new(CharInfo.Line.LineIndex, CharInfo.IndexInOriginalText + 1, CharInfo.IndexInParsedText + 1, Bounds);
                 return true;

@@ -1207,7 +1207,7 @@ namespace MGUI.Core.UI
 
         private void HandleKeyPress(BaseKeyPressedEventArgs e)
         {
-            Debug.WriteLine($"{e.PrintableValue} {e.IsHandled}");
+            //Debug.WriteLine($"{e.PrintableValue} {e.IsHandled}");
             if (!e.IsPrintableKey)
             {
                 //  Handle non-printable keys such as arrow keys

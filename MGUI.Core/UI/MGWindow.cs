@@ -1067,7 +1067,7 @@ namespace MGUI.Core.UI
                         IsDraggingWindowPosition = true;
                         DragWindowPositionOffset = Point.Zero;
                         e.SetHandledBy(this, false);
-                        Debug.WriteLine($"{nameof(MGWindow)}: Drag Start at: {e.Position}");
+                        //Debug.WriteLine($"{nameof(MGWindow)}: Drag Start at: {e.Position}");
                     }
                 }
             };
@@ -1107,7 +1107,7 @@ namespace MGUI.Core.UI
 
                         MouseHandler.Tracker.CurrentButtonReleasedEvents[MouseButton.Left]?.SetHandledBy(this, false);
 
-                        Debug.WriteLine($"{nameof(MGWindow)}: Drag End at: {e.EndPosition}");
+                        //Debug.WriteLine($"{nameof(MGWindow)}: Drag End at: {e.EndPosition}");
                     }
                 }
                 finally

@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using System.Diagnostics;
+using System.Threading;
 
 #if WINDOWS
 using Microsoft.Win32;
@@ -194,27 +195,43 @@ namespace MGUI.Core.UI
         private static bool TryBrowseFilePath(string InitialDirectory, out string FilePath)
         {
 #if WINDOWS
-            OpenFileDialog FileBrowser = new();
-            FileBrowser.Filter = "Xaml Files|*.xaml";
-            if (!string.IsNullOrEmpty(InitialDirectory) && Directory.Exists(InitialDirectory))
-                FileBrowser.InitialDirectory = InitialDirectory;
+            string Browse()
+            {
+                OpenFileDialog FileBrowser = new();
+                FileBrowser.Filter = "Xaml Files|*.xaml";
+                if (!string.IsNullOrEmpty(InitialDirectory) && Directory.Exists(InitialDirectory))
+                    FileBrowser.InitialDirectory = InitialDirectory;
 
-            if (FileBrowser.ShowDialog() == true)
-            {
-                FilePath = FileBrowser.FileName;
-                return true;
+                if (FileBrowser.ShowDialog() == true)
+                    return FileBrowser.FileName;
+                else
+                    return null;
             }
-            else
-            {
-                FilePath = null;
-                return false;
-            }
+
+            //  Microsoft.Win32.OpenFileDialog.ShowDialog() requires STA apartment state
+            ApartmentState State = Thread.CurrentThread.GetApartmentState();
+            FilePath = State == ApartmentState.STA ? Browse() : StartSTATask(Browse).Result;
+            return !string.IsNullOrEmpty(FilePath);
 #else
             //TODO: Implement this
             Debug.WriteLine($"This feature is not implemented on non-Windows platforms: {nameof(MGXAMLDesigner)}.{nameof(TryBrowseFilePath)}");
             FilePath = null;
             return false;
 #endif
+        }
+
+        //Taken from: https://stackoverflow.com/a/16722767/11689514
+        private static Task<T> StartSTATask<T>(Func<T> func)
+        {
+            var tcs = new TaskCompletionSource<T>();
+            Thread thread = new(() =>
+            {
+                try { tcs.SetResult(func()); }
+                catch (Exception e) { tcs.SetException(e); }
+            });
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            return tcs.Task;
         }
 
         private void RefreshParsedContent()

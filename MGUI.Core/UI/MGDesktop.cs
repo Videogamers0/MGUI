@@ -16,6 +16,7 @@ using MGUI.Core.UI.Brushes.Fill_Brushes;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 namespace MGUI.Core.UI
 {
@@ -319,6 +320,16 @@ namespace MGUI.Core.UI
 
         public MGDesktop(MainRenderer Renderer)
         {
+            ApartmentState ThreadState = Thread.CurrentThread.GetApartmentState();
+            if (ThreadState != ApartmentState.STA)
+            {
+                Debug.WriteLine(
+                    $"WARNING: {nameof(MGUI)}.{nameof(MGUI.Core)}.{nameof(MGUI.Core.UI)}.{nameof(MGDesktop)} is being instantiated from a thread whose {nameof(ApartmentState)}={ThreadState}. " +
+                    $"You may experience unforeseen issues when running from a non-{ApartmentState.STA} {nameof(ApartmentState)}. " +
+                    $"It is recommended to add the {nameof(STAThreadAttribute)} (\"[STAThread]\") to your program's main entry function to avoid issues."
+                );
+            }
+
             this.Renderer = Renderer;
             this.Windows = new();
             this.Resources = new(new MGTheme(Renderer.FontManager.DefaultFontFamily));
