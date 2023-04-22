@@ -470,6 +470,11 @@ MGUI can also parse and render your XAML markup at runtime using the MGXAMLDesig
      - Anywhere in your code, instantiate 1 or more `MGWindow` and add them to your `MGDesktop` instance via `MGDesktop.Windows`
      - In the Update method: Call `MGDesktop.Update()`
      - In the Draw method: Call `MGDesktop.Draw()`
+   - If your application freezes up while using the MGXAMLDesigner dialog explorer, double-check that the 
+       ```xaml
+        [ThreadSTAT]
+        ``` 
+       attribute is present above main in your project's program.cs. Newer Cross-platform MonoGame project templates use a compressed program.cs and do not include this by default.
       
 <details>
   <summary>Example code for your Game class:</summary>
