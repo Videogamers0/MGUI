@@ -445,13 +445,19 @@ namespace MGUI.Core.UI.Data_Binding
             if (Value == null)
                 return null;
             else if (StringFormat != null && TargetType == typeof(string))
-                return string.Format(StringFormat, Value);
+            {
+                try { return string.Format(StringFormat, Value); }
+                catch (FormatException) { return Value; }
+            }
             else if (CanAssign == true || (!CanAssign.HasValue && IsAssignable(SourceType, TargetType)))
                 return Value;
             else if (TryConvertWithTypeConverter(Context, SourceType, TargetType, Value, out object TypeConvertedValue))
                 return TypeConvertedValue;
             else if (Value is IConvertible)
-                return Convert.ChangeType(Value, TargetType);
+            {
+                try { return Convert.ChangeType(Value, TargetType); }
+                catch (FormatException) { return Value; }
+            }
             else if (TargetType == typeof(string))
                 return Value.ToString();
             else
@@ -473,16 +479,18 @@ namespace MGUI.Core.UI.Data_Binding
             TypeConverter Converter = GetConverter(TargetType);
             if (Converter.CanConvertFrom(SourceType))
             {
-                Result = Context == null ?
-                    Converter.ConvertFrom(Value) :
-                    Converter.ConvertFrom(Context, CultureInfo.CurrentCulture, Value);
-                return true;
+                try
+                {
+                    Result = Context == null ?
+                        Converter.ConvertFrom(Value) :
+                        Converter.ConvertFrom(Context, CultureInfo.CurrentCulture, Value);
+                    return true;
+                }
+                catch (ArgumentException) { }
             }
-            else
-            {
-                Result = null;
-                return false;
-            }
+
+            Result = null;
+            return false;
         }
 
         private static bool TryConvertToWithTypeConverter(ITypeDescriptorContext Context, Type SourceType, Type TargetType, object Value, out object Result)

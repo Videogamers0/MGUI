@@ -1,7 +1,9 @@
 ﻿using MGUI.Core.UI;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
+using MGUI.Shared.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +28,20 @@ namespace MGUI.Samples.Controls
             }
         }
 
+        private double _HeightInches;
+        public double HeightInches
+        {
+            get => _HeightInches;
+            set
+            {
+                if (_HeightInches != value)
+                {
+                    _HeightInches = value;
+                    NPC(nameof(HeightInches));
+                }
+            }
+        }
+
         public ButtonSamples(ContentManager Content, MGDesktop Desktop)
             : base(Content, Desktop, $"{nameof(Controls)}", "Button.xaml")
         {
@@ -39,7 +55,7 @@ namespace MGUI.Samples.Controls
                 return true;
             };
 
-            Window.GetResources().AddCommand("ReduceOpacity", x => x.Opacity -= 0.1f);
+            Resources.AddCommand("ReduceOpacity", x => x.Opacity -= 0.1f);
 
             List<Color> Colors = new()
             {
@@ -55,11 +71,11 @@ namespace MGUI.Samples.Controls
                 return true;
             };
 
-            Window.GetResources().AddCommand("OuterButtonCommand", x => TextBlock1Text = "Clicked the [b]outer[/b] button");
-            Window.GetResources().AddCommand("InnerButtonCommand", x => TextBlock1Text = "Clicked the [b]inner[/b] button");
+            Resources.AddCommand("OuterButtonCommand", x => TextBlock1Text = "Clicked the [b]outer[/b] button");
+            Resources.AddCommand("InnerButtonCommand", x => TextBlock1Text = "Clicked the [b]inner[/b] button");
 
             int RepeatCounter1 = 0;
-            Window.GetResources().AddCommand("RepeatButtonSample1", x =>
+            Resources.AddCommand("RepeatButtonSample1", x =>
             {
                 RepeatCounter1++;
                 MGButton Button = (MGButton)x;
@@ -69,7 +85,7 @@ namespace MGUI.Samples.Controls
             });
 
             int RepeatCounter2 = 0;
-            Window.GetResources().AddCommand("RepeatButtonSample2", x =>
+            Resources.AddCommand("RepeatButtonSample2", x =>
             {
                 RepeatCounter2++;
                 MGButton Button = (MGButton)x;
@@ -77,6 +93,34 @@ namespace MGUI.Samples.Controls
                 string NewText = $"Execution count: [b]{RepeatCounter2}[/b]";
                 TextBlock.SetText(NewText, NewText.Length == TextBlock.Text.Length);
             });
+
+            HeightInches = 70;
+            Resources.AddCommand("RepeatButtonSample_IncrementHeight", x => { HeightInches += 1; });
+            Resources.AddCommand("RepeatButtonSample_DecrementHeight", x => { HeightInches -= 1; });
+
+            //  Draw a triangle inside the IncrementHeight/DecrementHeight buttons to mimic up/down arrows
+            const int ArrowWidth = 8;
+            const int ArrowHeight = 5;
+            Window.GetElementByName<MGButton>("Button_IncrementHeight").OnEndingDraw += (sender, e) =>
+            {
+                MGButton Element = sender as MGButton;
+                Rectangle ArrowElementFullBounds = Element.LayoutBounds;
+                Rectangle ArrowPartBounds = MGElement.ApplyAlignment(ArrowElementFullBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new Size(ArrowWidth, ArrowHeight));
+                List<Vector2> ArrowVertices = new() {
+                    ArrowPartBounds.BottomLeft().ToVector2(), ArrowPartBounds.BottomRight().ToVector2(), new(ArrowPartBounds.Center.X, ArrowPartBounds.Top)
+                };
+                e.DA.DT.FillPolygon(e.DA.Offset.ToVector2(), ArrowVertices, Color.DarkGray * e.DA.Opacity);
+            };
+            Window.GetElementByName<MGButton>("Button_DecrementHeight").OnEndingDraw += (sender, e) =>
+            {
+                MGButton Element = sender as MGButton;
+                Rectangle ArrowElementFullBounds = Element.LayoutBounds;
+                Rectangle ArrowPartBounds = MGElement.ApplyAlignment(ArrowElementFullBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new Size(ArrowWidth, ArrowHeight));
+                List<Vector2> ArrowVertices = new() {
+                    ArrowPartBounds.TopLeft().ToVector2(), ArrowPartBounds.TopRight().ToVector2(), new(ArrowPartBounds.Center.X, ArrowPartBounds.Bottom)
+                };
+                e.DA.DT.FillPolygon(e.DA.Offset.ToVector2(), ArrowVertices, Color.DarkGray * e.DA.Opacity);
+            };
 
             Window.WindowDataContext = this;
         }

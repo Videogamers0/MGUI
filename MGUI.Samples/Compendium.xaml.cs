@@ -26,6 +26,7 @@ namespace MGUI.Samples
     {
         public ContentManager Content { get; }
         public MGDesktop Desktop { get; }
+        public MGResources Resources { get; }
         public MGWindow Window { get; }
 
         private bool _IsVisible;
@@ -59,6 +60,7 @@ namespace MGUI.Samples
         {
             this.Content = Content;
             this.Desktop = Desktop;
+            Resources = Desktop.Resources;
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.{(ProjectFolderName == null ? "" : ProjectFolderName + ".")}{XAMLFilename}";
             string XAML = GeneralUtils.ReadEmbeddedResourceAsString(Assembly.GetExecutingAssembly(), ResourceName);
             Initialize?.Invoke();

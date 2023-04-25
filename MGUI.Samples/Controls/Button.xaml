@@ -1,4 +1,4 @@
-<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         Left="440" Top="20" MinHeight="0" Width="560" SizeToContent="Height" TitleText="Button" Padding="10">
     <Window.Styles>
         <Style TargetType="TextBlock">
@@ -36,8 +36,9 @@
                 </TextBlock>
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
-                        Set [c=Turquoise]CommandName[/c] to associate a named action to the [c=Turquoise]Button[/c].
-                        Named actions are stored in [c=Turquoise]Window.NamedActions[/c] (Use [c=Turquoise]Window.AddNamedAction[/c](...) to create one).
+                        Set [c=Turquoise]CommandName[/c] to associate a particular command to the [c=Turquoise]Button[/c].
+                        Commands are stored in [c=Turquoise]MGResources.Commands[/c] (Use [c=Turquoise]MGResources.AddCommand[/c](...) to create one).
+                        [c=Turquoise]MGResources[/c] instance is typically accessed via [c=Turquoise]MGDesktop.Resources[/c] (See also: [c=Turquoise]MGElement.GetDesktop[/c]() and [c=Turquoise]MGElement.GetResources[/c]() )
                     </TextBlock>
                     <Button CommandName="ReduceOpacity" HorizontalAlignment="Left" Content="Click me to reduce my [c=Turquoise]Opacity[/c] by 10%" />
                     <Spacer Height="5" />
@@ -112,6 +113,31 @@
                     <Button CommandName="RepeatButtonSample2" HorizontalAlignment="Stretch" Padding="15,5" Background="DarkBlue"
                             Content="1.5s initial interval, then repeats 30 times per second" 
                             IsRepeatButton="True" InitialRepeatInterval="00:00:01.5" RepeatInterval="00:00:00.034" />
+                    <Spacer Height="5" />
+                    <TextBlock>
+                        Repeat buttons are commonly used when docked to the right of a numeric display.
+                    </TextBlock>
+                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                        <TextBlock Text="Enter your height in inches:" VerticalAlignment="Center" />
+                        <Spacer Width="5" />
+                        <DockPanel>
+                            <Grid Dock="Right" RowLengths="*,*" ColumnLengths="auto">
+                                <Grid.Styles>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Background" Value="DarkBlue" />
+                                        <Setter Property="MinHeight" Value="10" />
+                                        <Setter Property="MinWidth" Value="14" />
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="IsRepeatButton" Value="True" />
+                                        <Setter Property="RepeatInterval" Value="00:00:00.1" />
+                                    </Style>
+                                </Grid.Styles>
+                                <Button Name="Button_IncrementHeight" Row="0" Column="0" CommandName="RepeatButtonSample_IncrementHeight" />
+                                <Button Name="Button_DecrementHeight" Row="1" Column="0" CommandName="RepeatButtonSample_DecrementHeight" />
+                            </Grid>
+                            <TextBox Background="DarkBlue" MinWidth="40" Text="{MGBinding HeightInches, Mode=TwoWay, FallbackValue=70}" VerticalContentAlignment="Center" />
+                        </DockPanel>
+                    </StackPanel>
                 </StackPanel>
             </DockPanel>
             <Separator/>
