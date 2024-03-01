@@ -131,6 +131,11 @@ namespace MGUI.Samples.Dialogs.Debugging
             {
 
             }
+
+            if (Window.TryGetElementByName("LB1", out MGListBox<string> LB))
+            {
+
+            }
         }
     }
 }

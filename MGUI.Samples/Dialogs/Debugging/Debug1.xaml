@@ -144,7 +144,7 @@
                 <ListViewColumn Header="Test" Width="*" />
             </ListView>-->
 
-            <ListBox IsTitleVisible="True" xmlns:System="clr-namespace:System;assembly=mscorlib" ItemType="{x:Type System:String}"
+            <ListBox Name="LB1" IsTitleVisible="True" xmlns:System="clr-namespace:System;assembly=mscorlib" ItemType="{x:Type System:String}"
                      SelectionMode="Single">
                 <!--<ListBox.ScrollViewer>
                     <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto" />

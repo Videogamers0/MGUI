@@ -112,8 +112,8 @@ namespace MGUI.Core.UI
                 FromFileAutoRefreshCheckBox.HorizontalAlignment = HorizontalAlignment.Left;
                 FromFileAutoRefreshCheckBox.SetContent("Auto-refresh parsed content");
                 MGToolTip AutoRefreshToolTip = new MGToolTip(ParentWindow, FromFileAutoRefreshCheckBox, 0, 0);
-                AutoRefreshToolTip.DefaultTextForeground.SetAll(Color.Black);
-                AutoRefreshToolTip.SetContent("[shadow=white 1 1]If checked, the parsed content will automatically refresh whenever the selected file is saved.");
+                AutoRefreshToolTip.DefaultTextForeground.SetAll(Color.White);
+                AutoRefreshToolTip.SetContent("If checked, the parsed content will automatically refresh whenever the selected file is saved.");
                 AutoRefreshToolTip.ApplySizeToContent(SizeToContent.WidthAndHeight, 50, 50, 350, null, false);
                 FromFileAutoRefreshCheckBox.ToolTip = AutoRefreshToolTip;
 

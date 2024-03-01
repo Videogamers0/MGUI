@@ -223,24 +223,25 @@ namespace MGUI.Core.UI.Containers
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool HasContent => Content != null;
 
-        /// <returns>This <see cref="MGContentHost"/> (for convenience, to chain multiple <see cref="SetContent{THostType}(MGElement)"/> calls. Such as:<para/>
-        /// <code>new MGBorder(...).SetContent(new MGButton(...).SetContent(new MGTextBlock(...)))</code></returns>
+        /// <returns>The <paramref name="Content"/>, casted as the given <typeparamref name="THostType"/>
+        /// (for convenience, to chain multiple <see cref="SetContent{THostType}(MGElement)"/> calls. Such as:<para/>
+        /// <code>new MGBorder(...).SetContent(new MGButton(...)).SetContent(new MGTextBlock(...))</code></returns>
         /// <exception cref="InvalidOperationException"></exception>
         public THostType SetContent<THostType>(MGElement Content)
             where THostType : MGSingleContentHost
         {
             SetContentVirtual(Content);
-            return this as THostType;
+            return Content as THostType;
         }
 
+        /// <returns>The <paramref name="Content"/>, casted as an <see cref="MGSingleContentHost"/> or null if the <paramref name="Content"/> is not an <see cref="MGSingleContentHost"/>
+        /// (for convenience, to chain multiple <see cref="SetContent{THostType}(MGElement)"/> calls. Such as:<para/>
+        /// <code>new MGBorder(...).SetContent(new MGButton(...)).SetContent(new MGTextBlock(...))</code></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public MGSingleContentHost SetContent(MGElement Content)
             => SetContent<MGSingleContentHost>(Content);
 
-        public THostType SetContent<THostType>(string Content, Color? Foreground = null, int? FontSize = null)
-            where THostType : MGSingleContentHost
-            => SetContent<THostType>(new MGTextBlock(SelfOrParentWindow, Content, Foreground, FontSize));
-
-        public MGSingleContentHost SetContent(string Content, Color? Foreground = null, int? FontSize = null)
+        public void SetContent(string Content, Color? Foreground = null, int? FontSize = null)
             => SetContent<MGSingleContentHost>(new MGTextBlock(SelfOrParentWindow, Content, Foreground, FontSize));
 
         /// <summary>Only intended to be used by <see cref="MGWindow"/>'s constructor.</summary>

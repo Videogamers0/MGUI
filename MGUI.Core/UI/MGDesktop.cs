@@ -91,7 +91,7 @@ namespace MGUI.Core.UI
 
         internal MGToolTip QueuedToolTip { get; set; } = null;
 
-        /// <summary>Default value: 0.4s</summary>
+        /// <summary>Default value: 0.3s</summary>
         public static TimeSpan DefaultToolTipShowDelay { get; set; } = TimeSpan.FromSeconds(0.30);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -117,10 +117,10 @@ namespace MGUI.Core.UI
         private MGContextMenu _ActiveContextMenu;
         /// <summary>The currently open <see cref="MGContextMenu"/>.<para/>
         /// To set this value, use <see cref="TryCloseActiveContextMenu"/> or <see cref="TryOpenContextMenu(MGContextMenu, Point)"/></summary>
-        public MGContextMenu ActiveContextMenu { get => _ActiveContextMenu; }
+        public MGContextMenu ActiveContextMenu => _ActiveContextMenu;
 
         /// <returns>True if there was no <see cref="ActiveContextMenu"/> or it was successfully closed.<br/>
-        /// False if the action was cancelled such as via <see cref="ContextMenuOpening"/>'s <see cref="ContextMenuOpeningClosingEventArgs"/>.Cancel.</returns>
+        /// False if the action was cancelled such as via <see cref="ContextMenuClosing"/>'s <see cref="ContextMenuOpeningClosingEventArgs"/>.Cancel.</returns>
         public bool TryCloseActiveContextMenu()
         {
             if (ActiveContextMenu != null)
