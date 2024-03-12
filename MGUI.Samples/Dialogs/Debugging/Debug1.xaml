@@ -109,6 +109,43 @@
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
+                <TabItem Header="Tab #3">
+                    <ScrollViewer Dock="Top">
+                        <StackPanel Orientation="Vertical">
+                            <Border Background="Blue" Width="200" Height="200">
+                                <OverlayHost OverlayBackground="Black * 0.5">
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock FontSize="20" Text="This is the content underneath an overlay" />
+                                        <CheckBox IsChecked="False" Content="input test" HorizontalAlignment="Left" Margin="78,0,0,0" />
+                                        <Stopwatch IsRunning="True" HorizontalAlignment="Left" />
+                                    </StackPanel>
+
+                                    <OverlayHost.Overlays>
+                                        <Overlay Name="Overlay1" IsOpen="true" ShowCloseButton="True" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Overlay.CloseButton>
+                                                <Button/>
+                                            </Overlay.CloseButton>
+                                            <Grid>
+                                                <Border BorderBrush="Black" Background="White" Padding="20,20,20,20">
+                                                    <StackPanel Orientation="Vertical">
+                                                        <TextBlock Foreground="Black" Text="Overlay content" />
+                                                        <Button Content="Button" HorizontalAlignment="Center" />
+                                                    </StackPanel>
+                                                </Border>
+                                                <!--<CheckBox Content="A" HorizontalAlignment="Left" VerticalAlignment="Top" />-->
+                                            </Grid>
+                                        </Overlay>
+                                    </OverlayHost.Overlays>
+                                </OverlayHost>
+                            </Border>
+
+                            <Border BorderBrush="Black" BorderThickness="2" Background="Blue">
+                                <TextBlock Text="This is content that doesn't exist in the scope of the overlay above it" />
+                            </Border>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
             </TabControl>
 
             <!--<UniformGrid Name="UG1" Rows="6" Columns="4" CellSize="32,32" HeaderRowHeight="16" GridLinesVisibility="All" BG="LightBlue"

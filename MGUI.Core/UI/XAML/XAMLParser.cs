@@ -56,6 +56,10 @@ namespace MGUI.Core.UI.XAML
             { "ListBox", nameof(ListBox) },
             { "ListView", nameof(ListView) },
             { "ListViewColumn", nameof(ListViewColumn) },
+
+            { "OverlayHost", nameof(OverlayHost) },
+            { "Overlay", nameof(Overlay) },
+
             { "PasswordBox", nameof(PasswordBox) },
             { "ProgressBar", nameof(ProgressBar) },
             { "RadioButton", nameof(RadioButton) },

@@ -227,7 +227,9 @@ namespace MGUI.Core.UI
                 MGElementType.UniformGrid,
                 MGElementType.TabItem,
                 MGElementType.TextBlock,
-                MGElementType.UserControl
+                MGElementType.UserControl,
+                MGElementType.OverlayHost,
+                MGElementType.Overlay
             };
             foreach (MGElementType Type in TypesWithoutBackgrounds)
             {

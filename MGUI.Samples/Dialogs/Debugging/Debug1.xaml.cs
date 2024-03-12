@@ -136,6 +136,11 @@ namespace MGUI.Samples.Dialogs.Debugging
             {
 
             }
+
+            if (Window.TryGetElementByName("Overlay1", out MGOverlay Overlay))
+            {
+                string s = "";
+            }
         }
     }
 }

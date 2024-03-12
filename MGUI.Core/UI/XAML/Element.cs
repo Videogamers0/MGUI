@@ -134,7 +134,7 @@ namespace MGUI.Core.UI.XAML
         /// <summary>Used by <see cref="OverlayPanel"/>'s children</summary>
         [Category("Attached")]
         public Thickness Offset { get; set; } = new();
-        /// <summary>Used by <see cref="OverlayPanel"/>'s children</summary>
+        /// <summary>Used by <see cref="OverlayPanel"/>'s children and by <see cref="Overlay"/>s.</summary>
         [Category("Attached")]
         public double? ZIndex { get; set; } = null;
 

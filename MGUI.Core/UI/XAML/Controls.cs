@@ -646,6 +646,99 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
+    public class OverlayHost : SingleContentHost
+    {
+        public override MGElementType ElementType => MGElementType.OverlayHost;
+
+        [Category("Appearance")]
+        public FillBrush OverlayBackground { get; set; }
+        [Category("Behavior")]
+        public bool? IsModal { get; set; }
+
+        [Category("Data")]
+        public List<Overlay> Overlays { get; set; } = new();
+
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGOverlayHost(Window);
+
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
+        {
+            MGDesktop Desktop = Element.GetDesktop();
+
+            MGOverlayHost Host = Element as MGOverlayHost;
+
+            if (OverlayBackground != null)
+                Host.OverlayBackground = OverlayBackground.ToFillBrush(Desktop);
+            if (IsModal.HasValue)
+                Host.IsModal = IsModal.Value;
+
+            if (IncludeContent)
+            {
+                foreach (Overlay Child in Overlays)
+                {
+                    _ = Child.ToElement<MGOverlay>(Host.ParentWindow, Host);
+                }
+            }
+
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
+        }
+
+        protected internal override IEnumerable<Element> GetChildren()
+        {
+            foreach (Element Child in base.GetChildren())
+                yield return Child;
+
+            foreach (Overlay Overlay in Overlays)
+                yield return Overlay;
+        }
+    }
+
+    public class Overlay : SingleContentHost
+    {
+        public override MGElementType ElementType => MGElementType.Overlay;
+
+        [Category("Appearance")]
+        public bool? IsOpen { get; set; }
+
+        [Category("Appearance")]
+        public Button CloseButton { get; set; } = new();
+        [Category("Appearance")]
+        public bool? ShowCloseButton { get; set; }
+
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
+        {
+            if (Parent is MGOverlayHost OverlayHost)
+            {
+                MGElement ContentElement = Content?.ToElement<MGElement>(Window, null);
+                return OverlayHost.AddOverlay(ContentElement);
+            }
+            else
+                throw new InvalidOperationException($"The {nameof(Parent)} {nameof(MGElement)} of an {nameof(MGOverlay)} should be of type {nameof(MGOverlayHost)}");
+        }
+
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
+        {
+            MGOverlay Overlay = Element as MGOverlay;
+
+            CloseButton.ApplySettings(Parent, Overlay.CloseButtonComponent.Element, true);
+
+            if (ZIndex.HasValue)
+                Overlay.ZIndex = ZIndex.Value;
+            if (ShowCloseButton.HasValue)
+                Overlay.ShowCloseButton = ShowCloseButton.Value;
+            if (IsOpen.HasValue)
+                Overlay.IsOpen = IsOpen.Value;
+
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
+        }
+
+        protected internal override IEnumerable<Element> GetChildren()
+        {
+            foreach (Element Element in base.GetChildren())
+                yield return Element;
+            yield return CloseButton;
+        }
+    }
+
     public class PasswordBox : TextBox
     {
         public override MGElementType ElementType => MGElementType.PasswordBox;

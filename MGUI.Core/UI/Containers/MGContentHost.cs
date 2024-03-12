@@ -282,10 +282,40 @@ namespace MGUI.Core.UI.Containers
     /// <summary>Lightweight wrapper class that contains a single <see cref="MGElement"/> as its <see cref="MGSingleContentHost.Content"/></summary>
     public class MGContentPresenter : MGSingleContentHost
     {
-        public MGContentPresenter(MGWindow Window)
+        public MGContentPresenter(MGWindow Window) : this(Window, false) { }
+
+        internal bool SuppressContentAddedAndRemoved { get; }
+
+        /// <param name="SuppressContentAddedAndRemoved">If true, <see cref="MGContentHost.InvokeContentAdded(MGElement)"/> and <see cref="MGContentHost.InvokeContentRemoved(MGElement)"/> will
+        /// not be invoked when setting the <see cref="MGSingleContentHost.Content"/><br/>In 99% of cases this should be false.</param>
+        internal MGContentPresenter(MGWindow Window, bool SuppressContentAddedAndRemoved)
             : base(Window, MGElementType.ContentPresenter)
         {
+            this.SuppressContentAddedAndRemoved = SuppressContentAddedAndRemoved;
+        }
 
+        protected override void SetContentVirtual(MGElement Value)
+        {
+            if (_Content != Value)
+            {
+                if (!CanChangeContent)
+                    throw new InvalidOperationException($"Cannot set {nameof(MGSingleContentHost)}.{nameof(Content)} while {nameof(CanChangeContent)} is false.");
+
+                if (_Content != null && !SuppressContentAddedAndRemoved)
+                {
+                    _Content.SetParent(null);
+                    InvokeContentRemoved(_Content);
+                }
+                _Content = Value;
+                if (_Content != null && !SuppressContentAddedAndRemoved)
+                {
+                    _Content.SetParent(this);
+                    InvokeContentAdded(_Content);
+                }
+                LayoutChanged(this, true);
+                NPC(nameof(Content));
+                NPC(nameof(HasContent));
+            }
         }
 
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds) { }

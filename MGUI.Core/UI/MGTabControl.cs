@@ -25,12 +25,14 @@ namespace MGUI.Core.UI
                 if (!CanChangeContent)
                     throw new InvalidOperationException($"Cannot set {nameof(MGSingleContentHost)}.{nameof(Content)} while {nameof(CanChangeContent)} is false.");
 
+                //  ContentAdded/ContentRemoved is already invoked when AddTab or RemoveTab
+
                 //_Content?.SetParent(null);
                 //InvokeContentRemoved(_Content);
                 _Content = Value;
                 //_Content?.SetParent(this);
-                LayoutChanged(this, true);
                 //InvokeContentAdded(_Content);
+                LayoutChanged(this, true);
                 NPC(nameof(Content));
                 NPC(nameof(HasContent));
             }

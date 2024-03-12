@@ -351,7 +351,7 @@ namespace MGUI.Core.UI
             {
                 //  Handle the '[Action]' inlined formatting code
                 //  EX: Text="[Action=Action1]Click here[/Action] but not here"
-                //  Then clicking the substring "Click here" should invoke the action named "Action1" (in MGWindow.NamedActions)
+                //  Then clicking the substring "Click here" should invoke the command named "Action1" (in MGResources.Commands)
                 if (ActionBounds.Any())
                 {
                     Point MousePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, InputTracker.Mouse.CurrentPosition);
