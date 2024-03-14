@@ -37,6 +37,7 @@ namespace MGUI.Core.UI
             Overlay.OnZIndexChanged += HandleOverlayZIndexChanged;
             _Overlays.Add(Overlay);
             InvokeContentAdded(Overlay);
+            UpdateActiveOverlay();
             return Overlay;
         }
 
@@ -63,6 +64,7 @@ namespace MGUI.Core.UI
                 if (WasOpen)
                 {
                     Overlay.InvokeOnClosed();
+                    Overlay.NPC(nameof(MGOverlay.IsOpen));
                     UpdateActiveOverlay();
                 }
 
@@ -103,6 +105,7 @@ namespace MGUI.Core.UI
 
             _OpenOverlays.Add(Overlay);
             Overlay.InvokeOnOpened();
+            Overlay.NPC(nameof(MGOverlay.IsOpen));
 
             UpdateActiveOverlay();
             return true;
@@ -120,6 +123,7 @@ namespace MGUI.Core.UI
 
             _OpenOverlays.Remove(Overlay);
             Overlay.InvokeOnClosed();
+            Overlay.NPC(nameof(MGOverlay.IsOpen));
 
             UpdateActiveOverlay();
             return true;
@@ -186,6 +190,8 @@ namespace MGUI.Core.UI
 
                 IsModal = true;
 
+                Padding = new(4);
+
                 ActiveOverlayPresenter = new(Window, true);
                 ActiveOverlayPresenterComponent = new(ActiveOverlayPresenter, ComponentUpdatePriority.BeforeContents, ComponentDrawPriority.AfterContents, true, true, true, true, false, false, true,
                     (AvailableBounds, ComponentSize) => AvailableBounds.GetCompressed(Padding));
@@ -197,7 +203,18 @@ namespace MGUI.Core.UI
                 ActiveOverlayPresenter.MouseHandler.PressedInside += (sender, e) => TryHandleInputs(() => e.SetHandledBy(this, false));
                 ActiveOverlayPresenter.MouseHandler.ReleasedInside += (sender, e) => TryHandleInputs(() => e.SetHandledBy(this, false));
                 ActiveOverlayPresenter.MouseHandler.DragStart += (sender, e) => TryHandleInputs(() => e.SetHandledBy(this, false));
-                ActiveOverlayPresenter.MouseHandler.Scrolled += (sender, e) => TryHandleInputs(() => e.SetHandledBy(this, false));
+                ActiveOverlayPresenter.MouseHandler.Scrolled += (sender, e) =>
+                {
+                    if (IsModal && ActiveOverlay != null && Content != null)
+                    {
+                        //  Only swallow the mouse scroll events if the content underneath the overlay is scrollable.
+                        //  This will allow scroll events to continue bubbling up the visual tree if the content under the overlay wasn't scrollable
+                        //  (Such as if the parent of the OverlayHost was wrapped in a ScrollViewer)
+                        bool IsContentScrollable = Content.TraverseVisualTree(true, true, false, false, TreeTraversalMode.Preorder).Any(x => x.ElementType == MGElementType.ScrollViewer);
+                        if (IsContentScrollable)
+                            TryHandleInputs(() => e.SetHandledBy(this, false));
+                    }
+                };
                 void TryHandleInputs(Action SetHandled)
                 {
                     if (IsModal && ActiveOverlay != null)
@@ -218,11 +235,11 @@ namespace MGUI.Core.UI
                 base.SetContentVirtual(Value);
 
                 if (Previous != null)
-                    Previous.OnEndingDraw -= Content_OnEndingDraw;
+                    Previous.OnEndDraw -= Content_OnEndDraw;
                 if (Content != null)
-                    Content.OnEndingDraw += Content_OnEndingDraw;
+                    Content.OnEndDraw += Content_OnEndDraw;
 
-                void Content_OnEndingDraw(object sender, MGElementDrawEventArgs e)
+                void Content_OnEndDraw(object sender, MGElementDrawEventArgs e)
                 {
                     //  Draw the OverlayBackground overtop of the content, but underneath the active overlay
                     if (ActiveOverlay != null && OverlayBackground != null)
@@ -273,7 +290,7 @@ namespace MGUI.Core.UI
 
             if (IncludeInactive)
             {
-                foreach (MGOverlay InactiveOverlay in _Overlays.Where(x => !x.IsOpen))
+                foreach (MGOverlay InactiveOverlay in _Overlays.Where(x => x != ActiveOverlay))
                     yield return InactiveOverlay;
             }
 
@@ -287,6 +304,25 @@ namespace MGUI.Core.UI
     public class MGOverlay : MGSingleContentHost
     {
         public MGOverlayHost Host { get; }
+
+        #region Border
+        /// <summary>Provides direct access to this element's border.</summary>
+        public MGComponent<MGBorder> BorderComponent { get; }
+        private MGBorder BorderElement { get; }
+        public override MGBorder GetBorder() => BorderElement;
+
+        public IBorderBrush BorderBrush
+        {
+            get => BorderElement.BorderBrush;
+            set => BorderElement.BorderBrush = value;
+        }
+
+        public Thickness BorderThickness
+        {
+            get => BorderElement.BorderThickness;
+            set => BorderElement.BorderThickness = value;
+        }
+        #endregion Border
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private double _ZIndex;
@@ -356,7 +392,9 @@ namespace MGUI.Core.UI
         #endregion Events
 
         public MGComponent<MGButton> CloseButtonComponent { get; }
-        /// <summary>Only visible if <see cref="ShowCloseButton"/> is <see langword="true" /></summary>
+        /// <summary>Only visible if <see cref="ShowCloseButton"/> is <see langword="true" />.<para/>
+        /// By default, this is placed in the top-right corner and shares its consumed space with the overlay content.<br/>
+        /// (Meaning this button might be rendered overtop of other overlay content. You may wish to add a top and/or right <see cref="MGElement.Padding"/> to your overlay content to avoid overlaps with the close button).</summary>
         public MGButton CloseButton { get; }
 
         /// <summary><see langword="true"/> if the <see cref="CloseButton"/> should be displayed in the top-right corner.<para/>
@@ -377,13 +415,23 @@ namespace MGUI.Core.UI
                 SetContent(Content);
                 SetParent(Host);
 
+                HorizontalAlignment = HorizontalAlignment.Center;
+                VerticalAlignment = VerticalAlignment.Center;
+                Padding = new(5);
+
+                BorderElement = new(Host.ParentWindow, new(1), Color.Black.AsFillBrush());
+                BorderComponent = MGComponentBase.Create(BorderElement);
+                AddComponent(BorderComponent);
+                BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
+                BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
+
                 CloseButton = new(Host.ParentWindow, x => IsOpen = false);
                 CloseButton.MinWidth = 12;
                 CloseButton.MinHeight = 12;
                 CloseButton.BackgroundBrush = new(Color.Crimson.AsFillBrush() * 0.8f, Color.White * 0.18f, PressedModifierType.Darken, 0.06f);
                 CloseButton.BorderBrush = MGUniformBorderBrush.Black;
                 CloseButton.BorderThickness = new(1);
-                CloseButton.Margin = new(0);
+                CloseButton.Margin = BorderThickness;
                 CloseButton.Padding = new(4, -1);
                 CloseButton.VerticalAlignment = VerticalAlignment.Center;
                 CloseButton.VerticalContentAlignment = VerticalAlignment.Center;

@@ -185,6 +185,13 @@ namespace MGUI.Core.UI.XAML
 
             base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
+
+        protected internal override IEnumerable<Element> GetChildren()
+        {
+            foreach (Element Child in base.GetChildren())
+                yield return Child;
+            yield return Border;
+        }
     }
 
     public class ChatBox : Element
@@ -696,6 +703,23 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.Overlay;
 
+        [Category("Border")]
+        public Border Border { get; set; } = new();
+
+        [Category("Border")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
+
+        [Category("Border")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public Thickness? BorderThickness { get => Border.BorderThickness; set => Border.BorderThickness = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
+
         [Category("Appearance")]
         public bool? IsOpen { get; set; }
 
@@ -709,7 +733,8 @@ namespace MGUI.Core.UI.XAML
             if (Parent is MGOverlayHost OverlayHost)
             {
                 MGElement ContentElement = Content?.ToElement<MGElement>(Window, null);
-                return OverlayHost.AddOverlay(ContentElement);
+                MGOverlay Overlay = OverlayHost.AddOverlay(ContentElement);
+                return Overlay;
             }
             else
                 throw new InvalidOperationException($"The {nameof(Parent)} {nameof(MGElement)} of an {nameof(MGOverlay)} should be of type {nameof(MGOverlayHost)}");
@@ -719,6 +744,7 @@ namespace MGUI.Core.UI.XAML
         {
             MGOverlay Overlay = Element as MGOverlay;
 
+            Border.ApplySettings(Overlay, Overlay.BorderComponent.Element, false);
             CloseButton.ApplySettings(Parent, Overlay.CloseButtonComponent.Element, true);
 
             if (ZIndex.HasValue)
@@ -735,6 +761,7 @@ namespace MGUI.Core.UI.XAML
         {
             foreach (Element Element in base.GetChildren())
                 yield return Element;
+            yield return Border;
             yield return CloseButton;
         }
     }
