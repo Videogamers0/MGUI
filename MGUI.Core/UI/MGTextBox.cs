@@ -305,7 +305,7 @@ namespace MGUI.Core.UI
         /// Some characters are automatically added to this <see cref="MGTextBox"/>,<br/>
         /// such as hyphens that are appended at the end of a line when a single word's width exceeds the line's width and the word must wrap across multiple lines.<br/>
         /// These characters do not count towards the limit.<para/>
-        /// Linebreaks count as 1 character ('\n'). Tabs are typically treated as 4 spaces and thus count as 4 characters. See also: <see cref="TabSpacesCount"/></summary>
+        /// Linebreaks count as 1 character ('\n'). Tabs are typically treated as 4 spaces and thus count as 4 characters. See also: <see cref="MGTextRun.TabSpacesCount"/></summary>
         public int? CharacterLimit
         {
             get => _CharacterLimit;
@@ -884,8 +884,6 @@ namespace MGUI.Core.UI
             }
         }
 
-        private const int TabSpacesCount = 4;
-
         private record struct RecentKeyPress(BaseKeyPressedEventArgs KeyArgs)
         {
             public DateTime PressedAt { get; } = DateTime.Now;
@@ -1436,7 +1434,7 @@ namespace MGUI.Core.UI
                             AddUndoState(UndoState);
                             CurrentSelection = null;
                             TextBlockElement.UpdateLines();
-                            int NumCharactersInserted = IsTab ? TabSpacesCount : 1;
+                            int NumCharactersInserted = IsTab ? MGTextRun.TabSpacesCount : 1;
                             _ = Caret.MoveToOriginalCharacterIndexOrEnd(SelectionStart + NumCharactersInserted - 1, false);
                         }
                     }
@@ -1469,7 +1467,7 @@ namespace MGUI.Core.UI
                         //Debug.WriteLine($"{nameof(MGTextBox)}: Insert key - {e.PrintableValue}");
                         if (SetText(NewText))
                             TextBlockElement.UpdateLines();
-                        int NumCharactersInserted = IsTab ? TabSpacesCount : 1;
+                        int NumCharactersInserted = IsTab ? MGTextRun.TabSpacesCount : 1;
                         if (IsEnter)
                             _ = Caret.MoveToOriginalCharacterIndexOrLeft(Caret.Position.Value.IndexInOriginalText + NumCharactersInserted, true);
                         else

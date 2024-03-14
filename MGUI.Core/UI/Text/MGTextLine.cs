@@ -68,6 +68,7 @@ namespace MGUI.Core.UI.Text
             this.LineWidth = LineWidth;
             this.LineTextHeight = LineTextHeight;
             this.LineTotalHeight = LineTotalHeight;
+            this.LineImageHeight = LineImageHeight;
             this.LineNumber = LineNumber;
             this.EndsInLinebreakCharacter = EndsInLinebreakCharacter;
             this.OriginalCharacterIndices = Indices.ToList().AsReadOnly();

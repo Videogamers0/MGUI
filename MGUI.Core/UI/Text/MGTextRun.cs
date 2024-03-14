@@ -150,6 +150,11 @@ namespace MGUI.Core.UI.Text
     /// See also:<br/><see cref="MGTextRunText"/><br/><see cref="MGTextRunLineBreak"/><br/><see cref="MGTextRunImage"/></summary>
     public abstract class MGTextRun
     {
+        /// <summary>The number of spaces to convert tab characters into before parsing <see cref="MGTextRun"/>s.<para/>
+        /// Default value: 4</summary>
+        public const int TabSpacesCount = 4;
+        public static readonly string TabReplacement = string.Join("", Enumerable.Repeat(" ", TabSpacesCount));
+
         public static readonly FTParser Parser = new();
         public static readonly FTTokenizer Tokenizer = new();
 
@@ -172,6 +177,8 @@ namespace MGUI.Core.UI.Text
         {
             if (string.IsNullOrEmpty(FormattedText))
                 yield break;
+
+            FormattedText = FormattedText.Replace("\t", TabReplacement);
 
             if (!Tokenizer.TryTokenize(FormattedText, true, out List<FTTokenMatch> Tokens))
             {
