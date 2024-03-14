@@ -25,6 +25,8 @@ namespace MGUI.Samples.Dialogs.Debugging
             Desktop.Resources.AddTheme("Debug1_Theme", Theme);
         }
 
+        public MGOverlay Overlay1 { get; }
+
         public Debug1(ContentManager Content, MGDesktop Desktop)
             : base(Content, Desktop, $"{nameof(Dialogs)}.{nameof(Debugging)}", $"{nameof(Debug1)}.xaml", () => { InitializeResources(Content, Desktop); })
         {
@@ -139,8 +141,10 @@ namespace MGUI.Samples.Dialogs.Debugging
 
             if (Window.TryGetElementByName("Overlay1", out MGOverlay Overlay))
             {
-                string s = "";
+                Overlay1 = Overlay;
             }
+
+            Window.WindowDataContext = this;
         }
     }
 }

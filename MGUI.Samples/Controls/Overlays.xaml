@@ -1,0 +1,257 @@
+﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        Left="440" Top="20" MinHeight="0" Width="550" Height="800" TitleText="Window" Padding="10">
+    <Window.Styles>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10" />
+        </Style>
+        <Style Name="Header1" TargetType="TextBlock">
+            <Setter Property="IsBold" Value="True" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style TargetType="Separator">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Height" Value="2" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Opacity" Value="0.25" />
+        </Style>
+        <Style TargetType="Expander">
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="Background" Value="White * 0.1" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
+        <StackPanel Orientation="Vertical" Spacing="10">
+            <TextBlock StyleNames="Header1" Text="Overlays:" HorizontalAlignment="Center" />
+            <Separator/>
+            <TextBlock>
+                Overlays ([c=Turquoise]MGOverlayHost[/c] and [c=Turquoise]MGOverlay[/c]) provide a convenient method to overlay a set of content on top of some other content.
+                While you can achieve similar results simply by using a [c=Turquoise]Grid[/c] and adding several children to the same cell (or by using an [c=Turquoise]MGOverlayPanel[/c]),
+                [c=Turquoise]MGOverlays[/c] have a more specialized use-case that may be preferable.
+            </TextBlock>
+            <Separator />
+
+            <!-- Basic usage -->
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    To use an overlay, wrap your content in an [c=Turquoise]MGOverlayHost[/c], then add an [c=Turquoise]MGOverlay[/c] to [c=Turquoise]MGOverlayHost.Overlays[/c].
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBox Name="TextBox1" IsReadonly="True" AcceptsReturn="True" Background="rgb(12,16,82)" />
+                    <Spacer Height="5" />
+                    <TextBlock Text="Result:" />
+
+                    <Border BorderBrush="Black" BorderThickness="1">
+                        <OverlayHost>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="This content has an [c=Turquoise]MGOverlay[/c]" />
+                                <CheckBox Content="Lorem ipsum dolor" />
+                            </StackPanel>
+                            <OverlayHost.Overlays>
+                                <Overlay Name="Overlay1" IsOpen="true" Background="Yellow * 0.75">
+                                    <TextBlock Foreground="Black" Text="This is the content of an MGOverlay" />
+                                </Overlay>
+                            </OverlayHost.Overlays>
+                        </OverlayHost>
+                    </Border>
+                    <Spacer Height="3" />
+                    <CheckBox Content="Show overlay" IsChecked="{MGBinding ElementName=Overlay1, Path=IsOpen, Mode=TwoWay}" />
+                    <TextBlock FontSize="9" Text="Note: Overlays do not have a [c=Turquoise]Background[/c] by default. You may wish to apply a [c=Turquoise]Background[/c] to either the [c=Turquoise]MGOverlay[/c] or to its Content. The above overlay uses a [c=Yellow]Yellow[/c] [c=Turquoise]Background[/c]." />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise]MGOverlay.IsOpen[/c] to control if the overlay is visible. (Or call [c=Turquoise]MGOverlayHost.TryOpen/TryClose[/c]).
+                        
+                    A single [c=Turquoise]MGOverlayHost[/c] can manage multiple [c=Turquoise]MGOverlays[/c], but at most only 1 will be visible at a time.
+                    Set [c=Turquoise]MGOverlay.ZIndex[/c] to determine the priority when several are simultaneously opened. (See also: [c=Turquoise]MGOverlayHost.ActiveOverlay[/c])
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        The following contains 2 overlays. Use the controls below to manage the overlay [c=Turquoise]IsOpen[/c] and [c=Turquoise]ZIndex[/c] values.
+                    </TextBlock>
+                    <Border BorderBrush="Black" BorderThickness="1">
+                        <OverlayHost Padding="8" Name="ZIndexSample">
+                            <OverlayPanel>
+                                <Image Stretch="Fill" SourceName="SkullAndCrossbones" Opacity="0.3" />
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalContentAlignment="Center" MinHeight="250">
+                                    <TextBlock Text="My cool game:" FontSize="12" HorizontalAlignment="Center" IsUnderlined="True" />
+                                    <Spacer Height="5" />
+                                    <Button Content="Lorem ipsum dolor" />
+                                </StackPanel>
+                            </OverlayPanel>
+
+                            <OverlayHost.Overlays>
+                                
+                                <!-- A simple overlay displaying an end-user license agreement -->
+                                <Overlay Name="Overlay_EULA" IsOpen="True" ZIndex="2" Background="Gray" MaxHeight="230" Padding="10">
+                                    <DockPanel>
+                                        <TextBlock Dock="Top" Text="End User License Agreement:" FontSize="12" IsUnderlined="True" IsBold="True" HorizontalAlignment="Center" />
+                                        <CheckBox Dock="Bottom" Content="I accept the terms" />
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,4,0,6">
+                                            <TextBlock WrapText="True" Foreground="Black"
+                                                       xml:space="preserve">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam odio justo, tempus eu lacus nec, dignissim elementum mauris. Etiam et dolor pretium, tempus sem vitae, convallis mi. Ut luctus interdum odio nec malesuada. In fermentum facilisis metus. Suspendisse nibh purus, posuere quis est sit amet, maximus sagittis urna. Sed nec arcu ipsum. Etiam vitae tortor augue. Vestibulum ultricies mauris a massa hendrerit, non rutrum ligula consequat. 
+                                                    
+Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse potenti. In dignissim orci purus, eget viverra urna sagittis quis. In eu porttitor sapien. Maecenas fringilla, nisl eu convallis dapibus, sapien sem gravida leo, ac sollicitudin turpis nisi vitae quam.
+                                                    
+Pellentesque ultricies erat ac viverra posuere. Nunc nunc neque, tincidunt et tellus volutpat, facilisis condimentum metus. Vestibulum pharetra, erat eget fringilla vulputate, augue velit tincidunt metus, non hendrerit turpis neque vitae orci. Praesent facilisis ut sem in dictum. Nulla id urna maximus purus consectetur pretium et vel metus. Nam quis est nec dui vestibulum malesuada. Pellentesque tincidunt arcu a ultricies efficitur.<!--
+                                            --></TextBlock>
+                                        </ScrollViewer>
+
+                                    </DockPanel>
+                                </Overlay>
+
+                                <!-- A simple overlay displaying username/password login fields -->
+                                <Overlay Name="Overlay_Login" IsOpen="True" ZIndex="1" Background="Gray" Padding="10">
+                                    <StackPanel Orientation="Vertical" MinWidth="200">
+                                        <!-- Username -->
+                                        <HeaderedContentPresenter HeaderPosition="Top" Spacing="2">
+                                            <HeaderedContentPresenter.Header>
+                                                <TextBlock Text="Username:" Foreground="Black" />
+                                            </HeaderedContentPresenter.Header>
+                                            <TextBox PlaceholderText="[i][opacity=0.5]Username[/opacity][/i]" CharacterLimit="16" ShowCharacterCount="false" AcceptsReturn="false" AcceptsTab="false">
+                                                <TextBox.ToolTip>
+                                                    <ToolTip SizeToContent="WidthAndHeight" TextForeground="Red" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                                        <TextBlock WrapText="True" LinePadding="10" FontSize="10" Text="Must contain only alphanumeric characters.\nCannot exceed [b]16[/b] characters." />
+                                                    </ToolTip>
+                                                </TextBox.ToolTip>
+                                            </TextBox>
+                                        </HeaderedContentPresenter>
+                                        <Spacer Height="12" />
+
+                                        <!-- Password -->
+                                        <HeaderedContentPresenter HeaderPosition="Top" Spacing="2">
+                                            <HeaderedContentPresenter.Header>
+                                                <TextBlock Text="Password:" Foreground="Black" />
+                                            </HeaderedContentPresenter.Header>
+                                            <PasswordBox PasswordCharacter="*" Text="Hunter2" />
+                                        </HeaderedContentPresenter>
+                                        <Spacer Height="16" />
+
+                                        <!-- Login  -->
+                                        <Button Background="Orange" HorizontalAlignment="Center" Padding="16,3">
+                                            <TextBlock Text="[b]Login[/b]" FontSize="12" />
+                                        </Button>
+                                    </StackPanel>
+                                </Overlay>
+                            </OverlayHost.Overlays>
+                        </OverlayHost>
+                    </Border>
+                    <Spacer Height="3" />
+                    
+                    <!-- Controls to modify IsOpen/ZIndex in the above overlays -->
+                    <Grid RowLengths="auto,auto" ColumnLengths="*,*" RowSpacing="2" ColumnSpacing="12">
+                        <CheckBox Row="0" Column="0" Content="Show EULA" IsChecked="{MGBinding ElementName=Overlay_EULA, Path=IsOpen, Mode=TwoWay}" />
+                        <HeaderedContentPresenter Row="1" Column="0" HeaderPosition="Left" Header="ZIndex:" Spacing="5">
+                            <Slider Minimum="0" Maximum="3" MinWidth="50" TickFrequency="1" TickWidth="2" ThumbWidth="8" DrawTicks="True" UseDiscreteValues="True" DiscreteValueInterval="1"
+                                    Value="{MGBinding ElementName=Overlay_EULA, Path=ZIndex, Mode=TwoWay}" />
+                        </HeaderedContentPresenter>
+
+                        <CheckBox Row="0" Column="1" Content="Show Login" IsChecked="{MGBinding ElementName=Overlay_Login, Path=IsOpen, Mode=TwoWay}" />
+                        <HeaderedContentPresenter Row="1" Column="1" HeaderPosition="Left" Header="ZIndex:" Spacing="5">
+                            <Slider Minimum="0" Maximum="3" MinWidth="50" TickFrequency="1" TickWidth="2" ThumbWidth="8" DrawTicks="True" UseDiscreteValues="True" DiscreteValueInterval="1"
+                                    Value="{MGBinding ElementName=Overlay_Login, Path=ZIndex, Mode=TwoWay}" />
+                        </HeaderedContentPresenter>
+                    </Grid>
+
+                    <Spacer Height="3" />
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <TextBlock Text="The active overlay is:" />
+                        <TextBlock IsBold="True" AllowsInlineFormatting="False" Text="{MGBinding ElementName=ZIndexSample, Path=ActiveOverlay.Name, FallbackValue=None, Mode=OneWay}" />
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise]MGOverlayHost.OverlayBackground[/c] to define a background that is only visible when an overlay is being shown. 
+                    This background is rendered under the overlay, but overtop of the content that is underneath the overlay.
+                    (Default value: 35% opacity Black solid fill)
+                </TextBlock>
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2" Width="230">
+                        <TextBlock FontSize="8">
+                            This [c=Turquoise]MGOverlayHost[/c] has a transparent [c=LightBlue]LightBlue[/c] [c=Turquoise]OverlayBackground[/c]
+                        </TextBlock>
+                        <OverlayHost OverlayBackground="LightBlue * 0.4" MinHeight="100" Content="(Content underneath overlay)">
+                            <OverlayHost.Overlays>
+                                <Overlay Name="Overlay2" Background="Purple" Content="(Overlay content)" IsOpen="True" />
+                            </OverlayHost.Overlays>
+                        </OverlayHost>
+                        <CheckBox IsChecked="{MGBinding ElementName=Overlay2, Path=IsOpen, Mode=TwoWay}" Content="Show overlay" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2" Width="230">
+                        <TextBlock FontSize="8">
+                            This [c=Turquoise]MGOverlayHost[/c] has a transparent [c=Yellow]Yellow[/c] [c=Turquoise]OverlayBackground[/c]
+                        </TextBlock>
+                        <OverlayHost OverlayBackground="Yellow * 0.4" MinHeight="100" Content="(Content underneath overlay)">
+                            <OverlayHost.Overlays>
+                                <Overlay Name="Overlay3" Background="Purple" Content="(Overlay content)" IsOpen="True" />
+                            </OverlayHost.Overlays>
+                        </OverlayHost>
+                        <CheckBox IsChecked="{MGBinding ElementName=Overlay3, Path=IsOpen, Mode=TwoWay}" Content="Show overlay" />
+                    </StackPanel>
+                </StackPanel>
+
+            </DockPanel>
+            <Separator/>
+            
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise]MGOverlay.ShowCloseButton[/c]=[c=LightBlue][s=Blue]true[/s][/c] to make a default Close Button appear in the overlay's top-right corner.
+                </TextBlock>
+                <TextBlock Dock="Bottom" HorizontalAlignment="Center">Note: The close button might overlap the overlay's content. You may wish to set the overlay's top [c=Turquoise]Padding[/c] to avoid overlaps.</TextBlock>
+
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2" Width="230">
+                        <TextBlock FontSize="8">
+                            This [c=Turquoise]MGOverlay[/c] has uses the default close button
+                        </TextBlock>
+                        <OverlayHost MinHeight="100" Content="(Content underneath overlay)">
+                            <OverlayHost.Overlays>
+                                <Overlay Name="Overlay4" ShowCloseButton="True" Background="Purple" Content="(Overlay content)" IsOpen="True" Padding="5,20,5,15" />
+                            </OverlayHost.Overlays>
+                        </OverlayHost>
+                        <CheckBox IsChecked="{MGBinding ElementName=Overlay4, Path=IsOpen, Mode=TwoWay}" Content="Show overlay" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2" Width="230">
+                        <TextBlock FontSize="8">
+                            This [c=Turquoise]MGOverlay[/c] uses a custom close button
+                        </TextBlock>
+                        <OverlayHost MinHeight="100" Content="(Content underneath overlay)">
+                            <OverlayHost.Overlays>
+                                <Overlay Name="Overlay5" ShowCloseButton="True" Background="Purple" Content="(Overlay content)" IsOpen="True" Padding="5,20,5,15">
+                                    <Overlay.CloseButton>
+                                        <Button Content="Close" Background="Orange" />
+                                    </Overlay.CloseButton>
+                                </Overlay>
+                            </OverlayHost.Overlays>
+                        </OverlayHost>
+                        <CheckBox IsChecked="{MGBinding ElementName=Overlay5, Path=IsOpen, Mode=TwoWay}" Content="Show overlay" />
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+
+            <Spacer Height="10" />
+
+            <!--<Separator/>
+            <DockPanel>
+                <TextBlock Dock="Top">
+
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+
+                    </TextBlock>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>-->
+
+        </StackPanel>
+    </ScrollViewer>
+</Window>

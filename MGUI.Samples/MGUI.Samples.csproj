@@ -31,6 +31,7 @@
     <None Remove="Controls\Image.xaml" />
     <None Remove="Controls\ListBox.xaml" />
     <None Remove="Controls\ListView.xaml" />
+	<None Remove="Controls\Overlays.xaml" />
     <None Remove="Controls\PasswordBox.xaml" />
     <None Remove="Controls\ProgressBar.xaml" />
     <None Remove="Controls\RadioButton.xaml" />
@@ -83,6 +84,9 @@
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ListView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+	<EmbeddedResource Include="Controls\Overlays.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\PasswordBox.xaml" />

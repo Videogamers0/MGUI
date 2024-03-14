@@ -120,6 +120,7 @@ namespace MGUI.Samples
         public ImageSamples ImageSamples { get; }
         public ListBoxSamples ListBoxSamples { get; }
         public ListViewSamples ListViewSamples { get; }
+        public OverlaySamples OverlaySamples { get; }
         public PasswordBoxSamples PasswordBoxSamples { get; }
         public ProgressBarSamples ProgressBarSamples { get; }
         public RadioButtonSamples RadioButtonSamples { get; }
@@ -167,6 +168,7 @@ namespace MGUI.Samples
             ImageSamples = new(Content, Desktop);
             ListBoxSamples = new(Content, Desktop);
             ListViewSamples = new(Content, Desktop);
+            OverlaySamples = new(Content, Desktop);
             PasswordBoxSamples = new(Content, Desktop);
             ProgressBarSamples = new(Content, Desktop);
             RadioButtonSamples = new(Content, Desktop);
@@ -198,6 +200,7 @@ namespace MGUI.Samples
 
 #if DEBUG
             //HUD.Show();
+            OverlaySamples.Show();
 #endif
 
             Window.WindowDataContext = this;

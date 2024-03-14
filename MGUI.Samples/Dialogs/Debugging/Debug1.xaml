@@ -117,6 +117,7 @@
                                     <StackPanel Orientation="Vertical">
                                         <TextBlock FontSize="20" Text="This is the content underneath an overlay" />
                                         <CheckBox IsChecked="False" Content="input test" HorizontalAlignment="Left" Margin="78,0,0,0" />
+                                        <Button Content="Button" HorizontalAlignment="Left" RenderScale="1.2" />
                                         <Stopwatch IsRunning="True" HorizontalAlignment="Left" />
                                     </StackPanel>
 
@@ -126,7 +127,7 @@
                                                 <Button/>
                                             </Overlay.CloseButton>
                                             <Grid>
-                                                <Border BorderBrush="Black" Background="White" Padding="20,20,20,20">
+                                                <Border BorderBrush="Black" Background="White * 0.9" Padding="20,20,20,20">
                                                     <StackPanel Orientation="Vertical">
                                                         <TextBlock Foreground="Black" Text="Overlay content" />
                                                         <Button Content="Button" HorizontalAlignment="Center" />
@@ -140,7 +141,10 @@
                             </Border>
 
                             <Border BorderBrush="Black" BorderThickness="2" Background="Blue">
-                                <TextBlock Text="This is content that doesn't exist in the scope of the overlay above it" />
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="This is content that doesn't exist in the scope of the overlay above it" />
+                                    <CheckBox IsChecked="{MGBinding Path=Overlay1.IsOpen, Mode=TwoWay}" Content="Is overlay open" />
+                                </StackPanel>
                             </Border>
 
                         </StackPanel>
