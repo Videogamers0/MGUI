@@ -88,7 +88,7 @@ namespace MGUI.Core.UI
         private float _Value;
         /// <summary>The current value that this <see cref="MGSlider"/> is set to.<para/>
         /// To set this value, use <see cref="SetValue(float)"/></summary>
-        public float Value { get => _Value; }
+        public float Value { get => _Value; set => SetValue(value); }
         /// <summary>See also: <see cref="GetActualValue(float)"/></summary>
         public float SetValue(float DesiredValue)
         {
