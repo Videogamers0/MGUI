@@ -200,7 +200,6 @@ namespace MGUI.Samples
 
 #if DEBUG
             //HUD.Show();
-            OverlaySamples.Show();
 #endif
 
             Window.WindowDataContext = this;
