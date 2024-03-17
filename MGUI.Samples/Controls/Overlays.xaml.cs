@@ -1,5 +1,8 @@
 ﻿using MGUI.Core.UI;
+using MGUI.Core.UI.Brushes.Fill_Brushes;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +13,8 @@ namespace MGUI.Samples.Controls
 {
     public class OverlaySamples : SampleBase
     {
+        public MGOverlay DesktopOverlay { get; }
+
         public OverlaySamples(ContentManager Content, MGDesktop Desktop)
             : base(Content, Desktop, $"{nameof(Controls)}", "Overlays.xaml")
         {
@@ -31,6 +36,18 @@ namespace MGUI.Samples.Controls
 	</OverlayHost.Overlays>
 </OverlayHost>";
             TextBox1.SetText(XAMLString);
+
+            MGWindow OverlayWindow = Desktop.OverlayHost.ParentWindow;
+            MGTextBlock OverlayContent = new MGTextBlock(OverlayWindow, "This is an [c=Turquoise][s=Black]MGOverlay[/s][/c] that has been added to [c=Turquoise][s=Black]MGDesktop.OverlayHost[/s][/c]", Color.Blue, 11)
+            {
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new(15)
+            };
+            DesktopOverlay = Desktop.OverlayHost.AddOverlay(OverlayContent, true);
+            DesktopOverlay.BackgroundBrush.SetAll(Color.DarkGray.AsFillBrush());
+
+            Window.WindowDataContext = this;
         }
     }
 }

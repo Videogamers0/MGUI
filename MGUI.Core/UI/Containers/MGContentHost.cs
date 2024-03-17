@@ -241,7 +241,7 @@ namespace MGUI.Core.UI.Containers
         public MGSingleContentHost SetContent(MGElement Content)
             => SetContent<MGSingleContentHost>(Content);
 
-        public void SetContent(string Content, Color? Foreground = null, int? FontSize = null)
+        public MGSingleContentHost SetContent(string Content, Color? Foreground = null, int? FontSize = null)
             => SetContent<MGSingleContentHost>(new MGTextBlock(SelfOrParentWindow, Content, Foreground, FontSize));
 
         /// <summary>Only intended to be used by <see cref="MGWindow"/>'s constructor.</summary>

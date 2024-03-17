@@ -30,11 +30,13 @@ namespace MGUI.Core.UI
         /// <summary>Add a new <see cref="MGOverlay"/> with the given <paramref name="OverlayContent"/> to this <see cref="MGOverlayHost"/>.<para/>
         /// Note: this does not open the overlay.<br/>See also: <see cref="TryOpen(MGOverlay)"/></summary>
         /// <param name="OverlayContent">The content to display in the created overlay element.</param>
+        /// <param name="ShowCloseButton">Determines the default value for <see cref="MGOverlay.ShowCloseButton"/> on the created <see cref="MGOverlay"/>.</param>
         /// <returns>The newly-created overlay.</returns>
-        public MGOverlay AddOverlay(MGElement OverlayContent)
+        public MGOverlay AddOverlay(MGElement OverlayContent, bool ShowCloseButton = false)
         {
             MGOverlay Overlay = new(this, OverlayContent);
             Overlay.OnZIndexChanged += HandleOverlayZIndexChanged;
+            Overlay.ShowCloseButton = ShowCloseButton;
             _Overlays.Add(Overlay);
             InvokeContentAdded(Overlay);
             UpdateActiveOverlay();
@@ -205,7 +207,9 @@ namespace MGUI.Core.UI
                 ActiveOverlayPresenter.MouseHandler.DragStart += (sender, e) => TryHandleInputs(() => e.SetHandledBy(this, false));
                 ActiveOverlayPresenter.MouseHandler.Scrolled += (sender, e) =>
                 {
-                    if (IsModal && ActiveOverlay != null && Content != null)
+                    if (Name == MGDesktop.OverlayName) // MGDesktop.OverlayHost is a special overlay that is rendered over the entire desktop, so it always swallows mouse scroll events
+                        TryHandleInputs(() => e.SetHandledBy(this, false));
+                    else if (IsModal && ActiveOverlay != null && Content != null)
                     {
                         //  Only swallow the mouse scroll events if the content underneath the overlay is scrollable.
                         //  This will allow scroll events to continue bubbling up the visual tree if the content under the overlay wasn't scrollable
@@ -273,6 +277,20 @@ namespace MGUI.Core.UI
             }
         }
 
+        public override void DrawBackground(ElementDrawArgs DA, Rectangle LayoutBounds)
+        {
+            base.DrawBackground(DA, LayoutBounds);
+
+            //  Draw the OverlayBackground
+            //  (Usually the OverlayBackground is rendered after Content.OnEndDraw, but Content could be null which means it wouldn't have been handled in SetContentVirtual)
+            if (Content == null && ActiveOverlay != null && OverlayBackground != null)
+            {
+                Rectangle BorderlessBounds = !HasBorder ? LayoutBounds : LayoutBounds.GetCompressed(GetBorder().BorderThickness);
+                Rectangle BackgroundBounds = BorderlessBounds.GetCompressed(BackgroundRenderPadding);
+                OverlayBackground.Draw(DA, this, BackgroundBounds);
+            }
+        }
+
         /*public override IEnumerable<MGElement> GetChildren()
         {
             foreach (MGElement Child in base.GetChildren())
@@ -300,7 +318,7 @@ namespace MGUI.Core.UI
         }
     }
 
-    /// <summary>Represents an overlay overtop of a piece of content. To instantiate this class, create an <see cref="MGOverlayHost"/> and call <see cref="MGOverlayHost.AddOverlay(MGElement)"/></summary>
+    /// <summary>Represents an overlay overtop of a piece of content. To instantiate this class, create an <see cref="MGOverlayHost"/> and call <see cref="MGOverlayHost.AddOverlay(MGElement, bool)"/></summary>
     public class MGOverlay : MGSingleContentHost
     {
         public MGOverlayHost Host { get; }
@@ -405,7 +423,7 @@ namespace MGUI.Core.UI
             set => CloseButton.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        /// <summary>To instantiate an <see cref="MGOverlay"/>, use <see cref="MGOverlayHost.AddOverlay(MGElement)"/></summary>
+        /// <summary>To instantiate an <see cref="MGOverlay"/>, use <see cref="MGOverlayHost.AddOverlay(MGElement, bool)"/></summary>
         internal MGOverlay(MGOverlayHost Host, MGElement Content)
             : base(Host.ParentWindow, MGElementType.Overlay)
         {

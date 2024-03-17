@@ -222,9 +222,16 @@ namespace MGUI.Core.UI
         #endregion Context Menu
 
         #region Windows
+        private MGWindow OverlayWindow { get; }
+        /// <summary>A specialized <see cref="MGOverlayHost"/> used for drawing <see cref="MGOverlay"/>s overtop of this entire <see cref="MGDesktop"/>.<para/>
+        /// This element's <see cref="MGWindow"/> is always updated first and drawn last, regardless of the <see cref="MGWindow.IsTopmost"/> state of other windows.</summary>
+        public MGOverlayHost OverlayHost { get; }
+        internal const string OverlayName = "DesktopOverlay";
+
         /// <summary>The last element represents the <see cref="MGWindow"/> that will be
         /// drawn last (I.E., rendered overtop of everything else), and updated first (I.E., has the first chance to handle inputs)<para/>
-        /// except in cases where a Topmost window is prioritized (See: <see cref="MGWindow.IsTopmost"/>)<para/></summary>
+        /// except in cases where a Topmost window is prioritized (See: <see cref="MGWindow.IsTopmost"/>)<para/>
+        /// Note: This list does not include the special window used to render overlays. See: <see cref="OverlayHost"/></summary>
         public List<MGWindow> Windows { get; }
 
         /// <summary>Moves the given <paramref name="Window"/> to the end of <see cref="Windows"/> list.<br/>
@@ -334,6 +341,15 @@ namespace MGUI.Core.UI
             this.Windows = new();
             this.Resources = new(new MGTheme(Renderer.FontManager.DefaultFontFamily));
 
+            this.OverlayWindow = new(this, 0, 0, ValidScreenBounds.Width, ValidScreenBounds.Height)
+            {
+                WindowStyle = WindowStyle.None,
+                AllowsClickThrough = true
+            };
+            this.OverlayHost = new(OverlayWindow) { Name = OverlayName };
+            OverlayWindow.SetContent(OverlayHost);
+            OverlayWindow.CanChangeContent = false;
+
             #region Sample Icons
             Texture2D CheckMark_64x64 = Renderer.Content.Load<Texture2D>(Path.Combine("Icons", "CheckMark_64x64"));
             Resources.AddTexture("CheckMark_64x64", new(CheckMark_64x64));
@@ -412,6 +428,15 @@ namespace MGUI.Core.UI
 
         public void Update()
         {
+            //  Revalidate the size/position of the OverlayWindow
+            if (ValidScreenBounds != new Rectangle(OverlayWindow.Left, OverlayWindow.Top, OverlayWindow.WindowWidth, OverlayWindow.WindowHeight))
+            {
+                OverlayWindow.Left = ValidScreenBounds.Left;
+                OverlayWindow.Top = ValidScreenBounds.Top;
+                OverlayWindow.WindowWidth = ValidScreenBounds.Width;
+                OverlayWindow.WindowHeight = ValidScreenBounds.Height;
+            }
+
             UpdateBaseArgs BA = Renderer.UpdateArgs;
 
             HighPriorityMouseHandler.ManualUpdate();
@@ -426,7 +451,10 @@ namespace MGUI.Core.UI
 
             bool IsWindowOccludedAtMousePos = false;
 
-            foreach (MGWindow Window in Windows.Reverse<MGWindow>().OrderByDescending(x => x.IsTopmost))
+            List<MGWindow> OrderedWindows = Windows.Reverse<MGWindow>().OrderByDescending(x => x.IsTopmost).ToList();
+            OrderedWindows.Insert(0, OverlayWindow);
+
+            foreach (MGWindow Window in OrderedWindows)
             {
                 MGToolTip PreviousQueuedToolTip = QueuedToolTip;
 
@@ -485,6 +513,9 @@ namespace MGUI.Core.UI
                     {
                         Window.Draw(DA);
                     }
+
+                    if (OverlayHost.ActiveOverlay != null)
+                        OverlayWindow.Draw(DA);
 
                     //  The ToolTip only takes priority if it is a ToolTip belonging to the current ContextMenu
                     if (ActiveToolTip != null && ActiveContextMenu != null && ActiveToolTip.ParentWindow == ActiveContextMenu)

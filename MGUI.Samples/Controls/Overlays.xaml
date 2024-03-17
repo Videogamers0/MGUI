@@ -236,6 +236,17 @@ Pellentesque ultricies erat ac viverra posuere. Nunc nunc neque, tincidunt et te
                     </StackPanel>
                 </StackPanel>
             </DockPanel>
+            <Separator/>
+            
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    If you want to draw an overlay overtop of the entire game window (such as when showing a tutorial or a MessageBox), add your overlay to [c=Turquoise]MGDesktop.OverlayHost[/c]
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <ToggleButton IsChecked="{MGBinding Path=DesktopOverlay.IsOpen, Mode=TwoWay}" Content="Show desktop overlay" HorizontalAlignment="Left" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
 
             <Spacer Height="10" />
 
