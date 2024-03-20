@@ -468,7 +468,9 @@ namespace MGUI.Core.UI
                 //  since that means the mouse is hovering a window that is drawn overtop of the next window
                 if (!IsWindowOccludedAtMousePos && Window.VisualState.IsPressedOrHovered)
                 {
-                    if (!Window.AllowsClickThrough)
+                    if (Window == OverlayWindow) // When an overlay is being shown, disallow showing of tooltips that belong to windows underneath the overlay
+                        IsWindowOccludedAtMousePos = OverlayHost.ActiveOverlay != null;
+                    else if (!Window.AllowsClickThrough)
                         IsWindowOccludedAtMousePos = true;
                     else
                     {
