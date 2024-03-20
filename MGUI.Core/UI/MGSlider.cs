@@ -796,7 +796,7 @@ namespace MGUI.Core.UI
 
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
         {
-            SecondaryVisualState VisualState = IsLMBPressed || IsDraggingThumb ? SecondaryVisualState.Pressed : IsHovered || IsHoveringThumb ? SecondaryVisualState.Hovered : SecondaryVisualState.None;
+            SecondaryVisualState VisualState = this.VisualState.GetSecondaryState(IsDraggingThumb, false);
             IFillBrush OverlayFillBrush = FocusBrush.GetFillOverlay(VisualState);
             IBorderBrush OverlayBorderBrush = FocusBrush.GetBorderOverlay(VisualState);
 

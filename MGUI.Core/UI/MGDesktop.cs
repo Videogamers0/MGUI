@@ -458,7 +458,9 @@ namespace MGUI.Core.UI
             {
                 MGToolTip PreviousQueuedToolTip = QueuedToolTip;
 
-                Window.Update(UA);
+                bool IsOverlayWindow = Window == OverlayWindow;
+                bool ProcessInputs = (IsOverlayWindow && OverlayHost.ActiveOverlay != null) || (!IsOverlayWindow && (OverlayHost.ActiveOverlay == null || !OverlayHost.IsModal));
+                Window.Update(ProcessInputs ? UA : UA with { IsHitTestVisible = false });
 
                 //  Disallow occluded windows from overriding the active ToolTip
                 //  TODO probably also need similar logic in MGWindow.OnBeginUpdateContents in case it has nested window(s)
@@ -468,7 +470,7 @@ namespace MGUI.Core.UI
                 //  since that means the mouse is hovering a window that is drawn overtop of the next window
                 if (!IsWindowOccludedAtMousePos && Window.VisualState.IsPressedOrHovered)
                 {
-                    if (Window == OverlayWindow) // When an overlay is being shown, disallow showing of tooltips that belong to windows underneath the overlay
+                    if (IsOverlayWindow) // When an overlay is being shown, disallow showing of tooltips that belong to windows underneath the overlay
                         IsWindowOccludedAtMousePos = OverlayHost.ActiveOverlay != null;
                     else if (!Window.AllowsClickThrough)
                         IsWindowOccludedAtMousePos = true;
