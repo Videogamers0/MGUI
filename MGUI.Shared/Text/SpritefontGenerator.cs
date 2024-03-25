@@ -26,6 +26,9 @@ namespace MGUI.Shared.Text
 
     public static class SpritefontGenerator
     {
+        public const string DefaultCharacterRegionStart = "&#32;";
+        public const string DefaultCharacterRegiondEnd = "&#126;";
+
         private const string DefaultSpritefontContent = 
 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <XnaContent xmlns:Graphics=""Microsoft.Xna.Framework.Content.Pipeline.Graphics"">
@@ -38,21 +41,21 @@ namespace MGUI.Shared.Text
     <DefaultCharacter>*</DefaultCharacter>
     <CharacterRegions>
         <CharacterRegion>
-        <Start>&#32;</Start>
-        <End>&#126;</End>
+        <Start>{{CharacterRegionStart}}</Start>
+        <End>{{CharacterRegionEnd}}</End>
         </CharacterRegion>
     </CharacterRegions>
     </Asset>
 </XnaContent>";
 
-        /// <summary>Invokes <see cref="Generate(ContentManager, string, IEnumerable{SpritefontStyle}, IEnumerable{int})"/> with default settings for font styles and sizes.</summary>
-        public static void GenerateDefault(ContentManager Content, string FontName)
+        /// <summary>Invokes <see cref="Generate(ContentManager, string, IEnumerable{SpritefontStyle}, IEnumerable{int}, string, string)"/> with default settings for font styles and sizes.</summary>
+        public static void GenerateDefault(ContentManager Content, string FontName, string CharacterRegionStart = DefaultCharacterRegionStart, string CharacterRegionEnd = DefaultCharacterRegiondEnd)
         {
             List<SpritefontStyle> Styles = new() { SpritefontStyle.Regular, SpritefontStyle.Bold, SpritefontStyle.Italic };
             //https://community.monogame.net/t/font-runtime-rendering/10584/34 User recommends these sizes: 8,9,10,12,16,18,24,36,72
             //Note: When importing the .spritefont files into MGCB, don't forget to change the smaller sizes to 'Color' instead of 'Compressed' texture format
             List<int> FontSizes = new() { 8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 24, 36, 48, 72 };
-            Generate(Content, FontName, Styles, FontSizes);
+            Generate(Content, FontName, Styles, FontSizes, CharacterRegionStart, CharacterRegionEnd);
         }
 
         /// <summary>Creates several .spritefont files in {ExeFolder}\{Content.RootDirectory}\Fonts\{FontName}, one file for each permutation of <paramref name="FontStyles"/> and <paramref name="FontSizes"/><para/>
@@ -65,7 +68,10 @@ namespace MGUI.Shared.Text
         /// <param name="FontName">The base name of the font, such as 'Arial' or 'Times New Roman'. This value should not include any suffixes related to the font's style (like 'Arial Bold')</param>
         /// <param name="FontStyles">The font styles to generate a .spritefont file for.</param>
         /// <param name="FontSizes">The font sizes (in points) to generate a .spritefont file for.</param>
-        public static void Generate(ContentManager Content, string FontName, IEnumerable<SpritefontStyle> FontStyles, IEnumerable<int> FontSizes)
+        /// <param name="CharacterRegionStart">The Start Character region to use. Default value: <see cref="DefaultCharacterRegionStart"/></param>
+        /// <param name="CharacterRegionEnd">The End Character region to use. Default value: <see cref="DefaultCharacterRegiondEnd"/></param>
+        public static void Generate(ContentManager Content, string FontName, IEnumerable<SpritefontStyle> FontStyles, IEnumerable<int> FontSizes, 
+            string CharacterRegionStart = DefaultCharacterRegionStart, string CharacterRegionEnd = DefaultCharacterRegiondEnd)
         {
             string ContentAbsolutePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", "..", "..", Content.RootDirectory);
             string SharedFontDirectory = Path.Combine(ContentAbsolutePath, FontSet.FontsBasePath);
@@ -102,7 +108,9 @@ namespace MGUI.Shared.Text
                     string FileContent = DefaultSpritefontContent
                         .Replace("{{FontName}}", ActualFontName)
                         .Replace("{{FontSize}}", SizePts.ToString("0.###"))
-                        .Replace("{{FontStyle}}", SFStyle.GetDescription());
+                        .Replace("{{FontStyle}}", SFStyle.GetDescription())
+                        .Replace("{{CharacterRegionStart}}", CharacterRegionStart)
+                        .Replace("{{CharacterRegionEnd}}", CharacterRegionEnd);
 
                     File.WriteAllText(FilePath, FileContent);
                 }

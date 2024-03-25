@@ -567,7 +567,8 @@ namespace MGUI.Core.UI
 
             foreach (char c in Text)
             {
-                SpriteFont.Glyph Glyph = Glyphs[c];
+                if (!Glyphs.TryGetValue(c, out SpriteFont.Glyph Glyph))
+                    Glyph = Glyphs[SF.DefaultCharacter.Value];
 
 #if NEVER
                 if (IsFirstCharacter)
