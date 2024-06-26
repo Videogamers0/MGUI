@@ -18,6 +18,9 @@ namespace MGUI.Samples.Controls
         public OverlaySamples(ContentManager Content, MGDesktop Desktop)
             : base(Content, Desktop, $"{nameof(Controls)}", "Overlays.xaml")
         {
+            if (Window == null)
+                return;
+
             MGTextBox TextBox1 = Window.GetElementByName<MGTextBox>("TextBox1");
             string XAMLString =
 @"<OverlayHost>

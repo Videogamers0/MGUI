@@ -64,8 +64,12 @@ namespace MGUI.Samples
             string ResourceName = $"{nameof(MGUI)}.{nameof(Samples)}.{(ProjectFolderName == null ? "" : ProjectFolderName + ".")}{XAMLFilename}";
             string XAML = GeneralUtils.ReadEmbeddedResourceAsString(Assembly.GetExecutingAssembly(), ResourceName);
             Initialize?.Invoke();
-            Window = XAMLParser.LoadRootWindow(Desktop, XAML, false, true);
-            Window.WindowClosed += (sender, e) => IsVisible = false;
+            try
+            { 
+                Window = XAMLParser.LoadRootWindow(Desktop, XAML, false, true);
+                Window.WindowClosed += (sender, e) => IsVisible = false;
+            } 
+            catch (Exception ex) { Debug.WriteLine($"Error parsing XAML content for {ResourceName}: {ex}"); }
         }
 
         protected static void OpenURL(string URL)

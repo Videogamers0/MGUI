@@ -30,6 +30,9 @@ namespace MGUI.Samples.Dialogs.Debugging
         public Debug1(ContentManager Content, MGDesktop Desktop)
             : base(Content, Desktop, $"{nameof(Dialogs)}.{nameof(Debugging)}", $"{nameof(Debug1)}.xaml", () => { InitializeResources(Content, Desktop); })
         {
+            if (Window == null)
+                return;
+
             Window.Scale = 2f;
 
             //Window.WindowStyle = WindowStyle.None;
