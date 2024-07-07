@@ -43,15 +43,15 @@
 
                     <Border BorderBrush="Black" BorderThickness="1">
                         <OverlayHost>
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock Text="This content has an [c=Turquoise]MGOverlay[/c]" />
-                                <CheckBox Content="Lorem ipsum dolor" />
-                            </StackPanel>
                             <OverlayHost.Overlays>
                                 <Overlay Name="Overlay1" IsOpen="true" Background="Yellow * 0.75">
                                     <TextBlock Foreground="Black" Text="This is the content of an MGOverlay" />
                                 </Overlay>
                             </OverlayHost.Overlays>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="This content has an [c=Turquoise]MGOverlay[/c]" />
+                                <CheckBox Content="Lorem ipsum dolor" />
+                            </StackPanel>
                         </OverlayHost>
                     </Border>
                     <Spacer Height="3" />
@@ -74,15 +74,6 @@
                     </TextBlock>
                     <Border BorderBrush="Black" BorderThickness="1">
                         <OverlayHost Padding="8" Name="ZIndexSample">
-                            <OverlayPanel>
-                                <Image Stretch="Fill" SourceName="SkullAndCrossbones" Opacity="0.3" />
-                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalContentAlignment="Center" MinHeight="250">
-                                    <TextBlock Text="My cool game:" FontSize="12" HorizontalAlignment="Center" IsUnderlined="True" />
-                                    <Spacer Height="5" />
-                                    <Button Content="Lorem ipsum dolor" />
-                                </StackPanel>
-                            </OverlayPanel>
-
                             <OverlayHost.Overlays>
                                 
                                 <!-- A simple overlay displaying an end-user license agreement -->
@@ -137,6 +128,15 @@ Pellentesque ultricies erat ac viverra posuere. Nunc nunc neque, tincidunt et te
                                     </StackPanel>
                                 </Overlay>
                             </OverlayHost.Overlays>
+
+                            <OverlayPanel>
+                                <Image Stretch="Fill" SourceName="SkullAndCrossbones" Opacity="0.3" />
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalContentAlignment="Center" MinHeight="250">
+                                    <TextBlock Text="My cool game:" FontSize="12" HorizontalAlignment="Center" IsUnderlined="True" />
+                                    <Spacer Height="5" />
+                                    <Button Content="Lorem ipsum dolor" />
+                                </StackPanel>
+                            </OverlayPanel>
                         </OverlayHost>
                     </Border>
                     <Spacer Height="3" />
@@ -209,7 +209,7 @@ Pellentesque ultricies erat ac viverra posuere. Nunc nunc neque, tincidunt et te
                 <StackPanel Orientation="Horizontal">
                     <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2" Width="230">
                         <TextBlock FontSize="8">
-                            This [c=Turquoise]MGOverlay[/c] has uses the default close button
+                            This [c=Turquoise]MGOverlay[/c] uses the default close button
                         </TextBlock>
                         <OverlayHost MinHeight="100" Content="(Content underneath overlay)">
                             <OverlayHost.Overlays>

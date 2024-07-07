@@ -24,12 +24,6 @@ namespace MGUI.Samples.Controls
             MGTextBox TextBox1 = Window.GetElementByName<MGTextBox>("TextBox1");
             string XAMLString =
 @"<OverlayHost>
-    <!-- This is the Content underneath the overlay -->
-    <StackPanel Orientation=""Vertical"">
-        <TextBlock Text=""This content has an MGOverlay"" />
-        <CheckBox Content=""Lorem ipsum dolor"" />
-    </StackPanel>
-
     <OverlayHost.Overlays>
         <!-- This is the overlay -->
         <Overlay IsOpen=""true"" Background=""Yellow * 0.75"">
@@ -37,6 +31,12 @@ namespace MGUI.Samples.Controls
                              Text=""This is the content of an MGOverlay"" />
         </Overlay>
 	</OverlayHost.Overlays>
+
+    <!-- This is the Content underneath the overlay -->
+    <StackPanel Orientation=""Vertical"">
+        <TextBlock Text=""This content has an MGOverlay"" />
+        <CheckBox Content=""Lorem ipsum dolor"" />
+    </StackPanel>
 </OverlayHost>";
             TextBox1.SetText(XAMLString);
 

@@ -114,13 +114,6 @@
                         <StackPanel Orientation="Vertical">
                             <Border Background="Blue" Width="200" Height="200">
                                 <OverlayHost OverlayBackground="Black * 0.5">
-                                    <StackPanel Orientation="Vertical">
-                                        <TextBlock FontSize="20" Text="This is the content underneath an overlay" />
-                                        <CheckBox IsChecked="False" Content="input test" HorizontalAlignment="Left" Margin="78,0,0,0" />
-                                        <Button Content="Button" HorizontalAlignment="Left" RenderScale="1.2" />
-                                        <Stopwatch IsRunning="True" HorizontalAlignment="Left" />
-                                    </StackPanel>
-
                                     <OverlayHost.Overlays>
                                         <Overlay Name="Overlay1" IsOpen="true" ShowCloseButton="True" HorizontalAlignment="Center" VerticalAlignment="Center">
                                             <Overlay.CloseButton>
@@ -137,6 +130,13 @@
                                             </Grid>
                                         </Overlay>
                                     </OverlayHost.Overlays>
+
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock FontSize="20" Text="This is the content underneath an overlay" />
+                                        <CheckBox IsChecked="False" Content="input test" HorizontalAlignment="Left" Margin="78,0,0,0" />
+                                        <Button Content="Button" HorizontalAlignment="Left" RenderScale="1.2" />
+                                        <Stopwatch IsRunning="True" HorizontalAlignment="Left" />
+                                    </StackPanel>
                                 </OverlayHost>
                             </Border>
 
