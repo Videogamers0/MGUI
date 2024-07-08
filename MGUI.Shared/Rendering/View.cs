@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace MGUI.Shared.Rendering
 {
     [DebuggerStepThrough]
-    public record struct DrawBaseArgs(TimeSpan TS, DrawTransaction DT, float Opacity)
+    public readonly record struct DrawBaseArgs(TimeSpan TS, DrawTransaction DT, float Opacity)
     {
         public DrawBaseArgs SetOpacity(float Value) => new(TS, DT, Value);
         public DrawBaseArgs MultiplyOpacity(float Scalar) => new(TS, DT, this.Opacity * Scalar);
@@ -34,9 +34,8 @@ namespace MGUI.Shared.Rendering
         }
     }
 
-#if true
     [DebuggerStepThrough]
-    public record struct UpdateBaseArgs(TimeSpan TotalElapsed, TimeSpan FrameElapsed, MouseState MouseState, KeyboardState KeyboardState)
+    public readonly record struct UpdateBaseArgs(TimeSpan TotalElapsed, TimeSpan FrameElapsed, MouseState MouseState, KeyboardState KeyboardState)
     {
         public UpdateBaseArgs GetTranslated(int MouseXOffset, int MouseYOffset)
         {
@@ -45,30 +44,6 @@ namespace MGUI.Shared.Rendering
             return new(TotalElapsed, FrameElapsed, Translated, KeyboardState);
         }
     }
-#else
-    public class UpdateBaseArgs
-    {
-        public readonly TimeSpan TotalElapsed;
-        public readonly TimeSpan FrameElapsed;
-        public readonly MouseState MouseState;
-        public readonly KeyboardState KeyboardState;
-
-        public UpdateBaseArgs(TimeSpan TotalElapsed, TimeSpan FrameElapsed, MouseState MouseState, KeyboardState KeyboardState)
-        {
-            this.TotalElapsed = TotalElapsed;
-            this.FrameElapsed = FrameElapsed;
-            this.MouseState = MouseState;
-            this.KeyboardState = KeyboardState;
-        }
-
-        public UpdateBaseArgs GetTranslated(int MouseXOffset, int MouseYOffset)
-        {
-            MouseState MS = MouseState;
-            MouseState Translated = new(MS.X + MouseXOffset, MS.Y + MouseYOffset, MS.ScrollWheelValue, MS.LeftButton, MS.MiddleButton, MS.RightButton, MS.XButton1, MS.XButton2);
-            return new(TotalElapsed, FrameElapsed, Translated, KeyboardState);
-        }
-    }
-#endif
 
     [DebuggerStepThrough]
     public class UpdateBaseEventArgs : EventArgs

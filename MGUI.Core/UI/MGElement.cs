@@ -20,38 +20,12 @@ using System.ComponentModel;
 
 namespace MGUI.Core.UI
 {
-#if true
     public readonly record struct ElementUpdateArgs(UpdateBaseArgs BA, bool IsEnabled, bool IsSelected, bool IsHitTestVisible, Point Offset, Rectangle ActualLayoutBounds)
     {
         public ElementUpdateArgs AsZeroOffset() => this with { Offset = Point.Zero };
         public ElementUpdateArgs ChangeOffset(Point Value) => Offset == Value ? this : this with { Offset = Value };
         public ElementUpdateArgs ChangeHitTestVisible(bool Value) => IsHitTestVisible == Value ? this : this with { IsHitTestVisible = Value };
     };
-#else
-    public class ElementUpdateArgs
-    {
-        public readonly UpdateBaseArgs BA;
-        public readonly bool IsEnabled;
-        public readonly bool IsSelected;
-        public readonly bool IsHitTestVisible;
-        public readonly Point Offset;
-        public readonly Rectangle ActualLayoutBounds;
-
-        public ElementUpdateArgs(UpdateBaseArgs BA, bool IsEnabled, bool IsSelected, bool IsHitTestVisible, Point Offset, Rectangle ActualLayoutBounds)
-        {
-            this.BA = BA;
-            this.IsEnabled = IsEnabled;
-            this.IsSelected = IsSelected;
-            this.IsHitTestVisible = IsHitTestVisible;
-            this.Offset = Offset;
-            this.ActualLayoutBounds = ActualLayoutBounds;
-        }
-
-        public ElementUpdateArgs AsZeroOffset() => new(BA, IsEnabled, IsSelected, IsHitTestVisible, Point.Zero, ActualLayoutBounds);
-        public ElementUpdateArgs ChangeOffset(Point Value) => Offset == Value ? this : new(BA, IsEnabled, IsSelected, IsHitTestVisible, Value, ActualLayoutBounds);
-        public ElementUpdateArgs ChangeHitTestVisible(bool Value) => IsHitTestVisible == Value ? this : new(BA, IsEnabled, IsSelected, Value, Offset, ActualLayoutBounds);
-    }
-#endif
 
     public readonly record struct ElementDrawArgs(DrawBaseArgs BA, VisualState VisualState, Point Offset)
     {
