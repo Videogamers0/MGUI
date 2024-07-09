@@ -882,6 +882,128 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
+    public class ProgressButton : SingleContentHost
+    {
+        public override MGElementType ElementType => MGElementType.ProgressButton;
+
+        [Category("Border")]
+        public Border Border { get; set; } = new();
+
+        [Category("Border")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
+
+        [Category("Border")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public Thickness? BorderThickness { get => Border.BorderThickness; set => Border.BorderThickness = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
+
+        [Category("Behavior")]
+        public ProgressButtonActionType? ActionWhenProcessing { get; set; }
+        [Category("Behavior")]
+        public ProgressButtonActionType? ActionWhenPaused { get; set; }
+
+        [Category("Behavior")]
+        public bool? PauseOnCompletion { get; set; }
+        [Category("Behavior")]
+        public bool? ResetOnCompletion { get; set; }
+
+        [Category("Behavior")]
+        public bool? HideWhenPaused { get; set; }
+        [Category("Behavior")]
+        public bool? IsPaused { get; set; }
+
+        [Category("Value")]
+        public float? Minimum { get; set; }
+        [Category("Value")]
+        public float? Maximum { get; set; }
+        [Category("Value")]
+        public float? Value { get; set; }
+
+        [Category("Behavior")]
+        public TimeSpan? Duration { get; set; }
+
+        [Category("Layout")]
+        public Orientation? Orientation { get; set; }
+        [Category("Layout")]
+        public bool? IsReversed { get; set; }
+        [Category("Layout")]
+        public ProgressBarAlignment? ProgressBarAlignment { get; set; }
+        [Category("Layout")]
+        public int? ProgressBarSize { get; set; }
+        [Category("Layout")]
+        public Thickness? ProgressBarMargin { get; set; }
+
+        [Category("Appearance")]
+        public FillBrush ProgressBarBackground { get; set; }
+        [Category("Appearance")]
+        public FillBrush ProgressBarForeground { get; set; }
+
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGProgressButton(Window, new(1), new MGUniformBorderBrush(Color.Black));
+
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
+        {
+            MGDesktop Desktop = Element.GetDesktop();
+
+            MGProgressButton ProgressButton = Element as MGProgressButton;
+            Border.ApplySettings(ProgressButton, ProgressButton.BorderComponent.Element, false);
+
+            if (ActionWhenProcessing.HasValue)
+                ProgressButton.ActionWhenProcessing = ActionWhenProcessing.Value;
+            if (ActionWhenPaused.HasValue)
+                ProgressButton.ActionWhenPaused = ActionWhenPaused.Value;
+
+            if (HideWhenPaused.HasValue)
+                ProgressButton.HideWhenPaused = HideWhenPaused.Value;
+            if (PauseOnCompletion.HasValue)
+                ProgressButton.PauseOnCompletion = PauseOnCompletion.Value;
+            if (IsPaused.HasValue)
+                ProgressButton.IsPaused = IsPaused.Value;
+
+            if (Minimum.HasValue)
+                ProgressButton.Minimum = Minimum.Value;
+            if (Maximum.HasValue)
+                ProgressButton.Maximum = Maximum.Value;
+            if (Value.HasValue)
+                ProgressButton.Value = Value.Value;
+
+            if (Duration.HasValue)
+                ProgressButton.Duration = Duration.Value;
+            if (ResetOnCompletion.HasValue)
+                ProgressButton.ResetOnCompletion = ResetOnCompletion.Value;
+
+            if (Orientation.HasValue)
+                ProgressButton.Orientation = Orientation.Value;
+            if (IsReversed.HasValue)
+                ProgressButton.IsReversed = IsReversed.Value;
+            if (ProgressBarAlignment.HasValue)
+                ProgressButton.ProgressBarAlignment = ProgressBarAlignment.Value;
+            if (ProgressBarSize.HasValue)
+                ProgressButton.ProgressBarSize = ProgressBarSize.Value;
+            if (ProgressBarMargin.HasValue)
+                ProgressButton.ProgressBarMargin = ProgressBarMargin.Value.ToThickness();
+
+            if (ProgressBarBackground != null)
+                ProgressButton.ProgressBarBackground = ProgressBarBackground.ToFillBrush(Desktop);
+            if (ProgressBarForeground != null)
+                ProgressButton.ProgressBarForeground = ProgressBarForeground.ToFillBrush(Desktop);
+
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
+        }
+
+        protected internal override IEnumerable<Element> GetChildren()
+        {
+            foreach (Element Child in base.GetChildren())
+                yield return Child;
+            yield return Border;
+        }
+    }
+
     public class RadioButton : SingleContentHost
     {
         public override MGElementType ElementType => MGElementType.RadioButton;

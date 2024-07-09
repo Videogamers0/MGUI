@@ -130,6 +130,8 @@ namespace MGUI.Core.UI
         /// <summary>The default value to use for <see cref="MGListBox{TItemType}.AlternatingRowBackgrounds"/></summary>
         public List<ThemeManagedFillBrush> ListBoxItemAlternatingRowBackgrounds { get; }
 
+        /// <summary>The default value to use for <see cref="MGProgressButton.ProgressBarForeground"/>.</summary>
+        public ThemeManagedFillBrush ProgressButtonForeground { get; }
         public ThemeManagedVisualStateFillBrush ProgressBarCompletedBrush { get; }
         public ThemeManagedVisualStateFillBrush ProgressBarIncompleteBrush { get; }
 
@@ -208,6 +210,10 @@ namespace MGUI.Core.UI
                 MGElementType.ContentPresenter,
                 MGElementType.ContextMenuItem,
                 MGElementType.Custom,
+                MGElementType.Custom_2,
+                MGElementType.Custom_3,
+                MGElementType.Custom_4,
+                MGElementType.Custom_5,
                 MGElementType.XAMLDesigner,
                 MGElementType.DockPanel,
                 MGElementType.Expander,
@@ -339,7 +345,7 @@ namespace MGUI.Core.UI
                 IFillBrush DimNeutralBackground = DimNeutralColor.AsFillBrush();
                 MGSolidFillBrush SpoilerUnpsoiledBG = MGSolidFillBrush.SemiBlack;
 
-                //  Button/ComboBox
+                //  Button/ProgressButton/ComboBox
                 ThemeManagedVisualStateFillBrush ButtonBG =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
@@ -347,6 +353,7 @@ namespace MGUI.Core.UI
                             Color.White * 0.12f, PressedModifierType.Darken, 0.06f)
                     );
                 _Backgrounds[MGElementType.Button] = new ThemeManagedVisualStateFillBrush(ButtonBG.GetValue(true));
+                _Backgrounds[MGElementType.ProgressButton] = new ThemeManagedVisualStateFillBrush(ButtonBG.GetValue(true));
                 _Backgrounds[MGElementType.ComboBox] = new ThemeManagedVisualStateFillBrush(ButtonBG.GetValue(true));
 
                 //  Context Menu
@@ -464,6 +471,8 @@ namespace MGUI.Core.UI
                             PrimaryBG,
                             Color.White * 0.22f, PressedModifierType.Darken, 0.06f)
                     );
+
+                this.ProgressButtonForeground = new ThemeManagedFillBrush(new MGSolidFillBrush(PrimaryBG.Color.Darken(0.35f)));
 
                 this.ProgressBarCompletedBrush =
                     new ThemeManagedVisualStateFillBrush(

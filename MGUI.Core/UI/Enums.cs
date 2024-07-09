@@ -38,6 +38,7 @@ namespace MGUI.Core.UI
         //  Buttons and Selection
         Button,
         ToggleButton,
+        ProgressButton,
         //RepeatButton?
         CheckBox,
         RadioButton,
@@ -84,6 +85,10 @@ namespace MGUI.Core.UI
         /// <summary>Represents an element that doesn't fit any other category</summary>
         Misc,
         Custom,
+        Custom_2,
+        Custom_3,
+        Custom_4,
+        Custom_5,
         UserControl,
     }
 
