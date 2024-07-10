@@ -563,11 +563,18 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
+                this.MinWidth = 16;
+                this.MinHeight = 16;
+
                 this.BorderElement = new(Window, BorderThickness, BorderBrush);
                 this.BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
                 BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
                 BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
+
+                this.HorizontalContentAlignment = HorizontalAlignment.Center;
+                this.VerticalContentAlignment = VerticalAlignment.Center;
+                this.Padding = new(4, 2, 4, 2);
 
                 SetRange(Minimum, Maximum);
                 this.Value = Value;
