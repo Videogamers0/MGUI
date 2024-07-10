@@ -127,6 +127,7 @@ namespace MGUI.Samples
         public OverlaySamples OverlaySamples { get; }
         public PasswordBoxSamples PasswordBoxSamples { get; }
         public ProgressBarSamples ProgressBarSamples { get; }
+        public ProgressButtonSamples ProgressButtonSamples { get; }
         public RadioButtonSamples RadioButtonSamples { get; }
         public ScrollViewerSamples ScrollViewerSamples { get; }
         public SliderSamples SliderSamples { get; }
@@ -175,6 +176,7 @@ namespace MGUI.Samples
             OverlaySamples = new(Content, Desktop);
             PasswordBoxSamples = new(Content, Desktop);
             ProgressBarSamples = new(Content, Desktop);
+            ProgressButtonSamples = new(Content, Desktop);
             RadioButtonSamples = new(Content, Desktop);
             ScrollViewerSamples = new(Content, Desktop);
             SliderSamples = new(Content, Desktop);
