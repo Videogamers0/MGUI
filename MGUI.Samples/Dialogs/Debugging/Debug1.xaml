@@ -145,7 +145,7 @@
                                     <TextBlock Text="This is content that doesn't exist in the scope of the overlay above it" />
                                     <CheckBox IsChecked="{MGBinding Path=Overlay1.IsOpen, Mode=TwoWay}" Content="Is overlay open" />
                                     <ProgressButton Content="Hello World" HorizontalAlignment="Center" Duration="00:00:02" 
-                                                    ProgressBarMargin="0" ProgressBarSize="6" ResetOnCompletion="True" PauseOnCompletion="False" ActionWhenProcessing="ResetAndResume"
+                                                    ProgressBarMargin="1" ProgressBarSize="6" ProgressBarBorderThickness="3" ResetOnCompletion="True" PauseOnCompletion="False" ActionWhenProcessing="ResetAndResume"
                                                     ProgressBarAlignment="RightOrBottom" />
                                 </StackPanel>
                             </Border>

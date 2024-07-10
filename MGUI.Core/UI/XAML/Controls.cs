@@ -940,6 +940,10 @@ namespace MGUI.Core.UI.XAML
         public Thickness? ProgressBarMargin { get; set; }
 
         [Category("Appearance")]
+        public Thickness? ProgressBarBorderThickness { get; set; }
+        [Category("Appearance")]
+        public BorderBrush ProgressBarBorderBrush { get; set; }
+        [Category("Appearance")]
         public FillBrush ProgressBarBackground { get; set; }
         [Category("Appearance")]
         public FillBrush ProgressBarForeground { get; set; }
@@ -988,6 +992,10 @@ namespace MGUI.Core.UI.XAML
             if (ProgressBarMargin.HasValue)
                 ProgressButton.ProgressBarMargin = ProgressBarMargin.Value.ToThickness();
 
+            if (ProgressBarBorderThickness.HasValue)
+                ProgressButton.ProgressBarBorderThickness = ProgressBarBorderThickness.Value.ToThickness();
+            if (ProgressBarBorderBrush != null)
+                ProgressButton.ProgressBarBorderBrush = ProgressBarBorderBrush.ToBorderBrush(Desktop);
             if (ProgressBarBackground != null)
                 ProgressButton.ProgressBarBackground = ProgressBarBackground.ToFillBrush(Desktop);
             if (ProgressBarForeground != null)

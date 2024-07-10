@@ -196,6 +196,7 @@ namespace MGUI.Core.UI
             }
         }
 
+        /// <summary>See also: <see cref="HideWhenPaused"/>, <see cref="IsPaused"/></summary>
         public bool IsProgressBarVisible => !IsPaused || !HideWhenPaused;
 
         #region Value
@@ -401,7 +402,8 @@ namespace MGUI.Core.UI
         /// If <see cref="IsHorizontal"/> is <see langword="true" />, this property determines the height of the progress bar.<br/>
         /// If <see cref="IsVertical"/> is <see langword="true" />, this property determines the width of the progress bar.<para/>
         /// If set to <see langword="null" />, then the progress bar will stretch the entire dimension of this element's bounds.
-        /// Default value: <see langword="null"/>.</summary>
+        /// Default value: <see langword="null"/>.<para/>
+        /// Note: If not set to <see langword="null" />, then the value will include any border thickness from <see cref="ProgressBarBorderThickness"/>.</summary>
         public int? ProgressBarSize
         {
             get => _ProgressBarSize;
@@ -434,34 +436,40 @@ namespace MGUI.Core.UI
             }
         }
 
-        private Rectangle GetProgressBarBounds(Rectangle ElementBounds)
+        private Rectangle GetProgressBarBounds(Rectangle ElementBounds, bool IncludeProgressBarBorder)
         {
             Rectangle PaddedBounds = ElementBounds.GetCompressed(ProgressBarMargin);
+            if (!IncludeProgressBarBorder && ProgressBarBorderBrush != null)
+                PaddedBounds = PaddedBounds.GetCompressed(ProgressBarBorderThickness);
+
             if (ProgressBarSize.HasValue)
             {
-                Size Size = new(ProgressBarSize.Value, ProgressBarSize.Value);
+                Size BarSize = new(ProgressBarSize.Value, ProgressBarSize.Value);
+                if (!IncludeProgressBarBorder && ProgressBarBorderBrush != null)
+                    BarSize = BarSize.Subtract(ProgressBarBorderThickness.Size, 0, 0);
+
                 return ProgressBarAlignment switch
                 {
                     ProgressBarAlignment.Stretch => PaddedBounds,
                     ProgressBarAlignment.Center =>
                         Orientation switch
                         {
-                            Orientation.Horizontal => ApplyAlignment(PaddedBounds, HorizontalAlignment.Stretch, VerticalAlignment.Center, Size),
-                            Orientation.Vertical => ApplyAlignment(PaddedBounds, HorizontalAlignment.Center, VerticalAlignment.Stretch, Size),
+                            Orientation.Horizontal => ApplyAlignment(PaddedBounds, HorizontalAlignment.Stretch, VerticalAlignment.Center, BarSize),
+                            Orientation.Vertical => ApplyAlignment(PaddedBounds, HorizontalAlignment.Center, VerticalAlignment.Stretch, BarSize),
                             _ => throw new NotImplementedException($"Unrecognized {nameof(UI.Orientation)}: {Orientation}"),
                         },
                     ProgressBarAlignment.LeftOrTop => 
                         Orientation switch
                         {
-                            Orientation.Horizontal => ApplyAlignment(PaddedBounds, HorizontalAlignment.Stretch, VerticalAlignment.Top, Size),
-                            Orientation.Vertical => ApplyAlignment(PaddedBounds, HorizontalAlignment.Left, VerticalAlignment.Stretch, Size),
+                            Orientation.Horizontal => ApplyAlignment(PaddedBounds, HorizontalAlignment.Stretch, VerticalAlignment.Top, BarSize),
+                            Orientation.Vertical => ApplyAlignment(PaddedBounds, HorizontalAlignment.Left, VerticalAlignment.Stretch, BarSize),
                             _ => throw new NotImplementedException($"Unrecognized {nameof(UI.Orientation)}: {Orientation}"),
                         },
                     ProgressBarAlignment.RightOrBottom =>
                         Orientation switch
                         {
-                            Orientation.Horizontal => ApplyAlignment(PaddedBounds, HorizontalAlignment.Stretch, VerticalAlignment.Bottom, Size),
-                            Orientation.Vertical => ApplyAlignment(PaddedBounds, HorizontalAlignment.Right, VerticalAlignment.Stretch, Size),
+                            Orientation.Horizontal => ApplyAlignment(PaddedBounds, HorizontalAlignment.Stretch, VerticalAlignment.Bottom, BarSize),
+                            Orientation.Vertical => ApplyAlignment(PaddedBounds, HorizontalAlignment.Right, VerticalAlignment.Stretch, BarSize),
                             _ => throw new NotImplementedException($"Unrecognized {nameof(UI.Orientation)}: {Orientation}"),
                         },
                     _ => throw new NotImplementedException($"Unrecognized {nameof(UI.ProgressBarAlignment)}: {ProgressBarAlignment}"),
@@ -473,6 +481,42 @@ namespace MGUI.Core.UI
         #endregion Progress Bar Bounds
 
         #region Progress Bar Graphics
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Thickness _ProgressBarBorderThickness;
+        /// <summary>Only relevant if <see cref="ProgressBarBorderBrush"/> is not <see langword="null" />.<para/>
+        /// The border thickness for the progress bar's graphics.<para/>
+        /// Default value: an empty <see cref="Thickness"/> (all sides equal to zero)<para/>
+        /// Note: if <see cref="ProgressBarSize"/> is not <see langword="null" />, then the <see cref="ProgressBarSize"/> will include the border.</summary>
+        public Thickness ProgressBarBorderThickness
+        {
+            get => _ProgressBarBorderThickness;
+            set
+            {
+                if (!_ProgressBarBorderThickness.Equals(value))
+                {
+                    _ProgressBarBorderThickness = value;
+                    NPC(nameof(ProgressBarBorderThickness));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IBorderBrush _ProgressBarBorderBrush;
+        /// <summary>Only relevant if <see cref="ProgressBarBorderThickness"/> is non-empty.<para/>
+        /// The border brush to use around the progress bar.<para/>
+        /// Default value: <see langword="null" /></summary>
+        public IBorderBrush ProgressBarBorderBrush
+        {
+            get => _ProgressBarBorderBrush;
+            set
+            {
+                if (_ProgressBarBorderBrush != value)
+                {
+                    _ProgressBarBorderBrush = value;
+                    NPC(nameof(ProgressBarBorderBrush));
+                }
+            }
+        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IFillBrush _ProgressBarBackground;
@@ -544,6 +588,8 @@ namespace MGUI.Core.UI
                 ProgressBarAlignment = ProgressBarAlignment.Stretch;
                 ProgressBarSize = null;
                 ProgressBarMargin = new(0);
+                ProgressBarBorderThickness = new(0);
+                ProgressBarBorderBrush = null;
                 ProgressBarBackground = null;
                 ProgressBarForeground = GetTheme().ProgressButtonForeground.GetValue(true);
 
@@ -599,25 +645,28 @@ namespace MGUI.Core.UI
             if (IsProgressBarVisible)
             {
                 Rectangle BorderlessBounds = LayoutBounds.GetCompressed(BorderThickness);
-                Rectangle ProgressBarBounds = GetProgressBarBounds(BorderlessBounds);
+                Rectangle ProgressBarBorderedBounds = GetProgressBarBounds(BorderlessBounds, true);
+                Rectangle ProgressBarBorderlessBounds = GetProgressBarBounds(BorderlessBounds, false);
 
                 float CompletedScalar = ValuePercent / 100.0f;
                 Rectangle CompletedBounds;
                 if (Orientation == Orientation.Horizontal)
                 {
                     HorizontalAlignment HA = IsReversed ? HorizontalAlignment.Right : HorizontalAlignment.Left;
-                    CompletedBounds = ApplyAlignment(ProgressBarBounds, HA, VerticalAlignment.Stretch, new((int)(ProgressBarBounds.Width * CompletedScalar), 0));
+                    CompletedBounds = ApplyAlignment(ProgressBarBorderlessBounds, HA, VerticalAlignment.Stretch, new((int)(ProgressBarBorderlessBounds.Width * CompletedScalar), 0));
                 }
                 else if (Orientation == Orientation.Vertical)
                 {
                     VerticalAlignment VA = IsReversed ? VerticalAlignment.Top : VerticalAlignment.Bottom;
-                    CompletedBounds = ApplyAlignment(ProgressBarBounds, HorizontalAlignment.Stretch, VA, new(0, (int)(ProgressBarBounds.Height * CompletedScalar)));
+                    CompletedBounds = ApplyAlignment(ProgressBarBorderlessBounds, HorizontalAlignment.Stretch, VA, new(0, (int)(ProgressBarBorderlessBounds.Height * CompletedScalar)));
                 }
                 else
                     throw new NotImplementedException($"Unrecognized {nameof(Orientation)}: {Orientation}");
 
                 //  Draw the progress bar
-                ProgressBarBackground?.Draw(DA, this, ProgressBarBounds);
+                if (!ProgressBarBorderThickness.IsEmpty())
+                    ProgressBarBorderBrush?.Draw(DA, this, ProgressBarBorderedBounds, ProgressBarBorderThickness);
+                ProgressBarBackground?.Draw(DA, this, ProgressBarBorderlessBounds);
                 if (CompletedBounds.Width > 0 && CompletedBounds.Height > 0)
                     ProgressBarForeground?.Draw(DA, this, CompletedBounds);
             }
