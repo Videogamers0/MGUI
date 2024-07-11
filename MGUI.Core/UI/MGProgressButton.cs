@@ -72,23 +72,6 @@ namespace MGUI.Core.UI
         #endregion Border
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private ProgressButtonActionType _ActionWhenProcessing;
-        /// <summary>Determines what action should be taken when the button is clicked when <see cref="IsPaused"/> is <see langword="false"/>.<para/>
-        /// Default value: <see cref="ProgressButtonActionType.None"/></summary>
-        public ProgressButtonActionType ActionWhenProcessing
-        {
-            get => _ActionWhenProcessing;
-            set
-            {
-                if (_ActionWhenProcessing != value)
-                {
-                    _ActionWhenProcessing = value;
-                    NPC(nameof(ActionWhenProcessing));
-                }
-            }
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ProgressButtonActionType _ActionWhenPaused;
         /// <summary>Determines what action should be taken when the button is clicked when <see cref="IsPaused"/> is <see langword="true"/>.<para/>
         /// Default value: <see cref="ProgressButtonActionType.ResetAndResume"/></summary>
@@ -105,40 +88,62 @@ namespace MGUI.Core.UI
             }
         }
 
-        private bool _PauseOnCompletion;
-        /// <summary>If <see langword="true" />, <see cref="IsPaused"/> will automatically be set to <see langword="true" /> when <see cref="OnCompleted"/> is invoked.<para/>
-        /// Default value: <see langword="true" /><para/>
-        /// Note: <see cref="IsPaused"/> affects the action taken when clicking the button, according to <see cref="ActionWhenPaused"/> and <see cref="ActionWhenProcessing"/>.</summary>
-        public bool PauseOnCompletion
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private ProgressButtonActionType _ActionWhenProcessing;
+        /// <summary>Determines what action should be taken when the button is clicked when <see cref="IsPaused"/> is <see langword="false"/> AND <see cref="IsCompleted"/> is <see langword="false"/>.<para/>
+        /// Default value: <see cref="ProgressButtonActionType.None"/></summary>
+        public ProgressButtonActionType ActionWhenProcessing
         {
-            get => _PauseOnCompletion;
+            get => _ActionWhenProcessing;
             set
             {
-                if (_PauseOnCompletion != value)
+                if (_ActionWhenProcessing != value)
                 {
-                    _PauseOnCompletion = value;
-                    NPC(nameof(PauseOnCompletion));
+                    _ActionWhenProcessing = value;
+                    NPC(nameof(ActionWhenProcessing));
                 }
             }
         }
 
-        private bool _ResetOnCompletion;
-        /// <summary>If <see langword="true" />, <see cref="Value"/> will be reset to <see cref="Minimum"/> after <see cref="OnCompleted"/> is invoked.<para/>
-        /// Default value: <see langword="false" /><para/>
-        /// Note: If setting this property to <see langword="true" />, you may also want to set <see cref="PauseOnCompletion"/> to <see langword="false" />.</summary>
-        public bool ResetOnCompletion
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private ProgressButtonActionType _ActionWhenCompleted;
+        /// <summary>Determines what action should be taken when the button is clicked when <see cref="IsPaused"/> is <see langword="false"/> AND <see cref="IsCompleted"/> is <see langword="true"/>.<para/>
+        /// Default value: <see cref="ProgressButtonActionType.None"/><para/>
+        /// Note: This property is for when the button is clicked, whereas <see cref="ActionOnCompleted"/> is executed automatically when completion occurs.</summary>
+        public ProgressButtonActionType ActionWhenCompleted
         {
-            get => _ResetOnCompletion;
+            get => _ActionWhenCompleted;
             set
             {
-                if (_ResetOnCompletion != value)
+                if (_ActionWhenCompleted != value)
                 {
-                    _ResetOnCompletion = value;
-                    NPC(nameof(ResetOnCompletion));
+                    _ActionWhenCompleted = value;
+                    NPC(nameof(ActionWhenCompleted));
                 }
             }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private ProgressButtonActionType _ActionOnCompleted;
+        /// <summary>Determines what action should be taken when <see cref="Value"/> changes from being less than <see cref="Maximum"/> to being greater than or equal to <see cref="Maximum"/>.<para/>
+        /// Default value: <see cref="ProgressButtonActionType.Pause"/><para/>
+        /// To execute your own custom logic on completion, subscribe to: <see cref="OnCompleted"/><para/>
+        /// Note: This property is for when completion occurs, whereas <see cref="ActionWhenCompleted"/> is executed when the button is clicked.</summary>
+        public ProgressButtonActionType ActionOnCompleted
+        {
+            get => _ActionOnCompleted;
+            set
+            {
+                if (_ActionOnCompleted != value)
+                {
+                    _ActionOnCompleted = value;
+                    NPC(nameof(ActionOnCompleted));
+                }
+            }
+        }
+
+        /// <summary>Invoked when <see cref="Value"/> is set to <see cref="Minimum"/> and <see cref="IsPaused"/> is <see langword="false" /></summary>
+        public event EventHandler<EventArgs> OnStarted;
         /// <summary>Invoked when <see cref="IsPaused"/> is set to <see langword="true"/></summary>
         public event EventHandler<EventArgs> OnPaused;
         /// <summary>Invoked when <see cref="IsPaused"/> is set to <see langword="false"/></summary>
@@ -188,7 +193,11 @@ namespace MGUI.Core.UI
                     if (IsPaused)
                         OnPaused?.Invoke(this, EventArgs.Empty);
                     else
+                    {
                         OnResumed?.Invoke(this, EventArgs.Empty);
+                        if (Value.IsAlmostEqual(Minimum))
+                            OnStarted?.Invoke(this, EventArgs.Empty);
+                    }
 
                     if (HideWhenPaused)
                         LayoutChanged(this, true);
@@ -253,20 +262,23 @@ namespace MGUI.Core.UI
                     NPC(nameof(ActualValue));
                     NPC(nameof(ValuePercent));
                     OnProgressChanged?.Invoke(this, new EventArgs<double>(Previous, Value));
+
                     if (!WasCompleted && IsCompleted)
                     {
                         OnCompleted?.Invoke(this, EventArgs.Empty);
-                        if (PauseOnCompletion)
-                            PerformAction(ProgressButtonActionType.Pause);
-                        if (ResetOnCompletion)
-                            PerformAction(ProgressButtonActionType.Reset);
+                        PerformAction(ActionOnCompleted);
                     }
                     if (Value.IsAlmostEqual(Minimum) && !Previous.IsAlmostEqual(Minimum))
+                    {
                         OnReset?.Invoke(this, EventArgs.Empty);
+                        if (!IsPaused)
+                            OnStarted?.Invoke(this, EventArgs.Empty);
+                    }
                 }
             }
         }
-
+        
+        /// <summary><see langword="true" /> if <see cref="Value"/> is >= <see cref="Maximum"/></summary>
         public bool IsCompleted => Value.IsGreaterThanOrEqual(Maximum);
 
         /// <summary>The <see cref="Value"/>, clamped to the range given by [<see cref="Minimum"/>, <see cref="Maximum"/>]</summary>
@@ -581,9 +593,8 @@ namespace MGUI.Core.UI
 
                 ActionWhenProcessing = ProgressButtonActionType.None;
                 ActionWhenPaused = ProgressButtonActionType.ResetAndResume;
-
-                PauseOnCompletion = true;
-                ResetOnCompletion = false;
+                ActionWhenCompleted = ProgressButtonActionType.None;
+                ActionOnCompleted = ProgressButtonActionType.Pause;
 
                 HideWhenPaused = false;
                 IsPaused = true;
@@ -690,12 +701,12 @@ namespace MGUI.Core.UI
                     Value = Minimum;
                     return;
                 case ProgressButtonActionType.ResetAndPause:
-                    Value = Minimum;
                     IsPaused = true;
+                    Value = Minimum;
                     return;
                 case ProgressButtonActionType.ResetAndResume:
-                    Value = Minimum;
                     IsPaused = false;
+                    Value = Minimum;
                     return;
                 case ProgressButtonActionType.Pause:
                     IsPaused = true;

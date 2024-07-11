@@ -907,11 +907,10 @@ namespace MGUI.Core.UI.XAML
         public ProgressButtonActionType? ActionWhenProcessing { get; set; }
         [Category("Behavior")]
         public ProgressButtonActionType? ActionWhenPaused { get; set; }
-
         [Category("Behavior")]
-        public bool? PauseOnCompletion { get; set; }
+        public ProgressButtonActionType? ActionWhenCompleted { get; set; }
         [Category("Behavior")]
-        public bool? ResetOnCompletion { get; set; }
+        public ProgressButtonActionType? ActionOnCompleted { get; set; }
 
         [Category("Behavior")]
         public bool? HideWhenPaused { get; set; }
@@ -961,11 +960,13 @@ namespace MGUI.Core.UI.XAML
                 ProgressButton.ActionWhenProcessing = ActionWhenProcessing.Value;
             if (ActionWhenPaused.HasValue)
                 ProgressButton.ActionWhenPaused = ActionWhenPaused.Value;
+            if (ActionWhenCompleted.HasValue)
+                ProgressButton.ActionWhenCompleted = ActionWhenCompleted.Value;
+            if (ActionOnCompleted.HasValue)
+                ProgressButton.ActionOnCompleted = ActionOnCompleted.Value;
 
             if (HideWhenPaused.HasValue)
                 ProgressButton.HideWhenPaused = HideWhenPaused.Value;
-            if (PauseOnCompletion.HasValue)
-                ProgressButton.PauseOnCompletion = PauseOnCompletion.Value;
             if (IsPaused.HasValue)
                 ProgressButton.IsPaused = IsPaused.Value;
 
@@ -978,8 +979,6 @@ namespace MGUI.Core.UI.XAML
 
             if (Duration.HasValue)
                 ProgressButton.Duration = Duration.Value;
-            if (ResetOnCompletion.HasValue)
-                ProgressButton.ResetOnCompletion = ResetOnCompletion.Value;
 
             if (Orientation.HasValue)
                 ProgressButton.Orientation = Orientation.Value;

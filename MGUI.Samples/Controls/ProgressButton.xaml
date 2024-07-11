@@ -37,10 +37,17 @@
                 <TextBlock Dock="Top">
                     Set [c=Turquoise]Minimum[/c], [c=Turquoise]Maximum[/c], and [c=Turquoise]Value[/c] to control the completion percent of the progress bar.
                 </TextBlock>
-                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
-                    <ProgressButton Minimum="0" Maximum="100" Value="25" Content="Min0, Max100, Value25" ActionWhenPaused="None" HorizontalAlignment="Left" Width="200" Margin="0,1" />
-                    <ProgressButton Minimum="0" Maximum="100" Value="80" Content="Min0, Max100, Value80" ActionWhenPaused="None" HorizontalAlignment="Left" Width="200" Margin="0,1" />
-                    <ProgressButton Minimum="20" Maximum="50" Value="40" Content="Min20, Max50, Value40" ActionWhenPaused="None" HorizontalAlignment="Left" Width="200" Margin="0,1" />
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="4">
+                    <StackPanel.Styles>
+                        <Style TargetType="ProgressButton">
+                            <Setter Property="ActionWhenPaused" Value="None" />
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                            <Setter Property="Width" Value="200" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <ProgressButton Minimum="0" Maximum="100" Value="25" Content="Min0, Max100, Value25" />
+                    <ProgressButton Minimum="0" Maximum="100" Value="80" Content="Min0, Max100, Value80" />
+                    <ProgressButton Minimum="20" Maximum="50" Value="40" Content="Min20, Max50, Value40" />
                 </StackPanel>
             </DockPanel>
             <Separator/>
@@ -57,10 +64,9 @@
                             <Setter Property="ProgressBarForeground" Value="DarkOrange" />
                             <Setter Property="HorizontalAlignment" Value="Left" />
                             <Setter Property="Width" Value="200" />
-                            <Setter Property="ActionWhenProcessing" Value="Pause" />
-                            <Setter Property="ActionWhenPaused" Value="Resume" />
-                            <Setter Property="ResetOnCompletion" Value="true" />
-                            <Setter Property="PauseOnCompletion" Value="false" />
+                            <Setter Property="ActionWhenProcessing" Value="None" />
+                            <Setter Property="ActionWhenPaused" Value="None" />
+                            <Setter Property="ActionOnCompleted" Value="Reset" />
                             <Setter Property="IsPaused" Value="false" />
                         </Style>
                     </StackPanel.Styles>
@@ -73,20 +79,22 @@
 
             <DockPanel>
                 <TextBlock Dock="Top">
-                    Set [c=Turquoise]ActionWhenProcessing[/c] and [c=Turquoise]ActionWhenPaused[/c] to control what the button does when left-clicked, 
-                    depending on the state of the [c=Turquoise]IsPaused[/c] property.
+                    Set [c=Turquoise]ActionWhenPaused[/c], [c=Turquoise]ActionWhenProcessing[/c], and [c=Turquoise]ActionWhenCompleted[/c] to control what the button does when left-clicked, 
+                    depending on the state of the [c=Turquoise]IsPaused[/c] and [c=Turquoise]IsCompleted[/c] properties.
                 </TextBlock>
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <ProgressButton Content="Clicking this resets the progress but does not pause it" Duration="00:00:03"
-                                    IsPaused="False" ActionWhenProcessing="ResetAndResume" ActionWhenPaused="ResetAndResume" PauseOnCompletion="False" />
+                                    IsPaused="False" ActionWhenProcessing="ResetAndResume" ActionWhenPaused="ResetAndResume" ActionOnCompleted="ResetAndResume" />
                     <DockPanel>
                         <Button Content="Reset" Dock="Right" CommandName="Button1_Reset" />
                         <ProgressButton Name="ProgressButton_1" Content="Clicking this toggles the [c=Turquoise]IsPaused[/c] state" Duration="00:00:03"
-                                    IsPaused="False" ActionWhenProcessing="Pause" ActionWhenPaused="Resume" ResetOnCompletion="False" PauseOnCompletion="False" />
+                                    IsPaused="False" ActionWhenProcessing="Pause" ActionWhenPaused="Resume" ActionOnCompleted="None" />
                     </DockPanel>
-                    <ProgressButton Content="Clicking this does nothing" Value="45" ActionWhenProcessing="None" ActionWhenPaused="None" />
+                    <ProgressButton Content="Clicking this does nothing" Value="45" ActionWhenProcessing="None" ActionWhenPaused="None" ActionWhenCompleted="None" />
                     <TextBlock>
-                        You can also set [c=Turquoise]ResetOnCompletion[/c] and [c=Turquoise]PauseOnCompletion[/c] for additional control.
+                        You can also set [c=Turquoise]ActionOnCompleted[/c] to perform an action the moment it completes. 
+                        Notice the name: Action[b]On[/b]Completed, executes the moment it completes (I.E. does not require user input), 
+                        whereas Action[b]When[/b]Completed executes when clicked if [c=Turquoise]IsCompleted[/c]=[c=LightBlue][s=Blue]true[/s][/c].
                     </TextBlock>
                 </StackPanel>
             </DockPanel>
@@ -101,8 +109,7 @@
                         <Style TargetType="ProgressButton">
                             <Setter Property="Background" Value="Gray" />
                             <Setter Property="ProgressBarForeground" Value="Green" />
-                            <Setter Property="PauseOnCompletion" Value="False" />
-                            <Setter Property="ResetOnCompletion" Value="true" />
+                            <Setter Property="ActionOnCompleted" Value="Reset" />
                             <Setter Property="IsPaused" Value="false" />
                             <Setter Property="Duration" Value="00:00:03" />
                             <Setter Property="HorizontalAlignment" Value="Left" />
@@ -134,8 +141,7 @@
                         <Style TargetType="ProgressButton">
                             <Setter Property="Background" Value="MediumPurple" />
                             <Setter Property="ProgressBarForeground" Value="LightSeaGreen" />
-                            <Setter Property="PauseOnCompletion" Value="False" />
-                            <Setter Property="ResetOnCompletion" Value="true" />
+                            <Setter Property="ActionOnCompleted" Value="Reset" />
                             <Setter Property="IsPaused" Value="false" />
                             <Setter Property="Duration" Value="00:00:03" />
                             <Setter Property="HorizontalAlignment" Value="Left" />
@@ -157,8 +163,7 @@
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="5">
                     <StackPanel.Styles>
                         <Style TargetType="ProgressButton">
-                            <Setter Property="PauseOnCompletion" Value="False" />
-                            <Setter Property="ResetOnCompletion" Value="true" />
+                            <Setter Property="ActionOnCompleted" Value="Reset" />
                             <Setter Property="IsPaused" Value="false" />
                             <Setter Property="Duration" Value="00:00:03" />
                             <Setter Property="HorizontalAlignment" Value="Left" />
@@ -178,6 +183,80 @@
                                     ProgressBarBorderThickness="3" ProgressBarBorderBrush="Gray" ProgressBarMargin="3" Padding="4,2,4,16">
                         <TextBlock Text="[c=Red][s=Black 1 1]Red[/s][/c] [c=Turquoise]ProgressBarBackground[/c],\n[c=Green][s=Black 1 1]Green[/s][/c] [c=Turquoise]ProgressBarForeground[/c],\n3px [c=Turquoise]ProgressBarBorderThickness[/c]\nusing a [c=Gray][s=Black 1 1]Gray[/s][/c] [c=Turquoise]ProgressBarBorderBrush[/c]" />
                     </ProgressButton>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <!--<TextBlock Dock="Top">
+                    Description placeholder
+                </TextBlock>-->
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        Since [c=Turquoise]ProgressButtons[/c] can host any kind of [c=Turquoise]Content[/c] inside them, they're great for things like abilities with cooldowns:
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <StackPanel.Styles>
+                            <Style TargetType="ProgressButton">
+                                <Setter Property="IsPaused" Value="True" />
+                                <Setter Property="ActionWhenPaused" Value="ResetAndResume" />
+                                <Setter Property="ActionWhenProcessing" Value="None" />
+                                <Setter Property="ActionWhenCompleted" Value="ResetAndPause" />
+                                <Setter Property="ActionOnCompleted" Value="ResetAndPause" />
+                                <Setter Property="Background" Value="DarkGray" />
+                                <Setter Property="ProgressBarForeground" Value="Gray" />
+                            </Style>
+                        </StackPanel.Styles>
+                        <ProgressButton Duration="00:00:01">
+                            <Image Width="24" Height="24" SourceName="SkullOpen" />
+                        </ProgressButton>
+                        <ProgressButton Duration="00:00:01.5">
+                            <Image Width="24" Height="24" SourceName="SkullClosed" />
+                        </ProgressButton>
+                        <ProgressButton Duration="00:00:03">
+                            <Image Width="24" Height="24" SourceName="SkullAndCrossbones" />
+                        </ProgressButton>
+                        <ProgressButton Duration="00:00:06">
+                            <Image Width="24" Height="24" SourceName="Ruby" />
+                        </ProgressButton>
+                    </StackPanel>
+                    <TextBlock>
+                        They're also great for Incremental/Clicker style games:
+                    </TextBlock>
+                    <Grid RowSpacing="3" ColumnSpacing="3" HorizontalAlignment="Left"
+                          RowLengths="auto,auto" ColumnLengths="auto,130,auto,130">
+                        <Grid.Styles>
+                            <Style TargetType="ProgressButton">
+                                <Setter Property="IsPaused" Value="True" />
+                                <Setter Property="ActionWhenPaused" Value="ResetAndResume" />
+                                <Setter Property="ActionWhenProcessing" Value="None" />
+                                <Setter Property="ActionOnCompleted" Value="ResetAndPause" />
+                                <Setter Property="MinHeight" Value="24" />
+                            </Style>
+                        </Grid.Styles>
+
+                        <!-- Wood -->
+                        <TextBlock Row="0" Column="0" VerticalAlignment="Center" Text="{MGBinding Path=WoodQty, Mode=OneWay, StringFormat='{}{0}x'}" />
+                        <ProgressButton Name="WoodBtn" Row="0" Column="1" Background="Peru" ProgressBarForeground="Sienna" Content="Gather Wood" TextForeground="Black" Duration="00:00:01" />
+                        
+                        <!-- Huts -->
+                        <TextBlock Row="0" Column="2" VerticalAlignment="Center" Text="{MGBinding Path=HutQty, Mode=OneWay, StringFormat='{}{0}x'}" />
+                        <!-- This progress button is only enabled when player has at least 3 wood. 
+                        The progress bar is only visible when unpaused, so that the ProgressBarBackground only gets rendered when it is processing.
+                        Thus, the gray disabled background is only seen if (!CanBuildHut && !IsPaused) -->
+                        <ProgressButton Name="HutBtn" Row="0" Column="3" Background="SandyBrown" ProgressBarForeground="Chocolate" ProgressBarBackground="SandyBrown" HideWhenPaused="True" 
+                                        TextForeground="Black" DisabledTextForeground="Black" Content="Build Hut" Duration="00:00:05"
+                                        IsEnabled="{MGBinding Path=CanBuildHut, Mode=OneWay}" DisabledBackground="Gray * 0.5" />
+
+                        <!-- Stone -->
+                        <TextBlock Row="1" Column="0" VerticalAlignment="Center" Text="{MGBinding Path=StoneQty, Mode=OneWay, StringFormat='{}{0}x'}" />
+                        <ProgressButton Name="StoneBtn" Row="1" Column="1" Background="LightGray" ProgressBarForeground="Gray" Content="Gather Stone" TextForeground="Black" Duration="00:00:01.3" />
+                        <TextBlock Row="1" Column="2" VerticalAlignment="Center" Text="{MGBinding Path=QuarryQty, Mode=OneWay, StringFormat='{}{0}x'}" />
+                        <ProgressButton Name="QuarryBtn" Row="1" Column="3" Background="AliceBlue" ProgressBarForeground="CadetBlue" ProgressBarBackground="AliceBlue" HideWhenPaused="True" 
+                                        TextForeground="Black" DisabledTextForeground="Black" Content="Build Quarry" Duration="00:00:07"
+                                        IsEnabled="{MGBinding Path=CanBuildQuarry, Mode=OneWay}" DisabledBackground="Gray * 0.5" />
+                    </Grid>
+                    <TextBlock Text="[c=SandyBrown]Huts[/c] require 2x [c=Peru]Wood[/c]. [c=AliceBlue]Quarries[/c] require 3x [c=LightGray]Stone[/c]" />
                 </StackPanel>
             </DockPanel>
             <Separator/>
