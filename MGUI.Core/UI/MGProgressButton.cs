@@ -696,27 +696,28 @@ namespace MGUI.Core.UI
         {
             switch (Action)
             {
-                case ProgressButtonActionType.None: return;
+                case ProgressButtonActionType.None: 
+                    break;
                 case ProgressButtonActionType.Reset:
                     Value = Minimum;
-                    return;
+                    break;
                 case ProgressButtonActionType.ResetAndPause:
                     IsPaused = true;
                     Value = Minimum;
-                    return;
+                    break;
                 case ProgressButtonActionType.ResetAndResume:
                     IsPaused = false;
                     Value = Minimum;
-                    return;
+                    break;
                 case ProgressButtonActionType.Pause:
                     IsPaused = true;
-                    return;
+                    break;
                 case ProgressButtonActionType.Resume:
                     IsPaused = false;
-                    return;
+                    break;
                 case ProgressButtonActionType.Toggle:
                     IsPaused = !IsPaused;
-                    return;
+                    break;
                 default: throw new NotImplementedException($"Unrecognized {nameof(ProgressButtonActionType)}: {Action}");
             }
         }

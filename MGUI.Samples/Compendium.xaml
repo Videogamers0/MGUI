@@ -50,7 +50,7 @@
                         <ToggleButton Content="Expander" IsChecked="{MGBinding Path=ExpanderSamples.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="Grid" IsChecked="{MGBinding Path=GridSamples.IsVisible, Mode=TwoWay}" Opacity="0.25" />
                         <ToggleButton Content="GroupBox" IsChecked="{MGBinding Path=GroupBoxSamples.IsVisible, Mode=TwoWay}" />
-                        <ToggleButton Content="Image" IsChecked="{MGBinding Path=ImageSamples.IsVisible, Mode=TwoWay}" Opacity="0.25" />
+                        <ToggleButton Content="Image" IsChecked="{MGBinding Path=ImageSamples.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="ListBox" IsChecked="{MGBinding Path=ListBoxSamples.IsVisible, Mode=TwoWay}" Opacity="0.25" />
                         <ToggleButton Content="ListView" IsChecked="{MGBinding Path=ListViewSamples.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="Overlays" IsChecked="{MGBinding Path=OverlaySamples.IsVisible, Mode=TwoWay}" />

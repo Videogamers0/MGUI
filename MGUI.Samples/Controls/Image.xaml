@@ -25,11 +25,204 @@
             <TextBlock StyleNames="Header1" Text="Image:" HorizontalAlignment="Center" />
             <Separator/>
             <TextBlock>
-
+                [c=Turquoise]Images[/c] render a Texture2D.
             </TextBlock>
             <Separator />
 
             <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise]SourceName[/c] or [c=Turquoise]Source[/c] to specify which texture to draw.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        If you specify [c=Turquoise]SourceName[/c], the texture data will be retrieved from the [c=Turquoise]MGResources.Textures[/c] dictionary. 
+                        (The [c=Turquoise]MGResources[/c] instance is typically obtained via [c=Turquoise]MGElement.GetResources[/c]() or via the [c=Turquoise]Resources[/c] property in [c=Turquoise]MGDesktop[/c])
+                    </TextBlock>
+                    <Spacer Height="8" />
+                    <TextBlock>
+                        This [c=Turquoise]MGImage[/c] uses [c=Turquoise]SourceName[/c]=[c=LightBlue][s=Blue]GoldMedal[/s][/c]. 
+                        [c=Turquoise]MGResources.Textures[/c]\["GoldMedal"] contains the [c=Turquoise]MGTextureData[/c] required to render it.
+                    </TextBlock>
+                    <Image SourceName="GoldMedal" Width="64" Height="64" HorizontalAlignment="Left" />
+                    <Spacer Height="8" />
+                    <TextBlock>
+                        This [c=Turquoise]MGImage[/c] sets the [c=Turquoise]Source[/c] data directly in c# code.
+                    </TextBlock>
+                    <Image Name="Image1" Width="64" Height="64" HorizontalAlignment="Left" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <DockPanel.Styles>
+                    <Style TargetType="Image">
+                        <Setter Property="HorizontalAlignment" Value="Left" />
+                        <Setter Property="Width" Value="64" />
+                        <Setter Property="Height" Value="64" />
+                    </Style>
+                </DockPanel.Styles>
+                
+                <TextBlock Dock="Top">
+                    The [c=Turquoise]MGTextureData[/c] object optionally allows you to specify an [c=Turquoise]Opacity[/c] and [c=Turquoise]RenderSizeOverride[/c].
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        [c=Turquoise]MGTextureData.Opacity[/c] value stacks multiplicatively with [c=Turquoise]MGElement.Opacity[/c].
+                        Also notice that [c=Turquoise]MGTextureData.Opacity[/c] does not affect the opacity of the element's [c=Turquoise]Background[/c], while [c=Turquoise]MGElement.Opacity[/c] does.
+                    </TextBlock>
+                    <Grid RowLengths="auto,auto" ColumnLengths="auto,auto" Background="White * 0.1" Padding="4" Margin="0,4,0,0" RowSpacing="3" ColumnSpacing="3">
+                        <Grid.Styles>
+                            <Style TargetType="Image">
+                                <Setter Property="Background" Value="White" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="Width" Value="64" />
+                                <Setter Property="Height" Value="64" />
+                            </Style>
+                        </Grid.Styles>
+
+                        <StackPanel Row="0" Column="0" Orientation="Vertical">
+                            <TextBlock Text="[c=Turquoise]MGTextureData.Opacity[/c]=[c=LightBlue][s=Blue]1.0[/c][/s],\n[c=Turquoise]MGElement.Opacity[/c]=[c=LightBlue][s=Blue]1.0[/c][/s]" />
+                            <Image Name="Image2" Opacity="1.0" />
+                        </StackPanel>
+
+                        <StackPanel Row="0" Column="1" Orientation="Vertical">
+                            <TextBlock Text="[c=Turquoise]MGTextureData.Opacity[/c]=[c=LightBlue][s=Blue]0.5[/c][/s],\n[c=Turquoise]MGElement.Opacity[/c]=[c=LightBlue][s=Blue]1.0[/c][/s]" />
+                            <Image Name="Image3" Opacity="1.0" />
+                        </StackPanel>
+
+                        <StackPanel Row="1" Column="0" Orientation="Vertical">
+                            <TextBlock Text="[c=Turquoise]MGTextureData.Opacity[/c]=[c=LightBlue][s=Blue]1.0[/c][/s],\n[c=Turquoise]MGElement.Opacity[/c]=[c=LightBlue][s=Blue]0.5[/c][/s]" />
+                            <Image Name="Image4" Opacity="0.5" />
+                        </StackPanel>
+
+                        <StackPanel Row="1" Column="1" Orientation="Vertical">
+                            <TextBlock Text="[c=Turquoise]MGTextureData.Opacity[/c]=[c=LightBlue][s=Blue]0.5[/c][/s],\n[c=Turquoise]MGElement.Opacity[/c]=[c=LightBlue][s=Blue]0.5[/c][/s]" />
+                            <Image Name="Image5" Opacity="0.5" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        The following [c=Turquoise]MGImage[/c]s are all explicitly sized to be 64x64, and have a White [c=Turquoise]Background[/c].
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="5" Spacing="3">
+                        <StackPanel.Styles>
+                            <Style TargetType="Image">
+                                <Setter Property="Background" Value="White" />
+                            </Style>
+                        </StackPanel.Styles>
+                        <TextBlock>
+                            [c=Turquoise]MGTextureData.RenderSizeOverride[/c]=[c=LightBlue][s=Blue]null[/s][/c]
+                        </TextBlock>
+                        <Image SourceName="SteelFloor" />
+                        <TextBlock>
+                            [c=Turquoise]MGTextureData.RenderSizeOverride[/c]=[c=LightBlue][s=Blue]64x32[/s][/c]
+                        </TextBlock>
+                        <Image Name="Image6" />
+                        <TextBlock>
+                            [c=Turquoise]MGTextureData.RenderSizeOverride[/c]=[c=LightBlue][s=Blue]32x64[/s][/c]
+                        </TextBlock>
+                        <Image Name="Image7" />
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise]TextureColor[/c] to apply a color tint. (Default value = [c=LightBlue][s=Blue]White[/s][/c])
+                </TextBlock>
+
+                <Grid RowLengths="auto,auto" ColumnLengths="auto,auto" Background="White * 0.1" Padding="4" Margin="0,4,0,0" RowSpacing="3" ColumnSpacing="3">
+                    <Grid.Styles>
+                        <Style TargetType="Image">
+                            <Setter Property="Background" Value="White" />
+                            <Setter Property="HorizontalAlignment" Value="Center" />
+                            <Setter Property="Width" Value="64" />
+                            <Setter Property="Height" Value="64" />
+                        </Style>
+                    </Grid.Styles>
+
+                    <StackPanel Row="0" Column="0" Orientation="Vertical">
+                        <TextBlock>
+                            [c=Turquoise]TextureColor[/c]=[c=LightBlue][s=Blue]White[/s][/c]
+                        </TextBlock>
+                        <Image SourceName="Diamond" TextureColor="White" />
+                    </StackPanel>
+
+                    <StackPanel Row="0" Column="1" Orientation="Vertical">
+                        <TextBlock>
+                            [c=Turquoise]TextureColor[/c]=[c=LightBlue][s=Blue]Red[/s][/c]
+                        </TextBlock>
+                        <Image SourceName="Diamond" TextureColor="Red" />
+                    </StackPanel>
+
+                    <StackPanel Row="1" Column="0" Orientation="Vertical">
+                        <TextBlock>
+                            [c=Turquoise]TextureColor[/c]=[c=LightBlue][s=Blue]Green[/s][/c]
+                        </TextBlock>
+                        <Image SourceName="Diamond" TextureColor="Green" />
+                    </StackPanel>
+
+                    <StackPanel Row="1" Column="1" Orientation="Vertical">
+                        <TextBlock>
+                        [c=Turquoise]TextureColor[/c]=[c=LightBlue][s=Blue]Blue[/s][/c]
+                        </TextBlock>
+                        <Image SourceName="Diamond" TextureColor="Blue" />
+                    </StackPanel>
+                </Grid>
+            </DockPanel>
+            <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise]Stretch[/c] to control how the texture fills the [c=Turquoise]MGImage[/c]'s bounds. (Default value = [c=LightBlue][s=Blue]Uniform[/s][/c])
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <StackPanel.Styles>
+                        <Style TargetType="Image">
+                            <Setter Property="Margin" Value="2" />
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                            <Setter Property="Width" Value="128" />
+                            <Setter Property="Height" Value="64" />
+                            <Setter Property="Background" Value="White" />
+                        </Style>
+                    </StackPanel.Styles>
+                    <TextBlock>
+                        The following [c=Turquoise]MGImages[/c] are all explicitly sized to 128x64 (Aspect ratio = 2:1) whilst rendering a texture that is 16x16 (Aspect ratio = 1:1)
+                    </TextBlock>
+                    <Separator/>
+                    <TextBlock>
+                        [c=Turquoise]Stretch[/c]=[c=LightBlue][s=Blue]Uniform[/s][/c]: The texture is resized to fit the destination bounds whilst preserving the aspect ratio.
+                        If the aspect ratio of the texture differs from that of the destination bounds, the texture will be fully visible, and there will be empty space inside the destination bounds.
+                    </TextBlock>
+                    <Image SourceName="Backpack" Stretch="Uniform" />
+
+                    <TextBlock>
+                        [c=Turquoise]Stretch[/c]=[c=LightBlue][s=Blue]UniformToFill[/s][/c]: The texture is resized to fit the destination bounds whilst preserving the aspect ratio.
+                        If the aspect ratio of the texture differs from that of the target bounds, the texture will be zoomed in just enough so that it fully spans the destination bounds.
+                    </TextBlock>
+                    <Image SourceName="Backpack" Stretch="UniformToFill" />
+
+                    <TextBlock>
+                        [c=Turquoise]Stretch[/c]=[c=LightBlue][s=Blue]Fill[/s][/c]: The texture is resized to fit the destination bounds. Aspect ratio is not preserved.
+                    </TextBlock>
+                    <Image SourceName="Backpack" Stretch="Fill" />
+
+                    <TextBlock>
+                        [c=Turquoise]Stretch[/c]=[c=LightBlue][s=Blue]None[/s][/c]: The texture is not resized. It is rendered at its exact size, regardless of the size of the destination bounds.
+                        Use [c=Turquoise]HorizontalContentAlignment[/c] / [c=Turquoise]VerticalContentAlignment[/c] to control how the texture is aligned within the destination bounds.
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Image SourceName="Backpack" Stretch="None" />
+                        <Image SourceName="Backpack" Stretch="None" HorizontalContentAlignment="Left" VerticalContentAlignment="Bottom" />
+                        <Image SourceName="Backpack" Stretch="None" HorizontalContentAlignment="Center" VerticalContentAlignment="Top" />
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <!--<DockPanel>
                 <TextBlock Dock="Top">
 
                 </TextBlock>
@@ -39,7 +232,7 @@
                     </TextBlock>
                 </StackPanel>
             </DockPanel>
-            <Separator/>
+            <Separator/>-->
 
         </StackPanel>
     </ScrollViewer>
