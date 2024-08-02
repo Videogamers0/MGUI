@@ -185,6 +185,9 @@ namespace MGUI.Core.UI
                 this.SourceName = SourceName;
                 this.TextureColor = null;
                 this.Stretch = Stretch;
+
+                HorizontalContentAlignment = HorizontalAlignment.Center;
+                VerticalContentAlignment = VerticalAlignment.Center;
             }
         }
 
@@ -199,6 +202,9 @@ namespace MGUI.Core.UI
                 this.Source = Source;
                 this.TextureColor = TextureColor;
                 this.Stretch = Stretch;
+
+                HorizontalContentAlignment = HorizontalAlignment.Center;
+                VerticalContentAlignment = VerticalAlignment.Center;
             }
         }
 
@@ -321,7 +327,7 @@ namespace MGUI.Core.UI
             Rectangle Bounds;
             if (Stretch == Stretch.None)
             {
-                Bounds = ApplyAlignment(PaddedBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new Size(UnstretchedWidth, UnstretchedHeight));
+                Bounds = ApplyAlignment(PaddedBounds, HorizontalContentAlignment, VerticalContentAlignment, new Size(UnstretchedWidth, UnstretchedHeight));
             }
             else if (Stretch == Stretch.Uniform)
             {
