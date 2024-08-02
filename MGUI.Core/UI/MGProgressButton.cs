@@ -601,7 +601,7 @@ namespace MGUI.Core.UI
 
                 Duration = null;
 
-                Orientation = Orientation.Horizontal;
+                this.Orientation = Orientation;
                 IsReversed = false;
                 ProgressBarAlignment = ProgressBarAlignment.Stretch;
                 ProgressBarSize = null;

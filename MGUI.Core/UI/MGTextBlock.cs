@@ -560,7 +560,9 @@ namespace MGUI.Core.UI
             float Height = SF.LineSpacing;
 
             float CurrentXOffset = 0;
+#pragma warning disable CS0219 // Variable is assigned but its value is never used
             bool IsFirstCharacter = true;
+#pragma warning restore CS0219 // Variable is assigned but its value is never used
 
             if (SF.Spacing != 0)
                 throw new NotImplementedException($"{nameof(MGTextBlock)}.{nameof(MeasureText)} currently does not handle {nameof(SpriteFont)}s with a non-zero Spacing.");

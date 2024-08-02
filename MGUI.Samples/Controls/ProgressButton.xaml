@@ -1,5 +1,5 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
-        Left="440" Top="20" MinHeight="0" Width="560" SizeToContent="Height" TitleText="Button" Padding="10">
+        Left="440" Top="20" MinHeight="0" Width="560" SizeToContent="Height" TitleText="ProgressButton" Padding="10">
     <Window.Styles>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="10" />

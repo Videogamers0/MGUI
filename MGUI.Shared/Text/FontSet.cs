@@ -76,7 +76,7 @@ namespace MGUI.Shared.Text
         /// {ExeFolder}\Content\Fonts\Helvetica\14_Normal.xnb - Represents a SpriteFont where Size=14pts for the 'Helvetica' Font Family.<para/>
         /// Supported FontStyles: <see cref="CustomFontStyles.Normal"/>, <see cref="CustomFontStyles.Bold"/>, <see cref="CustomFontStyles.Italic"/><para/>
         /// To programmatically generate .spritefont files in the desired file name format, consider using:<br/>
-        /// <see cref="SpritefontGenerator.GenerateDefault(ContentManager, string)"/><br/>
+        /// <see cref="SpritefontGenerator.GenerateDefault(ContentManager, string, string, string)"/><br/>
         /// and then adding the generated .spritefont files to your MonoGame Content</summary>
         public FontSet(ContentManager Content, string FontName)
         {
