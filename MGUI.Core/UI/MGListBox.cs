@@ -490,6 +490,21 @@ namespace MGUI.Core.UI
             if (SelectedItems?.Count != 0)
                 SelectedItems = new List<MGListBoxItem<TItemType>>().AsReadOnly();
         }
+
+        /// <summary>The <see cref="MGListBoxItem{TItemType}"/> that the mouse was pressed on during the last mouse left-button press, or null if no item is currently pressed.<br/>
+        /// This value is set back to <see langword="null"/> at the END of the update tick when the mouse left-button is released (so that other input-handlers have a chance to read the value before it is invalidated).<para/>
+        /// This value can be useful for manually implementing drag-drop behavior.<para/>
+        /// Note: By default, clicked items are selected during a mouse-RELEASED event, NOT during a mouse-PRESSED event, so this value may differ from <see cref="SelectedItems"/>.<para/>
+        /// See also: <see cref="ReleasedItem"/></summary>
+        public MGListBoxItem<TItemType> PressedItem { get; private set; }
+
+        private bool IsPressedItemInvalidationPending { get; set; }
+
+        /// <summary>The most recent <see cref="MGListBoxItem{TItemType}"/> that was clicked (set during a mouse left-button released event).<para/>
+        /// Warning - This value is not guaranteed to be in the <see cref="ItemsSource"/> if the source items have changed.<br/>
+        /// The <see cref="ReleasedItem"/> could refer to an old item that has been removed from the source list.<para/>
+        /// See also: <see cref="PressedItem"/></summary>
+        public MGListBoxItem<TItemType> ReleasedItem { get; private set; }
         #endregion Selection
 
         public MGScrollViewer ScrollViewer { get; }
@@ -654,7 +669,7 @@ namespace MGUI.Core.UI
                 InnerBorder.CanChangeContent = false;
 
                 SetTitleAndContentBorder(MGSolidFillBrush.Black, 1);
-
+                
                 MinHeight = 30;
 
                 AlternatingRowBackgrounds = GetTheme().ListBoxItemAlternatingRowBackgrounds.Select(x => x.GetValue(true)).ToList().AsReadOnly();
@@ -669,25 +684,49 @@ namespace MGUI.Core.UI
                 this.SelectionMode = ListBoxSelectionMode.Single;
                 this.CanDeselectByClickingSelectedItem = true;
 
+                GetDesktop().Renderer.Host.EndUpdate += (sender, e) =>
+                {
+                    //  Reset PressedItem to null at the end of an update tick, rather than immediately when the mouse button is released,
+                    //  because other input handlers with lower priority still need a chance to read the data before it is modified.
+                    if (IsPressedItemInvalidationPending)
+                    {
+                        IsPressedItemInvalidationPending = false;
+                        PressedItem = null;
+                    }
+                };
+
+                MouseHandler.LMBPressedInside += (sender, e) =>
+                {
+                    PressedItem = InternalItems?.FirstOrDefault(x => x.ContentPresenter.IsHovered);
+                };
+
+                MouseHandler.ReleasedOutside += (sender, e) =>
+                {
+                    if (e.IsLMB)
+                        IsPressedItemInvalidationPending = true;
+                };
+
                 MouseHandler.LMBReleasedInside += (sender, e) =>
                 {
-                    MGListBoxItem<TItemType> PressedItem = InternalItems?.FirstOrDefault(x => x.ContentPresenter.IsHovered);
-                    if (PressedItem != null)
+                    IsPressedItemInvalidationPending = true;
+                    ReleasedItem = InternalItems?.FirstOrDefault(x => x.ContentPresenter.IsHovered);
+
+                    if (ReleasedItem != null)
                     {
-                        bool IsPressedItemAlreadySelected = SelectedItems?.Contains(PressedItem) == true;
+                        bool IsReleasedItemAlreadySelected = SelectedItems?.Contains(ReleasedItem) == true;
                         bool IsShiftDown = InputTracker.Keyboard.IsShiftDown;
                         bool IsControlDown = InputTracker.Keyboard.IsControlDown;
 
                         void SelectSingle()
                         {
-                            if (IsPressedItemAlreadySelected && CanDeselectByClickingSelectedItem && SelectedItems.Count <= 1)
+                            if (IsReleasedItemAlreadySelected && CanDeselectByClickingSelectedItem && SelectedItems.Count <= 1)
                             {
                                 ClearSelection();
                             }
                             else
                             {
-                                SelectionSourceItem = PressedItem;
-                                SelectedItems = new List<MGListBoxItem<TItemType>>() { PressedItem }.AsReadOnly();
+                                SelectionSourceItem = ReleasedItem;
+                                SelectedItems = new List<MGListBoxItem<TItemType>>() { ReleasedItem }.AsReadOnly();
                             }
                         }
 
@@ -700,7 +739,7 @@ namespace MGUI.Core.UI
                             else
                             {
                                 int SourceIndex = InternalItems.IndexOf(SelectionSourceItem);
-                                int PressedIndex = InternalItems.IndexOf(PressedItem);
+                                int PressedIndex = InternalItems.IndexOf(ReleasedItem);
 
                                 int StartIndex = Math.Min(SourceIndex, PressedIndex);
                                 int EndIndex = Math.Max(SourceIndex, PressedIndex);
@@ -722,10 +761,10 @@ namespace MGUI.Core.UI
                             case ListBoxSelectionMode.Multiple:
                                 if (IsControlDown)
                                 {
-                                    if (IsPressedItemAlreadySelected)
-                                        SelectedItems = SelectedItems.Where(x => x != PressedItem).ToList().AsReadOnly();
+                                    if (IsReleasedItemAlreadySelected)
+                                        SelectedItems = SelectedItems.Where(x => x != ReleasedItem).ToList().AsReadOnly();
                                     else
-                                        SelectedItems = SelectedItems.Append(PressedItem).ToList().AsReadOnly();
+                                        SelectedItems = SelectedItems.Append(ReleasedItem).ToList().AsReadOnly();
                                 }
                                 else
                                     SelectContiguous();
