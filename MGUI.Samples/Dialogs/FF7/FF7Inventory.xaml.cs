@@ -126,6 +126,23 @@ namespace MGUI.Samples.Dialogs.FF7
         private MGListBox<InventoryItem> ItemsList { get; }
         //private MGTextBlock ItemDescriptionLabel { get; }
 
+        private string _DragDropLabelText;
+        public string DragDropLabelText
+        {
+            get => _DragDropLabelText;
+            private set
+            {
+                if (_DragDropLabelText != value)
+                {
+                    _DragDropLabelText = value;
+                    NPC(nameof(DragDropLabelText));
+                    NPC(nameof(HasDragDropText));
+                }
+            }
+        }
+
+        public bool HasDragDropText => !string.IsNullOrEmpty(DragDropLabelText);
+
         public FF7Inventory(ContentManager Content, MGDesktop Desktop)
             : base(Content, Desktop, $"{nameof(Dialogs)}.{nameof(FF7)}", $"{nameof(FF7Inventory)}.xaml")
         {
@@ -192,12 +209,34 @@ namespace MGUI.Samples.Dialogs.FF7
             {
                 PartyMember.ContentPresenter.MouseHandler.LMBReleasedInside += (sender, e) =>
                 {
-                    if (TryUseItemOn(SelectedItem, PartyMember.Data) && SelectedItem.Quantity <= 0)
+                    // Note: If ItemsList.PressedItem is not null, then user is dragging+dropping an item from the inventory list onto a party member
+                    InventoryItem SourceItem = ItemsList.PressedItem?.Data ?? SelectedItem;
+
+                    if (TryUseItemOn(SourceItem, PartyMember.Data) && SourceItem.Quantity <= 0)
                     {
-                        RemoveItem(SelectedItem.Item);
+                        RemoveItem(SourceItem.Item);
                     }
                 };
             }
+
+            PartyList.OnEndingDraw += (sender, e) =>
+            {
+                DragDropLabelText = null;
+
+                //  Draw an additional graphical overlay to give visual feedback when dragging+dropping an item from the ItemsList onto a PartyMember
+                if (ItemsList.PressedItem != null)
+                {
+                    foreach (MGListBoxItem<PartyMember> PartyMember in PartyList.ListBoxItems)
+                    {
+                        MGBorder PartyMemberPresenter = PartyMember.ContentPresenter;
+                        if (PartyMemberPresenter.VisualState.IsPressedOrHovered)
+                        {
+                            e.DA.DT.FillRectangle(e.DA.Offset.ToVector2(), PartyMemberPresenter.LayoutBounds, Microsoft.Xna.Framework.Color.Yellow * 0.075f);
+                            DragDropLabelText = $"Use {ItemsList.PressedItem.Data.Name} on {PartyMember.Data.Name}";
+                        }
+                    }
+                }
+            };
 
             //  Handle clicking on the close button
             MGButton CloseButton = Window.GetElementByName<MGButton>("CloseButton");

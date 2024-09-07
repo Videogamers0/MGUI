@@ -74,7 +74,7 @@ namespace MGUI.Shared.Input.Mouse
 
         /// <summary>The maximum number of pixels that the mouse can move by (in either the X or Y direction) while pressed before releasing for a Click event to be invoked.</summary>
         public int ClickPositionThreshold { get; set; } = 2;
-        /// <summary>The maximum amount of time that can pass between a mouse button press and mouse button release to still be registed as a Click event</summary>
+        /// <summary>The maximum amount of time that can pass between a mouse button press and mouse button release to still be registered as a Click event</summary>
         public TimeSpan ClickTimeThreshold { get; set; } = TimeSpan.FromMilliseconds(300);
 
         /// <summary>The minimum number of pixels that the mouse must move by (in either the X or Y direction) while pressed before the a mouse drag event begins.<para/>

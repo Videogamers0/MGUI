@@ -1,6 +1,7 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:MGUI.Samples.Dialogs.FF7;assembly=MGUI.Samples"
+        xmlns:Converters="clr-namespace:MGUI.Core.UI.Data_Binding.Converters;assembly=MGUI.Core"
         WindowStyle="None" Width="600" Height="470">
     <OverlayPanel>
         <OverlayPanel.Styles>
@@ -116,28 +117,36 @@
                 </Border>
 
                 <Border StyleNames="PanelBorder">
-                    <!-- List of each item in the inventory -->
-                    <ListBox Name="ItemsList" ItemType="{x:Type local:InventoryItem}" IsTitleVisible="False" Background="Transparent" 
+                    <OverlayPanel>
+                        <!-- List of each item in the inventory -->
+                        <ListBox Name="ItemsList" ItemType="{x:Type local:InventoryItem}" IsTitleVisible="False" Background="Transparent" 
                              Margin="10" AlternatingRowBackgrounds="{x:Null}" ItemsPanelBorderThickness="0">
-                        <ListBox.ItemTemplate>
-                            <ContentTemplate>
-                                <DockPanel>
-                                    <!-- Name and icon -->
-                                    <StackPanel Orientation="Horizontal" Dock="Left" Spacing="5">
-                                        <Image VerticalAlignment="Center" SourceName="FF7ItemIcon" Width="24" Height="22" />
-                                        <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Name, Mode=OneTime}" />
-                                    </StackPanel>
+                            <ListBox.ItemTemplate>
+                                <ContentTemplate>
+                                    <DockPanel>
+                                        <!-- Name and icon -->
+                                        <StackPanel Orientation="Horizontal" Dock="Left" Spacing="5">
+                                            <Image VerticalAlignment="Center" SourceName="FF7ItemIcon" Width="24" Height="22" />
+                                            <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Name, Mode=OneTime}" />
+                                        </StackPanel>
 
-                                    <!-- Quantity -->
-                                    <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Right">
-                                        <TextBlock VerticalAlignment="Center" Text=":" IsBold="True" />
-                                        <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Quantity, Mode=OneWay}" 
+                                        <!-- Quantity -->
+                                        <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Right">
+                                            <TextBlock VerticalAlignment="Center" Text=":" IsBold="True" />
+                                            <TextBlock VerticalAlignment="Center" Text="{MGBinding Path=Quantity, Mode=OneWay}" 
                                                MinWidth="24" TextAlignment="Right" IsBold="True" />
-                                    </StackPanel>
-                                </DockPanel>
-                            </ContentTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </ContentTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <!-- An additional textblock that informs the user what item they are currently dragging+dropping from inventory onto a party member -->
+                        <Border StyleNames="PanelBorder" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                Visibility="{MGBinding Path=HasDragDropText, Mode=OneWay, Converter={Converters:BoolToVisibilityConverter}, FallbackValue=Collapsed}">
+                            <TextBlock Text="{MGBinding Path=DragDropLabelText, Mode=OneWay}" />
+                        </Border>
+                    </OverlayPanel>
                 </Border>
             </DockPanel>
         </DockPanel>
