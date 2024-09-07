@@ -2,7 +2,7 @@
 
 MGUI is a UI framework for [MonoGame](https://www.monogame.net/) ([Src](https://github.com/MonoGame/MonoGame)) that features a powerful layout engine and data binding engine similar to WPF, and a robust set of controls to build your UI with. 
 
-All control names are prefixed with 'MG' and have similar names and properties to what you might find in WPF. Currently supported controls:
+All control names are prefixed with 'MG' and many controls have similar names and properties to what you might find in WPF. Currently supported controls:
 - 'Container'-like Controls that define their own logic for arranging their children:
   - MGDockPanel
   - MGGrid
@@ -21,6 +21,7 @@ All control names are prefixed with 'MG' and have similar names and properties t
   - MGGroupBox
   - MGListBox
   - MGListView
+  - MGProgressButton
   - MGRadioButton
   - MGScrollViewer
   - MGTabControl
@@ -456,13 +457,13 @@ MGUI can also parse and render your XAML markup at runtime using the MGXAMLDesig
 # Getting Started:
 
 1. Clone this repo
-2. Use Visual Studio 2022 (since this project targets .NET 6.0, and makes use of some new-ish C# language features such as record structs)
+2. Use Visual Studio 2022 or later (since this project targets .NET 6.0, and makes use of some new-ish C# language features such as record structs (which may be unavailable in c# language version 8.0 or earlier))
 3. In your MonoGame project:
    - In the Solution Explorer:
      - Right-click your Solution, *Add* -> *Existing Project*. Browse for `MGUI.Shared.csproj`, and `MGUI.Core.csproj`.
-     - Right-click your Project, *Add* -> *Project Reference*. Add references to `MGUI.Shared and MGUI.Core`.
+     - Right-click your Project, *Add* -> *Project Reference*. Add references to `MGUI.Shared` and `MGUI.Core`.
      - You may need to:
-       - Right-click your game's *Content* folder, *Add* -> *Existing Item*. Browse for `MGUI\MGUI.Shared\Content\MGUI.Shared.Content.mgcb` and `MGUI\MGUI.Core\Content\MGUI.Core.Content.mgcb` and add them both as links (in the file browser dialog, click the dropdown arrow next to the *Add* button and choose *Add as link*). This is intended to ensure MGUI's content .xnb files are copied to your project's bin\Content folder. This step might not be necessary.
+       - Right-click your game's *Content* folder, *Add* -> *Existing Item*. Browse for `MGUI\MGUI.Shared\Content\MGUI.Shared.Content.mgcb` and `MGUI\MGUI.Core\Content\MGUI.Core.Content.mgcb` and add them both as links (in the file browser dialog, click the dropdown arrow next to the *Add* button and choose *Add as link*). This step will ensure that MGUI's content .xnb files are copied to your project's bin\Content folder. This step might not be necessary.
    - In your Game class:
      - In the Initialize method:
        - Instantiate `MGUI.Shared.Rendering.MainRenderer`
@@ -520,8 +521,10 @@ public class Game1 : Game, IObservableUpdate
     {
         PreviewUpdate?.Invoke(this, gameTime.TotalGameTime);
 
+        // Call Desktop.Update() at start of your update loop, so that the UI has the 1st-chance to receive and handle user-inputs
         Desktop.Update();
-        // TODO: Add your update logic here
+
+        // TODO: Add your game update logic here
 
         base.Update(gameTime);
 
@@ -533,6 +536,8 @@ public class Game1 : Game, IObservableUpdate
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         // TODO: Add your drawing code here
+
+        //  Call Desktop.Draw() at the end of your draw loop, so that the UI is rendered overtop of everything else
         Desktop.Draw();
 
         base.Draw(gameTime);
@@ -545,7 +550,7 @@ public class Game1 : Game, IObservableUpdate
   
 # Multi-Platform
 
-MGUI.Core targets `net6.0-windows` by default. If you wish to use MGUI on another OS, open `MGUI\MGUI.Core\MGUI.Core.csproj` and change `<TargetFramework>net6.0-windows</TargetFramework>` to `<TargetFramework>net6.0</TargetFramework>`. Some features have better implementations when targeting `net6.0-windows`, but everything probably™ works fine when targeting `net6.0`. In particular, targeting `net6.0` breaks some intellisense related to `MarkupExtensions` (such as `MGBinding`) when using the Visual Studio Xaml designer (but it still works at runtime).
+MGUI.Core targets `net6.0-windows` by default. If you wish to use MGUI on another OS, open `MGUI\MGUI.Core\MGUI.Core.csproj` and change `<TargetFramework>net6.0-windows</TargetFramework>` to `<TargetFramework>net6.0</TargetFramework>`. Some features have better implementations when targeting `net6.0-windows`, but everything probably™ works fine when targeting `net6.0`. In particular, targeting `net6.0` breaks some intellisense related to `MarkupExtensions` (such as `MGBinding`) when using the Visual Studio Xaml designer (but it still works at runtime, don't ask me why).
 
 # Input Handling
 
@@ -556,7 +561,7 @@ MGUI uses its own framework to detect and respond to inputs.
   - Uusually only 1 instance per program, automatically created when you create an instance of `MGUI.Shared.Rendering.MainRenderer`
   - Contains 2 child objects: `MouseTracker` and `KeyboardTracker`
 - `MouseTracker`
-  - Detects changes to the `MouseState` and stores information about those changes in EventArg objects, most of which have an `IsHandled` property.
+  - Detects changes to the `MouseState` and stores information about those changes in `EventArg` objects, most of which have an `IsHandled` property.
   - Manages 0 to many `MouseHandlers`
   - `MouseHandler`
     - Exposes several events that your code can subscribe to, to react to mouse events. Such as:
@@ -565,10 +570,58 @@ MGUI uses its own framework to detect and respond to inputs.
 - `KeyboardTracker`
   - Just like `MouseTracker` except for managing Keyboard-related inputs.
         
-If you'd like to utilize this framework in your own code, get the `InputTracker` instance from your `MGUI.Shared.Rendering.MainRenderer` instance, then get the `MouseTracker` and/or `KeyboardTracker` instance from the `InputTracker`. Call `MouseTracker.CreateHandler(...)`/`KeyboardTracker.CreateHandler(...)`, and subscribe to the events in the returned handler instance.
+If you'd like to utilize this framework in your own code, get the `MouseTracker` and/or `KeyboardTracker` instance from the `InputTracker`. Call `MouseTracker.CreateHandler(...)`/`KeyboardTracker.CreateHandler(...)`, and subscribe to the events in the returned handler instance.
+
+EX: Creates a MouseHandler instance in Game1.Initialize and subscribes to an event
+```c#
+public class Game1 : Game, IObservableUpdate, IMouseHandlerHost
+{
+    private MainRenderer MGUIRenderer { get; set; }
+    private MGDesktop Desktop { get; set; }
+
+    //  IObservableUpdate implementation
+    public event EventHandler<TimeSpan> PreviewUpdate;
+    public event EventHandler<EventArgs> EndUpdate;
+
+    //  IMouseHandlerHost implementation
+    bool IMouseViewport.IsInside(Vector2 Position) => Window.ClientBounds.Contains(Position);
+    Vector2 IMouseViewport.GetOffset() => Vector2.Zero;
+
+    private MouseHandler MH { get; set; }
+
+    protected override void Initialize()
+    {
+        this.MGUIRenderer = new MainRenderer(new GameRenderHost<Game1>(this));
+        this.Desktop = new MGDesktop(MGUIRenderer);
+
+        //  Create a MouseHandler
+        this.MH = MGUIRenderer.Input.Mouse.CreateHandler(this, null);
+
+        //  Subscribe to 1 or more mouse-related events
+        MH.MovedInside += (sender, e) =>
+        {
+            // TODO: Do something in response to the mouse moving
+        };
+
+        base.Initialize();
+    }
+
+    protected override void Update(GameTime gameTime)
+    {
+        PreviewUpdate?.Invoke(this, gameTime.TotalGameTime);
+        Desktop.Update();
+        MH.ManualUpdate();
+        // TODO: Add your update logic here
+        base.Update(gameTime);
+        EndUpdate?.Invoke(this, EventArgs.Empty);
+    }
+
+    // constructor and other functions ommitted for brevity...
+}
+```
 
 <details>
-  <summary>Example code:</summary>
+  <summary>Full example code:</summary>
   
 Suppose you want to react to WASD keys to move your player, but you don't want to move the player if the WASD was handled by an `MGTextBox` on the UI:
 
@@ -616,7 +669,7 @@ public class Game1 : Game, IObservableUpdate, IKeyboardHandlerHost
             if (e.Key is Keys.W or Keys.A or Keys.S or Keys.D)
             {
                 //TODO Move the player
-                e.SetHandled(this, false);
+                e.SetHandledBy(this, false);
             }
         };
 
@@ -634,7 +687,8 @@ public class Game1 : Game, IObservableUpdate, IKeyboardHandlerHost
 
         Desktop.Update();
 
-        // By updating this handler AFTER we've updated our UI, the handler won't receive events that were already handled by our UI's TextBox
+        // By updating this handler AFTER we've updated our UI,
+        // the handler won't receive events that were already handled by our UI's TextBox
         PlayerMovementHandler.ManualUpdate();
 
         // TODO: Add your update logic here
@@ -653,7 +707,7 @@ public class Game1 : Game, IObservableUpdate, IKeyboardHandlerHost
 }
 ```
 
-If you don't want to use MGUI's input framework, then you can just check if the EventArgs in `MouseTracker`/`KeyboardTracker` have already been handled before your code attempts to handle them:
+If you don't want to use MGUI's input framework, then you can just check if the `EventArgs` in `MouseTracker`/`KeyboardTracker` have already been handled before your code attempts to handle them:
 
 ```c#
 BaseKeyPressedEventArgs W_PressEvent = MGUIRenderer.Input.Keyboard.CurrentKeyPressedEvents[Keys.W];
