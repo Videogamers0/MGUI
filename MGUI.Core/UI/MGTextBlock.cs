@@ -283,6 +283,47 @@ namespace MGUI.Core.UI
         public Color ActualForeground => Foreground.GetValue(VisualState.Primary) ?? DerivedDefaultTextForeground ?? GetTheme().TextBlockFallbackForeground.GetValue(false).GetValue(VisualState.Primary);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private double? _TextProgress;
+        /// <summary>Determines what percentage of the <see cref="Text"/> is currently being rendered.<br/>
+        /// If <see langword="null"/>, all <see cref="Text"/> will be drawn.<para/>
+        /// Min value: 0.0 (0%)<br/>Max value: 1.0 (100%)<para/>
+        /// Default value: <see langword="null"/><para/>
+        /// See also: <see cref="TextCharactersPerSecond"/></summary>
+        public double? TextProgress
+        {
+            get => _TextProgress;
+            set
+            {
+                if (_TextProgress != value)
+                {
+                    _TextProgress = value;
+                    NPC(nameof(TextProgress));
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private double? _TextCharactersPerSecond;
+        /// <summary>Determines how many characters in this <see cref="MGTextBlock"/>'s <see cref="Text"/> should appear per second.<para/>
+        /// If not <see langword="null"/>, this will automatically update <see cref="TextProgress"/>.<br/>
+        /// This property is typically used to make text appear slowly over time, such as to mimic an NPC speaking. (Note: People typically speak at a rate of about 17 CPS)<para/>
+        /// Default value: <see langword="null"/><para/>
+        /// See also: <see cref="TextProgress"/></summary>
+        public double? TextCharactersPerSecond
+        {
+            get => _TextCharactersPerSecond;
+            set
+            {
+                if (_TextCharactersPerSecond != value)
+                {
+                    _TextCharactersPerSecond = value;
+                    NPC(nameof(TextCharactersPerSecond));
+                    TextProgress = TextCharactersPerSecond.HasValue ? 0.0 : null;
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _AllowsInlineFormatting = true;
         /// <summary>If true, <see cref="Text"/> can contain formatting codes such as "[bold]...[/bold]" or "[color=green]...[/color]" etc.<br/>
         /// If false, all formatting codes within <see cref="Text"/> will be treated as literal strings instead of affecting how the text is rendered.<para/>
@@ -414,10 +455,12 @@ namespace MGUI.Core.UI
             IsTrackingMouseClicks = AllowsInlineFormatting && Runs.Any(x => x.HasAction);
 
             NPC(nameof(Runs));
+            NumCharacters = Runs.Where(x => x is MGTextRunText).Cast<MGTextRunText>().Sum(x => x.Text.Length);
         }
 
         public ReadOnlyCollection<MGTextRun> Runs { get; private set; }
         public ReadOnlyCollection<MGTextLine> Lines { get; private set; }
+        private int NumCharacters { get; set; }
 
         internal void UpdateLines()
         {
@@ -538,6 +581,8 @@ namespace MGUI.Core.UI
                 this.TextAlignment = HorizontalAlignment.Left;
                 this.Padding = new(1,2,1,1);
                 this.VerticalContentAlignment = VerticalAlignment.Center;
+                this.TextProgress = null;
+                this.TextCharactersPerSecond = null;
 
                 OnLayoutUpdated += (sender, e) => { UpdateLines(); };
             }
@@ -723,8 +768,17 @@ namespace MGUI.Core.UI
         public override void UpdateSelf(ElementUpdateArgs UA)
         {
             base.UpdateSelf(UA);
+
             if (ActionBounds.Any())
                 ActionBounds.Clear();
+
+            //  Update TextProgress (makes the Text appear slowly over time instead of all at once)
+            if (TextCharactersPerSecond.HasValue && NumCharacters > 0 && (!TextProgress.HasValue || TextProgress.Value < 1.0))
+            {
+                double ElapsedCharacters = UA.BA.FrameElapsed.TotalSeconds * TextCharactersPerSecond.Value;
+                double ElapsedProgress = ElapsedCharacters / NumCharacters;
+                TextProgress = TextProgress.HasValue ? TextProgress.Value + ElapsedProgress : ElapsedProgress;
+            }
         }
 
 #if false //true
@@ -840,6 +894,8 @@ namespace MGUI.Core.UI
             ActionBounds.Clear();
             ToolTipBounds.Clear();
 
+            int RemainingCharacters = TextProgress.HasValue ? (int)(TextProgress.Value * NumCharacters) : NumCharacters;
+
             float CurrentY = LayoutBounds.Top + Padding.Top;
 
             foreach (MGTextLine Line in this.Lines)
@@ -885,7 +941,11 @@ namespace MGUI.Core.UI
                         float ActualOpacity = Opacity * TextRun.Settings.Opacity;
                         Color Foreground = (TextRun.Settings.Foreground ?? DefaultForeground) * ActualOpacity;
 
-                        Vector2 TextSize = MeasureText(TextRun.Text, IsBold, IsItalic, IsStartOfLine);
+                        string ActualText = TextRun.Text;
+                        if (TextProgress.HasValue && RemainingCharacters < TextRun.Text.Length)
+                            ActualText = TextRun.Text.Substring(0, RemainingCharacters);
+
+                        Vector2 TextSize = MeasureText(ActualText, IsBold, IsItalic, IsStartOfLine);
 
                         //  Draw background
                         if (TextRun.Settings.HasBackground)
@@ -929,17 +989,21 @@ namespace MGUI.Core.UI
                             Color ShadowColor = (TextRun.Settings.Shadow.ShadowColor ?? DefaultForeground) * ActualOpacity;
                             Vector2 ShadowOffset = TextRun.Settings.Shadow.ShadowOffset ?? new(1, 1);
 
-                            DT.DrawSpriteFontText(SF, TextRun.Text, Position + ShadowOffset, ShadowColor, FontOrigin, FontScale, FontScale);
-                            DT.DrawSpriteFontText(SF, TextRun.Text, Position, Foreground, FontOrigin, FontScale, FontScale);
+                            DT.DrawSpriteFontText(SF, ActualText, Position + ShadowOffset, ShadowColor, FontOrigin, FontScale, FontScale);
+                            DT.DrawSpriteFontText(SF, ActualText, Position, Foreground, FontOrigin, FontScale, FontScale);
                         }
                         else
                         {
-                            DT.DrawSpriteFontText(SF, TextRun.Text, Position, Foreground, FontOrigin, FontScale, FontScale);
+                            DT.DrawSpriteFontText(SF, ActualText, Position, Foreground, FontOrigin, FontScale, FontScale);
                         }
 
                         RunBounds = new(CurrentX, TextYPosition, TextSize.X, TextSize.Y);
                         CurrentX += TextSize.X;
                         IsStartOfLine = false;
+
+                        RemainingCharacters -= ActualText.Length;
+                        if (TextProgress.HasValue && RemainingCharacters <= 0)
+                            break;
                     }
                     else
                         throw new NotImplementedException($"{nameof(MGTextBlock)}.{nameof(DrawSelf)} does not support rendering {nameof(MGTextRun)}s of type={nameof(TextRunType)}.{Run.RunType}");
@@ -976,6 +1040,9 @@ namespace MGUI.Core.UI
                 }
 
                 CurrentY += Line.LineTotalHeight + LinePadding;
+
+                if (TextProgress.HasValue && RemainingCharacters <= 0)
+                    break;
             }
 
             TemporaryDrawTransform?.Dispose();

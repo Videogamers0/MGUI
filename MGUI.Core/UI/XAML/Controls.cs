@@ -1751,6 +1751,11 @@ namespace MGUI.Core.UI.XAML
         [Category("Layout")]
         public HorizontalAlignment? TextAlignment { get; set; }
 
+        [Category("Behavior")]
+        public double? TextProgress { get; set; }
+        [Category("Behavior")]
+        public double? TextCharactersPerSecond { get; set; }
+
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTextBlock(Window, Text, Foreground?.ToXNAColor(), FontSize ?? null, AllowsInlineFormatting ?? true);
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
@@ -1791,6 +1796,11 @@ namespace MGUI.Core.UI.XAML
                 TextBlock.LinePadding = LinePadding.Value;
             if (TextAlignment.HasValue)
                 TextBlock.TextAlignment = TextAlignment.Value;
+
+            if (TextCharactersPerSecond.HasValue)
+                TextBlock.TextCharactersPerSecond = TextCharactersPerSecond.Value;
+            if (TextProgress.HasValue)
+                TextBlock.TextProgress = TextProgress.Value;
         }
 
         protected internal override IEnumerable<Element> GetChildren() => Enumerable.Empty<Element>();

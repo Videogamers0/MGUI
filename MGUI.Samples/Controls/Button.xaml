@@ -29,7 +29,7 @@
             </TextBlock>
             <Separator />
             <Button Name="Button1" Content="Click me!" HorizontalAlignment="Left" Padding="15,5" />
-
+            
             <DockPanel>
                 <TextBlock Dock="Top">
                     [c=Turquoise]Buttons[/c] execute an Action when clicked.

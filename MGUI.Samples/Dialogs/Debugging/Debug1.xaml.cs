@@ -63,6 +63,19 @@ namespace MGUI.Samples.Dialogs.Debugging
                 Btn1.RenderScale = new(1.1f, 1.1f);
             }
 
+            if (Window.TryGetElementByName("ThreadingTestBtn", out MGButton ThreadingBtn))
+            {
+                ThreadingBtn.OnLeftClicked += async (sender, e) =>
+                {
+                    if (!e.IsHandled && ThreadingBtn.Content is MGTextBlock tb)
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(2.0));
+                        await Task.Run(() => { tb.SetText("Threading test", false); });
+                        e.SetHandledBy(ThreadingBtn);
+                    }
+                };
+            }
+
             if (Window.TryGetElementByName("SP_1", out MGStackPanel SP))
             {
                 //SP.BackgroundBrush.NormalValue = new MGTextureFillBrush(Desktop, "SkullAndCrossbones");
@@ -145,6 +158,15 @@ namespace MGUI.Samples.Dialogs.Debugging
             if (Window.TryGetElementByName("Overlay1", out MGOverlay Overlay))
             {
                 Overlay1 = Overlay;
+            }
+
+            if (Window.TryGetElementByName("ResetSlowTextSample", out MGButton SlowTextBtn) && Window.TryGetElementByName("SlowTextSample", out MGTextBlock SlowTextSample))
+            {
+                SlowTextBtn.Command = (btn) =>
+                {
+                    SlowTextSample.TextProgress = 0.0;
+                    return true;
+                };
             }
 
             Window.WindowDataContext = this;
