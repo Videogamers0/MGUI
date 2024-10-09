@@ -1,6 +1,6 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Left="440" Top="20" Width="350" Height="420"
+        Left="440" Top="20" Width="450" Height="430"
         ThemeName="Debug1_Theme"
         TitleText="[ToolTip=Test2][Action=Debug1_TestAction][img=SkullAndCrossbones 16x16][/Action][/ToolTip] [b]Window [ToolTip=Test1]Title[/ToolTip] Text[/b]">
     <!--<Window.TitleBar>
@@ -156,6 +156,26 @@
                                 </StackPanel>
                             </Border>
 
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Tab #4">
+                    <ScrollViewer>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Testing SpriteFonts generated at runtime by SpriteFontPlus nuget pkg:" />
+                            <Spacer Height="20" />
+                            <TextBlock FontFamily="Century Gothic" FontSize="12" Text="The quick brown fox jumps over the lazy dog!" />
+                            <TextBlock FontFamily="Century Gothic" FontSize="12" Text="The quick brown fox jumps over the lazy dog!" IsBold="True" />
+                            <TextBlock FontFamily="Century Gothic" FontSize="12" Text="The quick brown fox jumps over the lazy dog!" IsItalic="True" />
+                            <TextBlock FontFamily="Century Gothic" FontSize="16" Text="The quick brown fox jumps over the lazy dog!" />
+                            <TextBlock FontFamily="Century Gothic" FontSize="16" Text="The quick brown fox jumps over the lazy dog!" IsBold="True" />
+                            <TextBlock FontFamily="Century Gothic" FontSize="16" Text="The quick brown fox jumps over the lazy dog!" IsItalic="True" />
+                            <TextBlock FontFamily="Century Gothic" FontSize="20" Text="The quick brown fox jumps over the lazy dog!" />
+                            <TextBlock FontFamily="Century Gothic" FontSize="20" Text="The quick brown fox jumps over the lazy dog!" IsBold="True" />
+                            <TextBlock FontFamily="Century Gothic" FontSize="20" Text="The quick brown fox jumps over the lazy dog!" IsItalic="True" />
+                            <!--<Button Height="60">
+                                <TextBlock VerticalAlignment="Center" Background="Red" FontFamily="Century Gothic" FontSize="20" Text="The quick brown fox jumps over the lazy dog!" IsBold="True" />
+                            </Button>-->
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>

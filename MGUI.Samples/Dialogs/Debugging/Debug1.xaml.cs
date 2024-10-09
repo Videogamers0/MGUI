@@ -33,7 +33,7 @@ namespace MGUI.Samples.Dialogs.Debugging
             if (Window == null)
                 return;
 
-            Window.Scale = 2f;
+            //Window.Scale = 2f;
 
             //Window.WindowStyle = WindowStyle.None;
 
