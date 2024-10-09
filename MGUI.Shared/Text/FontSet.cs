@@ -193,6 +193,8 @@ namespace MGUI.Shared.Text
                         Styles |= CustomFontStyles.Bold;
                     if (IsItalic)
                         Styles |= CustomFontStyles.Italic;
+                    if (Styles == CustomFontStyles.None)
+                        Styles = CustomFontStyles.Normal;
                     Variations.Add(Styles, SF);
                 }
 
