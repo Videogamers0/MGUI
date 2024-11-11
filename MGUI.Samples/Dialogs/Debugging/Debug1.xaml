@@ -160,7 +160,7 @@
                     </ScrollViewer>
                 </TabItem>
                 <TabItem Header="Tab #4">
-                    <ScrollViewer>
+                    <!--<ScrollViewer>
                         <StackPanel Orientation="Vertical">
                             <TextBlock Text="Testing SpriteFonts generated at runtime by SpriteFontPlus nuget pkg:" />
                             <Spacer Height="20" />
@@ -173,11 +173,54 @@
                             <TextBlock FontFamily="Century Gothic" FontSize="20" Text="The quick brown fox jumps over the lazy dog!" />
                             <TextBlock FontFamily="Century Gothic" FontSize="20" Text="The quick brown fox jumps over the lazy dog!" IsBold="True" />
                             <TextBlock FontFamily="Century Gothic" FontSize="20" Text="The quick brown fox jumps over the lazy dog!" IsItalic="True" />
-                            <!--<Button Height="60">
+                            --><!--<Button Height="60">
                                 <TextBlock VerticalAlignment="Center" Background="Red" FontFamily="Century Gothic" FontSize="20" Text="The quick brown fox jumps over the lazy dog!" IsBold="True" />
-                            </Button>-->
+                            </Button>--><!--
                         </StackPanel>
-                    </ScrollViewer>
+                    </ScrollViewer>-->
+                    
+                    <!-- Sample TreeView -->
+                    <Border BorderBrush="Red" BorderThickness="2" Background="rgb(241,241,241)" TextForeground="Black" MaxHeight="300">
+                        <Border.Styles>
+                            <Style TargetType="Expander" Name="TreeViewExpander">
+                                <Setter Property="ExpanderButtonSize" Value="8" />
+                                <Setter Property="ExpanderButtonCollapsedBackgroundBrush" Value="Transparent" />
+                                <Setter Property="ExpanderButtonExpandedBackgroundBrush" Value="Transparent" />
+                                <Setter Property="ExpanderButtonBorderThickness" Value="0" />
+                                <Setter Property="ExpanderDropdownArrowColor" Value="Black" />
+                                <Setter Property="Margin" Value="2" />
+                            </Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                            <Style TargetType="StackPanel" Name="TreeViewStackPanel">
+                                <Setter Property="Orientation" Value="Vertical" />
+                                <Setter Property="Margin" Value="30,0,0,0" />
+                            </Style>
+                        </Border.Styles>
+                        <ScrollViewer>
+                            <Expander StyleNames="TreeViewExpander" Header="Beverages">
+                                <StackPanel StyleNames="TreeViewStackPanel">
+                                    <TextBlock Text="Water" />
+                                    <Expander StyleNames="TreeViewExpander" Header="Tea">
+                                        <StackPanel StyleNames="TreeViewStackPanel">
+                                            <TextBlock Text="Black Tea" />
+                                            <TextBlock Text="White Tea" />
+                                            <Expander StyleNames="TreeViewExpander" Header="Green Tea">
+                                                <StackPanel StyleNames="TreeViewStackPanel">
+                                                    <TextBlock Text="Sencha" />
+                                                    <TextBlock Text="Gyokuro" />
+                                                    <TextBlock Text="Matcha" />
+                                                    <TextBlock Text="Pi Lo Chun" />
+                                                </StackPanel>
+                                            </Expander>
+                                        </StackPanel>
+                                    </Expander>
+                                    <TextBlock Text="Coffee" />
+                                </StackPanel>
+                            </Expander>
+                        </ScrollViewer>
+                    </Border>
                 </TabItem>
             </TabControl>
 

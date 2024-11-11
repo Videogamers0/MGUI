@@ -170,10 +170,16 @@ namespace MGUI.Core.UI
                     {
                         HandleTemplatedContentRemoved(InternalItems.Select(x => x.Content));
                         InternalItems.CollectionChanged -= ListBoxItems_CollectionChanged;
+                        foreach (MGListBoxItem<TItemType> Removed in InternalItems)
+                            OnListBoxItemRemoved?.Invoke(this, Removed);
                     }
                     _InternalItems = value;
                     if (InternalItems != null)
+                    {
                         InternalItems.CollectionChanged += ListBoxItems_CollectionChanged;
+                        foreach (MGListBoxItem<TItemType> Added in InternalItems)
+                            OnListBoxItemAdded?.Invoke(this, Added);
+                    }
 
                     using (ItemsPanel.AllowChangingContentTemporarily())
                     {
@@ -223,6 +229,7 @@ namespace MGUI.Core.UI
                     foreach (MGListBoxItem<TItemType> Item in e.NewItems)
                     {
                         ItemsPanel.TryInsertChild(Index, Item.ContentPresenter);
+                        OnListBoxItemAdded?.Invoke(this, Item);
                         Index++;
                     }
 
@@ -235,6 +242,7 @@ namespace MGUI.Core.UI
                         if (ItemsPanel.TryRemoveChild(Item.ContentPresenter))
                         {
                             Removed.Add(Item);
+                            OnListBoxItemRemoved?.Invoke(this, Item);
                         }
                     }
 
@@ -253,6 +261,9 @@ namespace MGUI.Core.UI
                             if (AlternatingRowBackgrounds?.Any() == true)
                                 New[i].ContentPresenter.BackgroundBrush.NormalValue = Old[i].ContentPresenter.BackgroundBrush.NormalValue;
                         }
+
+                        OnListBoxItemRemoved?.Invoke(this, Old[i]);
+                        OnListBoxItemAdded?.Invoke(this, New[i]);
                     }
                 }
                 else if (e.Action is NotifyCollectionChangedAction.Move)
@@ -273,6 +284,12 @@ namespace MGUI.Core.UI
                 HandleTemplatedContentRemoved(Removed.Select(x => x.Content));
             }
         }
+
+        /// <summary>Invoked when a new item is added to <see cref="ListBoxItems"/></summary>
+        public event EventHandler<MGListBoxItem<TItemType>> OnListBoxItemAdded;
+        /// <summary>Invoked when an item is removed from <see cref="ListBoxItems"/> either by removal or replacement.<para/>
+        /// Warning - This event is NOT invoked if <see cref="ListBoxItems"/> is cleared via <see cref="ICollection{T}.Clear"/></summary>
+        public event EventHandler<MGListBoxItem<TItemType>> OnListBoxItemRemoved;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ObservableCollection<TItemType> _ItemsSource;
@@ -299,6 +316,7 @@ namespace MGUI.Core.UI
                     }
 
                     NPC(nameof(ItemsSource));
+                    NPC(nameof(BindableItemsSource));
                 }
             }
         }
@@ -354,6 +372,14 @@ namespace MGUI.Core.UI
                 this.ItemsSource = Observable;
             else
                 this.ItemsSource = new ObservableCollection<TItemType>(Value.ToList());
+        }
+
+        /// <summary>Do not use. This property is only intended to be used by DataBindings.<para/>
+        /// Use <see cref="ItemsSource"/> or <see cref="SetItemsSource(ICollection{TItemType})"/> instead.</summary>
+        public ICollection<TItemType> BindableItemsSource
+        {
+            get => ItemsSource;
+            set => SetItemsSource(value);
         }
         #endregion Items Source
 

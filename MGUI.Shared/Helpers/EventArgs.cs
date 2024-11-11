@@ -12,7 +12,7 @@ namespace MGUI.Shared.Helpers
         public TProperty PreviousValue { get; }
         public TProperty NewValue { get; }
 
-        public EventArgs(TObject Obj, TProperty PreviousValue, TProperty NewValue)
+        public EventArgs(TObject Item, TProperty PreviousValue, TProperty NewValue)
         {
             this.Item = Item;
             this.PreviousValue = PreviousValue;
