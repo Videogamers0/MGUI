@@ -291,7 +291,7 @@ namespace MGUI.Core.UI.XAML
             { nameof(DisabledTextForeground), $"{nameof(MGElement.DefaultTextForeground)}.{nameof(VisualStateSetting<XNAColor>.DisabledValue)}" },
             { nameof(Width), $"{nameof(MGElement.PreferredWidth)}" },
             { nameof(Height), $"{nameof(MGElement.PreferredHeight)}" },
-            { nameof(ListBox.Items), $"{nameof(MGListBox<object>.BindableItemsSource)}" }
+            { nameof(ListBox.Items), $"{nameof(MGListBox<object>.ItemsSource)}" }
         };
 
         /// <summary>Resolves any pending <see cref="BindingConfig"/>s by converting them into <see cref="DataBinding"/>s</summary>

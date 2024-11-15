@@ -291,6 +291,7 @@ namespace MGUI.Core.UI
         /// Warning - This event is NOT invoked if <see cref="ListBoxItems"/> is cleared via <see cref="ICollection{T}.Clear"/></summary>
         public event EventHandler<MGListBoxItem<TItemType>> OnListBoxItemRemoved;
 
+#if NEVER //LEGACY CODE
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ObservableCollection<TItemType> _ItemsSource;
         /// <summary>To set this value, use <see cref="SetItemsSource(ICollection{TItemType})"/></summary>
@@ -320,6 +321,37 @@ namespace MGUI.Core.UI
                 }
             }
         }
+#else
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private ICollection<TItemType> _ItemsSource;
+        /// <summary>The data source that <see cref="ListBoxItems"/> are generated from.<br/>If you want the <see cref="ListBoxItems"/> to dynamically update as the collection changes, 
+        /// pass in a collection that implements <see cref="INotifyCollectionChanged"/>, such as an <see cref="ObservableCollection{T}"/></summary>
+        public ICollection<TItemType> ItemsSource
+        {
+            get => _ItemsSource;
+            private set
+            {
+                if (_ItemsSource != value)
+                {
+                    if (ItemsSource != null && ItemsSource is INotifyCollectionChanged Observable)
+                        Observable.CollectionChanged -= ItemsSource_CollectionChanged;
+                    _ItemsSource = value;
+                    if (ItemsSource != null && ItemsSource is INotifyCollectionChanged Observable2)
+                        Observable2.CollectionChanged += ItemsSource_CollectionChanged;
+
+                    if (ItemsSource == null)
+                        InternalItems = null;
+                    else
+                    {
+                        IEnumerable<MGListBoxItem<TItemType>> Values = ItemsSource.Select((x, Index) => new MGListBoxItem<TItemType>(this, x));
+                        this.InternalItems = new ObservableCollection<MGListBoxItem<TItemType>>(Values);
+                    }
+
+                    NPC(nameof(ItemsSource));
+                }
+            }
+        }
+#endif
 
         private void ItemsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -364,6 +396,7 @@ namespace MGUI.Core.UI
             }
         }
 
+#if NEVER //LEGACY CODE
         /// <param name="Value"><see cref="ItemsSource"/> will be set to a copy of this <see cref="ICollection{T}"/> unless the collection is an <see cref="ObservableCollection{T}"/>.<br/>
         /// If you want <see cref="ItemsSource"/> to dynamically update as the collection changes, pass in an <see cref="ObservableCollection{T}"/></param>
         public void SetItemsSource(ICollection<TItemType> Value)
@@ -373,15 +406,11 @@ namespace MGUI.Core.UI
             else
                 this.ItemsSource = new ObservableCollection<TItemType>(Value.ToList());
         }
-
-        /// <summary>Do not use. This property is only intended to be used by DataBindings.<para/>
-        /// Use <see cref="ItemsSource"/> or <see cref="SetItemsSource(ICollection{TItemType})"/> instead.</summary>
-        public ICollection<TItemType> BindableItemsSource
-        {
-            get => ItemsSource;
-            set => SetItemsSource(value);
-        }
-        #endregion Items Source
+#else
+        /// <summary>Deprecated. Set <see cref="ItemsSource"/> directly.</summary>
+        public void SetItemsSource(ICollection<TItemType> Value) => this.ItemsSource = Value;
+#endif
+#endregion Items Source
 
         #region Selection
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
