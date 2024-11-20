@@ -111,6 +111,9 @@ namespace MGUI.Core.UI.XAML
         [Category("Behavior")]
         public ListBoxSelectionMode? SelectionMode { get; set; }
 
+        [Category("Data")]
+        public object SelectedValue { get; set; }
+
         [Category("Appearance")]
         public List<FillBrush> AlternatingRowBackgrounds { get; set; } = new();
 

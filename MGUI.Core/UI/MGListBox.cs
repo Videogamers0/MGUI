@@ -886,6 +886,9 @@ namespace MGUI.Core.UI
             if (Settings.SelectionMode.HasValue)
                 SelectionMode = Settings.SelectionMode.Value;
 
+            if (Settings.SelectedValue is TItemType SelectedT)
+                SelectedValue = SelectedT;
+
             if (Settings.AlternatingRowBackgrounds != null && Settings.AlternatingRowBackgrounds.Any())
                 AlternatingRowBackgrounds = Settings.AlternatingRowBackgrounds.Select(x => x.ToFillBrush(Desktop)).ToList().AsReadOnly();
             else
