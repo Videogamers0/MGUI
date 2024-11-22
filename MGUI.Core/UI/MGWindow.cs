@@ -1107,6 +1107,41 @@ namespace MGUI.Core.UI
 
                         MouseHandler.Tracker.CurrentButtonReleasedEvents[MouseButton.Left]?.SetHandledBy(this, false);
 
+                        //  Reposition the window so that the title bar is fully on screen
+                        {
+                            //  Immediately update the layout to refresh child positions
+                            ValidateWindowSizeAndPosition();
+                            UpdateLayout(new Rectangle(Left, Top, WindowWidth, WindowHeight));
+
+                            Rectangle TitleBarLayoutBounds = TitleBarElement.LayoutBounds;
+                            Rectangle TitleBarScreenBounds = ConvertCoordinateSpace(CoordinateSpace.Layout, CoordinateSpace.Screen, TitleBarLayoutBounds);
+
+                            Rectangle ValidScreenBounds = Desktop.ValidScreenBounds;
+                            Rectangle ValidLayoutBounds = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, ValidScreenBounds);
+
+                            //  Shift the window up so the bottom of the title bar is above the bottom of the desktop bounds
+                            if (TitleBarScreenBounds.Bottom > ValidScreenBounds.Bottom)
+                            {
+                                this.Top -= Math.Abs(TitleBarScreenBounds.Bottom - ValidScreenBounds.Bottom);
+                            }
+                            //  Shift the window down so the top of the title bar is below the top of the desktop bounds
+                            else if (TitleBarScreenBounds.Top < ValidScreenBounds.Top)
+                            {
+                                this.Top += Math.Abs(ValidScreenBounds.Top - TitleBarScreenBounds.Top);
+                            }
+
+                            //  Shift the window left so the right of the title bar is left of the rightmost desktop bounds
+                            if (TitleBarScreenBounds.Right > ValidScreenBounds.Right)
+                            {
+                                this.Left -= Math.Abs(TitleBarScreenBounds.Right - ValidScreenBounds.Right);
+                            }
+                            //  Shift the window right so the left of the title bar is right of the leftmost desktop bounds
+                            else if (TitleBarScreenBounds.Left < ValidScreenBounds.Left)
+                            {
+                                this.Left += Math.Abs(ValidScreenBounds.Left - TitleBarScreenBounds.Left);
+                            }
+                        }
+
                         //Debug.WriteLine($"{nameof(MGWindow)}: Drag End at: {e.EndPosition}");
                     }
                 }
