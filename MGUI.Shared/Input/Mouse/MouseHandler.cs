@@ -220,220 +220,225 @@ namespace MGUI.Shared.Input.Mouse
 
         private void InvokeQueuedEvents()
         {
-            if (IsValid && HasSubscribedEvents && Owner.CanReceiveMouseInput())
+            if (IsValid && HasSubscribedEvents)
             {
                 Vector2 Offset = Owner.GetOffset();
 
-                //  Invoke Scrolled event
-                if (Tracker.CurrentScrollEvent != null && Scrolled != null && IsInside(Tracker.CurrentScrollEvent.Position, Offset))
+                //  Invoke scroll/move/click events
+                bool CanReceiveInputs = Owner.CanReceiveMouseInput();
+                if (CanReceiveInputs)
                 {
-                    if (InvokeEvenIfHandled || !Tracker.CurrentScrollEvent.IsHandled)
+                    //  Invoke Scrolled event
+                    if (Tracker.CurrentScrollEvent != null && Scrolled != null && IsInside(Tracker.CurrentScrollEvent.Position, Offset))
                     {
-                        Scrolled.Invoke(this, Tracker.CurrentScrollEvent);
-                        if (AlwaysHandlesEvents)
-                            Tracker.CurrentScrollEvent.SetHandledBy(Owner, false);
-                    }
-                }
-
-                //  Invoke mouse moved events
-                if (Tracker.CurrentMoveEvent != null && IsMonitoringMovement)
-                {
-                    bool WasHovering = IsInside(Tracker.CurrentMoveEvent.PreviousPosition, Offset);
-                    bool IsHovering = IsInside(Tracker.CurrentMoveEvent.CurrentPosition, Offset);
-
-                    if (IsHovering)
-                        MovedInside?.Invoke(this, Tracker.CurrentMoveEvent);
-                    if (!IsHovering)
-                        MovedOutside?.Invoke(this, Tracker.CurrentMoveEvent);
-
-                    if (!WasHovering && IsHovering)
-                        Entered?.Invoke(this, Tracker.CurrentMoveEvent);
-                    if (WasHovering && !IsHovering)
-                        Exited?.Invoke(this, Tracker.CurrentMoveEvent);
-                }
-
-                if (Tracker.HasCurrentButtonEvents && IsMonitoringClicks)
-                {
-                    //  Invoke mouse pressed events
-                    if (Tracker.HasCurrentButtonPressedEvents && PressedEvents.Any(x => x != null))
-                    {
-                        foreach (MouseButton Button in MouseButtons)
+                        if (InvokeEvenIfHandled || !Tracker.CurrentScrollEvent.IsHandled)
                         {
-                            BaseMousePressedEventArgs Args = Tracker.CurrentButtonPressedEvents[Button];
-                            if (Args != null)
-                            {
-                                bool IsPressedInside = IsInside(Args.Position, Offset);
-                                if (IsPressedInside)
-                                {
-                                    if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && PressedInside != null)
-                                    {
-                                        PressedInside.Invoke(this, Args);
-                                        if (AlwaysHandlesEvents)
-                                            Args.SetHandledBy(Owner, false);
-                                    }
+                            Scrolled.Invoke(this, Tracker.CurrentScrollEvent);
+                            if (AlwaysHandlesEvents)
+                                Tracker.CurrentScrollEvent.SetHandledBy(Owner, false);
+                        }
+                    }
 
-                                    if (InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner))
+                    //  Invoke mouse moved events
+                    if (Tracker.CurrentMoveEvent != null && IsMonitoringMovement)
+                    {
+                        bool WasHovering = IsInside(Tracker.CurrentMoveEvent.PreviousPosition, Offset);
+                        bool IsHovering = IsInside(Tracker.CurrentMoveEvent.CurrentPosition, Offset);
+
+                        if (IsHovering)
+                            MovedInside?.Invoke(this, Tracker.CurrentMoveEvent);
+                        if (!IsHovering)
+                            MovedOutside?.Invoke(this, Tracker.CurrentMoveEvent);
+
+                        if (!WasHovering && IsHovering)
+                            Entered?.Invoke(this, Tracker.CurrentMoveEvent);
+                        if (WasHovering && !IsHovering)
+                            Exited?.Invoke(this, Tracker.CurrentMoveEvent);
+                    }
+
+                    if (Tracker.HasCurrentButtonEvents && IsMonitoringClicks)
+                    {
+                        //  Invoke mouse pressed events
+                        if (Tracker.HasCurrentButtonPressedEvents && PressedEvents.Any(x => x != null))
+                        {
+                            foreach (MouseButton Button in MouseButtons)
+                            {
+                                BaseMousePressedEventArgs Args = Tracker.CurrentButtonPressedEvents[Button];
+                                if (Args != null)
+                                {
+                                    bool IsPressedInside = IsInside(Args.Position, Offset);
+                                    if (IsPressedInside)
                                     {
-                                        switch (Button)
+                                        if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && PressedInside != null)
                                         {
-                                            case MouseButton.Left:
-                                                if (LMBPressedInside != null)
-                                                {
-                                                    LMBPressedInside.Invoke(this, Args);
-                                                    if (AlwaysHandlesEvents)
-                                                        Args.SetHandledBy(Owner, false);
-                                                }
-                                                break;
-                                            case MouseButton.Middle:
-                                                if (MMBPressedInside != null)
-                                                {
-                                                    MMBPressedInside.Invoke(this, Args);
-                                                    if (AlwaysHandlesEvents)
-                                                        Args.SetHandledBy(Owner, false);
-                                                }
-                                                break;
-                                            case MouseButton.Right:
-                                                if (RMBPressedInside != null)
-                                                {
-                                                    RMBPressedInside.Invoke(this, Args);
-                                                    if (AlwaysHandlesEvents)
-                                                        Args.SetHandledBy(Owner, false);
-                                                }
-                                                break;
+                                            PressedInside.Invoke(this, Args);
+                                            if (AlwaysHandlesEvents)
+                                                Args.SetHandledBy(Owner, false);
+                                        }
+
+                                        if (InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner))
+                                        {
+                                            switch (Button)
+                                            {
+                                                case MouseButton.Left:
+                                                    if (LMBPressedInside != null)
+                                                    {
+                                                        LMBPressedInside.Invoke(this, Args);
+                                                        if (AlwaysHandlesEvents)
+                                                            Args.SetHandledBy(Owner, false);
+                                                    }
+                                                    break;
+                                                case MouseButton.Middle:
+                                                    if (MMBPressedInside != null)
+                                                    {
+                                                        MMBPressedInside.Invoke(this, Args);
+                                                        if (AlwaysHandlesEvents)
+                                                            Args.SetHandledBy(Owner, false);
+                                                    }
+                                                    break;
+                                                case MouseButton.Right:
+                                                    if (RMBPressedInside != null)
+                                                    {
+                                                        RMBPressedInside.Invoke(this, Args);
+                                                        if (AlwaysHandlesEvents)
+                                                            Args.SetHandledBy(Owner, false);
+                                                    }
+                                                    break;
+                                            }
                                         }
                                     }
-                                }
-                                else
-                                {
-                                    if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && PressedOutside != null)
+                                    else
                                     {
-                                        PressedOutside.Invoke(this, Args);
-                                        if (AlwaysHandlesEvents)
-                                            Args.SetHandledBy(Owner, false);
+                                        if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && PressedOutside != null)
+                                        {
+                                            PressedOutside.Invoke(this, Args);
+                                            if (AlwaysHandlesEvents)
+                                                Args.SetHandledBy(Owner, false);
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    //  Invoke mouse released events
-                    if (Tracker.HasCurrentButtonReleasedEvents && ReleasedEvents.Any(x => x != null))
-                    {
-                        foreach (MouseButton Button in MouseButtons)
+                        //  Invoke mouse released events
+                        if (Tracker.HasCurrentButtonReleasedEvents && ReleasedEvents.Any(x => x != null))
                         {
-                            BaseMouseReleasedEventArgs Args = Tracker.CurrentButtonReleasedEvents[Button];
-                            if (Args != null)
+                            foreach (MouseButton Button in MouseButtons)
                             {
-                                bool IsReleasedInside = IsInside(Args.Position, Offset);
-                                if (IsReleasedInside)
+                                BaseMouseReleasedEventArgs Args = Tracker.CurrentButtonReleasedEvents[Button];
+                                if (Args != null)
                                 {
-                                    if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && ReleasedInside != null)
+                                    bool IsReleasedInside = IsInside(Args.Position, Offset);
+                                    if (IsReleasedInside)
                                     {
-                                        ReleasedInside.Invoke(this, Args);
-                                        if (AlwaysHandlesEvents)
-                                            Args.SetHandledBy(Owner, false);
-                                    }
-
-                                    if (InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner))
-                                    {
-                                        switch (Button)
+                                        if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && ReleasedInside != null)
                                         {
-                                            case MouseButton.Left:
-                                                if (LMBReleasedInside != null)
-                                                {
-                                                    LMBReleasedInside.Invoke(this, Args);
-                                                    if (AlwaysHandlesEvents)
-                                                        Args.SetHandledBy(Owner, false);
-                                                }
-                                                break;
-                                            case MouseButton.Middle:
-                                                if (MMBReleasedInside != null)
-                                                {
-                                                    MMBReleasedInside.Invoke(this, Args);
-                                                    if (AlwaysHandlesEvents)
-                                                        Args.SetHandledBy(Owner, false);
-                                                }
-                                                break;
-                                            case MouseButton.Right:
-                                                if (RMBReleasedInside != null)
-                                                {
-                                                    RMBReleasedInside.Invoke(this, Args);
-                                                    if (AlwaysHandlesEvents)
-                                                        Args.SetHandledBy(Owner, false);
-                                                }
-                                                break;
+                                            ReleasedInside.Invoke(this, Args);
+                                            if (AlwaysHandlesEvents)
+                                                Args.SetHandledBy(Owner, false);
+                                        }
+
+                                        if (InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner))
+                                        {
+                                            switch (Button)
+                                            {
+                                                case MouseButton.Left:
+                                                    if (LMBReleasedInside != null)
+                                                    {
+                                                        LMBReleasedInside.Invoke(this, Args);
+                                                        if (AlwaysHandlesEvents)
+                                                            Args.SetHandledBy(Owner, false);
+                                                    }
+                                                    break;
+                                                case MouseButton.Middle:
+                                                    if (MMBReleasedInside != null)
+                                                    {
+                                                        MMBReleasedInside.Invoke(this, Args);
+                                                        if (AlwaysHandlesEvents)
+                                                            Args.SetHandledBy(Owner, false);
+                                                    }
+                                                    break;
+                                                case MouseButton.Right:
+                                                    if (RMBReleasedInside != null)
+                                                    {
+                                                        RMBReleasedInside.Invoke(this, Args);
+                                                        if (AlwaysHandlesEvents)
+                                                            Args.SetHandledBy(Owner, false);
+                                                    }
+                                                    break;
+                                            }
                                         }
                                     }
-                                }
-                                else
-                                {
-                                    if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && ReleasedOutside != null)
+                                    else
                                     {
-                                        ReleasedOutside.Invoke(this, Args);
-                                        if (AlwaysHandlesEvents)
-                                            Args.SetHandledBy(Owner, false);
+                                        if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && ReleasedOutside != null)
+                                        {
+                                            ReleasedOutside.Invoke(this, Args);
+                                            if (AlwaysHandlesEvents)
+                                                Args.SetHandledBy(Owner, false);
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    //  Invoke mouse clicked events
-                    if (Tracker.HasCurrentButtonClickedEvents && ClickedEvents.Any(x => x != null))
-                    {
-                        foreach (MouseButton Button in MouseButtons)
+                        //  Invoke mouse clicked events
+                        if (Tracker.HasCurrentButtonClickedEvents && ClickedEvents.Any(x => x != null))
                         {
-                            BaseMouseClickedEventArgs Args = Tracker.CurrentButtonClickedEvents[Button];
-                            if (Args != null)
+                            foreach (MouseButton Button in MouseButtons)
                             {
-                                bool IsClickedInside = IsInside(Args.Position, Offset);
-                                if (IsClickedInside)
+                                BaseMouseClickedEventArgs Args = Tracker.CurrentButtonClickedEvents[Button];
+                                if (Args != null)
                                 {
-                                    if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && (InvokeEvenIfHandled || !Args.ReleasedArgs.IsHandled || Args.ReleasedArgs.HandledBy == Owner) && ClickedInside != null)
+                                    bool IsClickedInside = IsInside(Args.Position, Offset);
+                                    if (IsClickedInside)
                                     {
-                                        ClickedInside.Invoke(this, Args);
-                                        if (AlwaysHandlesEvents)
-                                            Args.SetHandledBy(Owner, false);
-                                    }
-
-                                    if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && (InvokeEvenIfHandled || !Args.ReleasedArgs.IsHandled || Args.ReleasedArgs.HandledBy == Owner))
-                                    {
-                                        switch (Button)
+                                        if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && (InvokeEvenIfHandled || !Args.ReleasedArgs.IsHandled || Args.ReleasedArgs.HandledBy == Owner) && ClickedInside != null)
                                         {
-                                            case MouseButton.Left:
-                                                if (LMBClickedInside != null)
-                                                {
-                                                    LMBClickedInside.Invoke(this, Args);
-                                                    if (AlwaysHandlesEvents)
-                                                        Args.SetHandledBy(Owner, false);
-                                                }
-                                                break;
-                                            case MouseButton.Middle:
-                                                if (MMBClickedInside != null)
-                                                {
-                                                    MMBClickedInside.Invoke(this, Args);
-                                                    if (AlwaysHandlesEvents)
-                                                        Args.SetHandledBy(Owner, false);
-                                                }
-                                                break;
-                                            case MouseButton.Right:
-                                                if (RMBClickedInside != null)
-                                                {
-                                                    RMBClickedInside.Invoke(this, Args);
-                                                    if (AlwaysHandlesEvents)
-                                                        Args.SetHandledBy(Owner, false);
-                                                }
-                                                break;
+                                            ClickedInside.Invoke(this, Args);
+                                            if (AlwaysHandlesEvents)
+                                                Args.SetHandledBy(Owner, false);
+                                        }
+
+                                        if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && (InvokeEvenIfHandled || !Args.ReleasedArgs.IsHandled || Args.ReleasedArgs.HandledBy == Owner))
+                                        {
+                                            switch (Button)
+                                            {
+                                                case MouseButton.Left:
+                                                    if (LMBClickedInside != null)
+                                                    {
+                                                        LMBClickedInside.Invoke(this, Args);
+                                                        if (AlwaysHandlesEvents)
+                                                            Args.SetHandledBy(Owner, false);
+                                                    }
+                                                    break;
+                                                case MouseButton.Middle:
+                                                    if (MMBClickedInside != null)
+                                                    {
+                                                        MMBClickedInside.Invoke(this, Args);
+                                                        if (AlwaysHandlesEvents)
+                                                            Args.SetHandledBy(Owner, false);
+                                                    }
+                                                    break;
+                                                case MouseButton.Right:
+                                                    if (RMBClickedInside != null)
+                                                    {
+                                                        RMBClickedInside.Invoke(this, Args);
+                                                        if (AlwaysHandlesEvents)
+                                                            Args.SetHandledBy(Owner, false);
+                                                    }
+                                                    break;
+                                            }
                                         }
                                     }
-                                }
-                                else
-                                {
-                                    if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && (InvokeEvenIfHandled || !Args.ReleasedArgs.IsHandled || Args.ReleasedArgs.HandledBy == Owner) && ClickedOutside != null)
+                                    else
                                     {
-                                        ClickedOutside.Invoke(this, Args);
-                                        if (AlwaysHandlesEvents)
-                                            Args.SetHandledBy(Owner, false);
+                                        if ((InvokeEvenIfHandled || !Args.IsHandled || (InvokeIfHandledBySelf && Args.HandledBy == Owner)) && (InvokeEvenIfHandled || !Args.ReleasedArgs.IsHandled || Args.ReleasedArgs.HandledBy == Owner) && ClickedOutside != null)
+                                        {
+                                            ClickedOutside.Invoke(this, Args);
+                                            if (AlwaysHandlesEvents)
+                                                Args.SetHandledBy(Owner, false);
+                                        }
                                     }
                                 }
                             }
@@ -442,6 +447,8 @@ namespace MGUI.Shared.Input.Mouse
                 }
 
                 //  Invoke mouse drag events
+                //  Note: Drag events are invoked even if !Owner.CanReceiveMouseInput(), to ensure that every DragStart event is still followed by a corresponding DragEnd event
+                //  (because Owner.CanReceiveMouseInputs conditions could have changed during the drag, which could result in unexpected behavior)
                 if (Tracker.HasCurrentDragEvents && IsMonitoringDrag)
                 {
                     List<DragStartCondition> Conditions = new();
@@ -460,7 +467,7 @@ namespace MGUI.Shared.Input.Mouse
                         foreach (MouseButton Button in MouseButtons)
                         {
                             //  Drag started
-                            if (DragStart != null || DragStartOutside != null)
+                            if (CanReceiveInputs && (DragStart != null || DragStartOutside != null))
                             {
                                 BaseMouseDragStartEventArgs DragStartPressed = Tracker.CurrentDragStartEvents[DragStartCondition.MousePressed][Button];
                                 if (DragStartPressed != null && Condition == DragStartCondition.MousePressed && (InvokeEvenIfHandled || !DragStartPressed.IsHandled || (InvokeIfHandledBySelf && DragStartPressed.HandledBy == Owner)))
