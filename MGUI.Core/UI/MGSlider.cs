@@ -685,6 +685,15 @@ namespace MGUI.Core.UI
             }
         }
 
+        protected override IEnumerable<IBorderBrush> GetBorderBrushes()
+        {
+            foreach (IBorderBrush Brush in base.GetBorderBrushes())
+                yield return Brush;
+            yield return NumberLineBorderBrush;
+            yield return TickBorderBrush;
+            yield return ThumbBorderBrush;
+        }
+
         public override void UpdateSelf(ElementUpdateArgs UA)
         {
             base.UpdateSelf(UA);

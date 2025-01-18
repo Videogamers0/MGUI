@@ -21,7 +21,7 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
 
     /// <summary>An <see cref="IBorderBrush"/> that draws several nested <see cref="IBorderBrush"/>es starting from the outside and moving inwards.<para/>
     /// See also: <see cref="MGUniformBorderBrush"/>, <see cref="MGDockedBorderBrush"/></summary>
-    public struct MGBandedBorderBrush : IBorderBrush
+    public readonly struct MGBandedBorderBrush : IBorderBrush
     {
         public readonly ReadOnlyCollection<MGBorderBand> Bands;
 
@@ -53,6 +53,14 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
         }
 
         private static IEnumerable<T> AsEnum<T>(params T[] values) => values;
+
+        void IBorderBrush.Update(UpdateBaseArgs UA)
+        {
+            foreach (MGBorderBand Band in Bands)
+            {
+                Band.Brush?.Update(UA);
+            }
+        }
 
         public void Draw(ElementDrawArgs DA, MGElement Element, Rectangle Bounds, Thickness BT)
         {

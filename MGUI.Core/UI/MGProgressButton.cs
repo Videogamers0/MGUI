@@ -69,6 +69,13 @@ namespace MGUI.Core.UI
             get => BorderElement.BorderThickness;
             set => BorderElement.BorderThickness = value;
         }
+
+        protected override IEnumerable<IBorderBrush> GetBorderBrushes()
+        {
+            foreach (IBorderBrush Brush in base.GetBorderBrushes())
+                yield return Brush;
+            yield return ProgressBarBorderBrush;
+        }
         #endregion Border
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

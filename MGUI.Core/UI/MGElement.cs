@@ -17,6 +17,7 @@ using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Containers.Grids;
 using MGUI.Core.UI.Data_Binding;
 using System.ComponentModel;
+using MGUI.Core.UI.Brushes.Border_Brushes;
 
 namespace MGUI.Core.UI
 {
@@ -1116,6 +1117,16 @@ namespace MGUI.Core.UI
         public virtual MGBorder GetBorder() => null;
         public bool HasBorder => GetBorder() != null;
 
+        /// <summary>Retrieves all <see cref="IBorderBrush"/>es that this <see cref="MGElement"/> uses, 
+        /// excluding any brushes associated with its built-in <see cref="MGBorder"/> (See: <see cref="HasBorder"/>, <see cref="GetBorder"/>)<br/>
+        /// This method does not recursively return brushes nested within brushes, such as the <see cref="MGBandedBorderBrush.Bands"/> of an <see cref="MGBandedBorderBrush"/><para/>
+        /// May contain <see langword="null"/> entries.</summary>
+        protected virtual IEnumerable<IBorderBrush> GetBorderBrushes()
+        {
+            if (HasBorder)
+                yield return GetBorder().BorderBrush;
+        }
+
         /// <summary>Removes all <see cref="DataBinding"/>s that are associated with this <see cref="MGElement"/>.<para/>
         /// Recommended to invoke this method if you are about to remove this <see cref="MGElement"/> from the visual tree,<br/>
         /// so that all data bindings can unsubscribe from events such as <see cref="System.ComponentModel.INotifyPropertyChanged.PropertyChanged"/>.</summary>
@@ -1391,6 +1402,8 @@ namespace MGUI.Core.UI
             ElementUpdateEventArgs UpdateEventArgs = new(this, UA);
 
             OnBeginUpdate?.Invoke(this, UpdateEventArgs);
+
+            GetBorderBrushes().ToList().ForEach(x => x?.Update(UA.BA));
 
             if (ComputedIsHitTestVisible && Visibility == Visibility.Visible &&
                 (SecondaryVisualState == SecondaryVisualState.Hovered || (IsHovered && SecondaryVisualState == SecondaryVisualState.Pressed)))

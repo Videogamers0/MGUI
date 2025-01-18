@@ -13,7 +13,7 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
 {
     /// <summary>An <see cref="IBorderBrush"/> that uses separate <see cref="IFillBrush"/>es for each side: Left, Top, Right, Bottom<para/>
     /// See also: <see cref="MGUniformBorderBrush"/>, <see cref="MGBandedBorderBrush"/></summary>
-    public struct MGDockedBorderBrush : IBorderBrush
+    public readonly struct MGDockedBorderBrush : IBorderBrush
     {
         public IFillBrush Left { get; }
         public IFillBrush Top { get; }
