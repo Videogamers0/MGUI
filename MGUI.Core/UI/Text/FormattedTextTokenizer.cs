@@ -354,7 +354,7 @@ namespace MGUI.Core.UI.Text
             if (Match.Groups["Brush"].Success)
             {
                 string BrushString = Match.Groups["Brush"].Value;
-                Brush = FillBrushStringConverter.ParseFillBrush(BrushString).ToFillBrush(null);
+                Brush = FillBrushStringConverter.ParseFillBrush(BrushString).ToFillBrush(null, null);
             }
 
             return (Height, VerticalOffset, Brush);
@@ -369,7 +369,7 @@ namespace MGUI.Core.UI.Text
             Match Match = BackgroundValueParser.Match(Value);
 
             string BrushString = Match.Groups["Brush"].Value;
-            IFillBrush Brush = FillBrushStringConverter.ParseFillBrush(BrushString).ToFillBrush(null);
+            IFillBrush Brush = FillBrushStringConverter.ParseFillBrush(BrushString).ToFillBrush(null, null);
             Thickness Padding = Match.Groups["Padding"].Success ? Thickness.Parse(Match.Groups["Padding"].Value) : default;
 
             return (Brush, Padding);

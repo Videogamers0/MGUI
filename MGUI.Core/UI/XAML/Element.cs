@@ -339,11 +339,11 @@ namespace MGUI.Core.UI.XAML
             MGDesktop Desktop = Element.GetDesktop();
 
             if (Background != null)
-                Element.BackgroundBrush.NormalValue = Background.ToFillBrush(Desktop);
+                Element.BackgroundBrush.NormalValue = Background.ToFillBrush(Desktop, Element);
             if (DisabledBackground != null)
-                Element.BackgroundBrush.DisabledValue = DisabledBackground.ToFillBrush(Desktop);
+                Element.BackgroundBrush.DisabledValue = DisabledBackground.ToFillBrush(Desktop, Element);
             if (SelectedBackground != null)
-                Element.BackgroundBrush.SelectedValue = SelectedBackground.ToFillBrush(Desktop);
+                Element.BackgroundBrush.SelectedValue = SelectedBackground.ToFillBrush(Desktop, Element);
             if (BackgroundFocusedColor != null)
                 Element.BackgroundBrush.FocusedColor = BackgroundFocusedColor.Value.ToXNAColor();
         }

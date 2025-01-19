@@ -890,7 +890,7 @@ namespace MGUI.Core.UI
                 SelectedValue = SelectedT;
 
             if (Settings.AlternatingRowBackgrounds != null && Settings.AlternatingRowBackgrounds.Any())
-                AlternatingRowBackgrounds = Settings.AlternatingRowBackgrounds.Select(x => x.ToFillBrush(Desktop)).ToList().AsReadOnly();
+                AlternatingRowBackgrounds = Settings.AlternatingRowBackgrounds.Select(x => x.ToFillBrush(Desktop, this)).ToList().AsReadOnly();
             else
                 AlternatingRowBackgrounds = new List<IFillBrush>().AsReadOnly();
 

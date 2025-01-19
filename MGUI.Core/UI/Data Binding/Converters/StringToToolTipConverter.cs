@@ -84,7 +84,7 @@ namespace MGUI.Core.UI.Data_Binding.Converters
                 if (Padding.HasValue)
                     ToolTip.Padding = Padding.Value.ToThickness();
                 if (Background != null)
-                    ToolTip.BackgroundBrush.NormalValue = Background.ToFillBrush(ToolTip.GetDesktop());
+                    ToolTip.BackgroundBrush.NormalValue = Background.ToFillBrush(ToolTip.GetDesktop(), ToolTip);
 
                 if (Width.HasValue)
                     ToolTip.PreferredWidth = Width.Value;

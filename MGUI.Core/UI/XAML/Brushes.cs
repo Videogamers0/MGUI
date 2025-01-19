@@ -62,7 +62,7 @@ namespace MGUI.Core.UI.XAML
     [TypeConverter(typeof(FillBrushStringConverter))]
     public abstract class FillBrush
     {
-        public abstract IFillBrush ToFillBrush(MGDesktop Desktop);
+        public abstract IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element);
     }
 
     public class FillBrushStringConverter : TypeConverter
@@ -116,7 +116,7 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(SolidFillBrush)}: {Color}";
 
-        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGSolidFillBrush(Color.ToXNAColor());
+        public override IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element) => new MGSolidFillBrush(Color.ToXNAColor());
     }
 
     public class GradientFillBrush : FillBrush
@@ -137,7 +137,7 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(GradientFillBrush)}: {TopLeftColor} {TopRightColor} {BottomRightColor} {BottomLeftColor}";
 
-        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGGradientFillBrush(TopLeftColor.ToXNAColor(), TopRightColor.ToXNAColor(), BottomRightColor.ToXNAColor(), BottomLeftColor.ToXNAColor());
+        public override IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element) => new MGGradientFillBrush(TopLeftColor.ToXNAColor(), TopRightColor.ToXNAColor(), BottomRightColor.ToXNAColor(), BottomLeftColor.ToXNAColor());
     }
 
     public class DiagonalGradientFillBrush : FillBrush
@@ -156,7 +156,7 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(DiagonalGradientFillBrush)}: {Color1} ({Color1Position}) / {Color2}";
 
-        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGDiagonalGradientFillBrush(Color1.ToXNAColor(), Color2.ToXNAColor(), Color1Position);
+        public override IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element) => new MGDiagonalGradientFillBrush(Color1.ToXNAColor(), Color2.ToXNAColor(), Color1Position);
     }
 
     public class TextureFillBrush : FillBrush
@@ -175,7 +175,7 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(TextureFillBrush)}: {SourceName} ({Stretch})";
 
-        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGTextureFillBrush(Desktop, SourceName, Stretch, Color.ToXNAColor());
+        public override IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element) => new MGTextureFillBrush(Desktop, SourceName, Stretch, Color.ToXNAColor());
     }
 
     [ContentProperty(nameof(FillBrush))]
@@ -197,7 +197,8 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(BorderedFillBrush)}: {BorderBrush} / {FillBrush}";
 
-        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGBorderedFillBrush(BorderThickness.ToThickness(), BorderBrush?.ToBorderBrush(Desktop), FillBrush?.ToFillBrush(Desktop), PadFillBoundsByBorderThickness);
+        public override IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element) => 
+            new MGBorderedFillBrush(BorderThickness.ToThickness(), BorderBrush?.ToBorderBrush(Desktop, Element), FillBrush?.ToFillBrush(Desktop, Element), PadFillBoundsByBorderThickness);
     }
 
     [ContentProperty(nameof(Brushes))]
@@ -213,7 +214,7 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(CompositedFillBrush)}: {Brushes.Count} brush(es)";
 
-        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGCompositedFillBrush(Brushes.Select(x => x.ToFillBrush(Desktop)).ToArray());
+        public override IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element) => new MGCompositedFillBrush(Brushes.Select(x => x.ToFillBrush(Desktop, Element)).ToArray());
     }
 
     [ContentProperty(nameof(Brush))]
@@ -249,7 +250,7 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(PaddedFillBrush)}: {Brush}";
 
-        public override IFillBrush ToFillBrush(MGDesktop Desktop) => new MGPaddedFillBrush(Brush?.ToFillBrush(Desktop), Padding.ToThickness(), Scale, MinWidth, MinHeight, MaxWidth, MaxHeight, HorizontalAlignment, VerticalAlignment);
+        public override IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element) => new MGPaddedFillBrush(Brush?.ToFillBrush(Desktop, Element), Padding.ToThickness(), Scale, MinWidth, MinHeight, MaxWidth, MaxHeight, HorizontalAlignment, VerticalAlignment);
     }
     #endregion Fill Brush
 
@@ -257,7 +258,7 @@ namespace MGUI.Core.UI.XAML
     [TypeConverter(typeof(BorderBrushStringConverter))]
     public abstract class BorderBrush
     {
-        public abstract IBorderBrush ToBorderBrush(MGDesktop Desktop);
+        public abstract IBorderBrush ToBorderBrush(MGDesktop Desktop, MGElement Element);
     }
 
     public class BorderBrushStringConverter : TypeConverter
@@ -302,7 +303,7 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(UniformBorderBrush)}: {Brush}";
 
-        public override IBorderBrush ToBorderBrush(MGDesktop Desktop) => new MGUniformBorderBrush(Brush.ToFillBrush(Desktop));
+        public override IBorderBrush ToBorderBrush(MGDesktop Desktop, MGElement Element) => new MGUniformBorderBrush(Brush.ToFillBrush(Desktop, Element));
     }
 
     public class DockedBorderBrush : BorderBrush
@@ -323,7 +324,8 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(DockedBorderBrush)}: {Left}, {Top}, {Right}, {Bottom}";
 
-        public override IBorderBrush ToBorderBrush(MGDesktop Desktop) => new MGDockedBorderBrush(Left.ToFillBrush(Desktop), Top.ToFillBrush(Desktop), Right.ToFillBrush(Desktop), Bottom.ToFillBrush(Desktop));
+        public override IBorderBrush ToBorderBrush(MGDesktop Desktop, MGElement Element) => 
+            new MGDockedBorderBrush(Left.ToFillBrush(Desktop, Element), Top.ToFillBrush(Desktop, Element), Right.ToFillBrush(Desktop, Element), Bottom.ToFillBrush(Desktop, Element));
     }
 
     [ContentProperty(nameof(Bands))]
@@ -339,7 +341,7 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(BandedBorderBrush)}: {Bands.Count} band(s)";
 
-        public override IBorderBrush ToBorderBrush(MGDesktop Desktop) => new MGBandedBorderBrush(Bands.Select(x => x.ToBorderBand(Desktop)).ToArray());
+        public override IBorderBrush ToBorderBrush(MGDesktop Desktop, MGElement Element) => new MGBandedBorderBrush(Bands.Select(x => x.ToBorderBand(Desktop, Element)).ToArray());
     }
 
     [ContentProperty(nameof(Brush))]
@@ -348,7 +350,7 @@ namespace MGUI.Core.UI.XAML
         public BorderBrush Brush { get; set; } = new UniformBorderBrush(new SolidFillBrush(new XAMLColor(255, 255, 255, 0)));
         public double ThicknessWeight { get; set; } = 1.0;
 
-        public MGBorderBand ToBorderBand(MGDesktop Desktop) => new(Brush.ToBorderBrush(Desktop), ThicknessWeight);
+        public MGBorderBand ToBorderBand(MGDesktop Desktop, MGElement Element) => new(Brush.ToBorderBrush(Desktop, Element), ThicknessWeight);
     }
 
     public class TexturedBorderBrush : BorderBrush
@@ -375,8 +377,83 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(TexturedBorderBrush)}: {EdgeTextureName} / {CornerTextureName}";
 
-        public override IBorderBrush ToBorderBrush(MGDesktop Desktop)
+        public override IBorderBrush ToBorderBrush(MGDesktop Desktop, MGElement Element)
             => new MGTexturedBorderBrush(Desktop, EdgeTextureName, CornerTextureName, EdgeColor?.ToXNAColor(), CornerColor?.ToXNAColor(), Transforms, Opacity);
+    }
+
+    [ContentProperty(nameof(Underlay))]
+    public class HighlightBorderBrush : BorderBrush
+    {
+        public BorderBrush Underlay { get; set; }
+        public XAMLColor? HighlightColor { get; set; }
+        public HighlightAnimation? AnimationType { get; set; }
+
+        public double? AnimationProgress { get; set; }
+
+        public bool? IsEnabled { get; set; }
+
+        public TimeSpan? PulseFadeDuration { get; set; }
+        public TimeSpan? PulseDelay { get; set; }
+
+        public TimeSpan? FlashShowDuration { get; set; }
+        public TimeSpan? FlashHideDuration { get; set; }
+
+        public HighlightFlowDirection? ProgressFlowDirection { get; set; }
+        public TimeSpan? ProgressDuration { get; set; }
+        public double? ProgressSize { get; set; }
+
+        public Orientation? ScanOrientation { get; set; }
+        public bool? ScanIsReversed { get; set; }
+        public TimeSpan? ScanDuration { get; set; }
+        public double? ScanSize { get; set; }
+
+        public bool? StopOnMouseOver { get; set; }
+        public bool? StopOnClick { get; set; }
+
+        public override IBorderBrush ToBorderBrush(MGDesktop Desktop, MGElement Element)
+        {
+            MGHighlightBorderBrush Brush = new MGHighlightBorderBrush(Underlay.ToBorderBrush(Desktop, Element), HighlightColor?.ToXNAColor() ?? XNAColor.Yellow, 
+                AnimationType ?? HighlightAnimation.Pulse, Element);
+
+            if (AnimationProgress.HasValue)
+                Brush.AnimationProgress = AnimationProgress.Value;
+
+            if (IsEnabled.HasValue)
+                Brush.IsEnabled = IsEnabled.Value;
+
+            if (PulseFadeDuration.HasValue)
+                Brush.PulseFadeDuration = PulseFadeDuration.Value;
+            if (PulseDelay.HasValue)
+                Brush.PulseDelay = PulseDelay.Value;
+
+            if (FlashShowDuration.HasValue)
+                Brush.FlashShowDuration = FlashShowDuration.Value;
+            if (FlashHideDuration.HasValue)
+                Brush.FlashHideDuration = FlashHideDuration.Value;
+
+            if (ProgressFlowDirection.HasValue)
+                Brush.ProgressFlowDirection = ProgressFlowDirection.Value;
+            if (ProgressDuration.HasValue)
+                Brush.ProgressDuration = ProgressDuration.Value;
+            if (ProgressSize.HasValue)
+                Brush.ProgressSize = ProgressSize.Value;
+
+            if (ScanOrientation.HasValue)
+                Brush.ScanOrientation = ScanOrientation.Value;
+            if (ScanIsReversed.HasValue)
+                Brush.ScanIsReversed = ScanIsReversed.Value;
+            if (ScanDuration.HasValue)
+                Brush.ScanDuration = ScanDuration.Value;
+            if (ScanSize.HasValue)
+                Brush.ScanSize = ScanSize.Value;
+
+            if (StopOnMouseOver.HasValue)
+                Brush.StopOnMouseOver = StopOnMouseOver.Value;
+            if (StopOnClick.HasValue)
+                Brush.StopOnClick = StopOnClick.Value;
+
+            return Brush;
+        }
     }
     #endregion Border Brush
 }

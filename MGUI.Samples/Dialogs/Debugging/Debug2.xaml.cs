@@ -28,22 +28,7 @@ namespace MGUI.Samples.Dialogs.Debugging
         public Debug2(ContentManager Content, MGDesktop Desktop)
             : base(Content, Desktop, $"{nameof(Dialogs)}.{nameof(Debugging)}", $"{nameof(Debug2)}.xaml", () => { InitializeResources(Content, Desktop); })
         {
-            MGBorder Test1 = Window.GetElementByName<MGBorder>("Test1");
-            Test1.BorderBrush = new MGHighlightBorderBrush(MGUniformBorderBrush.Black, Color.Yellow, HighlightAnimation.Pulse, Test1);
-            MGBorder Test2 = Window.GetElementByName<MGBorder>("Test2");
-            Test2.BorderBrush = new MGHighlightBorderBrush(MGUniformBorderBrush.Black, Color.Yellow, HighlightAnimation.Flash, Test2);
-            MGBorder Test3 = Window.GetElementByName<MGBorder>("Test3");
-            Test3.BorderBrush = new MGHighlightBorderBrush(MGUniformBorderBrush.Black, Color.Yellow, HighlightAnimation.Progress, Test3)
-            {
-                ProgressSize = 0.25,
-                ProgressFlowDirection = HighlightFlowDirection.Clockwise
-            };
-            MGBorder Test4 = Window.GetElementByName<MGBorder>("Test4");
-            Test4.BorderBrush = new MGHighlightBorderBrush(MGUniformBorderBrush.Black, Color.Yellow, HighlightAnimation.Scan, Test4)
-            {
-                ScanOrientation = Orientation.Horizontal,
-                ScanIsReversed = true
-            };
+
         }
     }
 }

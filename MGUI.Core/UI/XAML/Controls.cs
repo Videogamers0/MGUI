@@ -122,7 +122,7 @@ namespace MGUI.Core.UI.XAML
             MGBorder Border = Element as MGBorder;
 
             if (BorderBrush != null)
-                Border.BorderBrush = BorderBrush.ToBorderBrush(Desktop);
+                Border.BorderBrush = BorderBrush.ToBorderBrush(Desktop, Element);
             if (BorderThickness.HasValue)
                 Border.BorderThickness = BorderThickness.Value.ToThickness();
 
@@ -459,13 +459,13 @@ namespace MGUI.Core.UI.XAML
             if (ExpanderButtonSize.HasValue)
                 Expander.ExpanderButtonSize = ExpanderButtonSize.Value;
             if (ExpanderButtonBorderBrush != null)
-                Expander.ExpanderButtonBorderBrush = ExpanderButtonBorderBrush.ToBorderBrush(Desktop);
+                Expander.ExpanderButtonBorderBrush = ExpanderButtonBorderBrush.ToBorderBrush(Desktop, Element);
             if (ExpanderButtonBorderThickness.HasValue)
                 Expander.ExpanderButtonBorderThickness = ExpanderButtonBorderThickness.Value.ToThickness();
             if (ExpanderButtonExpandedBackgroundBrush != null)
-                Expander.ExpanderButtonBackgroundBrush.SelectedValue = ExpanderButtonExpandedBackgroundBrush.ToFillBrush(Desktop);
+                Expander.ExpanderButtonBackgroundBrush.SelectedValue = ExpanderButtonExpandedBackgroundBrush.ToFillBrush(Desktop, Element);
             if (ExpanderButtonCollapsedBackgroundBrush != null)
-                Expander.ExpanderButtonBackgroundBrush.NormalValue = ExpanderButtonCollapsedBackgroundBrush.ToFillBrush(Desktop);
+                Expander.ExpanderButtonBackgroundBrush.NormalValue = ExpanderButtonCollapsedBackgroundBrush.ToFillBrush(Desktop, Element);
             if (ExpanderDropdownArrowColor.HasValue)
                 Expander.ExpanderDropdownArrowColor = ExpanderDropdownArrowColor.Value.ToXNAColor();
             if (ExpanderDropdownArrowSize.HasValue)
@@ -541,7 +541,7 @@ namespace MGUI.Core.UI.XAML
             HeaderPresenter.ApplySettings(GroupBox, GroupBox.HeaderPresenter, false);
 
             if (BorderBrush != null)
-                GroupBox.BorderBrush = (MGUniformBorderBrush)BorderBrush.ToBorderBrush(Desktop);
+                GroupBox.BorderBrush = (MGUniformBorderBrush)BorderBrush.ToBorderBrush(Desktop, Element);
             if (BorderThickness.HasValue)
                 GroupBox.BorderThickness = BorderThickness.Value.ToThickness();
             if (IsExpandable.HasValue)
@@ -674,7 +674,7 @@ namespace MGUI.Core.UI.XAML
             MGOverlayHost Host = Element as MGOverlayHost;
 
             if (OverlayBackground != null)
-                Host.OverlayBackground = OverlayBackground.ToFillBrush(Desktop);
+                Host.OverlayBackground = OverlayBackground.ToFillBrush(Desktop, Element);
             if (IsModal.HasValue)
                 Host.IsModal = IsModal.Value;
 
@@ -864,9 +864,9 @@ namespace MGUI.Core.UI.XAML
                 ProgressBar.Size = Size.Value;
 
             if (CompletedBrush != null)
-                ProgressBar.CompletedBrush.NormalValue = CompletedBrush.ToFillBrush(Desktop);
+                ProgressBar.CompletedBrush.NormalValue = CompletedBrush.ToFillBrush(Desktop, Element);
             if (IncompleteBrush != null)
-                ProgressBar.IncompleteBrush.NormalValue = IncompleteBrush.ToFillBrush(Desktop);
+                ProgressBar.IncompleteBrush.NormalValue = IncompleteBrush.ToFillBrush(Desktop, Element);
 
             if (Orientation.HasValue)
                 ProgressBar.Orientation = Orientation.Value;
@@ -994,11 +994,11 @@ namespace MGUI.Core.UI.XAML
             if (ProgressBarBorderThickness.HasValue)
                 ProgressButton.ProgressBarBorderThickness = ProgressBarBorderThickness.Value.ToThickness();
             if (ProgressBarBorderBrush != null)
-                ProgressButton.ProgressBarBorderBrush = ProgressBarBorderBrush.ToBorderBrush(Desktop);
+                ProgressButton.ProgressBarBorderBrush = ProgressBarBorderBrush.ToBorderBrush(Desktop, Element);
             if (ProgressBarBackground != null)
-                ProgressButton.ProgressBarBackground = ProgressBarBackground.ToFillBrush(Desktop);
+                ProgressButton.ProgressBarBackground = ProgressBarBackground.ToFillBrush(Desktop, Element);
             if (ProgressBarForeground != null)
-                ProgressButton.ProgressBarForeground = ProgressBarForeground.ToFillBrush(Desktop);
+                ProgressButton.ProgressBarForeground = ProgressBarForeground.ToFillBrush(Desktop, Element);
 
             base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
@@ -1186,7 +1186,7 @@ namespace MGUI.Core.UI.XAML
         public FillBrush Fill { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
-            => new MGRectangle(Window, Width ?? 16, Height ?? 16, Stroke?.ToXNAColor() ?? Color.Transparent, StrokeThickness ?? 1, Fill?.ToFillBrush(Window.Desktop));
+            => new MGRectangle(Window, Width ?? 16, Height ?? 16, Stroke?.ToXNAColor() ?? Color.Transparent, StrokeThickness ?? 1, Fill?.ToFillBrush(Window.Desktop, null));
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
@@ -1199,7 +1199,7 @@ namespace MGUI.Core.UI.XAML
             if (StrokeThickness.HasValue)
                 Rectangle.StrokeThickness = StrokeThickness.Value;
             if (Fill != null)
-                Rectangle.Fill = Fill.ToFillBrush(Desktop);
+                Rectangle.Fill = Fill.ToFillBrush(Desktop, Element);
         }
 
         protected internal override IEnumerable<Element> GetChildren() => Enumerable.Empty<Element>();
@@ -1282,14 +1282,14 @@ namespace MGUI.Core.UI.XAML
                 ScrollViewer.HorizontalOffset = HorizontalOffset.Value;
 
             if (ScrollBarUnfocusedOuterBrush != null)
-                ScrollViewer.ScrollBarOuterBrush.NormalValue = ScrollBarUnfocusedOuterBrush.ToFillBrush(Desktop);
+                ScrollViewer.ScrollBarOuterBrush.NormalValue = ScrollBarUnfocusedOuterBrush.ToFillBrush(Desktop, Element);
             if (ScrollBarFocusedOuterBrush != null)
-                ScrollViewer.ScrollBarOuterBrush.SelectedValue = ScrollBarFocusedOuterBrush.ToFillBrush(Desktop);
+                ScrollViewer.ScrollBarOuterBrush.SelectedValue = ScrollBarFocusedOuterBrush.ToFillBrush(Desktop, Element);
 
             if (ScrollBarUnfocusedInnerBrush != null)
-                ScrollViewer.ScrollBarInnerBrush.NormalValue = ScrollBarUnfocusedInnerBrush.ToFillBrush(Desktop);
+                ScrollViewer.ScrollBarInnerBrush.NormalValue = ScrollBarUnfocusedInnerBrush.ToFillBrush(Desktop, Element);
             if (ScrollBarFocusedInnerBrush != null)
-                ScrollViewer.ScrollBarInnerBrush.SelectedValue = ScrollBarFocusedInnerBrush.ToFillBrush(Desktop);
+                ScrollViewer.ScrollBarInnerBrush.SelectedValue = ScrollBarFocusedInnerBrush.ToFillBrush(Desktop, Element);
 
             base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
@@ -1404,9 +1404,9 @@ namespace MGUI.Core.UI.XAML
             if (NumberLineBorderThickness.HasValue)
                 Slider.NumberLineBorderThickness = NumberLineBorderThickness.Value.ToThickness();
             if (NumberLineBorderBrush != null)
-                Slider.NumberLineBorderBrush = NumberLineBorderBrush.ToBorderBrush(Desktop);
+                Slider.NumberLineBorderBrush = NumberLineBorderBrush.ToBorderBrush(Desktop, Element);
             if (NumberLineFillBrush != null)
-                Slider.NumberLineFillBrush = NumberLineFillBrush.ToFillBrush(Desktop);
+                Slider.NumberLineFillBrush = NumberLineFillBrush.ToFillBrush(Desktop, Element);
 
             if (TickFrequency.HasValue)
                 Slider.TickFrequency = TickFrequency.Value;
@@ -1419,9 +1419,9 @@ namespace MGUI.Core.UI.XAML
             if (TickBorderThickness.HasValue)
                 Slider.TickBorderThickness = TickBorderThickness.Value.ToThickness();
             if (TickBorderBrush != null)
-                Slider.TickBorderBrush = TickBorderBrush.ToBorderBrush(Desktop);
+                Slider.TickBorderBrush = TickBorderBrush.ToBorderBrush(Desktop, Element);
             if (TickFillBrush != null)
-                Slider.TickFillBrush = TickFillBrush.ToFillBrush(Desktop);
+                Slider.TickFillBrush = TickFillBrush.ToFillBrush(Desktop, Element);
 
             if (ThumbWidth.HasValue)
                 Slider.ThumbWidth = ThumbWidth.Value;
@@ -1430,15 +1430,15 @@ namespace MGUI.Core.UI.XAML
             if (ThumbBorderThickness.HasValue)
                 Slider.ThumbBorderThickness = ThumbBorderThickness.Value.ToThickness();
             if (ThumbBorderBrush != null)
-                Slider.ThumbBorderBrush = ThumbBorderBrush.ToBorderBrush(Desktop);
+                Slider.ThumbBorderBrush = ThumbBorderBrush.ToBorderBrush(Desktop, Element);
             if (ThumbFillBrush != null)
-                Slider.ThumbFillBrush = ThumbFillBrush.ToFillBrush(Desktop);
+                Slider.ThumbFillBrush = ThumbFillBrush.ToFillBrush(Desktop, Element);
 
             if (Orientation.HasValue)
                 Slider.Orientation = Orientation.Value;
 
             if (Foreground != null)
-                Slider.Foreground = Foreground.ToFillBrush(Desktop);
+                Slider.Foreground = Foreground.ToFillBrush(Desktop, Element);
 
             if (AcceptsMouseScrollWheel.HasValue)
                 Slider.AcceptsMouseScrollWheel = AcceptsMouseScrollWheel.Value;
@@ -1614,7 +1614,7 @@ namespace MGUI.Core.UI.XAML
             HeadersPanel.ApplySettings(TabControl, TabControl.HeadersPanelElement, false);
 
             if (HeaderAreaBackground != null)
-                TabControl.HeaderAreaBackground.NormalValue = HeaderAreaBackground.ToFillBrush(Desktop);
+                TabControl.HeaderAreaBackground.NormalValue = HeaderAreaBackground.ToFillBrush(Desktop, Element);
             if (TabHeaderPosition.HasValue)
                 TabControl.TabHeaderPosition = TabHeaderPosition.Value;
 
@@ -2078,7 +2078,7 @@ namespace MGUI.Core.UI.XAML
             Border.ApplySettings(Parent, ToggleButton.BorderComponent.Element, false);
 
             if (CheckedBackgroundBrush != null)
-                ToggleButton.CheckedBackgroundBrush = CheckedBackgroundBrush.ToFillBrush(Desktop);
+                ToggleButton.CheckedBackgroundBrush = CheckedBackgroundBrush.ToFillBrush(Desktop, Element);
             if (CheckedTextForeground.HasValue)
                 ToggleButton.CheckedTextForeground = CheckedTextForeground.Value.ToXNAColor();
             if (IsChecked.HasValue)
