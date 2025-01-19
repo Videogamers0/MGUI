@@ -29,6 +29,15 @@
                 <TabItem Header="Audio" Content="Content of Audio tab" />
                 <TabItem Header="Controls" Content="Content of Controls tab" />
             </TabControl>
+
+            <ScrollViewer Height="100" Width="400" Row="1" Column="0" ColumnSpan="2" Background="White * 0.1">
+                <StackPanel Orientation="Horizontal" Spacing="10" Width="500">
+                    <Border Name="Test1" BorderThickness="10" Background="Orange" MinWidth="100" MaxHeight="100" />
+                    <Border Name="Test2" BorderThickness="10" Background="MediumSeaGreen" MinWidth="100" MaxHeight="100" />
+                    <Border Name="Test3" BorderThickness="10" Background="OrangeRed" MinWidth="100" MaxHeight="100" />
+                    <Border Name="Test4" BorderThickness="10" Background="Magenta" MinWidth="100" MaxHeight="100" />
+                </StackPanel>
+            </ScrollViewer>
         </Grid>
     </Border>
 </Window>

@@ -28,6 +28,10 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
             this.BorderBrush = BorderBrush;
             this.FillBrush = FillBrush;
             this.PadFillBoundsByBorderThickness = PadFillBoundsByBorderThickness;
+
+            //  MGHighlightBorderBrush updates its animation in IBorderBrush.Update, which currently isn't being called because IFillBrush doesn't have an Update method and I'm too lazy to implement it.
+            if (BorderBrush is MGHighlightBorderBrush)
+                throw new NotImplementedException($"{nameof(MGBorderedFillBrush)} does not support {nameof(MGHighlightBorderBrush)} border brushes.");
         }
 
         public void Draw(ElementDrawArgs DA, MGElement Element, Rectangle Bounds)
