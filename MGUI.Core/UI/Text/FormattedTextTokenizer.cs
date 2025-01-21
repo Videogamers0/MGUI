@@ -283,9 +283,10 @@ namespace MGUI.Core.UI.Text
                 Enumerable.Empty<FTTokenType?>())
             );
 
-            string ColorHexPattern = @"#[a-fA-F0-9]{6,8}";
-            string ColorNamePattern = @"[a-zA-Z]+";
-            string ColorPattern = $@"({ColorHexPattern}|{ColorNamePattern})";
+            const string ColorHexPattern = @"#[a-fA-F0-9]{6,8}";
+            const string ColorNamePattern = @"[a-zA-Z]+";
+            const string ColorRGBPattern = @"(?i)RGBA?(?-i)\(\d{1,3}, ?\d{1,3}, ?\d{1,3}(, ?\d{1,3})?\)";
+            string ColorPattern = $@"({ColorRGBPattern}|{ColorHexPattern}|{ColorNamePattern})( ?\* ?\d+(\.\d+)?)?";
             Definitions.Add(new(FTTokenType.ForegroundValue, $@"^={ColorPattern}",
                 AsEnumerable<FTTokenType?>(FTTokenType.ForegroundOpenTagType),
                 Enumerable.Empty<FTTokenType?>())
@@ -326,8 +327,9 @@ namespace MGUI.Core.UI.Text
 #if NEVER //DEBUG
             try
             {
-                string sample = $"H{EscapeOpenTagChar}{EscapeOpenTagChar}[b]e\nllo[img=Test 32x64][bold]W[bg=Red]orld[color=Green][shadow=Red 1 2]def[/color]Test";
-                var result = Tokenize(sample, true).ToList();
+                //string sample = $"H{EscapeOpenTagChar}{EscapeOpenTagChar}[b]e\nllo[img=Test 32x64][bold]W[bg=Red]orld[color=Green][shadow=Red 1 2]def[/color]Test";
+                string sample = $"[c=RGB(100,120,140)]Hello world[/c]";
+                List<FTTokenMatch> tokens = Tokenize(sample, true).ToList();
             }
             catch (Exception) { }
 #endif

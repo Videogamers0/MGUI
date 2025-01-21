@@ -83,7 +83,7 @@ namespace MGUI.Core.UI.Text
                 case FTActionType.SetForeground:
                     {
                         PreviousForegrounds.Add(Foreground);
-                        Color Value = ColorTranslator.FromHtml(Action.Parameter.Substring(1)).AsXNAColor();
+                        Color Value = ColorStringConverter.ParseColor(Action.Parameter.Substring(1)).ToXNAColor(); //ColorTranslator.FromHtml(Action.Parameter.Substring(1)).AsXNAColor();
                         return this with { Foreground = Value };
                     }
                 case FTActionType.RevertForeground:
