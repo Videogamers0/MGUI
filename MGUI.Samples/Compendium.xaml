@@ -90,7 +90,7 @@
                         <ToggleButton Content="Theme" Name="Theme_Toggle" Opacity="0.25" />
                         <ToggleButton Content="VisualState" Name="VisualState_Toggle" Opacity="0.25" />
                         <ToggleButton Content="BorderBrush" Name="BorderBrush_Toggle" Opacity="0.25" />
-                        <ToggleButton Content="FillBrush" Name="FillBrush_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="FillBrush" Name="FillBrush_Toggle" IsChecked="{MGBinding Path=IFillBrushSamples.IsVisible, Mode=TwoWay}" />
                     </UniformGrid>
                 </StackPanel>
             </Expander>

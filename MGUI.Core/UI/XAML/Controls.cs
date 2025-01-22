@@ -1806,6 +1806,7 @@ namespace MGUI.Core.UI.XAML
         protected internal override IEnumerable<Element> GetChildren() => Enumerable.Empty<Element>();
     }
 
+    [ContentProperty(nameof(Text))]
     public class TextBox : Element
     {
         public override MGElementType ElementType => MGElementType.TextBox;

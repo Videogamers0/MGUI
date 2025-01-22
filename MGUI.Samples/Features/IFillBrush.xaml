@@ -1,0 +1,442 @@
+﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        Left="440" Top="20" MinHeight="0" Width="820" Height="800" TitleText="IFillBrush" Padding="10">
+    <Window.Styles>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10" />
+        </Style>
+        <Style Name="Header1" TargetType="TextBlock">
+            <Setter Property="IsBold" Value="True" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style TargetType="Separator">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Height" Value="2" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Opacity" Value="0.25" />
+        </Style>
+        <Style TargetType="Expander">
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="Background" Value="White * 0.1" />
+        </Style>
+        <Style TargetType="Button" Name="SampleButtonStyle">
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="BorderBrush" Value="White" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="TextBlock" Name="SampleTextBlockStyle">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextAlignment" Value="Center" />
+            <Setter Property="TextWrapping" Value="True" />
+            <Setter Property="IsBold" Value="True" />
+            <Setter Property="Text" Value="[s=Black]Hello\nWorld[/s]" />
+        </Style>
+        <Style TargetType="TextBox" Name="SampleTextBoxStyle">
+            <Setter Property="Background" Value="rgb(12,16,82)" />
+            <Setter Property="IsReadonly" Value="True" />
+            <Setter Property="Margin" Value="0,2" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
+        <StackPanel Orientation="Vertical" Spacing="10">
+            <TextBlock StyleNames="Header1" Text="IFillBrush:" HorizontalAlignment="Center" />
+            <Separator/>
+            <TextBlock>
+                Fill Brushes implement the [c=Turquoise]IFillBrush[/c] interface and are usually used to fill in the [c=Turquoise]Background[/c] of an [c=Turquoise]MGElement[/c]. 
+                You can create your own implementation or use a built-in implementation such as [c=Turquoise]MGSolidFillBrush[/c], [c=Turquoise]MGGradientFillBrush[/c], [c=Turquoise]MGTextureFillBrush[/c] etc.
+            </TextBlock>
+            <Separator />
+
+            <!-- Colors in XAML -->
+            <Expander IsExpanded="False">
+                <Expander.Header>
+                    <TextBlock VerticalAlignment="Center">
+                        Specifying Colors in XAML
+                    </TextBlock>
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        Since Fill Brushes commonly reference [c=Turquoise]Microsoft.Xna.Framework.Color[/c] objects, 
+                        you often need to define a [c=Turquoise]Color[/c] in XAML as a string. MGUI supports the following string formats:
+                    </TextBlock>
+                    <Border Background="White * 0.1" Padding="5" Margin="0,4">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock>- The name of the color (such as [c=LightCoral]LightCoral[/c]). MGUI uses [c=Turquoise]System.Drawing.ColorTranslator.FromHtml[/c] to parse color names.</TextBlock>
+                            <TextBlock>- The hex value (such as [c=#F08080]#F08080[/c], can also include the Alpha component [c=#FFF08080]#FFF08080[/c])</TextBlock>
+                            <TextBlock>- The RGB value (such as [c=RGB(240,128,128)]RGB(240, 128, 128)[/c], can also include the Alpha component [c=rgba(240, 128, 128, 255)]RGBA(240, 128, 128, 255)[/c])</TextBlock>
+                            <TextBlock>    (The 'RGB' / 'RGBA' prefix is case-insensitive)</TextBlock>
+                        </StackPanel>
+                    </Border>
+                    <TextBlock>Colors can also be suffixed by an Opacity scalar, such as [c=Cyan * 0.6]Cyan * 0.5[/c] (spaces are optional, [c=Cyan*0.5]Cyan*0.5[/c] is also valid)</TextBlock>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <!-- SolidFillBrush -->
+            <Expander IsExpanded="False">
+                <Expander.Header>
+                    <TextBlock VerticalAlignment="Center">
+                        [c=Turquoise]MGSolidFillBrush[/c]
+                    </TextBlock>
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        Fills its bounds with a single solid color.
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Spacing="5" Margin="0,5">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button StyleNames="SampleButtonStyle" Background="Orange">
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="Orange" />
+                            </Button>
+                            <Button StyleNames="SampleButtonStyle" Background="MediumSeaGreen">
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="MediumSeaGreen" />
+                            </Button>
+                            <Button StyleNames="SampleButtonStyle" Background="#F08080">
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="#F08080" />
+                            </Button>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock>Note: If you specify a Color in XAML using a supported string format, it will automatically be converted into an [c=Turquoise]MGSolidFillBrush[/c].</TextBlock>
+                            <TextBox Name="TB1" StyleNames="SampleTextBoxStyle" />
+                            <TextBlock>Alternatively, you can explicitly use a [c=Turquoise]SolidFillBrush[/c]:</TextBlock>
+                            <TextBox Name="TB2" StyleNames="SampleTextBoxStyle" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <!-- DiagonalGradientFillBrush -->
+            <Expander IsExpanded="False">
+                <Expander.Header>
+                    <TextBlock VerticalAlignment="Center">
+                        [c=Turquoise]MGDiagonalGradientFillBrush[/c]
+                    </TextBlock>
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        Fill its bounds with a gradient where the 1st color represents the top-left corner and the 2nd color is the bottom-right.
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Spacing="5" Margin="0,5">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button StyleNames="SampleButtonStyle" Background="Blue|Black">
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="Blue to Black" />
+                            </Button>
+                            <Button StyleNames="SampleButtonStyle" Background="Red|Orange">
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="Red to Orange" />
+                            </Button>
+                            <Button StyleNames="SampleButtonStyle" Background="Brown|DarkGray">
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="Brown to DarkGray" />
+                            </Button>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock>Note: If you specify 2 Colors in XAML, delimited by a vertical pipe character ( [b][s=Black][c=Red]|[/s][/c][/b] ), it will automatically be converted into an [c=Turquoise]MGDiagonalGradientFillBrush[/c].</TextBlock>
+                            <TextBox Name="TB3" StyleNames="SampleTextBoxStyle" />
+                            <TextBlock>Alternatively, you can explicitly use a [c=Turquoise]DiagonalGradientFillBrush[/c]:</TextBlock>
+                            <TextBox Name="TB4" StyleNames="SampleTextBoxStyle" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <!-- GradientFillBrush -->
+            <Expander IsExpanded="False">
+                <Expander.Header>
+                    <TextBlock VerticalAlignment="Center">
+                        [c=Turquoise]MGGradientFillBrush[/c]
+                    </TextBlock>
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        Fill its bounds with a gradient just like a [c=Turquoise]MGDiagonalGradientFillBrush[/c], but lets you specify a color for each corner instead of just 2 colors.
+                    </TextBlock>
+                    <TextBlock>
+                        - Color1 = Topleft corner
+                        - Color2 = Topright corner
+                        - Color3 = Bottomright corner
+                        - Color4 = Bottomleft corner
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Spacing="5" Margin="0,5">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button StyleNames="SampleButtonStyle" Background="Blue|Black|Green|Purple">
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="Blue, Black, Green, Purple" />
+                            </Button>
+                            <Button StyleNames="SampleButtonStyle" Background="rgb(47,29,109)|Black|rgb(45,108,151)|rgb(47,196,202)">
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="Purple, Black, Blue, Teal" />
+                            </Button>
+                            <Button StyleNames="SampleButtonStyle" Background="Brown|Brown|DarkGray|DarkGray">
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="Brown, Brown, DarkGray, DarkGray" />
+                            </Button>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock>Note: If you specify 4 Colors in XAML, delimited by a vertical pipe character ( [b][s=Black][c=Red]|[/s][/c][/b] ), it will automatically be converted into an [c=Turquoise]MGGradientFillBrush[/c].</TextBlock>
+                            <TextBox Name="TB5" StyleNames="SampleTextBoxStyle" />
+                            <TextBlock>Alternatively, you can explicitly use a [c=Turquoise]GradientFillBrush[/c]:</TextBlock>
+                            <TextBox Name="TB6" StyleNames="SampleTextBoxStyle" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <!-- MGTextureFillBrush -->
+            <Expander IsExpanded="False">
+                <Expander.Header>
+                    <TextBlock VerticalAlignment="Center">
+                        [c=Turquoise]MGTextureFillBrush[/c]
+                    </TextBlock>
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        Draws a [c=Turquoise]Texture2D[/c].
+                    </TextBlock>
+                    <Separator/>
+                    <StackPanel Orientation="Vertical" Spacing="5" Margin="0,5">
+                        <TextBlock>Set [c=Turquoise]SourceName[/c] to the name of the texture resource in your [c=Turquoise]MGResources[/c].
+                            (Can be obtained in c# via [c=Turquoise]MGDesktop.Resources[/c] or [c=Turquoise]MGElement.GetResources()[/c])
+                        </TextBlock>
+                        <TextBlock>
+                            Set [c=Turquoise]Color[/c] to apply a color mask to the texture.
+                            Usually you should leave this at the default value (White).
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button StyleNames="SampleButtonStyle">
+                                <Button.Background>
+                                    <TextureFillBrush SourceName="Diamond" Color="White" />
+                                </Button.Background>
+                                <TextBlock StyleNames="SampleTextBlockStyle" />
+                            </Button>
+                            <Button StyleNames="SampleButtonStyle">
+                                <Button.Background>
+                                    <TextureFillBrush SourceName="Diamond" Color="Red" />
+                                </Button.Background>
+                                <TextBlock StyleNames="SampleTextBlockStyle" />
+                            </Button>
+                            <Button StyleNames="SampleButtonStyle">
+                                <Button.Background>
+                                    <TextureFillBrush SourceName="Diamond" Color="Green" />
+                                </Button.Background>
+                                <TextBlock StyleNames="SampleTextBlockStyle" />
+                            </Button>
+                            <Button StyleNames="SampleButtonStyle">
+                                <Button.Background>
+                                    <TextureFillBrush SourceName="Diamond" Color="Blue" />
+                                </Button.Background>
+                                <TextBlock StyleNames="SampleTextBlockStyle" />
+                            </Button>
+                        </StackPanel>
+
+                        <TextBlock>
+                            Set [c=Turquoise]Stretch[/c] to control how the referenced texture stretches to the brush's bounds.
+                            See the documentation on [c=Turquoise]Image[/c]s to better understand the [c=Turquoise]Stretch[/c] property with detailed examples.
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button StyleNames="SampleButtonStyle">
+                                <Button.Background>
+                                    <TextureFillBrush SourceName="Diamond" Color="#A0A0FF" Stretch="None" />
+                                </Button.Background>
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="Stretch=None" />
+                            </Button>
+                            <Button StyleNames="SampleButtonStyle">
+                                <Button.Background>
+                                    <TextureFillBrush SourceName="Diamond" Color="#A0A0FF" Stretch="Fill" />
+                                </Button.Background>
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="Stretch=Fill" />
+                            </Button>
+                            <Button StyleNames="SampleButtonStyle">
+                                <Button.Background>
+                                    <TextureFillBrush SourceName="Diamond" Color="#A0A0FF" Stretch="Uniform" />
+                                </Button.Background>
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="Stretch=Uniform" />
+                            </Button>
+                            <Button StyleNames="SampleButtonStyle">
+                                <Button.Background>
+                                    <TextureFillBrush SourceName="Diamond" Color="#A0A0FF" Stretch="UniformToFill" />
+                                </Button.Background>
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="Stretch=UniformToFill" />
+                            </Button>
+                        </StackPanel>
+
+                        <TextBlock>
+                            You may want to combine texture fill brushes with other brushes by using an [c=Turquoise]MGCompositedFillBrush[/c]:
+                        </TextBlock>
+                        <Button StyleNames="SampleButtonStyle" HorizontalAlignment="Left">
+                            <Button.Background>
+                                <CompositedFillBrush>
+                                    <DiagonalGradientFillBrush Color1="rgb(24,24,24)" Color2="LightBlue" />
+                                    <PaddedFillBrush Padding="60,5">
+                                        <PaddedFillBrush.Brush>
+                                            <TextureFillBrush SourceName="SkullAndCrossbones" Color="White" Stretch="Fill" />
+                                        </PaddedFillBrush.Brush>
+                                    </PaddedFillBrush>
+                                </CompositedFillBrush>
+                            </Button.Background>
+                            <TextBlock StyleNames="SampleTextBlockStyle" Text="[s=Black]Separate gradient brush\nunderneath the texture brush[/s]" />
+                        </Button>
+
+
+                        <TextBlock>
+                            Note: [c=Turquoise]IFillBrushes[/c] do NOT affect the measurement of the [c=Turquoise]MGElement[/c] they are rendered within;
+                            an [c=Turquoise]MGTextureFillBrush[/c] that is rendering a 50x50 texture does not guarantee that the parent element requests at least 50x50 pixels on the UI's layout.
+                        </TextBlock>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <!-- MGProgressBarGradientBrush -->
+            <Expander IsExpanded="False">
+                <Expander.Header>
+                    <TextBlock VerticalAlignment="Center">
+                        [c=Turquoise]MGProgressBarGradientBrush[/c]
+                    </TextBlock>
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        Linearly interpolates between several colors based on an [c=Turquoise]MGProgressBar[/c]'s [c=Turquoise]ValuePercent[/c] property.
+                        Usually used for [c=Turquoise]MGProgressBar[/c]'s [c=Turquoise]CompletedBrush[/c] property.
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Spacing="5" Margin="0,5">
+                        <StackPanel Orientation="Vertical" Spacing="10">
+                            <TextBlock>This progress bar's background color changes from [c=Red]Red[/c] to [c=Yellow]Yellow[/c] to [c=Green]Green[/c] as it becomes more filled up.</TextBlock>
+                            <ProgressBar Name="ProgressBar1" Minimum="0" Maximum="100" Value="0" Width="500" ShowValue="True" IncompleteBrush="rgb(32,32,32)" 
+                                         ValueDisplayFormat="[b][s=LightBlue]{{Value}}[/b][/s] / [b][s=LightBlue]{{Maximum}}[/b][/s]"
+                                         NumberFormat="0" BorderBrush="Black" BorderThickness="2" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <!-- MGCompositedFillBrush -->
+            <Expander IsExpanded="False">
+                <Expander.Header>
+                    <TextBlock VerticalAlignment="Center">
+                        [c=Turquoise]MGCompositedFillBrush[/c]
+                    </TextBlock>
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        A wrapper that allows you to overlay multiple [c=Turquoise]IFillBrushes[/c] on top of each other.
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Spacing="5" Margin="0,5">
+                        <Button StyleNames="SampleButtonStyle" HorizontalAlignment="Left">
+                            <Button.Background>
+                                <CompositedFillBrush>
+                                    <DiagonalGradientFillBrush Color1="Blue" Color2="Black" />
+                                    <TextureFillBrush Color="Red" Stretch="Uniform" SourceName="Diamond" />
+                                </CompositedFillBrush>
+                            </Button.Background>
+                            <TextBlock StyleNames="SampleTextBlockStyle" Text="[s=Black]Gradient brush underneath\na texture brush[/s]" />
+                        </Button>
+                        <TextBlock>
+                            The composited brushes are rendered in the same order they are defined in, so the 1st brush appears on the bottom.
+                        </TextBlock>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <!-- MGPaddedFillBrush -->
+            <Expander IsExpanded="False">
+                <Expander.Header>
+                    <TextBlock VerticalAlignment="Center">
+                        [c=Turquoise]MGPaddedFillBrush[/c]
+                    </TextBlock>
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        A wrapper that allows you to apply a [c=Turquoise]Padding[/c] to the underlying [c=Turquoise]IFillBrush[/c]
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Spacing="5" Margin="0,5">
+                        <TextBlock Text="Note: These examples include multiple brushes overlaid on top of each other via an [c=Turquoise][s=Black]MGCompositedFillBrush[/s][/c]" />
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button StyleNames="SampleButtonStyle" Padding="15">
+                                <Button.Background>
+                                    <CompositedFillBrush>
+                                        <GradientFillBrush TopLeftColor="Black" TopRightColor="Black" BottomRightColor="DarkGray" BottomLeftColor="DarkGray" />
+                                        <PaddedFillBrush Padding="10" Brush="Yellow * 0.15" />
+                                    </CompositedFillBrush>
+                                </Button.Background>
+                                <TextBlock StyleNames="SampleTextBlockStyle">
+                                    A Padded translucent Yellow brush inside of a Black/Gray gradient brush
+                                </TextBlock>
+                            </Button>
+
+                            <Button StyleNames="SampleButtonStyle" Padding="0,5">
+                                <Button.Background>
+                                    <CompositedFillBrush>
+                                        <SolidFillBrush Color="DarkBlue" />
+                                        <PaddedFillBrush Padding="5,5,55,5" Brush="DarkGray" />
+                                    </CompositedFillBrush>
+                                </Button.Background>
+                                <DockPanel>
+                                    <TextBlock Dock="Right" Width="55" StyleNames="SampleTextBlockStyle" Text="Dark\nBlue" />
+                                    <TextBlock HorizontalAlignment="Center" MinWidth="160" StyleNames="SampleTextBlockStyle" Text="Dark\nGray" />
+                                </DockPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <!-- MGBorderedFillBrush -->
+            <Expander IsExpanded="False">
+                <Expander.Header>
+                    <TextBlock VerticalAlignment="Center">
+                        [c=Turquoise]MGBorderedFillBrush[/c]
+                    </TextBlock>
+                </Expander.Header>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        A wrapper that allows you to draw an [c=Turquoise]IBorderBrush[/c] around the underlying [c=Turquoise]IFillBrush[/c].
+                    </TextBlock>
+                    <Separator />
+                    <StackPanel Orientation="Vertical" Spacing="5" Margin="0,5">
+                        <StackPanel Orientation="Vertical" Spacing="10">
+                            <TextBlock>
+                                There's probably no reason to do this, but the following example [c=Turquoise]Button[/c] has no [c=Turquoise]BorderBrush[/c]. 
+                                Instead, the border is baked into the [c=Turquoise]IFillBrush[/c] used by the [c=Turquoise]Button's[/c] [c=Turquoise]Background[/c].
+                            </TextBlock>
+                            <Button StyleNames="SampleButtonStyle" BorderThickness="0" BorderBrush="Transparent" HorizontalAlignment="Left">
+                                <Button.Background>
+                                    <BorderedFillBrush BorderThickness="3" BorderBrush="White" FillBrush="Red|Black" />
+                                </Button.Background>
+                                <TextBlock StyleNames="SampleTextBlockStyle" MinWidth="150" />
+                            </Button>
+                            <TextBlock>
+                                This example is the same as above, but the [c=Turquoise]Button[/c]'s [c=Turquoise]BorderBrush[/c] is a 3px Black brush, 
+                                so it looks like there are 2 concentric borders.
+                            </TextBlock>
+                            <Button StyleNames="SampleButtonStyle" BorderThickness="3" BorderBrush="Black" HorizontalAlignment="Left">
+                                <Button.Background>
+                                    <BorderedFillBrush BorderThickness="2" BorderBrush="White" FillBrush="Red|Black" />
+                                </Button.Background>
+                                <TextBlock StyleNames="SampleTextBlockStyle" MinWidth="150" />
+                            </Button>
+                            <TextBlock>
+                                This [c=Turquoise]Button[/c] has no [c=Turquoise]BorderBrush[/c] BUT has a very large [c=Turquoise]BorderThickness[/c].
+                                Hover over it to see that it's bounds are not as they visually appear
+                            </TextBlock>
+                            <Button StyleNames="SampleButtonStyle" BorderThickness="20" BorderBrush="Transparent" HorizontalAlignment="Left">
+                                <Button.Background>
+                                    <BorderedFillBrush BorderThickness="2" BorderBrush="White" FillBrush="Red|Black" />
+                                </Button.Background>
+                                <TextBlock StyleNames="SampleTextBlockStyle" MinWidth="150" />
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+        </StackPanel>
+    </ScrollViewer>
+</Window>
