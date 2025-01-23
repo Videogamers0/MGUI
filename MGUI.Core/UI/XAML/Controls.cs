@@ -435,7 +435,7 @@ namespace MGUI.Core.UI.XAML
         public int? HeaderSpacingWidth { get; set; }
         public Element Header { get; set; }
         [Category("Layout")]
-        public VerticalAlignment? HeaderVerticalAlignment { get; set; }
+        public VerticalAlignment? HeaderVerticalAlignment { get; set; } = UI.VerticalAlignment.Center;
 
         [Category("Behavior")]
         public bool? IsExpanded { get; set; }

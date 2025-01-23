@@ -50,12 +50,7 @@
             <Separator />
 
             <!-- Colors in XAML -->
-            <Expander IsExpanded="False">
-                <Expander.Header>
-                    <TextBlock VerticalAlignment="Center">
-                        Specifying Colors in XAML
-                    </TextBlock>
-                </Expander.Header>
+            <Expander IsExpanded="False" Header="Specifying Colors in XAML">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
                         Since Fill Brushes commonly reference [c=Turquoise]Microsoft.Xna.Framework.Color[/c] objects, 
@@ -75,12 +70,7 @@
             <Separator/>
 
             <!-- SolidFillBrush -->
-            <Expander IsExpanded="False">
-                <Expander.Header>
-                    <TextBlock VerticalAlignment="Center">
-                        [c=Turquoise]MGSolidFillBrush[/c]
-                    </TextBlock>
-                </Expander.Header>
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGSolidFillBrush[/c]">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
                         Fills its bounds with a single solid color.
@@ -110,12 +100,7 @@
             <Separator/>
 
             <!-- DiagonalGradientFillBrush -->
-            <Expander IsExpanded="False">
-                <Expander.Header>
-                    <TextBlock VerticalAlignment="Center">
-                        [c=Turquoise]MGDiagonalGradientFillBrush[/c]
-                    </TextBlock>
-                </Expander.Header>
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGDiagonalGradientFillBrush[/c]">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
                         Fill its bounds with a gradient where the 1st color represents the top-left corner and the 2nd color is the bottom-right.
@@ -145,12 +130,7 @@
             <Separator/>
 
             <!-- GradientFillBrush -->
-            <Expander IsExpanded="False">
-                <Expander.Header>
-                    <TextBlock VerticalAlignment="Center">
-                        [c=Turquoise]MGGradientFillBrush[/c]
-                    </TextBlock>
-                </Expander.Header>
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGGradientFillBrush[/c]">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
                         Fill its bounds with a gradient just like a [c=Turquoise]MGDiagonalGradientFillBrush[/c], but lets you specify a color for each corner instead of just 2 colors.
@@ -186,12 +166,7 @@
             <Separator/>
 
             <!-- MGTextureFillBrush -->
-            <Expander IsExpanded="False">
-                <Expander.Header>
-                    <TextBlock VerticalAlignment="Center">
-                        [c=Turquoise]MGTextureFillBrush[/c]
-                    </TextBlock>
-                </Expander.Header>
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGTextureFillBrush[/c]">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
                         Draws a [c=Turquoise]Texture2D[/c].
@@ -291,12 +266,7 @@
             <Separator/>
 
             <!-- MGProgressBarGradientBrush -->
-            <Expander IsExpanded="False">
-                <Expander.Header>
-                    <TextBlock VerticalAlignment="Center">
-                        [c=Turquoise]MGProgressBarGradientBrush[/c]
-                    </TextBlock>
-                </Expander.Header>
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGProgressBarGradientBrush[/c]">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
                         Linearly interpolates between several colors based on an [c=Turquoise]MGProgressBar[/c]'s [c=Turquoise]ValuePercent[/c] property.
@@ -315,12 +285,7 @@
             <Separator/>
 
             <!-- MGCompositedFillBrush -->
-            <Expander IsExpanded="False">
-                <Expander.Header>
-                    <TextBlock VerticalAlignment="Center">
-                        [c=Turquoise]MGCompositedFillBrush[/c]
-                    </TextBlock>
-                </Expander.Header>
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGCompositedFillBrush[/c]">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
                         A wrapper that allows you to overlay multiple [c=Turquoise]IFillBrushes[/c] on top of each other.
@@ -344,12 +309,7 @@
             <Separator/>
 
             <!-- MGPaddedFillBrush -->
-            <Expander IsExpanded="False">
-                <Expander.Header>
-                    <TextBlock VerticalAlignment="Center">
-                        [c=Turquoise]MGPaddedFillBrush[/c]
-                    </TextBlock>
-                </Expander.Header>
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGPaddedFillBrush[/c]">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
                         A wrapper that allows you to apply a [c=Turquoise]Padding[/c] to the underlying [c=Turquoise]IFillBrush[/c]
@@ -388,12 +348,7 @@
             <Separator/>
 
             <!-- MGBorderedFillBrush -->
-            <Expander IsExpanded="False">
-                <Expander.Header>
-                    <TextBlock VerticalAlignment="Center">
-                        [c=Turquoise]MGBorderedFillBrush[/c]
-                    </TextBlock>
-                </Expander.Header>
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGBorderedFillBrush[/c]">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
                         A wrapper that allows you to draw an [c=Turquoise]IBorderBrush[/c] around the underlying [c=Turquoise]IFillBrush[/c].
