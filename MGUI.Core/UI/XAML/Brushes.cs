@@ -412,7 +412,7 @@ namespace MGUI.Core.UI.XAML
 
         public override IBorderBrush ToBorderBrush(MGDesktop Desktop, MGElement Element)
         {
-            MGHighlightBorderBrush Brush = new MGHighlightBorderBrush(Underlay.ToBorderBrush(Desktop, Element), HighlightColor?.ToXNAColor() ?? XNAColor.Yellow, 
+            MGHighlightBorderBrush Brush = new MGHighlightBorderBrush(Underlay?.ToBorderBrush(Desktop, Element), HighlightColor?.ToXNAColor() ?? XNAColor.Yellow, 
                 AnimationType ?? HighlightAnimation.Pulse, Element);
 
             if (AnimationProgress.HasValue)
