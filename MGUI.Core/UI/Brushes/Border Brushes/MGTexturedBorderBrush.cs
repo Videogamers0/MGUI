@@ -153,6 +153,8 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
 
             if (EdgeTexture.Texture?.IsDisposed == false)
             {
+                Bounds = Bounds.GetTranslated(DA.Offset);
+
                 EdgeTransforms EdgeTransforms = Transforms.EdgeTransforms;
                 Color EdgeColor = this.EdgeColor * Opacity * EdgeTexture.Opacity;
 
