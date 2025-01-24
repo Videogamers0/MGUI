@@ -174,8 +174,8 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
 		#endregion Pulse Settings
 
 		#region Flash Settings
-		/// <summary>Default value: 0.25s</summary>
-		public static TimeSpan DefaultFlashShowDuration { get; set; } = TimeSpan.FromSeconds(0.25);
+		/// <summary>Default value: 0.4s</summary>
+		public static TimeSpan DefaultFlashShowDuration { get; set; } = TimeSpan.FromSeconds(0.4);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private TimeSpan _FlashShowDuration;
@@ -196,8 +196,8 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
 			}
 		}
 
-        /// <summary>Default value: 0.25s</summary>
-        public static TimeSpan DefaultFlashHideDuration { get; set; } = TimeSpan.FromSeconds(0.25);
+        /// <summary>Default value: 0.4s</summary>
+        public static TimeSpan DefaultFlashHideDuration { get; set; } = TimeSpan.FromSeconds(0.4);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private TimeSpan _FlashHideDuration;

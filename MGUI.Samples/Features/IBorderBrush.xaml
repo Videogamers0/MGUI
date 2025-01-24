@@ -81,6 +81,15 @@
                                 </UniformBorderBrush>
                             </Button.BorderBrush>
                         </Button>
+
+                        <StackPanel Orientation="Vertical" Spacing="4" Margin="0,5,0,0">
+                            <TextBlock>
+                                If you specify a single [c=Turquoise]IFillBrush[/c] in XAML, 
+                                it will automatically be converted into an [c=Turquoise]MGUniformBorderBrush[/c].</TextBlock>
+                            <TextBox Name="TB1" StyleNames="SampleTextBoxStyle" />
+                            <TextBlock>Alternatively, you can explicitly use a [c=Turquoise]UniformBorderBrush[/c]:</TextBlock>
+                            <TextBox Name="TB2" StyleNames="SampleTextBoxStyle" />
+                        </StackPanel>
                     </StackPanel>
                 </StackPanel>
             </Expander>
@@ -134,9 +143,9 @@
                             <TextBlock>
                                 If you specify 4 brushes in XAML, delimited by a hyphen character ( [b][s=Black][c=Red]-[/s][/c][/b] ), 
                                 it will automatically be converted into an [c=Turquoise]MGDockedBorderBrush[/c]. (in this order: Left, Top, Right, Bottom)</TextBlock>
-                            <TextBox Name="TB1" StyleNames="SampleTextBoxStyle" />
+                            <TextBox Name="TB3" StyleNames="SampleTextBoxStyle" />
                             <TextBlock>Alternatively, you can explicitly use a [c=Turquoise]DockedBorderBrush[/c]:</TextBlock>
-                            <TextBox Name="TB2" StyleNames="SampleTextBoxStyle" />
+                            <TextBox Name="TB4" StyleNames="SampleTextBoxStyle" />
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>
@@ -147,10 +156,32 @@
             <Expander IsExpanded="False" Header="[c=Turquoise]MGTexturedBorderBrush[/c]">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="5">
                     <TextBlock>
-                        TODO
+                        Draws the border using 2 textures: One texture for the corners, and the other for the edges. 
+                        These textures are rotated 0, 90, 180, or 270 degrees based on their position in the border.
                     </TextBlock>
                     <StackPanel Orientation="Vertical" Spacing="5">
-
+                        <Button StyleNames="SampleButtonStyle" BorderThickness="12" HorizontalAlignment="Left">
+                            <Button.BorderBrush>
+                                <TexturedBorderBrush EdgeTextureName="BorderEdgeTexture1" CornerTextureName="BorderCornerTexture1" EdgeBasis="Right" CornerBasis="BottomRight" />
+                            </Button.BorderBrush>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock FontSize="12" Text="This button uses an [c=Turquoise]MGTexturedBorderBrush[/c] with these 2 textures:" />
+                                <Grid RowLengths="auto[32,],auto[32,]" RowSpacing="3" ColumnLengths="auto,32" ColumnSpacing="6" HorizontalAlignment="Center" Padding="10" Background="White * 0.2">
+                                    <TextBlock Row="0" Column="0" VerticalAlignment="Center" Text="Edges:" />
+                                    <Image Row="0" Column="1" SourceName="BorderEdgeTexture1" />
+                                    <TextBlock Row="1" Column="0" VerticalAlignment="Center" Text="Corners:" />
+                                    <Image Row="1" Column="1" SourceName="BorderCornerTexture1" />
+                                </Grid>
+                            </StackPanel>
+                        </Button>
+                        <TextBlock>
+                            Set [c=Turquoise]EdgeBasis[/c] to control which edge will use a 0 degree rotation and [c=Turquoise]CornerBasis[/c] to control which corner will use a 0 degree rotation.
+                            In the above example, [c=Turquoise]EdgeBasis[/c]=[c=LightBlue][s=Blue]Right[/s][/c] and [c=Turquoise]CornerBasis[/c]=[c=LightBlue][s=Blue]BottomRight[/s][/c].
+                        </TextBlock>
+                        <TextBlock>
+                            The texture names that you specify should be added to your [c=Turquoise]MGResources[/c] instance via [c=Turquoise]MGResources[/c].[c=Turquoise]AddTexture[/c](). 
+                            ([c=Turquoise]MGResources[/c] instance is accessed via either [c=Turquoise]MGDesktop.Resources[/c] or [c=Turquoise]MGElement.GetResources()[/c])
+                        </TextBlock>
                     </StackPanel>
                 </StackPanel>
             </Expander>
@@ -160,10 +191,47 @@
             <Expander IsExpanded="False" Header="[c=Turquoise]MGBandedBorderBrush[/c]">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="5">
                     <TextBlock>
-                        TODO
+                        Allows you to specify 1 or more 'BorderBands' which are drawn concentrically inwards from each other.
+                        This is often used to create complex border graphics without needing to make a texture.
                     </TextBlock>
                     <StackPanel Orientation="Vertical" Spacing="5">
-
+                        <Border HorizontalAlignment="Left" MaxWidth="300" Padding="8,4" BorderThickness="6" Background="rgb(0,0,180)|rgb(0,0,50)">
+                            <Border.BorderBrush>
+                                <BandedBorderBrush>
+                                    <BorderBand Brush="rgb(128,128,128)" />
+                                    <BorderBand Brush="rgb(168,168,168)" />
+                                    <BorderBand Brush="rgb(198,198,198)" />
+                                    <BorderBand Brush="rgb(210,210,210)" />
+                                    <BorderBand Brush="rgb(148,148,148)" />
+                                    <BorderBand Brush="rgb(85,85,104)" />
+                                </BandedBorderBrush>
+                            </Border.BorderBrush>
+                            <TextBlock StyleNames="SampleTextBlockStyle" Text="Menu inspired by old-school Final Fantasy" />
+                        </Border>
+                        <Border HorizontalAlignment="Left" MaxWidth="300" Padding="8,4" BorderThickness="9" Background="RGB(255,203,123)">
+                            <Border.BorderBrush>
+                                <BandedBorderBrush>
+                                    <BorderBand Brush="RGB(133,54,5)" />
+                                    <BorderBand Brush="RGB(250,147,5)" />
+                                    <BorderBand Brush="RGB(177,78,5)" />
+                                </BandedBorderBrush>
+                            </Border.BorderBrush>
+                            <TextBlock StyleNames="SampleTextBlockStyle" Foreground="Black" Text="Menu inspired by Stardew Valley" />
+                        </Border>
+                        <TextBlock>
+                            Each [c=Turquoise]BorderBand[/c] has a [c=Turquoise]ThicknessWeight[/c] property which determines what percentage of the overall [c=Turquoise]BorderThickness[/c] it receives.
+                            The actual thickness of each band is rounded down, so be sure to use a large enough [c=Turquoise]BorderThickness[/c] for each band to receive at least 1 pixel or it won't be visible.
+                        </TextBlock>
+                        <Border HorizontalAlignment="Left" MaxWidth="300" BorderThickness="10" Padding="8,4" Background="White * 0.2">
+                            <Border.BorderBrush>
+                                <BandedBorderBrush>
+                                    <BorderBand Brush="Red" ThicknessWeight="0.6" />
+                                    <BorderBand Brush="Black" ThicknessWeight="0.3" />
+                                    <BorderBand Brush="White" ThicknessWeight="0.1" />
+                                </BandedBorderBrush>
+                            </Border.BorderBrush>
+                            <TextBlock Text="Outermost band = 0.6 * 10 = 6px thickness,\nMiddle band = 0.3 * 10 = 3px thickness\nInnermost band = 0.1 * 10 = 1px thickness" />
+                        </Border>
                     </StackPanel>
                 </StackPanel>
             </Expander>
@@ -173,11 +241,253 @@
             <Expander IsExpanded="False" Header="[c=Turquoise]MGHighlightBorderBrush[/c]">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="5">
                     <TextBlock>
-                        TODO A wrapper that draws a highlight animation overtop of the underlying border.
+                        A wrapper that draws a highlight animation overtop of the underlying border.
                     </TextBlock>
                     <StackPanel Orientation="Vertical" Spacing="5">
+                        <TextBlock Text="Set [c=Turquoise]Underlay[/c] to control the border that is drawn underneath the highlight.\nSet [c=Turquoise]AnimationType[/c] and [c=Turquoise]HighlightColor[/c] to modify the highlight's graphics." />
 
-                        <!-- make a compositedborderbrush, showcase example with 2 highlightborders (animation=progress) with 50% offset overlaid on each other for a 2-tone progress animation -->
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Button StyleNames="SampleButtonStyle" BorderThickness="6">
+                                    <Button.BorderBrush>
+                                        <HighlightBorderBrush AnimationType="Flash" FlashShowDuration="00:00:00.5" FlashHideDuration="00:00:00.5">
+                                            <HighlightBorderBrush.Underlay>
+                                                <BandedBorderBrush>
+                                                    <BorderBand Brush="rgb(128,128,128)" />
+                                                    <BorderBand Brush="rgb(168,168,168)" />
+                                                    <BorderBand Brush="rgb(198,198,198)" />
+                                                    <BorderBand Brush="rgb(210,210,210)" />
+                                                    <BorderBand Brush="rgb(148,148,148)" />
+                                                    <BorderBand Brush="rgb(85,85,104)" />
+                                                </BandedBorderBrush>
+                                            </HighlightBorderBrush.Underlay>
+                                        </HighlightBorderBrush>
+                                    </Button.BorderBrush>
+                                    <TextBlock StyleNames="SampleTextBlockStyle" Text="[c=Turquoise]AnimationType[/c]=\n[c=LightBlue][s=Blue]Flash[/s][/c]" />
+                                </Button>
+
+                                <Button StyleNames="SampleButtonStyle" BorderThickness="8">
+                                    <Button.BorderBrush>
+                                        <HighlightBorderBrush Underlay="Black" AnimationType="Pulse" PulseFadeDuration="00:00:02" PulseDelay="00:00:00.2" />
+                                    </Button.BorderBrush>
+                                    <TextBlock StyleNames="SampleTextBlockStyle" Text="[c=Turquoise]AnimationType[/c]=\n[c=LightBlue][s=Blue]Pulse[/s][/c]" />
+                                </Button>
+
+                                <Button StyleNames="SampleButtonStyle" BorderThickness="10">
+                                    <Button.BorderBrush>
+                                        <HighlightBorderBrush Underlay="Navy" AnimationType="Scan" ScanOrientation="Horizontal" ScanDuration="00:00:02" />
+                                    </Button.BorderBrush>
+                                    <TextBlock StyleNames="SampleTextBlockStyle" Text="[c=Turquoise]AnimationType[/c]=\n[c=LightBlue][s=Blue]Scan[/s][/c]" />
+                                </Button>
+
+                                <Button StyleNames="SampleButtonStyle" BorderThickness="4">
+                                    <Button.BorderBrush>
+                                        <HighlightBorderBrush Underlay="Black" AnimationType="Progress" ProgressSize="0.5" ProgressDuration="00:00:05" ProgressFlowDirection="Clockwise" />
+                                    </Button.BorderBrush>
+                                    <TextBlock StyleNames="SampleTextBlockStyle" Text="[c=Turquoise]AnimationType[/c]=\n[c=LightBlue][s=Blue]Progress[/s][/c]" />
+                                </Button>
+
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <TextBlock>
+                            Each [c=Turquoise]AnimationType[/c] has additional settings, such as 
+                            [c=Turquoise]FlashShowDuration[/c] and [c=Turquoise]FlashHideDuration[/c] for [c=Turquoise]AnimationType[/c]=[c=LightBlue][s=Blue]Flash[/s][/c].
+                        </TextBlock>
+
+                        <StackPanel Orientation="Vertical" Spacing="10" Background="White * 0.1" Padding="5" Margin="5">
+                            <StackPanel.Styles>
+                                <Style TargetType="TextBlock" Name="SampleTextBlockStyle2">
+                                    <Setter Property="FontSize" Value="10" />
+                                    <Setter Property="TextAlignment" Value="Center" />
+                                    <Setter Property="TextWrapping" Value="True" />
+                                    <Setter Property="IsBold" Value="True" />
+                                </Style>
+                            </StackPanel.Styles>
+
+                            <!-- Flash samples-->
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Flash" FlashShowDuration="00:00:00.35" FlashHideDuration="00:00:00.35" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Fast flashing" />
+                                    </Button>
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Flash" FlashShowDuration="00:00:00.8" FlashHideDuration="00:00:00.8" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Slow flashing" />
+                                    </Button>
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Flash" FlashShowDuration="00:00:01.75" FlashHideDuration="00:00:01.75" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Very slow flashing" />
+                                    </Button>
+                                </StackPanel>
+                            </ScrollViewer>
+
+                            <!-- Pulse samples -->
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Pulse" PulseFadeDuration="00:00:00.75" PulseDelay="00:00:03" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Fast pulse,\nlong pause" />
+                                    </Button>
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Pulse" PulseFadeDuration="00:00:00.75" PulseDelay="00:00:00" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Fast pulse,\nno pause" />
+                                    </Button>
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Pulse" PulseFadeDuration="00:00:04" PulseDelay="00:00:03" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Slow pulse,\nlong pause" />
+                                    </Button>
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Pulse" PulseFadeDuration="00:00:04" PulseDelay="00:00:00" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Slow pulse,\nno pause" />
+                                    </Button>
+                                </StackPanel>
+                            </ScrollViewer>
+
+                            <!-- Progress samples -->
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Progress" ProgressDuration="00:00:01" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Fast progress" />
+                                    </Button>
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Progress" ProgressDuration="00:00:06" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Slow progress" />
+                                    </Button>
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Progress" ProgressSize="0.5" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Big progress" />
+                                    </Button>
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Progress" ProgressSize="0.05" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Small progress" />
+                                    </Button>
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Progress" ProgressDuration="00:00:02" ProgressFlowDirection="CounterClockwise" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Reversed progress" />
+                                    </Button>
+                                </StackPanel>
+                            </ScrollViewer>
+
+                            <!-- Scan samples -->
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Scan" ScanOrientation="Horizontal" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Horizontal scan" />
+                                    </Button>
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Scan" ScanOrientation="Vertical" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Vertical scan" />
+                                    </Button>
+
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Scan" ScanSize="0.75" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Big scan" />
+                                    </Button>
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Scan" ScanSize="0.1" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Small scan" />
+                                    </Button>
+
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Scan" ScanDuration="00:00:05" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="5s scan" />
+                                    </Button>
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Scan" ScanDuration="00:00:00.5" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="0.5s scan" />
+                                    </Button>
+
+                                    <Button StyleNames="SampleButtonStyle" BorderThickness="5">
+                                        <Button.BorderBrush>
+                                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightBlue" AnimationType="Scan" ScanIsReversed="True" />
+                                        </Button.BorderBrush>
+                                        <TextBlock StyleNames="SampleTextBlockStyle2" Text="Reversed scan" />
+                                    </Button>
+                                </StackPanel>
+                            </ScrollViewer>
+
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <!-- CompositedBorderBrush -->
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGCompositedBorderBrush[/c]">
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="5">
+                    <TextBlock>
+                        A wrapper that allows you to overlay multiple [c=Turquoise]IBorderBrushes[/c] on top of each other.
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Spacing="5" Margin="0,5">
+                        <Button StyleNames="SampleButtonStyle" HorizontalAlignment="Left" BorderThickness="4">
+                            <Button.BorderBrush>
+                                <CompositedBorderBrush>
+                                    <UniformBorderBrush Brush="Black" />
+                                    <HighlightBorderBrush HighlightColor="Yellow" AnimationType="Progress" AnimationProgress="0.0" ProgressDuration="00:00:05" />
+                                    <HighlightBorderBrush HighlightColor="Yellow" AnimationType="Progress" AnimationProgress="0.5" ProgressDuration="00:00:05" />
+                                </CompositedBorderBrush>
+                            </Button.BorderBrush>
+                            <TextBlock StyleNames="SampleTextBlockStyle" Text="Multiple [c=Turquoise]MGHighlightBorderBrush[/c]es with [c=Turquoise]AnimationType[/c]=[c=LightBlue][s=Blue]Progress[/s][/c]\nrunning concurrently at different offsets." />
+                        </Button>
+                        <Button StyleNames="SampleButtonStyle" HorizontalAlignment="Left" BorderThickness="6" Background="Blue|rgb(32,32,32)">
+                            <Button.BorderBrush>
+                                <CompositedBorderBrush>
+                                    <BandedBorderBrush>
+                                        <BorderBand Brush="rgb(128,128,128)" />
+                                        <BorderBand Brush="rgb(168,168,168)" />
+                                        <BorderBand Brush="rgb(198,198,198)" />
+                                        <BorderBand Brush="rgb(210,210,210)" />
+                                        <BorderBand Brush="rgb(148,148,148)" />
+                                        <BorderBand Brush="rgb(85,85,104)" />
+                                    </BandedBorderBrush>
+                                    <DockedBorderBrush Left="Yellow" Top="Transparent" Right="Transparent" Bottom="Transparent" />
+                                </CompositedBorderBrush>
+                            </Button.BorderBrush>
+                            <TextBlock StyleNames="SampleTextBlockStyle" Text="An [c=Turquoise]MGBandedBorderBrush[/c] with a solid Yellow left edge" />
+                        </Button>
+                        <TextBlock>
+                            The composited brushes are rendered in the same order they are defined in, so the 1st brush appears on the bottom.
+                        </TextBlock>
                     </StackPanel>
                 </StackPanel>
             </Expander>
