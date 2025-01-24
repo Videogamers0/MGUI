@@ -92,7 +92,7 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
     /// <summary>An <see cref="IBorderBrush"/> that is composed of 2 textures:<br/>
     /// 1 for the edges (Left, Top, Right, Bottom), and 1 for the corners (TopLeft, TopRight, BottomRight, BottomLeft)<para/>
     /// This brush renders the edge texture on all 4 edges, then renders the corner texture on all 4 corners, optionally applying reflections or rotations on each part<para/>
-    /// See also: <see cref="MGUniformBorderBrush"/>, <see cref="MGDockedBorderBrush"/>, <see cref="MGBandedBorderBrush"/>, <see cref="MGHighlightBorderBrush"/></summary>
+    /// See also: <see cref="MGUniformBorderBrush"/>, <see cref="MGDockedBorderBrush"/>, <see cref="MGBandedBorderBrush"/>, <see cref="MGHighlightBorderBrush"/>, <see cref="MGCompositedBorderBrush"/></summary>
     public readonly struct MGTexturedBorderBrush : IBorderBrush
     {
         public readonly MGTextureData EdgeTexture;

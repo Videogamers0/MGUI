@@ -10,7 +10,7 @@ using MGUI.Shared.Rendering;
 
 namespace MGUI.Core.UI.Brushes.Border_Brushes
 {
-    /// <summary>See also:<br/><see cref="MGUniformBorderBrush"/><br/><see cref="MGDockedBorderBrush"/><br/><see cref="MGBandedBorderBrush"/><br/><see cref="MGTexturedBorderBrush"/><br/><see cref="MGHighlightBorderBrush"/></summary>
+    /// <summary>See also:<br/><see cref="MGUniformBorderBrush"/><br/><see cref="MGDockedBorderBrush"/><br/><see cref="MGBandedBorderBrush"/><br/><see cref="MGTexturedBorderBrush"/><br/><see cref="MGHighlightBorderBrush"/><br/><see cref="MGCompositedFillBrush"/></summary>
     public interface IBorderBrush : ICloneable
     {
         public void Update(UpdateBaseArgs UA) { }

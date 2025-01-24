@@ -11,8 +11,8 @@ using System.Threading.Tasks;
 namespace MGUI.Core.UI.Brushes.Border_Brushes
 {
     /// <summary>An <see cref="IBorderBrush"/> that uses the same <see cref="IFillBrush"/> for each side: Left, Top, Right, Bottom<para/>
-    /// See also: <see cref="MGDockedBorderBrush"/>, <see cref="MGBandedBorderBrush"/>, <see cref="MGTexturedBorderBrush"/>, <see cref="MGHighlightBorderBrush"/></summary>
-    public struct MGUniformBorderBrush : IBorderBrush
+    /// See also: <see cref="MGDockedBorderBrush"/>, <see cref="MGBandedBorderBrush"/>, <see cref="MGTexturedBorderBrush"/>, <see cref="MGHighlightBorderBrush"/>, <see cref="MGCompositedBorderBrush"/></summary>
+    public readonly struct MGUniformBorderBrush : IBorderBrush
     {
         public static readonly MGUniformBorderBrush Transparent = new(MGSolidFillBrush.Transparent);
         public static readonly MGUniformBorderBrush White = new(MGSolidFillBrush.White);

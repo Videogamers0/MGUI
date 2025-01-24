@@ -31,9 +31,9 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
 		CounterClockwise
 	}
 
-	/// <summary>An <see cref="IBorderBrush"/> that draws a simple animation (using a <see cref="HighlightColor"/>) overtop of the border, typically to direct the user's attention
-	/// to the bordered element. <see cref="MGHighlightBorderBrush"/>es are particularly useful for tutorials or directing the user's focus to a newly-unlocked piece of content on the UI.<para/>
-	/// See also: <see cref="MGUniformBorderBrush"/>, <see cref="MGDockedBorderBrush"/>, <see cref="MGTexturedBorderBrush"/>, <see cref="MGBandedBorderBrush"/></summary>
+    /// <summary>An <see cref="IBorderBrush"/> that draws a simple animation (using a <see cref="HighlightColor"/>) overtop of the border, typically to direct the user's attention
+    /// to the bordered element. <see cref="MGHighlightBorderBrush"/>es are particularly useful for tutorials or directing the user's focus to a newly-unlocked piece of content on the UI.<para/>
+    /// See also: <see cref="MGUniformBorderBrush"/>, <see cref="MGDockedBorderBrush"/>, <see cref="MGTexturedBorderBrush"/>, <see cref="MGBandedBorderBrush"/>, <see cref="MGCompositedBorderBrush"/></summary>
     public class MGHighlightBorderBrush : ViewModelBase, IBorderBrush
     {
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]

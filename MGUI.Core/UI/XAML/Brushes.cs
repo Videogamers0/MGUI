@@ -455,5 +455,21 @@ namespace MGUI.Core.UI.XAML
             return Brush;
         }
     }
+
+    [ContentProperty(nameof(Brushes))]
+    public class CompositedBorderBrush : BorderBrush
+    {
+        public List<BorderBrush> Brushes { get; set; } = new();
+
+        public CompositedBorderBrush() : this(new List<BorderBrush>()) { }
+        public CompositedBorderBrush(IEnumerable<BorderBrush> Brushes)
+        {
+            this.Brushes = Brushes.ToList();
+        }
+
+        public override string ToString() => $"{nameof(CompositedBorderBrush)}: {Brushes.Count} brush(es)";
+
+        public override IBorderBrush ToBorderBrush(MGDesktop Desktop, MGElement Element) => new MGCompositedBorderBrush(Brushes.Select(x => x.ToBorderBrush(Desktop, Element)).ToArray());
+    }
     #endregion Border Brush
 }
