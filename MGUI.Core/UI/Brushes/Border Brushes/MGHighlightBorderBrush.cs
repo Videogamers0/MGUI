@@ -32,7 +32,8 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
 	}
 
 	/// <summary>An <see cref="IBorderBrush"/> that draws a simple animation (using a <see cref="HighlightColor"/>) overtop of the border, typically to direct the user's attention
-	/// to the bordered element. <see cref="MGHighlightBorderBrush"/>es are particularly useful for tutorials or directing the user's focus to a newly-unlocked piece of content on the UI.</summary>
+	/// to the bordered element. <see cref="MGHighlightBorderBrush"/>es are particularly useful for tutorials or directing the user's focus to a newly-unlocked piece of content on the UI.<para/>
+	/// See also: <see cref="MGUniformBorderBrush"/>, <see cref="MGDockedBorderBrush"/>, <see cref="MGTexturedBorderBrush"/>, <see cref="MGBandedBorderBrush"/></summary>
     public class MGHighlightBorderBrush : ViewModelBase, IBorderBrush
     {
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]

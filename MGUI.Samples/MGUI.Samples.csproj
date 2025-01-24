@@ -53,6 +53,7 @@
     <None Remove="Dialogs\Stardew Valley\SDVInventory.xaml" />
     <None Remove="Dialogs\XAMLDesignerWindow.xaml" />
     <None Remove="Features\DataBindings.xaml" />
+    <None Remove="Features\IBorderBrush.xaml" />
     <None Remove="Features\IFillBrush.xaml" />
     <None Remove="Features\Styles.xaml" />
   </ItemGroup>
@@ -146,6 +147,9 @@
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Features\DataBindings.xaml" />
+    <EmbeddedResource Include="Features\IBorderBrush.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Include="Features\IFillBrush.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>

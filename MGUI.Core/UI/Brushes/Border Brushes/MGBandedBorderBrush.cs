@@ -20,7 +20,7 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
     public readonly record struct MGBorderBand(IBorderBrush Brush, double ThicknessWeight);
 
     /// <summary>An <see cref="IBorderBrush"/> that draws several nested <see cref="IBorderBrush"/>es starting from the outside and moving inwards.<para/>
-    /// See also: <see cref="MGUniformBorderBrush"/>, <see cref="MGDockedBorderBrush"/></summary>
+    /// See also: <see cref="MGUniformBorderBrush"/>, <see cref="MGDockedBorderBrush"/>, <see cref="MGTexturedBorderBrush"/>, <see cref="MGHighlightBorderBrush"/></summary>
     public readonly struct MGBandedBorderBrush : IBorderBrush
     {
         public readonly ReadOnlyCollection<MGBorderBand> Bands;

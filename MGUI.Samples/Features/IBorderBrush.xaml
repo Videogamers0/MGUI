@@ -1,0 +1,188 @@
+﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        Left="440" Top="20" MinHeight="0" Width="800" Height="800" TitleText="IBorderBrush" Padding="10">
+    <Window.Styles>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10" />
+        </Style>
+        <Style Name="Header1" TargetType="TextBlock">
+            <Setter Property="IsBold" Value="True" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style TargetType="Separator">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Height" Value="2" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Opacity" Value="0.25" />
+        </Style>
+        <Style TargetType="Expander">
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="Background" Value="White * 0.1" />
+        </Style>
+        <Style TargetType="Button" Name="SampleButtonStyle">
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="BorderBrush" Value="White" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="TextBlock" Name="SampleTextBlockStyle">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextAlignment" Value="Center" />
+            <Setter Property="TextWrapping" Value="True" />
+            <Setter Property="IsBold" Value="True" />
+            <Setter Property="Text" Value="[s=Black]Hello\nWorld[/s]" />
+        </Style>
+        <Style TargetType="TextBox" Name="SampleTextBoxStyle">
+            <Setter Property="Background" Value="rgb(12,16,82)" />
+            <Setter Property="IsReadonly" Value="True" />
+            <Setter Property="Margin" Value="0,2" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
+        <StackPanel Orientation="Vertical" Spacing="10">
+            <TextBlock StyleNames="Header1" Text="IBorderBrush:" HorizontalAlignment="Center" />
+            <Separator/>
+            <TextBlock>
+                Many MGElements have built-in borders that can be customized via the [c=Turquoise]BorderBrush[/c] and [c=Turquoise]BorderThickness[/c] properties. 
+                BorderBrushes implement the [c=Turquoise]IBorderBrush[/c] interface, so you can create your own or use a built-in implementation such as [c=Turquoise]MGUniformBorderBrush[/c] or [c=Turquoise]MGDockedBorderBrush[/c].
+            </TextBlock>
+            <TextBlock>
+                Before reading this documentation, you should read the documentation on [c=#2020EE][u][action=OpenAndActivateFillBrushSamples]IFillBrush[/action][/u][/c] because many borders are comprised of fill brushes.
+            </TextBlock>
+            <Separator />
+
+            <!-- UniformBorderBrush -->
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGUniformBorderBrush[/c]">
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="5">
+                    <TextBlock>
+                        Draws the same [c=Turquoise]IFillBrush[/c] to each edge (top, right, bottom, left) of the border bounds.
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Spacing="5">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button Background="MediumPurple|Purple" BorderBrush="Blue" BorderThickness="2" Content="2x Blue border" />
+                            <Button Background="MediumSeaGreen" BorderBrush="Green" BorderThickness="5" Content="5px Green border" />
+                            <Button Background="Brown" BorderBrush="Black" BorderThickness="10,5,10,5" Content="10px Black border top/bottom\n5px Black border left/right" />
+                        </StackPanel>
+                        <TextBlock Text="Usually [c=Turquoise]MGSolidFillBrush[/c]es are used for the fill brush, but you can use any kind of [c=Turquoise]IFillBrush[/c]." />
+                        <Button HorizontalAlignment="Left" Padding="8" BorderThickness="16" Content="This button has a texture\novertop of a solid fill brush.">
+                            <Button.BorderBrush>
+                                <UniformBorderBrush>
+                                    <UniformBorderBrush.Brush>
+                                        <CompositedFillBrush>
+                                            <SolidFillBrush Color="Teal" />
+                                            <PaddedFillBrush Padding="2">
+                                                <PaddedFillBrush.Brush>
+                                                    <TextureFillBrush SourceName="Diamond" Stretch="Uniform" />
+                                                </PaddedFillBrush.Brush>
+                                            </PaddedFillBrush>
+                                        </CompositedFillBrush>
+                                    </UniformBorderBrush.Brush>
+                                </UniformBorderBrush>
+                            </Button.BorderBrush>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <!-- DockedBorderBrush -->
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGDockedBorderBrush[/c]">
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="5">
+                    <TextBlock>
+                        Draws a different [c=Turquoise]IFillBrush[/c] to each edge (top, right, bottom, left) of the border bounds.
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Spacing="5">
+                        <TextBlock>
+                                Note: The corners are drawn by the top/bottom [c=Turquoise]IFillBrush[/c]es. The [c=Turquoise]IFillBrush[/c]es for the left and right edges do not span the corner regions.
+                        </TextBlock>
+                        <Button StyleNames="SampleButtonStyle" BorderThickness="12" Background="Black" HorizontalAlignment="Left">
+                            <Button.BorderBrush>
+                                <DockedBorderBrush Left="Red" Right="Red" Top="Peru|Peru|Red|Red" Bottom="Red|Red|Peru|Peru" />
+                            </Button.BorderBrush>
+                            <TextBlock StyleNames="SampleTextBlockStyle" FontSize="10" Text="Uses gradient brushes on the top and bottom edge,\n solid brushes on the sides" />
+                        </Button>
+
+                        <TextBlock>
+                            However, if all 4 edges are using an [c=Turquoise]MGSolidFillBrush[/c], the corners will be split diagonally.
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button StyleNames="SampleButtonStyle" BorderThickness="8" BorderBrush="LightGreen-DarkGreen-Green-MediumSeaGreen" Background="Green * 0.35">
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="Shades of green\non each edge" />
+                            </Button>
+                            <Button StyleNames="SampleButtonStyle" BorderThickness="8" BorderBrush="DarkOrchid-MediumPurple-BlueViolet-DarkMagenta">
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="Shades of purple\non each edge" />
+                            </Button>
+                            <Button StyleNames="SampleButtonStyle" BorderThickness="8" BorderBrush="DarkGray-Black-Gray-LightGray" Background="White">
+                                <TextBlock StyleNames="SampleTextBlockStyle" Foreground="Black" Text="Shades of gray\non each edge" />
+                            </Button>
+                        </StackPanel>
+
+                        <TextBlock>
+                            [c=Turquoise]MGDockedBorderBrush[/c]es are also great for mimicing bevel borders:
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="10" Padding="10" Background="rgb(220,220,220)">
+                            <Button StyleNames="SampleButtonStyle" Background="rgb(220,220,220)" BorderThickness="4" BorderBrush="rgb(100,100,100)-rgb(100,100,100)-White-White">
+                                <TextBlock StyleNames="SampleTextBlockStyle" Foreground="Black" Text="Lowered Bevel" />
+                            </Button>
+                            <Button StyleNames="SampleButtonStyle" Background="rgb(220,220,220)" BorderThickness="4" BorderBrush="White-White-rgb(100,100,100)-rgb(100,100,100)">
+                                <TextBlock StyleNames="SampleTextBlockStyle" Foreground="Black" Text="Raised Bevel" />
+                            </Button>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" Spacing="4" Margin="0,5,0,0">
+                            <TextBlock>
+                                If you specify 4 brushes in XAML, delimited by a hyphen character ( [b][s=Black][c=Red]-[/s][/c][/b] ), 
+                                it will automatically be converted into an [c=Turquoise]MGDockedBorderBrush[/c]. (in this order: Left, Top, Right, Bottom)</TextBlock>
+                            <TextBox Name="TB1" StyleNames="SampleTextBoxStyle" />
+                            <TextBlock>Alternatively, you can explicitly use a [c=Turquoise]DockedBorderBrush[/c]:</TextBlock>
+                            <TextBox Name="TB2" StyleNames="SampleTextBoxStyle" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <!-- TexturedBorderBrush -->
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGTexturedBorderBrush[/c]">
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="5">
+                    <TextBlock>
+                        TODO
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Spacing="5">
+
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <!-- BandedBorderBrush -->
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGBandedBorderBrush[/c]">
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="5">
+                    <TextBlock>
+                        TODO
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Spacing="5">
+
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+            
+            <!-- HighlightBorderBrush -->
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGHighlightBorderBrush[/c]">
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="5">
+                    <TextBlock>
+                        TODO A wrapper that draws a highlight animation overtop of the underlying border.
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Spacing="5">
+
+                        <!-- make a compositedborderbrush, showcase example with 2 highlightborders (animation=progress) with 50% offset overlaid on each other for a 2-tone progress animation -->
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+        </StackPanel>
+    </ScrollViewer>
+</Window>

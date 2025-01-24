@@ -84,13 +84,13 @@
                                 <Setter Property="FontSize" Value="10" />
                             </Style>
                         </UniformGrid.Styles>
-                        <ToggleButton Content="XAML" Name="XAML_Toggle" Opacity="0.25" />
+                        <ToggleButton Content="XAML" Opacity="0.25" />
                         <ToggleButton Content="Styles" IsChecked="{MGBinding Path=StylesSamples.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="DataBindings" IsChecked="{MGBinding Path=DataBindingSamples.IsVisible, Mode=TwoWay}" />
-                        <ToggleButton Content="Theme" Name="Theme_Toggle" Opacity="0.25" />
-                        <ToggleButton Content="VisualState" Name="VisualState_Toggle" Opacity="0.25" />
-                        <ToggleButton Content="BorderBrush" Name="BorderBrush_Toggle" Opacity="0.25" />
-                        <ToggleButton Content="FillBrush" Name="FillBrush_Toggle" IsChecked="{MGBinding Path=IFillBrushSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="Theme" Opacity="0.25" />
+                        <ToggleButton Content="VisualState" Opacity="0.25" />
+                        <ToggleButton Content="BorderBrush" IsChecked="{MGBinding Path=IBorderBrushSamples.IsVisible, Mode=TwoWay}" />
+                        <ToggleButton Content="FillBrush" IsChecked="{MGBinding Path=IFillBrushSamples.IsVisible, Mode=TwoWay}" />
                     </UniformGrid>
                 </StackPanel>
             </Expander>

@@ -144,6 +144,7 @@ namespace MGUI.Samples
         public StylesSamples StylesSamples { get; }
         public DataBindingSamples DataBindingSamples { get; }
         public IFillBrushSamples IFillBrushSamples { get; }
+        public IBorderBrushSamples IBorderBrushSamples { get; }
         #endregion Features
 
         #region Dialogs
@@ -194,6 +195,7 @@ namespace MGUI.Samples
             StylesSamples = new(Content, Desktop);
             DataBindingSamples = new(Content, Desktop);
             IFillBrushSamples = new(Content, Desktop);
+            IBorderBrushSamples = new(Content, Desktop, this);
             #endregion Features
 
             #region Dialogs
