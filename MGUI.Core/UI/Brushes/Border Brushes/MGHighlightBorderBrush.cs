@@ -126,8 +126,8 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
 			AnimationProgress - Math.Truncate(AnimationProgress);
 
 		#region Pulse Settings
-		/// <summary>Default value: 1s</summary>
-		public static TimeSpan DefaultPulseFadeDuration { get; set; } = TimeSpan.FromSeconds(1.0);
+		/// <summary>Default value: 2.0s</summary>
+		public static TimeSpan DefaultPulseFadeDuration { get; set; } = TimeSpan.FromSeconds(2.0);
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private TimeSpan _PulseFadeDuration;
@@ -241,6 +241,7 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
 			}
 		}
 
+		/// <summary>Default value: 3s</summary>
 		public static TimeSpan DefaultProgressDuration { get; set; } = TimeSpan.FromSeconds(3.0);
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
