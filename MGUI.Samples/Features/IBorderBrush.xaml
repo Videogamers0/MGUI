@@ -447,6 +447,27 @@
                             </ScrollViewer>
 
                         </StackPanel>
+
+                        <TextBlock>
+                            You can also set [c=Turquoise]IsEnabled[/c] to [c=LightBlue][s=Blue]false[/s][/c] to stop the highlight animation, 
+                            or [c=Turquoise]StopOnMouseOver[/c] and/or [c=Turquoise]StopOnClick[/c] to automatically set [c=Turquoise]IsEnabled[/c] when these conditions are met.
+                        </TextBlock>
+
+                        <DockPanel>
+                            <StackPanel Orientation="Vertical" Margin="0,0,8,0" Spacing="2" Dock="Left" VerticalAlignment="Center">
+                                <CheckBox IsChecked="{MGBinding HighlightBorderSampleIsEnabled, Mode=TwoWay}" Content="IsEnabled" />
+                                <CheckBox IsChecked="{MGBinding HighlightBorderSampleStopOnClick, Mode=TwoWay}" Content="StopOnClick" />
+                                <CheckBox IsChecked="{MGBinding HighlightBorderSampleStopOnMouseOver, Mode=TwoWay}" Content="StopOnMouseOver" />
+                            </StackPanel>
+
+                            <Button Name="HighlightBorderSampleButton" StyleNames="SampleButtonStyle" BorderThickness="6" HorizontalAlignment="Left" MinWidth="200">
+                                <Button.BorderBrush>
+                                    <HighlightBorderBrush Underlay="Black" AnimationType="Pulse" />
+                                </Button.BorderBrush>
+                                <TextBlock StyleNames="SampleTextBlockStyle" Text="Hello\nWorld" />
+                            </Button>
+                        </DockPanel>
+
                     </StackPanel>
                 </StackPanel>
             </Expander>

@@ -100,7 +100,8 @@ namespace MGUI.Core.UI.XAML
                     return GetDefaultValue(TargetProperty.PropertyType);
             }
 
-            throw new NotImplementedException("Cannot provide a value when the underlying Type is unknown.");
+            throw new NotImplementedException($"Cannot provide a value when the underlying Type is unknown. " +
+                $"{nameof(MGBinding)}s are only supported on {nameof(Element)} objects such as {nameof(Button)}, {nameof(ScrollViewer)} etc.");
         }
 
         private static object GetDefaultValue(Type Type) => Type.IsValueType ? Activator.CreateInstance(Type) : null;
