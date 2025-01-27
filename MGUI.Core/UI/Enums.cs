@@ -45,6 +45,7 @@ namespace MGUI.Core.UI
         ComboBox,
         Slider,
         RatingControl,
+        GridColorPicker,
 
         //  Menus
         ToolTip,

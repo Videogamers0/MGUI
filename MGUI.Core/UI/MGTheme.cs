@@ -218,6 +218,7 @@ namespace MGUI.Core.UI
                 MGElementType.DockPanel,
                 MGElementType.Expander,
                 MGElementType.Grid,
+                MGElementType.GridColorPicker,
                 MGElementType.Image,
                 MGElementType.OverlayPanel,
                 MGElementType.Misc,

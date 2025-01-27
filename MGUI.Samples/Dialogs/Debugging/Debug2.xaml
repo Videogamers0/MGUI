@@ -1,4 +1,5 @@
 ﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        xmlns:System="clr-namespace:System;assembly=System.Runtime"
         Left="440" Top="20" MinHeight="0" SizeToContent="WidthAndHeight" WindowStyle="None">
     <!--<TabControl TabHeaderPosition="Left" Padding="10,20">
         <TabItem Header="Tab Header" />
@@ -30,28 +31,22 @@
                 <TabItem Header="Controls" Content="Content of Controls tab" />
             </TabControl>
 
-            <ScrollViewer Height="100" Width="400" Row="1" Column="0" ColumnSpan="2" Background="White * 0.1">
-                <StackPanel Orientation="Horizontal" Spacing="10" Width="500">
-                    <Border BorderThickness="10" Background="Orange" MinWidth="100" MaxHeight="100">
-                        <Border.BorderBrush>
-                            <HighlightBorderBrush Underlay="Black" HighlightColor="LightGreen" AnimationType="Pulse" PulseFadeDuration="00:00:01" />
-                        </Border.BorderBrush>
-                    </Border>
-                    <Border BorderThickness="10" Background="MediumSeaGreen" MinWidth="100" MaxHeight="100">
-                        <Border.BorderBrush>
-                            <HighlightBorderBrush Underlay="Black" HighlightColor="Orange" AnimationType="Flash" FlashShowDuration="00:00:00.25" FlashHideDuration="00:00:00.25" />
-                        </Border.BorderBrush>
-                    </Border>
-                    <Border BorderThickness="10" Background="OrangeRed" MinWidth="100" MaxHeight="100">
-                        <Border.BorderBrush>
-                            <HighlightBorderBrush Underlay="Black" HighlightColor="Cyan" AnimationType="Progress" ProgressSize="0.25" ProgressFlowDirection="Clockwise" ProgressDuration="00:00:02.5" />
-                        </Border.BorderBrush>
-                    </Border>
-                    <Border Name="Test4" BorderThickness="10" Background="Magenta" MinWidth="100" MaxHeight="100">
-                        <Border.BorderBrush>
-                            <HighlightBorderBrush Underlay="Black" HighlightColor="Yellow" AnimationType="Scan" ScanOrientation="Horizontal" ScanIsReversed="True" />
-                        </Border.BorderBrush>
-                    </Border>
+            <ScrollViewer Row="1" Column="0" ColumnSpan="2" Background="White * 0.1">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="GridColorPicker test" />
+                    <GridColorPicker BorderBrush="Black" BorderThickness="5" RowSpacing="5" ColumnSpacing="5" Padding="10" Background="White" ColorSize="24" 
+                                     HorizontalAlignment="Left" VerticalAlignment="Center" ColorPalette="EGA_64" ShowSelectedColorLabel="True" AllowMultiSelect="True"
+                                     CommaSeparatedColors="Red,Green,Blue,Orange,Purple,Magenta,Brown,Gray">
+                        <GridColorPicker.SelectedColorPresenter>
+                            <HeaderedContentPresenter HeaderPosition="Left" Background="Black" />
+                        </GridColorPicker.SelectedColorPresenter>
+                        <GridColorPicker.SelectedColorLabel>
+                            <TextBlock Foreground="White" IsBold="True" Text="Selected Color:" Background="Black" />
+                        </GridColorPicker.SelectedColorLabel>
+                        <GridColorPicker.SelectedColorValue>
+                            <Rectangle Width="20" Height="20" Stroke="Black" StrokeThickness="2" />
+                        </GridColorPicker.SelectedColorValue>
+                    </GridColorPicker>
                 </StackPanel>
             </ScrollViewer>
         </Grid>

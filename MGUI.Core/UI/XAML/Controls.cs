@@ -502,6 +502,150 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
+    [ContentProperty(nameof(Colors))]
+    public class GridColorPicker : Element
+    {
+        public override MGElementType ElementType => MGElementType.GridColorPicker;
+
+        [Category("Border")]
+        public BorderBrush BorderBrush { get; set; }
+        [Category("Border")]
+        public Thickness? BorderThickness { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
+
+        [Category("Layout")]
+        public int? Columns { get; set; }
+
+        #region Colors
+        /// <summary>The list of colors to display in the grid. If both this and <see cref="CommaSeparatedColors"/> are specified, <see cref="CommaSeparatedColors"/> takes priority.</summary>
+        [Category("Data")]
+        public List<string> Colors { get; set; } = new List<string>();
+        /// <summary>The list of colors to display in the grid. This property takes priority over <see cref="Colors"/> if both are specified.<para/>
+        /// Each string value should be parsable via <see cref="System.Drawing.ColorTranslator.FromHtml(string)"/> (such as the name "Magenta" or the hex code "#FF00FF").<br/>
+        /// Or can be in this format: "rgb(RedValue,GreenValue,BlueValue)" such as "rgb(255,0,255)" (optionally can include an alpha component: "rgba(255,0,255,255)")</summary>
+        [Category("Data")]
+        public string CommaSeparatedColors { get; set; }
+        private List<Color> ActualColors
+        {
+            get
+            {
+                List<string> Values = !string.IsNullOrEmpty(CommaSeparatedColors) ? CommaSeparatedColors.Split(',').ToList() : Colors;
+                return Values.Select(x => ColorStringConverter.ParseColor(x).ToXNAColor()).ToList();
+            }
+        }
+
+        /// <summary>Optional. Provides a convenient way to set the colors to a pre-made set of colors.<br/>
+        /// If set, overrides <see cref="Colors"/> and <see cref="CommaSeparatedColors"/>.</summary>
+        [Category("Data")]
+        public ColorPalette? ColorPalette { get; set; }
+        #endregion Colors
+
+        [Category("Layout")]
+        public Size? ColorSize { get; set; }
+
+        [Category("Layout")]
+        public int? RowSpacing { get; set; }
+        [Category("Layout")]
+        public int? ColumnSpacing { get; set; }
+
+        [Category("Appearance")]
+        public BorderBrush SelectedColorBorderBrush { get; set; }
+        [Category("Appearance")]
+        public Thickness? SelectedColorBorderThickness { get; set; }
+        [Category("Appearance")]
+        public BorderBrush UnselectedColorBorderBrush { get; set; }
+        [Category("Appearance")]
+        public Thickness? UnselectedColorBorderThickness { get; set; }
+
+        [Category("Appearance")]
+        public FillBrush HoveredColorOverlay { get; set; }
+        [Category("Appearance")]
+        public FillBrush SelectedColorOverlay { get; set; }
+
+        [Category("Data")]
+        public XAMLColor? SelectedColor { get; set; }
+
+        [Category("Behavior")]
+        public bool? AllowMultiSelect { get; set; }
+
+        [Category("Behavior")]
+        public bool? ShowSelectedColorLabel { get; set; }
+
+        /// <summary>The presenter that hosts the <see cref="SelectedColorLabel"/> and <see cref="SelectedColorValue"/></summary>
+        public HeaderedContentPresenter SelectedColorPresenter { get; set; } = new();
+        /// <summary>A text label that displays the selected color below the color grid.<para/>
+        /// (only visible if <see cref="AllowMultiSelect"/> is <see langword="false"/> AND <see cref="SelectedColor"/> is not <see langword="null"/> AND <see cref="ShowSelectedColorLabel"/> is <see langword="true"/>)</summary>
+        public TextBlock SelectedColorLabel { get; set; } = new();
+        /// <summary>The rectangle that displays the selected color below the color grid.<para/>
+        /// (only visible if <see cref="AllowMultiSelect"/> is <see langword="false"/> AND <see cref="SelectedColor"/> is not <see langword="null"/> AND <see cref="ShowSelectedColorLabel"/> is <see langword="true"/>)</summary>
+        public Rectangle SelectedColorValue { get; set; } = new();
+
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => 
+            new MGGridColorPicker(Window, Columns ?? Math.Min(8, ActualColors.Count), ActualColors.ToArray());
+
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
+        {
+            MGDesktop Desktop = Element.GetDesktop();
+
+            MGGridColorPicker ColorPicker = Element as MGGridColorPicker;
+
+            SelectedColorPresenter.ApplySettings(ColorPicker, ColorPicker.SelectedColorPresenter, false);
+            SelectedColorLabel.ApplySettings(ColorPicker, ColorPicker.SelectedColorLabel, false);
+            SelectedColorValue.ApplySettings(ColorPicker, ColorPicker.SelectedColorValue, false);
+
+            if (BorderBrush != null)
+                ColorPicker.BorderBrush = BorderBrush.ToBorderBrush(Desktop, Element);
+            if (BorderThickness.HasValue)
+                ColorPicker.BorderThickness = BorderThickness.Value.ToThickness();
+
+            if (Columns.HasValue)
+                ColorPicker.Columns = Columns.Value;
+            if (ColorSize.HasValue)
+                ColorPicker.ColorSize = ColorSize.Value.ToSize();
+            if (RowSpacing.HasValue)
+                ColorPicker.RowSpacing = RowSpacing.Value;
+            if (ColumnSpacing.HasValue)
+                ColorPicker.ColumnSpacing = ColumnSpacing.Value;
+
+            if (SelectedColorBorderBrush != null)
+                ColorPicker.SelectedColorBorderBrush = SelectedColorBorderBrush.ToBorderBrush(Desktop, Element);
+            if (SelectedColorBorderThickness.HasValue)
+                ColorPicker.SelectedColorBorderThickness = SelectedColorBorderThickness.Value.ToThickness();
+            if (UnselectedColorBorderBrush != null)
+                ColorPicker.UnselectedColorBorderBrush = UnselectedColorBorderBrush.ToBorderBrush(Desktop, Element);
+            if (UnselectedColorBorderThickness.HasValue)
+                ColorPicker.UnselectedColorBorderThickness = UnselectedColorBorderThickness.Value.ToThickness();
+
+            if (HoveredColorOverlay != null)
+                ColorPicker.HoveredColorOverlay = HoveredColorOverlay.ToFillBrush(Desktop, Element);
+            if (SelectedColorOverlay != null)
+                ColorPicker.SelectedColorOverlay = SelectedColorOverlay.ToFillBrush(Desktop, Element);
+
+            if (AllowMultiSelect.HasValue)
+                ColorPicker.AllowMultiSelect = AllowMultiSelect.Value;
+
+            if (ShowSelectedColorLabel.HasValue)
+                ColorPicker.ShowSelectedColorLabel = ShowSelectedColorLabel.Value;
+
+            if (ColorPalette.HasValue)
+                ColorPicker.SetColors(ColorPalette.Value, !Columns.HasValue);
+
+            if (SelectedColor.HasValue)
+                ColorPicker.SelectedColor = SelectedColor.Value.ToXNAColor();
+
+            //base.ApplyDerivedSettings(Parent, Element, IncludeContent);
+        }
+
+        protected internal override IEnumerable<Element> GetChildren()
+        {
+            yield return SelectedColorPresenter;
+            yield return SelectedColorLabel;
+            yield return SelectedColorValue;
+        }
+    }
+
     public class GroupBox : SingleContentHost
     {
         public override MGElementType ElementType => MGElementType.GroupBox;
