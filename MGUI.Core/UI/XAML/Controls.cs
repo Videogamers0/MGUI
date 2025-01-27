@@ -1200,6 +1200,11 @@ namespace MGUI.Core.UI.XAML
                 Rectangle.StrokeThickness = StrokeThickness.Value;
             if (Fill != null)
                 Rectangle.Fill = Fill.ToFillBrush(Desktop, Element);
+
+            if (Width.HasValue)
+                Rectangle.Width = Width.Value;
+            if (Height.HasValue)
+                Rectangle.Height = Height.Value;
         }
 
         protected internal override IEnumerable<Element> GetChildren() => Enumerable.Empty<Element>();
