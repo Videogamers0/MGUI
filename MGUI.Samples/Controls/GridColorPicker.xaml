@@ -1,0 +1,212 @@
+﻿<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        Left="440" Top="20" MinHeight="0" Width="800" Height="800" TitleText="GridColorPicker" Padding="10"
+        xmlns:System="clr-namespace:System;assembly=System.Runtime">
+    <Window.Styles>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10" />
+        </Style>
+        <Style Name="Header1" TargetType="TextBlock">
+            <Setter Property="IsBold" Value="True" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style TargetType="Separator">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Height" Value="2" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Opacity" Value="0.25" />
+        </Style>
+        <Style TargetType="Expander">
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="Background" Value="White * 0.1" />
+        </Style>
+        <Style TargetType="GridColorPicker">
+            <Setter Property="BorderBrush" Value="Black" />
+            <Setter Property="BorderThickness" Value="4" />
+            <Setter Property="Background" Value="rgb(0,0,180)|rgb(0,0,50)" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="RowSpacing" Value="3" />
+            <Setter Property="ColumnSpacing" Value="3" />
+            <Setter Property="Padding" Value="8" />
+            <Setter Property="ColorSize" Value="24" />
+            <Setter Property="ShowSelectedColorLabel" Value="False" />
+        </Style>
+        <Style TargetType="TextBox" Name="SampleTextBoxStyle">
+            <Setter Property="Background" Value="rgb(12,16,82)" />
+            <Setter Property="IsReadonly" Value="True" />
+            <Setter Property="Margin" Value="0,2" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
+        <StackPanel Orientation="Vertical" Spacing="10">
+            <TextBlock StyleNames="Header1" Text="GridColorPicker:" HorizontalAlignment="Center" />
+            <Separator/>
+            <TextBlock>
+                Displays a grid of colored rectangles and allows the user to select one or more colors.
+            </TextBlock>
+            <Separator />
+
+            <!-- Colors, CommaSeparatedColors, ColorPalettes -->
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise]Colors[/c] to control what colors appear in the grid.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        This [c=Turquoise]GridColorPicker[/c] displays 8 common colors.
+                    </TextBlock>
+                    <GridColorPicker Columns="8" ShowSelectedColorLabel="False" BorderThickness="2" Padding="4" Background="LightGray">
+                        <!-- Note: Colors is the 'ContentProperty', so in XAML you don't need to specify "<GridColorPicker.Colors>...</GridColorPicker.Colors>-->
+                        <System:String>Black</System:String>
+                        <System:String>White</System:String>
+                        <System:String>Red</System:String>
+                        <System:String>Green</System:String>
+                        <System:String>Blue</System:String>
+                        <System:String>Yellow</System:String>
+                        <System:String>Purple</System:String>
+                        <System:String>Orange</System:String>
+                    </GridColorPicker>
+                    <TextBlock>
+                        In XAML, you can alternatively set [c=Turquoise]CommaSeparatedColors[/c] as a more convenient way to specify the values.
+                    </TextBlock>
+                    <TextBox Name="SampleTB1" StyleNames="SampleTextBoxStyle" />
+                    <TextBlock>
+                        Color values can be the HTML color name (EX: "[b]Red[/b]"), the Hex value (EX: "[b]#FF0000[/b]" or "[b]#FF0000FF[/b]"), 
+                        or the RGB value (EX: "[b]rgb(255,0,0)[/b]" or "[b]rgba(255,0,0,255)[/b]")
+                    </TextBlock>
+                    <Separator Margin="0,4" />
+                    <TextBlock>
+                        To use a pre-made list of colors, set [c=Turquoise]ColorPalette[/c] enum property in XAML or call [c=Turquoise]SetColors[/c]([c=Turquoise]ColorPalette[/c]...) in c# code.
+                    </TextBlock>
+                    <Spacer Height="4" />
+                    <TextBlock>This [c=Turquoise]GridColorPicker[/c] uses the [c=LightBlue][s=Blue]NES[/c] palette:</TextBlock>
+                    <GridColorPicker ColorPalette="NES" ShowSelectedColorLabel="False" />
+                    <TextBlock>This [c=Turquoise]GridColorPicker[/c] uses the [c=LightBlue][s=Blue]_3Level_RGB[/c] palette:</TextBlock>
+                    <GridColorPicker ColorPalette="_3Level_RGB" ShowSelectedColorLabel="False" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <!-- Columns, RowSpacing, ColumnSpacing -->
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise]Columns[/c] to control how the colored rectangles are arranged in the grid.
+                    Set [c=Turquoise]RowSpacing[/c] / [c=Turquoise]ColumnSpacing[/c] to add empty padding between rows and/or columns.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>This [c=Turquoise]GridColorPicker[/c] has 4 columns, with 2px spacing between rows and columns.</TextBlock>
+                    <GridColorPicker Background="LightGray" Padding="2" BorderThickness="2" Columns="4" RowSpacing="2" ColumnSpacing="2" 
+                                     CommaSeparatedColors="Black,White,Red,Green,Blue,Yellow,Purple,Orange" />
+                    <TextBlock>
+                        This [c=Turquoise]GridColorPicker[/c] has 6 columns for the same 8 colors, and a larger spacing between rows and columns.
+                        (Also more [c=Turquoise]Padding[/c] to match the row/column spacings)
+                    </TextBlock>
+                    <GridColorPicker Background="LightBlue" Padding="8" BorderThickness="2" Columns="6" RowSpacing="8" ColumnSpacing="8" 
+                                     CommaSeparatedColors="Black,White,Red,Green,Blue,Yellow,Purple,Orange" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <!-- ColorSize -->
+            <DockPanel>
+                <TextBlock Dock="Top">Set [c=Turquoise]ColorSize[/c] to control how big each color is.</TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <GridColorPicker ColorPalette="Mac_16" ColorSize="16" RowSpacing="0" ColumnSpacing="0" Padding="0" BorderThickness="2" />
+                    <GridColorPicker ColorPalette="Mac_16" ColorSize="24" RowSpacing="0" ColumnSpacing="0" Padding="0" BorderThickness="2" />
+                    <GridColorPicker ColorPalette="Mac_16" ColorSize="32" RowSpacing="0" ColumnSpacing="0" Padding="0" BorderThickness="2" />
+                    <GridColorPicker ColorPalette="Mac_16" ColorSize="64,32" RowSpacing="0" ColumnSpacing="0" Padding="0" BorderThickness="2" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <!-- Border brushes and thicknesses -->
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise]UnselectedColorBorderBrush[/c], [c=Turquoise]UnselectedColorBorderThickness[/c], [c=Turquoise]SelectedColorBorderBrush[/c], and [c=Turquoise]SelectedColorBorderThickness[/c]
+                    to control the border drawn around each color.
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        This [c=Turquoise]GridColorPicker[/c] uses a 2px [c=Red]Red[/c] border around unselected colors and a 4px [c=Cyan]Cyan[/c] border around the selected color.
+                    </TextBlock>
+                    <GridColorPicker Background="White" ColorPalette="_4Bit_RGBI" ColorSize="24" 
+                                     UnselectedColorBorderBrush="Red" UnselectedColorBorderThickness="2" SelectedColorBorderBrush="Cyan" SelectedColorBorderThickness="4" />
+                    <TextBlock>
+                        This [c=Turquoise]GridColorPicker[/c] uses a [c=Turquoise]BandedBorderBrush[/c] with multiple colors around the selected color, 
+                        so that the [c=Cyan]Cyan[/c] border appears inside of the [c=Red]Red[/c] border.
+                    </TextBlock>
+                    <GridColorPicker Background="White" ColorPalette="_4Bit_RGBI" ColorSize="24" 
+                                     UnselectedColorBorderBrush="Red" UnselectedColorBorderThickness="2" SelectedColorBorderThickness="4">
+                        <GridColorPicker.SelectedColorBorderBrush>
+                            <BandedBorderBrush>
+                                <BorderBand Brush="Red" ThicknessWeight="0.5" />
+                                <BorderBand Brush="Cyan" ThicknessWeight="0.5" />
+                            </BandedBorderBrush>
+                        </GridColorPicker.SelectedColorBorderBrush>
+                    </GridColorPicker>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <!-- Selection -->
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    Set [c=Turquoise]SelectedColorIndexes[/c] or [c=Turquoise]SelectedColor[/c] to control which color(s) are selected.
+                    Set [c=Turquoise]AllowMultiSelect[/c]=[c=LightBlue][s=Blue]true[/s][/c] if the user should be able to select several colors by holding [b]CTRL[/b].
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        [c=Turquoise]GridColorPicker[/c] that allows multiple color selection by holding CTRL:
+                    </TextBlock>
+                    <GridColorPicker AllowMultiSelect="True" ColorPalette="EGA_64" Name="GCP1" />
+                    <Separator Margin="0,4" />
+                    <TextBlock>
+                        Set [c=Turquoise]ShowSelectedColorLabel[/c] to control if an additional label should be displayed below the grid, which shows the selected color.
+                        This is only applicable if [c=Turquoise]AllowMultiSelect[/c]=[c=LightBlue][s=Blue]false[/s][/c], and it's only shown if a color has been selected.
+                    </TextBlock>
+                    <Spacer Height="4" />
+                    <TextBlock>Select a color to see the label appear below the grid:</TextBlock>
+                    <GridColorPicker ColorPalette="Windows_20" ShowSelectedColorLabel="True" Name="GCP2" />
+                    <Spacer Height="4" />
+                    <TextBlock>
+                        You can also modify [c=Turquoise]SelectedColorPresenter[/c], [c=Turquoise]SelectedColorLabel[/c], and [c=Turquoise]SelectedColorValue[/c]
+                        to control the text and graphics displayed below the grid.
+                    </TextBlock>
+                    <GridColorPicker ColorPalette="Windows_20" ShowSelectedColorLabel="True" Name="GCP3">
+                        <GridColorPicker.SelectedColorLabel>
+                            <TextBlock Foreground="Red" IsBold="True" Text="You Selected:" />
+                        </GridColorPicker.SelectedColorLabel>
+                        <GridColorPicker.SelectedColorValue>
+                            <Rectangle Height="24" Width="64" Stroke="Red" StrokeThickness="3" />
+                        </GridColorPicker.SelectedColorValue>
+                    </GridColorPicker>
+                    <GridColorPicker ColorPalette="Windows_20" ShowSelectedColorLabel="True" Name="GCP4">
+                        <GridColorPicker.SelectedColorPresenter>
+                            <HeaderedContentPresenter HeaderPosition="Top" Spacing="0" Background="White * 0.5" />
+                        </GridColorPicker.SelectedColorPresenter>
+                        <GridColorPicker.SelectedColorLabel>
+                            <TextBlock Foreground="Black" IsUnderlined="True" Text="Selected this color:" Margin="5,3,5,0" />
+                        </GridColorPicker.SelectedColorLabel>
+                        <GridColorPicker.SelectedColorValue>
+                            <Rectangle Margin="5,2,5,3" Stroke="Gray" StrokeThickness="2" HorizontalAlignment="Stretch" />
+                        </GridColorPicker.SelectedColorValue>
+                    </GridColorPicker>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
+
+            <!--<DockPanel>
+                <TextBlock Dock="Top">
+
+                </TextBlock>
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+
+                    </TextBlock>
+                </StackPanel>
+            </DockPanel>
+            <Separator/>-->
+
+        </StackPanel>
+    </ScrollViewer>
+</Window>

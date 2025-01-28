@@ -27,6 +27,7 @@
     <None Remove="Controls\DockPanel.xaml" />
     <None Remove="Controls\Expander.xaml" />
     <None Remove="Controls\Grid.xaml" />
+    <None Remove="Controls\GridColorPicker.xaml" />
     <None Remove="Controls\GroupBox.xaml" />
     <None Remove="Controls\Image.xaml" />
     <None Remove="Controls\ListBox.xaml" />
@@ -79,6 +80,9 @@
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\Grid.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\GridColorPicker.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\GroupBox.xaml" />

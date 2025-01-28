@@ -120,6 +120,7 @@ namespace MGUI.Samples
         public DockPanelSamples DockPanelSamples { get; }
         public ExpanderSamples ExpanderSamples { get; }
         public GridSamples GridSamples { get; }
+        public GridColorPickerSamples GridColorPickerSamples { get; }
         public GroupBoxSamples GroupBoxSamples { get; }
         public ImageSamples ImageSamples { get; }
         public ListBoxSamples ListBoxSamples { get; }
@@ -171,6 +172,7 @@ namespace MGUI.Samples
             DockPanelSamples = new(Content, Desktop);
             ExpanderSamples = new(Content, Desktop);
             GridSamples = new(Content, Desktop);
+            GridColorPickerSamples = new(Content, Desktop);
             GroupBoxSamples = new(Content, Desktop);
             ImageSamples = new(Content, Desktop);
             ListBoxSamples = new(Content, Desktop);
@@ -210,6 +212,7 @@ namespace MGUI.Samples
 
 #if DEBUG
             //HUD.Show();
+            GridColorPickerSamples.Show();
 #endif
 
             Window.WindowDataContext = this;
