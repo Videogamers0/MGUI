@@ -212,7 +212,6 @@ namespace MGUI.Samples
 
 #if DEBUG
             //HUD.Show();
-            GridColorPickerSamples.Show();
 #endif
 
             Window.WindowDataContext = this;
