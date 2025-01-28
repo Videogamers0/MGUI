@@ -35,7 +35,7 @@
                 <StackPanel Orientation="Vertical">
                     <TextBlock Text="GridColorPicker test" />
                     <GridColorPicker BorderBrush="Black" BorderThickness="5" RowSpacing="5" ColumnSpacing="5" Padding="10" Background="White" ColorSize="24" 
-                                     HorizontalAlignment="Left" VerticalAlignment="Center" ColorPalette="EGA_64" ShowSelectedColorLabel="True" AllowMultiSelect="True"
+                                     HorizontalAlignment="Left" VerticalAlignment="Center" ColorPalette="SuperCassetteVision" ShowSelectedColorLabel="True" AllowMultiSelect="True"
                                      CommaSeparatedColors="Red,Green,Blue,Orange,Purple,Magenta,Brown,Gray">
                         <GridColorPicker.SelectedColorPresenter>
                             <HeaderedContentPresenter HeaderPosition="Left" Background="Black" />
