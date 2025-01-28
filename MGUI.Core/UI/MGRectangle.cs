@@ -114,8 +114,8 @@ namespace MGUI.Core.UI
                 this.StrokeThickness = StrokeThickness;
                 this.Fill = Fill;
 
-                this.HorizontalAlignment = HorizontalAlignment.Left;
-                this.VerticalAlignment = VerticalAlignment.Top;
+                this.HorizontalAlignment = HorizontalAlignment.Center;
+                this.VerticalAlignment = VerticalAlignment.Center;
             }
         }
 
@@ -127,7 +127,7 @@ namespace MGUI.Core.UI
 
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
         {
-            Rectangle ActualBounds = ApplyAlignment(LayoutBounds, HorizontalAlignment.Center, VerticalAlignment.Center, new Size(Width, Height));
+            Rectangle ActualBounds = ApplyAlignment(LayoutBounds, HorizontalAlignment, VerticalAlignment, new Size(Width, Height));
             if (ActualBounds.Width <= 0 || ActualBounds.Height <= 0)
                 return;
 
