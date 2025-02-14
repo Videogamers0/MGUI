@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MonoGame.Extended;
 using System.Diagnostics;
+using MGUI.Core.UI.Data_Binding;
 
 #if UseWPF
 using System.Windows.Markup;
@@ -101,6 +102,16 @@ namespace MGUI.Core.UI.XAML
         }
 
         protected internal override IEnumerable<Element> GetChildren() => Enumerable.Empty<Element>();
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGGridSplitter TypedElement)
+            {
+                yield return (Foreground, TypedElement.Foreground?.NormalValue, $"{nameof(MGGridSplitter.Foreground)}.{nameof(VisualStateFillBrush.NormalValue)}");
+            }
+        }
     }
 
     public class Grid : MultiContentHost
@@ -208,6 +219,19 @@ namespace MGUI.Core.UI.XAML
                     MGElement ChildElement = Child.ToElement<MGElement>(Grid.SelfOrParentWindow, Grid);
                     Grid.TryAddChild(Child.GridRow, Child.GridColumn, new GridSpan(Child.GridRowSpan, Child.GridColumnSpan, Child.GridAffectsMeasure), ChildElement);
                 }
+            }
+        }
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGGrid TypedElement)
+            {
+                yield return (SelectionBackground, TypedElement.SelectionBackground, nameof(MGGrid.SelectionBackground));
+                yield return (SelectionOverlay, TypedElement.SelectionOverlay, nameof(MGGrid.SelectionOverlay));
+                yield return (HorizontalGridLineBrush, TypedElement.HorizontalGridLineBrush, nameof(MGGrid.HorizontalGridLineBrush));
+                yield return (VerticalGridLineBrush, TypedElement.VerticalGridLineBrush, nameof(MGGrid.VerticalGridLineBrush));
             }
         }
     }
@@ -348,6 +372,20 @@ namespace MGUI.Core.UI.XAML
                     Grid.TryAddChild(Row, Column, ChildElement);
                     Counter++;
                 }
+            }
+        }
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGUniformGrid TypedElement)
+            {
+                yield return (SelectionBackground, TypedElement.SelectionBackground, nameof(MGUniformGrid.SelectionBackground));
+                yield return (SelectionOverlay, TypedElement.SelectionOverlay, nameof(MGUniformGrid.SelectionOverlay));
+                yield return (HorizontalGridLineBrush, TypedElement.HorizontalGridLineBrush, nameof(MGUniformGrid.HorizontalGridLineBrush));
+                yield return (VerticalGridLineBrush, TypedElement.VerticalGridLineBrush, nameof(MGUniformGrid.VerticalGridLineBrush));
+                yield return (CellBackground, TypedElement.CellBackground?.NormalValue, $"{nameof(MGUniformGrid.CellBackground)}.{nameof(VisualStateFillBrush.NormalValue)}");
             }
         }
     }

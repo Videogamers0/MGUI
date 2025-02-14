@@ -10,45 +10,54 @@
             <TexturedBorderBrush EdgeTextureName="BorderEdgeRegion1" CornerTextureName="BorderCornerRegion1" EdgeBasis="Right" CornerBasis="BottomRight" />
         </Border.BorderBrush>
 
-        <Grid RowLengths="*,auto" ColumnLengths="auto,auto" RowSpacing="10" ColumnSpacing="20">
-            <TabControl Row="0" Column="0" HeaderAreaBackground="rgb(120,120,150)">
-                <TabControl.SelectedTabHeaderTemplate>
-                    <Button BorderThickness="0,0,0,3" Padding="4,2" Margin="6,4" Background="White * 0.15" BorderBrush="Black" MinWidth="50" TextForeground="Black" />
-                </TabControl.SelectedTabHeaderTemplate>
-                <TabControl.UnselectedTabHeaderTemplate>
-                    <Button BorderThickness="0,0,0,0" Padding="4,2" Margin="6,4,6,7" Background="Transparent" BorderBrush="rgb(80,80,80)" MinWidth="50" TextForeground="rgb(40,40,40)" />
-                </TabControl.UnselectedTabHeaderTemplate>
-                <TabItem Header="Gameplay" Content="Content of Gameplay tab" />
-                <TabItem Header="Graphics" Content="Content of Graphics tab" />
-                <TabItem Header="Audio" Content="Content of Audio tab" />
-                <TabItem Header="Controls" Content="Content of Controls tab" />
-            </TabControl>
+        <DockPanel>
+            <Border BorderBrush="Black" Dock="Top" BorderThickness="1" Height="50" Width="150" HA="Center" Padding="10">
+                <Border.Background>
+                    <SolidFillBrush Color="{MGBinding Path=TestColor, Mode=OneWay}" />
+                </Border.Background>
+                <Button Name="TestBtn" Content="Change BG Color" />
+            </Border>
 
-            <TabControl Row="0" Column="1">
-                <TabItem Header="Gameplay" Content="Content of Gameplay tab" />
-                <TabItem Header="Graphics" Content="Content of Graphics tab" />
-                <TabItem Header="Audio" Content="Content of Audio tab" />
-                <TabItem Header="Controls" Content="Content of Controls tab" />
-            </TabControl>
+            <Grid RowLengths="*,auto" ColumnLengths="auto,auto" RowSpacing="10" ColumnSpacing="20">
+                <TabControl Row="0" Column="0" HeaderAreaBackground="rgb(120,120,150)">
+                    <TabControl.SelectedTabHeaderTemplate>
+                        <Button BorderThickness="0,0,0,3" Padding="4,2" Margin="6,4" Background="White * 0.15" BorderBrush="Black" MinWidth="50" TextForeground="Black" />
+                    </TabControl.SelectedTabHeaderTemplate>
+                    <TabControl.UnselectedTabHeaderTemplate>
+                        <Button BorderThickness="0,0,0,0" Padding="4,2" Margin="6,4,6,7" Background="Transparent" BorderBrush="rgb(80,80,80)" MinWidth="50" TextForeground="rgb(40,40,40)" />
+                    </TabControl.UnselectedTabHeaderTemplate>
+                    <TabItem Header="Gameplay" Content="Content of Gameplay tab" />
+                    <TabItem Header="Graphics" Content="Content of Graphics tab" />
+                    <TabItem Header="Audio" Content="Content of Audio tab" />
+                    <TabItem Header="Controls" Content="Content of Controls tab" />
+                </TabControl>
 
-            <ScrollViewer Row="1" Column="0" ColumnSpan="2" Background="White * 0.1">
-                <StackPanel Orientation="Vertical">
-                    <TextBlock Text="GridColorPicker test" />
-                    <GridColorPicker BorderBrush="Black" BorderThickness="5" RowSpacing="5" ColumnSpacing="5" Padding="10" Background="White" ColorSize="24" 
+                <TabControl Row="0" Column="1">
+                    <TabItem Header="Gameplay" Content="Content of Gameplay tab" />
+                    <TabItem Header="Graphics" Content="Content of Graphics tab" />
+                    <TabItem Header="Audio" Content="Content of Audio tab" />
+                    <TabItem Header="Controls" Content="Content of Controls tab" />
+                </TabControl>
+
+                <ScrollViewer Row="1" Column="0" ColumnSpan="2" Background="White * 0.1">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="GridColorPicker test" />
+                        <GridColorPicker BorderBrush="Black" BorderThickness="5" RowSpacing="5" ColumnSpacing="5" Padding="10" Background="White" ColorSize="24" 
                                      HorizontalAlignment="Left" VerticalAlignment="Center" ColorPalette="SuperCassetteVision" ShowSelectedColorLabel="True" AllowMultiSelect="True"
                                      CommaSeparatedColors="Red,Green,Blue,Orange,Purple,Magenta,Brown,Gray">
-                        <GridColorPicker.SelectedColorPresenter>
-                            <HeaderedContentPresenter HeaderPosition="Left" Background="Black" />
-                        </GridColorPicker.SelectedColorPresenter>
-                        <GridColorPicker.SelectedColorLabel>
-                            <TextBlock Foreground="White" IsBold="True" Text="Selected Color:" Background="Black" />
-                        </GridColorPicker.SelectedColorLabel>
-                        <GridColorPicker.SelectedColorValue>
-                            <Rectangle Width="20" Height="20" Stroke="Black" StrokeThickness="2" />
-                        </GridColorPicker.SelectedColorValue>
-                    </GridColorPicker>
-                </StackPanel>
-            </ScrollViewer>
-        </Grid>
+                            <GridColorPicker.SelectedColorPresenter>
+                                <HeaderedContentPresenter HeaderPosition="Left" Background="Black" />
+                            </GridColorPicker.SelectedColorPresenter>
+                            <GridColorPicker.SelectedColorLabel>
+                                <TextBlock Foreground="White" IsBold="True" Text="Selected Color:" Background="Black" />
+                            </GridColorPicker.SelectedColorLabel>
+                            <GridColorPicker.SelectedColorValue>
+                                <Rectangle Width="20" Height="20" Stroke="Black" StrokeThickness="2" />
+                            </GridColorPicker.SelectedColorValue>
+                        </GridColorPicker>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </DockPanel>
     </Border>
 </Window>

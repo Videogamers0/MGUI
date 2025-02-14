@@ -153,7 +153,8 @@ namespace MGUI.Core.UI
     //		The Visual Tree traversal logic should have an additional parameter, IncludeAttached
 
     /// <summary>Base class for all UI elements.</summary>
-    public abstract class MGElement : ViewModelBase, IMouseHandlerHost, IKeyboardHandlerHost, IObservableDataContext
+    public abstract class MGElement : XAMLBindableBase, IMouseHandlerHost, IKeyboardHandlerHost, 
+        IElementNameResolver, IResourcesResolver, IDesktopResolver
     {
         public string UniqueId { get; }
 
@@ -161,6 +162,7 @@ namespace MGUI.Core.UI
         /// <summary>Prioritizes <see cref="MGWindow.Theme"/>. If null, falls back to <see cref="MGDesktop.Theme"/></summary>
         public MGTheme GetTheme() => SelfOrParentWindow.Theme ?? GetDesktop().Theme;
         public MGResources GetResources() => GetDesktop().Resources;
+        public bool TryGetElementByName(string Name, out MGElement NamedElement) => SelfOrParentWindow.TryGetElementByName(Name, out NamedElement);
 
 		/// <summary>The <see cref="MGWindow"/> that this <see cref="MGElement"/> belongs to. This value is only null if this <see cref="MGElement"/> is an <see cref="MGWindow"/> with no parent.</summary>
 		public MGWindow ParentWindow { get; }
@@ -182,7 +184,7 @@ namespace MGUI.Core.UI
                     _DataContextOverride = value;
                     NPC(nameof(DataContextOverride));
                     NPC(nameof(DataContext));
-                    DataContextChanged?.Invoke(this, DataContext);
+                    InvokeDataContextChanged();
                 }
             }
         }
@@ -190,9 +192,7 @@ namespace MGUI.Core.UI
         /// <summary>The source object that data bindings are resolved from.<para/>
         /// This value prioritizes <see cref="DataContextOverride"/>, but falls back on <see cref="MGWindow.WindowDataContext"/> if there is no explicit override.<para/>
         /// To set this value, set <see cref="DataContextOverride"/> or set <see cref="MGWindow.WindowDataContext"/></summary>
-        public object DataContext => DataContextOverride ?? SelfOrParentWindow.WindowDataContext;
-        /// <summary>Invoked after <see cref="DataContext"/> is changed.</summary>
-        public event EventHandler<object> DataContextChanged;
+        public override object DataContext => DataContextOverride ?? SelfOrParentWindow.WindowDataContext;
 
         public static readonly ReadOnlyCollection<MGElementType> WindowElementTypes = new List<MGElementType>() { MGElementType.Window, MGElementType.ToolTip, MGElementType.ContextMenu }.AsReadOnly();
         public MGElementType ElementType { get; }
@@ -1075,7 +1075,7 @@ namespace MGUI.Core.UI
                     if (DataContextOverride == null)
                     {
                         NPC(nameof(DataContext));
-                        DataContextChanged?.Invoke(this, DataContext);
+                        InvokeDataContextChanged();
                     }
                 };
 
@@ -1243,12 +1243,29 @@ namespace MGUI.Core.UI
             }
         }
 
+        private Rectangle _ActualLayoutBounds;
         /// <summary>The screen space that this element is rendered to.<para/>
         /// Unlike <see cref="LayoutBounds"/>, this value always uses an origin of <see cref="Point.Zero"/>, rather than being relative to <see cref="Origin"/>,<br/>
         /// and also accounts for <see cref="ClipToBounds"/> by intersecting the bounds with the parent's <see cref="ActualLayoutBounds"/>.<para/>
         /// This value will show Width=0/Height=0 for elements that are outside the visible viewport, even if they've technically been allocated non-zero dimensions.<para/>
         /// See also: <see cref="LayoutBounds"/>, <see cref="Origin"/></summary>
-        public Rectangle ActualLayoutBounds { get; private set; }
+        public Rectangle ActualLayoutBounds
+        {
+            get => _ActualLayoutBounds;
+            private set
+            {
+                if (_ActualLayoutBounds != value)
+                {
+                    Rectangle Previous = ActualLayoutBounds;
+                    _ActualLayoutBounds = value;
+                    NPC(nameof(ActualLayoutBounds));
+                    OnActualLayoutBoundsChanged?.Invoke(this, new(Previous, ActualLayoutBounds));
+                }
+            }
+        }
+
+        /// <summary>Invoked when <see cref="ActualLayoutBounds"/> changes.</summary>
+        public event EventHandler<EventArgs<Rectangle>> OnActualLayoutBoundsChanged;
 
         /// <summary>The screen space that was allocated to this <see cref="MGElement"/>.<br/>
         /// This <see cref="MGElement"/> may choose not to use all of the allocated space based on <see cref="HorizontalAlignment"/> and <see cref="VerticalAlignment"/>.<para/>
