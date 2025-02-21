@@ -1645,7 +1645,7 @@ namespace MGUI.Core.UI
         protected void DrawBackground(ElementDrawArgs DA) => DrawBackground(DA, this.LayoutBounds);
 
         private Rectangle GetBackgroundBounds()
-		{
+        {
             Rectangle BorderlessBounds = !HasBorder ? LayoutBounds : LayoutBounds.GetCompressed(GetBorder().BorderThickness);
             Rectangle BackgroundBounds = BorderlessBounds.GetCompressed(BackgroundRenderPadding);
             return BackgroundBounds;

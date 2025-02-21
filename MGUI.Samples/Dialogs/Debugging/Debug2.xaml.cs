@@ -45,12 +45,14 @@ namespace MGUI.Samples.Dialogs.Debugging
             : base(Content, Desktop, $"{nameof(Dialogs)}.{nameof(Debugging)}", $"{nameof(Debug2)}.xaml", () => { InitializeResources(Content, Desktop); })
         {
             TestColor = Color.Orange;
-
-            Window.GetElementByName<MGButton>("TestBtn").Command = (btn) =>
+            if (Window.TryGetElementByName<MGButton>("TestBtn", out MGButton TestBtn))
             {
-                TestColor = Color.Green;
-                return true;
-            };
+                TestBtn.Command = (btn) =>
+                {
+                    TestColor = Color.Green;
+                    return true;
+                };
+            }
 
             Window.WindowDataContext = this;
         }

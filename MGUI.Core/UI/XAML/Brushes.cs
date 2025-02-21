@@ -278,6 +278,32 @@ namespace MGUI.Core.UI.XAML
             yield return (Brush, nameof(Brush));
         }
     }
+
+    public class HighlightFillBrush : FillBrush
+    {
+        public bool IsEnabled { get; set; } = true;
+        public bool FillFocusedRegion { get; set; } = false;
+        public XAMLColor? FocusedColor { get; set; }
+        public bool FillUnfocusedRegion { get; set; } = true;
+        public XAMLColor? UnfocusedColor { get; set; }
+        public IReadOnlyList<Microsoft.Xna.Framework.Rectangle> FocusedBounds { get; set; }
+        public IReadOnlyList<MGElement> FocusedElements { get; set; }
+        public MGElement FocusedElement { get; set; }
+
+        public override string ToString() => $"{nameof(HighlightFillBrush)}: {FocusedColor} / {UnfocusedColor}";
+
+        public override IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element)
+        {
+            MGHighlightFillBrush Brush = new(FillFocusedRegion, FocusedColor?.ToXNAColor(), FillUnfocusedRegion, UnfocusedColor?.ToXNAColor())
+            {
+                IsEnabled = IsEnabled,
+                FocusedBounds = FocusedBounds,
+                FocusedElements = FocusedElements,
+                SourceElement = Element
+            };
+            return Brush;
+        }
+    }
     #endregion Fill Brush
 
     #region Border Brush
