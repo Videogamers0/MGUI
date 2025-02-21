@@ -849,7 +849,7 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private VisualStateFillBrush _BackgroundBrush;
         /// <summary>The <see cref="IFillBrush"/>es to use for this <see cref="MGElement"/>'s background, depending on the current <see cref="VisualState"/>.<para/>
-        /// See also: <see cref="BackgroundUnderlay"/>, <see cref="BackgroundOverlay"/></summary>
+        /// See also: <see cref="OverlayBrush"/></summary>
         public VisualStateFillBrush BackgroundBrush
         {
             get => _BackgroundBrush;
@@ -895,12 +895,24 @@ namespace MGUI.Core.UI
         /// Else traverses up the visual tree until finding the first non-null <see cref="CurrentDefaultTextForeground"/>.</summary>
         public Color? DerivedDefaultTextForeground => CurrentDefaultTextForeground ?? Parent?.DerivedDefaultTextForeground;
 
-        //TODO VisualStateFillBrush OverlayBrush, drawn after DrawSelf and DrawContents
-        //When drawing the overlay, draws OverlayBrush?.GetUnderlay(VisualState.Primary), then OverlayBrush?.GetOverlay(VisualState.Secondary)
-        //Add a new event to Draw: OnBeginDrawOverlay. Look for anything that subscribes to OnEndDraw, probably change them all to OnBeginDrawOverlay
-        //in MGElement Constructor, set OverlayBrush = new(null, null, null, ...);
-
-
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IFillBrush _OverlayBrush;
+        /// <summary>A brush that is drawn overtop of this element.<br/>
+        /// This brush is drawn to the same bounds as the <see cref="BackgroundBrush"/>.
+        /// I.E. It does not span the border thickness if this element has a border, and it accounts for <see cref="Margin"/> and <see cref="BackgroundRenderPadding"/>)<para/>
+        /// See also: <see cref="BackgroundBrush"/></summary>
+        public IFillBrush OverlayBrush
+        {
+            get => _OverlayBrush;
+            set
+            {
+                if (_OverlayBrush != value)
+                {
+                    _OverlayBrush = value;
+                    NPC(nameof(OverlayBrush));
+                }
+            }
+        }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Visibility _Visibility;
@@ -1591,6 +1603,8 @@ namespace MGUI.Core.UI
                     foreach (MGElement Component in Components.Where(x => x.DrawAfterContents).Select(x => x.BaseElement))
                         Component.Draw(DA);
 
+                    OverlayBrush?.Draw(DA, this, GetBackgroundBounds());
+
                     OnEndingDraw?.Invoke(this, DrawEventArgs);
                 }
             }
@@ -1619,7 +1633,7 @@ namespace MGUI.Core.UI
 		}
 
 		public event EventHandler<MGElementDrawEventArgs> OnBeginDraw;
-        /// <summary>Invoked after drawing the background, self, and all components, 
+        /// <summary>Invoked after drawing the <see cref="BackgroundBrush"/>, self, all components, and the <see cref="OverlayBrush"/>,
         /// but while the <see cref="GraphicsDevice.ScissorRectangle"/> is still set to the desired screen-space bounds of this element.<para/>
         /// See also: <see cref="OnEndDraw"/></summary>
         public event EventHandler<MGElementDrawEventArgs> OnEndingDraw;
@@ -1630,10 +1644,16 @@ namespace MGUI.Core.UI
 
         protected void DrawBackground(ElementDrawArgs DA) => DrawBackground(DA, this.LayoutBounds);
 
-        public virtual void DrawBackground(ElementDrawArgs DA, Rectangle LayoutBounds)
+        private Rectangle GetBackgroundBounds()
 		{
             Rectangle BorderlessBounds = !HasBorder ? LayoutBounds : LayoutBounds.GetCompressed(GetBorder().BorderThickness);
             Rectangle BackgroundBounds = BorderlessBounds.GetCompressed(BackgroundRenderPadding);
+            return BackgroundBounds;
+        }
+
+        public virtual void DrawBackground(ElementDrawArgs DA, Rectangle LayoutBounds)
+		{
+            Rectangle BackgroundBounds = GetBackgroundBounds();
             BackgroundBrush.GetUnderlay(DA.VisualState.Primary)?.Draw(DA, this, BackgroundBounds);
             SecondaryVisualState SecondaryState = DA.VisualState.GetSecondaryState(SpoofIsPressedWhileDrawingBackground, SpoofIsHoveredWhileDrawingBackground);
             BackgroundBrush.GetFillOverlay(SecondaryState)?.Draw(DA, this, BackgroundBounds);

@@ -82,6 +82,8 @@ namespace MGUI.Core.UI.XAML
         public Thickness? BackgroundRenderPadding { get; set; }
         [Category("Appearance")]
         public FillBrush Background { get; set; }
+        [Category("Appearance")]
+        public FillBrush Overlay { get; set; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [Browsable(false)]
         public FillBrush BG { get => Background; set => Background = value; }
@@ -194,6 +196,8 @@ namespace MGUI.Core.UI.XAML
         {
             using (Element.BeginInitializing())
             {
+                MGDesktop Desktop = Element.GetDesktop();
+
                 if (Name != null)
                     Element.Name = Name;
 
@@ -242,6 +246,7 @@ namespace MGUI.Core.UI.XAML
                 if (BackgroundRenderPadding.HasValue)
                     Element.BackgroundRenderPadding = BackgroundRenderPadding.Value.ToThickness();
                 ApplyBackground(Element);
+                Element.OverlayBrush = Overlay?.ToFillBrush(Desktop, Element);
 
                 if (TextForeground.HasValue)
                     Element.DefaultTextForeground.NormalValue = TextForeground.Value.ToXNAColor();
@@ -338,6 +343,7 @@ namespace MGUI.Core.UI.XAML
         private IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBaseBindableObjects(MGElement Element)
         {
             yield return (Background, Element.BackgroundBrush?.NormalValue, $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.NormalValue)}");
+            yield return (Overlay, Element.OverlayBrush, $"{nameof(MGElement.OverlayBrush)}");
             yield return (DisabledBackground, Element.BackgroundBrush?.DisabledValue, $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.DisabledValue)}");
             yield return (SelectedBackground, Element.BackgroundBrush?.SelectedValue, $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.SelectedValue)}");
         }
@@ -356,6 +362,7 @@ namespace MGUI.Core.UI.XAML
         private static readonly Dictionary<string, string> BindingPathMappings = new()
         {
             { nameof(Background), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.NormalValue)}" },
+            { nameof(Overlay), $"{nameof(MGElement.OverlayBrush)}" },
             { nameof(SelectedBackground), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.SelectedValue)}" },
             { nameof(DisabledBackground), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.DisabledValue)}" },
             { nameof(TextForeground), $"{nameof(MGElement.DefaultTextForeground)}.{nameof(VisualStateSetting<XNAColor>.NormalValue)}" },
