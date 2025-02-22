@@ -289,6 +289,7 @@ namespace MGUI.Core.UI.XAML
         public IReadOnlyList<Microsoft.Xna.Framework.Rectangle> FocusedBounds { get; set; }
         public IReadOnlyList<MGElement> FocusedElements { get; set; }
         public MGElement FocusedElement { get; set; }
+        public int FocusedElementPadding { get; set; }
 
         public override string ToString() => $"{nameof(HighlightFillBrush)}: {FocusedColor} / {UnfocusedColor}";
 
@@ -299,6 +300,7 @@ namespace MGUI.Core.UI.XAML
                 IsEnabled = IsEnabled,
                 FocusedBounds = FocusedBounds,
                 FocusedElements = FocusedElements,
+                FocusedElementPadding = FocusedElementPadding,
                 SourceElement = Element
             };
             return Brush;

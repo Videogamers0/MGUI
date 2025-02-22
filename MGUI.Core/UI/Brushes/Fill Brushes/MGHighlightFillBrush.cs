@@ -1,4 +1,5 @@
 ﻿using MGUI.Core.UI.Data_Binding;
+using MGUI.Shared.Helpers;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -182,6 +183,24 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
 			}
 		}
 
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private int _FocusedElementPadding;
+		/// <summary>Additional space to be added to the bounds of the <see cref="FocusedElements"/> when calculating the focused region.<para/>
+		/// A positive value will expand the focused region.</summary>
+		public int FocusedElementPadding
+		{
+			get => _FocusedElementPadding;
+			set
+			{
+				if (_FocusedElementPadding != value)
+				{
+					_FocusedElementPadding = value;
+					NPC(nameof(FocusedElementPadding));
+                    CachedUnfocusedRegions.Clear();
+                }
+			}
+		}
+
 		/// <summary>Convenience property that just sets <see cref="FocusedElements"/> to a list with 1 item.</summary>
 		public MGElement FocusedElement
 		{
@@ -206,6 +225,7 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
 
 			this.FocusedBounds = null;
 			this.FocusedElements = null;
+			this.FocusedElementPadding = 0;
 		}
 
 		//TODO what about input handling? Maybe a way to swallow mouse inputs within the bounds of the Source, but not within the bounds of any FocusedElements?
@@ -233,7 +253,7 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
 
 				if (FocusedElements != null)
 				{
-					foreach (Rectangle r in FocusedElements.Select(x => x.LayoutBounds))
+					foreach (Rectangle r in FocusedElements.Select(x => x.LayoutBounds.GetExpanded(FocusedElementPadding)))
 						DA.DT.FillRectangle(Offset, r, FocusedColor.Value);
 				}
 			}
@@ -258,7 +278,7 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
 					if (FocusedBounds?.Any() == true)
 						Subtractions.AddRange(FocusedBounds);
 					if (FocusedElements?.Any() == true)
-						Subtractions.AddRange(FocusedElements.Select(x => x.LayoutBounds));
+						Subtractions.AddRange(FocusedElements.Select(x => x.LayoutBounds.GetExpanded(FocusedElementPadding)));
 					UnfocusedRegion = Subtract(Bounds, Subtractions);
 
 					//  Cache the result
@@ -283,7 +303,8 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
 				FocusedColor = FocusedColor,
 				UnfocusedColor = UnfocusedColor,
 				FocusedBounds = FocusedBounds?.ToList(),
-				FocusedElements = FocusedElements?.ToList()
+				FocusedElements = FocusedElements?.ToList(),
+				FocusedElementPadding = FocusedElementPadding
 			};
 
 			return Copy;
