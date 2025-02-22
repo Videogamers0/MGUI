@@ -19,7 +19,7 @@
                 <Button Name="TestBtn" Content="Change BG Color" />
             </Border>-->
 
-            <Border BorderBrush="Black" Dock="Top" BorderThickness="1" MinHeight="50" Width="150" HA="Center" Padding="10">
+            <!--<Border BorderBrush="Black" Dock="Top" BorderThickness="1" MinHeight="50" Width="150" HA="Center" Padding="10">
                 <Border.Overlay>
                     <HighlightFillBrush FillFocusedRegion="False" FocusedColor="White * 0.35" FillUnfocusedRegion="True" UnfocusedColor="Black * 0.35" 
                                         FocusedElement="{MGBinding ElementName=TestBorder, Mode=OneTime}" />
@@ -31,7 +31,7 @@
                     </Border>
                     <CheckBox Content="Checkbox2" />
                 </StackPanel>
-            </Border>
+            </Border>-->
 
             <Grid RowLengths="*,auto" ColumnLengths="auto,auto" RowSpacing="10" ColumnSpacing="20">
                 <TabControl Row="0" Column="0" HeaderAreaBackground="rgb(120,120,150)">

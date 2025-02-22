@@ -228,9 +228,6 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
 			this.FocusedElementPadding = 0;
 		}
 
-		//TODO what about input handling? Maybe a way to swallow mouse inputs within the bounds of the Source, but not within the bounds of any FocusedElements?
-		//
-
 		public void Draw(ElementDrawArgs DA, MGElement Element, Rectangle Bounds)
 		{
 			if (!IsEnabled || (!CanFillFocusedRegion && !CanFillUnfocusedRegion))
