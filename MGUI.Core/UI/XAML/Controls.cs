@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using MGUI.Core.UI.Data_Binding;
 
 #if UseWPF
 using System.Windows.Markup;
@@ -127,6 +128,16 @@ namespace MGUI.Core.UI.XAML
                 Border.BorderThickness = BorderThickness.Value.ToThickness();
 
             base.ApplyDerivedSettings(Parent, Element, IncludeContent);
+        }
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGBorder TypedElement)
+            {
+                yield return (BorderBrush, TypedElement.BorderBrush, nameof(MGBorder.BorderBrush));
+            }
         }
     }
 
@@ -500,6 +511,18 @@ namespace MGUI.Core.UI.XAML
 
             yield return HeadersPanel;
         }
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGExpander TypedElement)
+            {
+                yield return (ExpanderButtonBorderBrush, TypedElement.ExpanderButtonBorderBrush, nameof(MGExpander.ExpanderButtonBorderBrush));
+                yield return (ExpanderButtonExpandedBackgroundBrush, TypedElement.ExpanderButtonBackgroundBrush?.SelectedValue, $"{nameof(MGExpander.ExpanderButtonBorderBrush)}.{nameof(VisualStateFillBrush.SelectedValue)}");
+                yield return (ExpanderButtonCollapsedBackgroundBrush, TypedElement.ExpanderButtonBackgroundBrush?.NormalValue, $"{nameof(MGExpander.ExpanderButtonBorderBrush)}.{nameof(VisualStateFillBrush.NormalValue)}");
+            }
+        }
     }
 
     [ContentProperty(nameof(Colors))]
@@ -508,9 +531,18 @@ namespace MGUI.Core.UI.XAML
         public override MGElementType ElementType => MGElementType.GridColorPicker;
 
         [Category("Border")]
-        public BorderBrush BorderBrush { get; set; }
+        public Border Border { get; set; } = new();
+
         [Category("Border")]
-        public Thickness? BorderThickness { get; set; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
+
+        [Category("Border")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public Thickness? BorderThickness { get => Border.BorderThickness; set => Border.BorderThickness = value; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [Browsable(false)]
         public Thickness? BT { get => BorderThickness; set => BorderThickness = value; }
@@ -591,14 +623,10 @@ namespace MGUI.Core.UI.XAML
 
             MGGridColorPicker ColorPicker = Element as MGGridColorPicker;
 
+            Border.ApplySettings(ColorPicker, ColorPicker.BorderComponent.Element, false);
             SelectedColorPresenter.ApplySettings(ColorPicker, ColorPicker.SelectedColorPresenter, false);
             SelectedColorLabel.ApplySettings(ColorPicker, ColorPicker.SelectedColorLabel, false);
             SelectedColorValue.ApplySettings(ColorPicker, ColorPicker.SelectedColorValue, false);
-
-            if (BorderBrush != null)
-                ColorPicker.BorderBrush = BorderBrush.ToBorderBrush(Desktop, Element);
-            if (BorderThickness.HasValue)
-                ColorPicker.BorderThickness = BorderThickness.Value.ToThickness();
 
             if (Columns.HasValue)
                 ColorPicker.Columns = Columns.Value;
@@ -640,9 +668,23 @@ namespace MGUI.Core.UI.XAML
 
         protected internal override IEnumerable<Element> GetChildren()
         {
+            yield return Border;
             yield return SelectedColorPresenter;
             yield return SelectedColorLabel;
             yield return SelectedColorValue;
+        }
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGGridColorPicker TypedElement)
+            {
+                yield return (SelectedColorBorderBrush, TypedElement.SelectedColorBorderBrush, nameof(MGGridColorPicker.SelectedColorBorderBrush));
+                yield return (UnselectedColorBorderBrush, TypedElement.UnselectedColorBorderBrush, nameof(MGGridColorPicker.UnselectedColorBorderBrush));
+                yield return (HoveredColorOverlay, TypedElement.HoveredColorOverlay, nameof(MGGridColorPicker.HoveredColorOverlay));
+                yield return (SelectedColorOverlay, TypedElement.SelectedColorOverlay, nameof(MGGridColorPicker.SelectedColorOverlay));
+            }
         }
     }
 
@@ -841,6 +883,16 @@ namespace MGUI.Core.UI.XAML
             foreach (Overlay Overlay in Overlays)
                 yield return Overlay;
         }
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGOverlayHost TypedElement)
+            {
+                yield return (OverlayBackground, TypedElement.OverlayBackground, nameof(MGOverlayHost.OverlayBackground));
+            }
+        }
     }
 
     public class Overlay : SingleContentHost
@@ -1024,6 +1076,17 @@ namespace MGUI.Core.UI.XAML
             ValueTextBlock ??= new();
             yield return ValueTextBlock;
         }
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGProgressBar TypedElement)
+            {
+                yield return (CompletedBrush, TypedElement.CompletedBrush?.NormalValue, $"{nameof(MGProgressBar.CompletedBrush)}.{nameof(VisualStateFillBrush.NormalValue)}");
+                yield return (IncompleteBrush, TypedElement.IncompleteBrush?.NormalValue, $"{nameof(MGProgressBar.IncompleteBrush)}.{nameof(VisualStateFillBrush.NormalValue)}");
+            }
+        }
     }
 
     public class ProgressButton : SingleContentHost
@@ -1152,6 +1215,18 @@ namespace MGUI.Core.UI.XAML
             foreach (Element Child in base.GetChildren())
                 yield return Child;
             yield return Border;
+        }
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGProgressButton TypedElement)
+            {
+                yield return (ProgressBarBorderBrush, TypedElement.ProgressBarBorderBrush, nameof(MGProgressButton.ProgressBarBorderBrush));
+                yield return (ProgressBarBackground, TypedElement.ProgressBarBackground, nameof(MGProgressButton.ProgressBarBackground));
+                yield return (ProgressBarForeground, TypedElement.ProgressBarForeground, nameof(MGProgressButton.ProgressBarForeground));
+            }
         }
     }
 
@@ -1352,6 +1427,16 @@ namespace MGUI.Core.UI.XAML
         }
 
         protected internal override IEnumerable<Element> GetChildren() => Enumerable.Empty<Element>();
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGRectangle TypedElement)
+            {
+                yield return (Fill, TypedElement.Fill, nameof(MGRectangle.Fill));
+            }
+        }
     }
 
     public class ResizeGrip : Element
@@ -1441,6 +1526,19 @@ namespace MGUI.Core.UI.XAML
                 ScrollViewer.ScrollBarInnerBrush.SelectedValue = ScrollBarFocusedInnerBrush.ToFillBrush(Desktop, Element);
 
             base.ApplyDerivedSettings(Parent, Element, IncludeContent);
+        }
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGScrollViewer TypedElement)
+            {
+                yield return (ScrollBarUnfocusedOuterBrush, TypedElement.ScrollBarOuterBrush?.NormalValue, $"{nameof(MGScrollViewer.ScrollBarOuterBrush)}.{nameof(VisualStateFillBrush.NormalValue)}");
+                yield return (ScrollBarFocusedOuterBrush, TypedElement.ScrollBarOuterBrush?.SelectedValue, $"{nameof(MGScrollViewer.ScrollBarOuterBrush)}.{nameof(VisualStateFillBrush.SelectedValue)}");
+                yield return (ScrollBarUnfocusedInnerBrush, TypedElement.ScrollBarInnerBrush?.NormalValue, $"{nameof(MGScrollViewer.ScrollBarInnerBrush)}.{nameof(VisualStateFillBrush.NormalValue)}");
+                yield return (ScrollBarFocusedInnerBrush, TypedElement.ScrollBarInnerBrush?.SelectedValue, $"{nameof(MGScrollViewer.ScrollBarInnerBrush)}.{nameof(VisualStateFillBrush.SelectedValue)}");
+            }
         }
     }
 
@@ -1594,6 +1692,22 @@ namespace MGUI.Core.UI.XAML
         }
 
         protected internal override IEnumerable<Element> GetChildren() => Enumerable.Empty<Element>();
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGSlider TypedElement)
+            {
+                yield return (NumberLineBorderBrush, TypedElement.NumberLineBorderBrush, nameof(MGSlider.NumberLineBorderBrush));
+                yield return (TickBorderBrush, TypedElement.TickBorderBrush, nameof(MGSlider.TickBorderBrush));
+                yield return (ThumbBorderBrush, TypedElement.ThumbBorderBrush, nameof(MGSlider.ThumbBorderBrush));
+                yield return (NumberLineFillBrush, TypedElement.NumberLineFillBrush, nameof(MGSlider.NumberLineFillBrush));
+                yield return (TickFillBrush, TypedElement.TickFillBrush, nameof(MGSlider.TickFillBrush));
+                yield return (ThumbFillBrush, TypedElement.ThumbFillBrush, nameof(MGSlider.ThumbFillBrush));
+                yield return (Foreground, TypedElement.Foreground, nameof(MGSlider.Foreground));
+            }
+        }
     }
 
     public class Spacer : Element
@@ -1815,6 +1929,16 @@ namespace MGUI.Core.UI.XAML
 
             foreach (TabItem Tab in Tabs)
                 yield return Tab;
+        }
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGTabControl TypedElement)
+            {
+                yield return (HeaderAreaBackground, TypedElement.HeaderAreaBackground?.NormalValue, $"{nameof(MGTabControl.HeaderAreaBackground)}.{nameof(VisualStateFillBrush.NormalValue)}");
+            }
         }
     }
 
@@ -2243,6 +2367,16 @@ namespace MGUI.Core.UI.XAML
                 yield return Element;
 
             yield return Border;
+        }
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGToggleButton TypedElement)
+            {
+                yield return (CheckedBackgroundBrush, TypedElement.CheckedBackgroundBrush, nameof(MGToggleButton.CheckedBackgroundBrush));
+            }
         }
     }
 

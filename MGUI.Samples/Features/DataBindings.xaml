@@ -417,6 +417,24 @@ The Converter is specified using:
                         </StackPanel>
                     </Expander>
                     <Spacer Height="5" />
+                    <Expander IsExpanded="False">
+                        <Expander.Header>
+                            <TextBlock StyleNames="Header1" FontSize="12" Text="Non-MGElement properties" />
+                        </Expander.Header>
+                        <StackPanel Orientation="Vertical" Spacing="5" Padding="4">
+                            <TextBlock>
+                                If a DataBinding is defined in XAML, it must only be applied to properties that belong to [c=Turquoise]MGElement[/c] objects.
+                            </TextBlock>
+                            <TextBlock>
+                                If, for example, you define a [c=Turquoise]BorderedFillBrush[/c] in XAML, and tried to put a binding onto a property of the brush, the binding would be ignored.
+                                Binding the [c=Turquoise]Background[/c] of an element to a [c=Turquoise]BorderedFillBrush[/c] works fine, 
+                                BUT setting the [c=Turquoise]Background[/c] in XAML to a [c=Turquoise]BorderedFillBrush[/c], and then binding the [c=Turquoise]BorderedFillBrush.FillBrush[/c] property will not work 
+                                because the target property of the DataBinding would not belong to an [c=Turquoise]MGElement[/c] object.
+                                There are [i]Some[/i] exceptions where a [c=Turquoise]FillBrush[/c] or [c=Turquoise]BorderBrush[/c] does support nested bindings, but most do not.
+                            </TextBlock>
+                        </StackPanel>
+                    </Expander>
+                    <Spacer Height="5" />
                     <TextBlock>
                         TODO: Documentation on circular dependencies, such as a TwoWay binding to another Element's Height.
                         Also describe cases where a bound property's setter might set the value to a different value than what was

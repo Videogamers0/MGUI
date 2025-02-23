@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,21 @@ namespace MGUI.Samples.Dialogs.Debugging
 {
     public class Debug2 : SampleBase
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private Color _TestColor;
+        public Color TestColor
+        {
+            get => _TestColor;
+            set
+            {
+                if (_TestColor != value)
+                {
+                    _TestColor = value;
+                    NPC(nameof(TestColor));
+                }
+            }
+        }
+
         private static void InitializeResources(ContentManager Content, MGDesktop Desktop)
         {
             //  XAML uses named resources to reference Texture2D objects.
@@ -28,7 +44,17 @@ namespace MGUI.Samples.Dialogs.Debugging
         public Debug2(ContentManager Content, MGDesktop Desktop)
             : base(Content, Desktop, $"{nameof(Dialogs)}.{nameof(Debugging)}", $"{nameof(Debug2)}.xaml", () => { InitializeResources(Content, Desktop); })
         {
+            TestColor = Color.Orange;
+            if (Window.TryGetElementByName<MGButton>("TestBtn", out MGButton TestBtn))
+            {
+                TestBtn.Command = (btn) =>
+                {
+                    TestColor = Color.Green;
+                    return true;
+                };
+            }
 
+            Window.WindowDataContext = this;
         }
     }
 }

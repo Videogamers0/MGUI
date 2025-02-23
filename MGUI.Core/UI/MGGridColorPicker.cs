@@ -662,7 +662,7 @@ namespace MGUI.Core.UI
 
                 SelectedColorIndexes = new List<int>();
                 AllowMultiSelect = false;
-                ShowSelectedColorLabel = true;
+                ShowSelectedColorLabel = false;
 
                 SelectedColorBorderBrush = new MGBandedBorderBrush(new List<Color>() { Color.Black, Color.Yellow }, new List<double>() { 1.0/3, 2.0/3 });
                 SelectedColorBorderThickness = new(3);

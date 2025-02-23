@@ -392,6 +392,85 @@
             </Expander>
             <Separator/>
 
+            <!-- HighlightFillBrush -->
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGHighlightFillBrush[/c]">
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        Directs the user's attention to a particular region either by brightening the focused region or by dimming the unfocused region.
+                        Typically used as an overlay brush ([c=Turquoise]MGElement.OverlayBrush[/c]).
+                    </TextBlock>
+                    <StackPanel Orientation="Vertical" Spacing="5" Margin="0,5">
+                        <TextBlock>Set [c=Turquoise]FocusedBounds[/c] or [c=Turquoise]FocusedElements[/c] to define which screen areas should be highlighted.</TextBlock>
+                        <TextBlock>Set [c=Turquoise]FillFocusedRegion[/c] to [c=LightBlue][s=Blue]true[/s][/c] and then set [c=Turquoise]FocusedColor[/c] to apply a color to the focal region.</TextBlock>
+                        <TextBlock>Set [c=Turquoise]FillUnfocusedRegion[/c] to [c=LightBlue][s=Blue]true[/s][/c] and then set [c=Turquoise]UnfocusedColor[/c] to apply a color to the non-focal region.</TextBlock>
+
+                        <Border Padding="15" BorderBrush="Black" BorderThickness="3" HorizontalAlignment="Left">
+                            <Border.Overlay>
+                                <HighlightFillBrush FillFocusedRegion="{MGBinding ElementName=FillFocusedRegionCheckBox, Path=IsChecked, Mode=OneWay}"
+                                                    FillUnfocusedRegion="{MGBinding ElementName=FillUnfocusedRegionCheckBox, Path=IsChecked, Mode=OneWay}"
+                                                    FocusedColor="{MGBinding Path=HighlightBrushActualFocusedColor, Mode=OneWay, FallbackValue='White * 0.5'}"
+                                                    UnfocusedColor="{MGBinding Path=HighlightBrushActualUnfocusedColor, Mode=OneWay, FallbackValue='Black * 0.5'}"
+                                                    FocusedElements="{MGBinding Path=HighlightBrushFocusedElements, Mode=OneWay}"
+                                                    FocusedElementPadding="{MGBinding Path=HighlightBrushFocusedElementPadding, Mode=OneWay}">
+                                </HighlightFillBrush>
+                            </Border.Overlay>
+
+                            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Spacing="8">
+                                <TextBlock FontSize="16" Text="[b][u]Sample UI Content[/u][/b]" />
+                                <Spacer Height="10" />
+                                <CheckBox Name="HighlightBrushSampleCheckBox" Content="Sample Checkbox" />
+                                <Button Name="HighlightBrushSampleButton" Content="Hello World" />
+                                <StackPanel Name="HighlightBrushSampleRadioButtons" Orientation="Vertical" Spacing="3">
+                                    <RadioButton GroupName="RB1" Content="Option #1" />
+                                    <RadioButton GroupName="RB1" Content="Option #2" />
+                                    <RadioButton GroupName="RB1" Content="Option #3" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Orientation="Vertical" Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="FocusedElements:" />
+                                <CheckBox Content="CheckBox" IsChecked="{MGBinding Path=HighlightBrushFocusCheckBox, Mode=TwoWay}" />
+                                <CheckBox Content="Button" IsChecked="{MGBinding Path=HighlightBrushFocusButton, Mode=TwoWay}" />
+                                <CheckBox Content="RadioButtons" IsChecked="{MGBinding Path=HighlightBrushFocusRadioButtons, Mode=TwoWay}" />
+                            </StackPanel>
+
+                            <Grid RowLengths="auto,auto" ColumnLengths="*,*" ColumnSpacing="20" RowSpacing="5" HorizontalAlignment="Left">
+                                <CheckBox Row="0" Column="0" Name="FillFocusedRegionCheckBox" Content="FillFocusedRegion" IsChecked="True" />
+                                <CheckBox Row="0" Column="1" Name="FillUnfocusedRegionCheckBox" Content="FillUnfocusedRegion" IsChecked="True" />
+                                <StackPanel Row="1" Column="0" Orientation="Vertical">
+                                    <GridColorPicker ColorPalette="Mac_16" SelectedColor="{MGBinding HighlightBrushFocusedColor, Mode=TwoWay}"
+                                                     ShowSelectedColorLabel="False" ColumnSpacing="0" RowSpacing="0" ColorSize="24" />
+                                    <DockPanel>
+                                        <TextBlock Text="Opacity:" Dock="Left" Margin="0,0,3,0" VerticalAlignment="Center" />
+                                        <Slider Minimum="0" Maximum="1" MinWidth="100" UseDiscreteValues="True" DiscreteValueInterval="0.05"
+                                                Value="{MGBinding Path=HighlightBrushFocusedColorOpacity, Mode=TwoWay}" />
+                                    </DockPanel>
+                                </StackPanel>
+                                <StackPanel Row="1" Column="1" Orientation="Vertical">
+                                    <GridColorPicker ColorPalette="Mac_16" SelectedColor="{MGBinding HighlightBrushUnfocusedColor, Mode=TwoWay}"
+                                                     ShowSelectedColorLabel="False" ColumnSpacing="0" RowSpacing="0" ColorSize="24" />
+                                    <DockPanel>
+                                        <TextBlock Text="Opacity:" Dock="Left" Margin="0,0,3,0" VerticalAlignment="Center" />
+                                        <Slider Minimum="0" Maximum="1" MinWidth="100" UseDiscreteValues="True" DiscreteValueInterval="0.05"
+                                                Value="{MGBinding Path=HighlightBrushUnfocusedColorOpacity, Mode=TwoWay}" />
+                                    </DockPanel>
+                                </StackPanel>
+                            </Grid>
+
+                            <StackPanel Orientation="Vertical" Spacing="2" HorizontalAlignment="Left">
+                                <TextBlock Text="FocusedElementPadding (Non-zero value expands the bounds of the [c=Turquoise]FocusedElements[/c]" />
+                                <Slider Minimum="0" Maximum="10" UseDiscreteValues="True" DiscreteValueInterval="1" MinWidth="100" 
+                                        Value="{MGBinding Path=HighlightBrushFocusedElementPadding, Mode=TwoWay}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
         </StackPanel>
     </ScrollViewer>
 </Window>

@@ -40,6 +40,21 @@ namespace MGUI.Core.UI.Data_Binding
         public static ISourceObjectResolver FromDesktop() => DesktopResolver;
     }
 
+    public interface IElementNameResolver
+    {
+        public bool TryGetElementByName(string Name, out MGElement NamedElement);
+    }
+
+    public interface IResourcesResolver
+    {
+        public MGResources GetResources();
+    }
+
+    public interface IDesktopResolver
+    {
+        public MGDesktop GetDesktop();
+    }
+
     /// <summary>Indicates that the source object of the binding is the same as the Targeted object</summary>
     public class SourceObjectResolverSelf : ISourceObjectResolver
     {
@@ -61,7 +76,7 @@ namespace MGUI.Core.UI.Data_Binding
 
         public object ResolveSourceObject(object TargetObject)
         {
-            if (TargetObject is MGElement Element && Element.SelfOrParentWindow.TryGetElementByName(ElementName, out MGElement NamedElement))
+            if (TargetObject is IElementNameResolver Resolver && Resolver.TryGetElementByName(ElementName, out MGElement NamedElement))
                 return NamedElement;
             else
                 return null;
@@ -83,7 +98,7 @@ namespace MGUI.Core.UI.Data_Binding
 
         public object ResolveSourceObject(object TargetObject)
         {
-            if (TargetObject is MGElement Element && Element.GetResources().StaticResources.TryGetValue(ResourceName, out object Resource))
+            if (TargetObject is IResourcesResolver Resolver && Resolver.GetResources()?.StaticResources.TryGetValue(ResourceName, out object Resource) == true)
                 return Resource;
             else
                 return null;
@@ -147,8 +162,8 @@ namespace MGUI.Core.UI.Data_Binding
 
         public object ResolveSourceObject(object TargetObject)
         {
-            if (TargetObject is MGElement Element)
-                return Element.GetDesktop();
+            if (TargetObject is IDesktopResolver Resolver)
+                return Resolver.GetDesktop();
             else
                 return null;
         }

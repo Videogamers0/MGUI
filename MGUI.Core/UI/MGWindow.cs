@@ -759,6 +759,7 @@ namespace MGUI.Core.UI
                     NPC(nameof(DataContextOverride));
                     NPC(nameof(DataContext));
                     WindowDataContextChanged?.Invoke(this, WindowDataContext);
+                    InvokeDataContextChanged();
                     //  Changing the DataContext may have changed the sizes of elements on this window, so attempt to resize the window to its contents
                     //RevalidateSizeToContent(false);
                 }
@@ -1171,7 +1172,7 @@ namespace MGUI.Core.UI
         public MGElement GetElementByName(string Name) => ElementsByName[Name];
         public T GetElementByName<T>(string Name) where T : MGElement => ElementsByName[Name] as T;
 
-        public bool TryGetElementByName(string Name, out MGElement Element) => ElementsByName.TryGetValue(Name, out Element);
+        public new bool TryGetElementByName(string Name, out MGElement Element) => ElementsByName.TryGetValue(Name, out Element);
         public bool TryGetElementByName<T>(string Name, out T Element) where T : MGElement
         {
             if (TryGetElementByName(Name, out MGElement Result))

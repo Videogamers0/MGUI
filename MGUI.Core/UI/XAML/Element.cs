@@ -15,7 +15,7 @@ using XNAColor = Microsoft.Xna.Framework.Color;
 namespace MGUI.Core.UI.XAML
 {
     [TypeConverter(typeof(ElementStringConverter))]
-    public abstract class Element
+    public abstract class Element : XAMLBindableBase
     {
         public abstract MGElementType ElementType { get; }
 
@@ -82,6 +82,8 @@ namespace MGUI.Core.UI.XAML
         public Thickness? BackgroundRenderPadding { get; set; }
         [Category("Appearance")]
         public FillBrush Background { get; set; }
+        [Category("Appearance")]
+        public FillBrush Overlay { get; set; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [Browsable(false)]
         public FillBrush BG { get => Background; set => Background = value; }
@@ -170,8 +172,6 @@ namespace MGUI.Core.UI.XAML
         [Category("Attached")]
         public object Tag { get; set; }
 
-        protected internal List<BindingConfig> Bindings { get; } = new();
-
         /// <param name="ApplyBaseSettings">If not null, this action will be invoked before <see cref="ApplySettings(MGElement, MGElement, bool)"/> executes.</param>
         public T ToElement<T>(MGWindow Window, MGElement Parent, Action<T> ApplyBaseSettings = null) 
             where T : MGElement
@@ -196,6 +196,8 @@ namespace MGUI.Core.UI.XAML
         {
             using (Element.BeginInitializing())
             {
+                MGDesktop Desktop = Element.GetDesktop();
+
                 if (Name != null)
                     Element.Name = Name;
 
@@ -244,6 +246,7 @@ namespace MGUI.Core.UI.XAML
                 if (BackgroundRenderPadding.HasValue)
                     Element.BackgroundRenderPadding = BackgroundRenderPadding.Value.ToThickness();
                 ApplyBackground(Element);
+                Element.OverlayBrush = Overlay?.ToFillBrush(Desktop, Element);
 
                 if (TextForeground.HasValue)
                     Element.DefaultTextForeground.NormalValue = TextForeground.Value.ToXNAColor();
@@ -264,19 +267,94 @@ namespace MGUI.Core.UI.XAML
                 if (RenderScale.HasValue)
                     Element.RenderScale = new(RenderScale.Value, RenderScale.Value);
 
-                Element.Tag = this.Tag;
+                Element.Tag = Tag;
 
                 if (IncludeBindings)
                 {
-                    //  These bindings are initialized in Window.ToElement(Desktop, Theme)
-                    //  Because ElementName references cannot be resolved until named elements have been processed and added to the MGWindow instance
-                    if (Bindings.Any())
-                        Element.Metadata[BindingsMetadataKey] = this.Bindings;
+                    //  Note: DataBindings are initialized later, once all XAML content is done parsing, (in Window.ToElement(Desktop, Theme))
+                    //  Because ElementName references cannot be resolved until all named elements have been processed and added to the MGWindow instance.
+                    //  So this logic temporarily copies binding information to the underlying target types and processes them later.
+
+                    if (Bindings?.Any() == true)
+                        Element.Bindings.AddRange(Bindings);
+
+                    void CopyBindings(XAMLBindableBase Source, object Target, string TargetPath)
+                    {
+                        if (Source?.Bindings?.Any() == true && Target != null)
+                        {
+                            if (Target is not XAMLBindableBase BindableTarget)
+                            {
+                                Debug.WriteLine($"Warning - DataBinding(s) on XAML element '{Source.GetType().Name}' are ignored " +
+                                    $"because the underlying target type ({Target.GetType().Name}) does not support DataBindings. " +
+                                    $"Bindings in XAML should typically only be applied to properties belonging to {nameof(MGElement)} objects.");
+                            }
+                            else
+                            {
+                                BindableTarget.Bindings.AddRange(Source.Bindings);
+
+                                //  Store the target object path in the element's metadata so the target objects can be dynamically retrieved later when the binding is being created
+                                List<string> Paths;
+                                if (!Element.Metadata.TryGetValue(BindingPathsMetadataKey, out object List))
+                                {
+                                    Paths = new List<string>();
+                                    Element.Metadata.Add(BindingPathsMetadataKey, Paths);
+                                }
+                                else
+                                {
+                                    Paths = List as List<string>;
+                                }
+                                Paths.Add(TargetPath);
+                            }
+
+                            //TODO what about nested bindable objects, such as MGBorderedFillBrush.FillBrush?
+                            //Current implementation ignores bindings defined in XAML that are nested on a XAMLBindableBase object and only processes the outer-most object (MGBorderedFillBrush).
+                            //XAMLBindableBase.GetNestedBindableObjects() is intended to fix this issue but there are some problems with it such as the Target object
+                            //      of the nested bindable object might be null, so there isn't anything to copy the binding data to.
+                            static IEnumerable<XAMLBindableBase> RecurseNestedBindableObjects(XAMLBindableBase Current)
+                            {
+                                if (Current != null)
+                                {
+                                    foreach (var Item in Current.GetNestedBindableObjects())
+                                    {
+                                        if (Item.Item != null)
+                                        {
+                                            yield return Item.Item;
+                                            foreach (XAMLBindableBase Nested in RecurseNestedBindableObjects(Item.Item))
+                                                yield return Nested;
+                                        }
+                                    }
+                                }
+                            }
+                            if (RecurseNestedBindableObjects(Source).Any(x => x.Bindings?.Any() == true))
+                            {
+                                Debug.WriteLine($"Warning - DataBindings that are defined in XAML are ignored if they are nested within non-{nameof(MGElement)} objects.");
+                            }
+                        }
+                    }
+
+                    foreach (var (Source, Target, TargetPath) in GetBaseBindableObjects(Element))
+                        CopyBindings(Source, Target, TargetPath);
+                    foreach (var (Source, Target, TargetPath) in GetBindableObjects(Element))
+                        CopyBindings(Source, Target, TargetPath);
                 }
             }
         }
 
-        private const string BindingsMetadataKey = "TmpBindings";
+        private IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBaseBindableObjects(MGElement Element)
+        {
+            yield return (Background, Element.BackgroundBrush?.NormalValue, $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.NormalValue)}");
+            yield return (Overlay, Element.OverlayBrush, $"{nameof(MGElement.OverlayBrush)}");
+            yield return (DisabledBackground, Element.BackgroundBrush?.DisabledValue, $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.DisabledValue)}");
+            yield return (SelectedBackground, Element.BackgroundBrush?.SelectedValue, $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.SelectedValue)}");
+        }
+
+        /// <summary>Returns a list of non-<see cref="MGElement"/> objects that support <see cref="DataBinding"/>s in XAML.<para/>
+        /// Value1: the XAML type<br/>Value2: the the underlying type<br/>Value3: the path to the underlying type, starting from the <see cref="MGElement"/> object.<para/>
+        /// This is usually fillbrushes and borderbrushes with bindable properties. 
+        /// For example, a <see cref="Slider"/> would return a tuple consisting of <see cref="Slider.Foreground"/>, <see cref="MGSlider.Foreground"/>, and nameof(<see cref="MGSlider.Foreground"/>).</summary>
+        /// <param name="Element"></param>
+        protected virtual IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element) 
+            => Enumerable.Empty<(XAMLBindableBase Source, object Target, string TargetPath)>();
 
         //  DataBindings are defined in XAML (so they are applied to the properties of the XAML types)
         //  but are bound to the properties of the actual type (such as MGUI.Core.UI.MGButton instead of MGUI.Core.UI.XAML.Button).
@@ -284,6 +362,7 @@ namespace MGUI.Core.UI.XAML
         private static readonly Dictionary<string, string> BindingPathMappings = new()
         {
             { nameof(Background), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.NormalValue)}" },
+            { nameof(Overlay), $"{nameof(MGElement.OverlayBrush)}" },
             { nameof(SelectedBackground), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.SelectedValue)}" },
             { nameof(DisabledBackground), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.DisabledValue)}" },
             { nameof(TextForeground), $"{nameof(MGElement.DefaultTextForeground)}.{nameof(VisualStateSetting<XNAColor>.NormalValue)}" },
@@ -293,6 +372,8 @@ namespace MGUI.Core.UI.XAML
             { nameof(Height), $"{nameof(MGElement.PreferredHeight)}" },
             { nameof(ListBox.Items), $"{nameof(MGListBox<object>.ItemsSource)}" }
         };
+
+        private const string BindingPathsMetadataKey = "TmpBindingPaths";
 
         /// <summary>Resolves any pending <see cref="BindingConfig"/>s by converting them into <see cref="DataBinding"/>s</summary>
         /// <param name="DataContextOverride">If not null, this value will be applied to the <see cref="MGElement.DataContextOverride"/> value of every element that is processed.<para/>
@@ -311,9 +392,9 @@ namespace MGUI.Core.UI.XAML
                 if (DataContextOverride != null)
                     Element.DataContextOverride = DataContextOverride;
 
-                if (Element.Metadata.TryGetValue(BindingsMetadataKey, out object Value) && Value is List<BindingConfig> Bindings)
+                if (Element.Bindings?.Any() == true)
                 {
-                    foreach (BindingConfig Binding in Bindings)
+                    foreach (BindingConfig Binding in Element.Bindings)
                     {
                         object TargetObject = Element;
                         BindingConfig PostProcessedBinding = Binding;
@@ -329,7 +410,53 @@ namespace MGUI.Core.UI.XAML
 
                         DataBindingManager.AddBinding(PostProcessedBinding, TargetObject);
                     }
-                    Element.Metadata.Remove(BindingsMetadataKey);
+                    Element.Bindings.Clear();
+                }
+
+                if (Element.Metadata.TryGetValue(BindingPathsMetadataKey, out object Items))
+                {
+                    if (Items is List<string> BindingPaths)
+                    {
+                        MGWindow Window = Element.SelfOrParentWindow;
+                        List<XAMLBindableBase> Targets = new List<XAMLBindableBase>();
+
+                        foreach (string Path in BindingPaths)
+                        {
+                            object Target = DataBinding.ResolvePath(Element, Path.Split('.'));
+                            if (Target != null && Target is XAMLBindableBase BindableTarget && BindableTarget.Bindings?.Any() == true)
+                            {
+                                foreach (BindingConfig Binding in BindableTarget.Bindings)
+                                {
+                                    if (Binding.Converter is StringToToolTipConverter StringToolTipConverter)
+                                        StringToolTipConverter.Host = Element;
+                                    DataBindingManager.AddBinding(Binding, BindableTarget);
+                                    Targets.Add(BindableTarget);
+                                }
+                            }
+                        }
+
+                        //  Copy the DataContext from the parent window to each binding target object
+                        if (Targets.Any())
+                        {
+                            void UpdateDataContext(XAMLBindableBase Target)
+                            {
+                                if (Target.DataContext != Window.WindowDataContext)
+                                {
+                                    Target.DataContext = Window.WindowDataContext;
+                                    Target.InvokeDataContextChanged();
+                                }
+                            }
+
+                            foreach (var Item in Targets)
+                                UpdateDataContext(Item);
+                            Window.DataContextChanged += (sender, e) =>
+                            {
+                                foreach (var Item in Targets)
+                                    UpdateDataContext(Item);
+                            };
+                        }
+                    }
+                    Element.Metadata.Remove(BindingPathsMetadataKey);
                 }
             }
         }

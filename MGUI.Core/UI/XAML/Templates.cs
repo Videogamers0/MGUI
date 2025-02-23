@@ -22,7 +22,7 @@ namespace MGUI.Core.UI.XAML
     [ContentProperty(nameof(Content))]
     public class ContentTemplate
     {
-        /// <summary>The name of the <see cref="MGElementTemplate"/> to when generating the Content. <see cref="MGElementTemplate"/>s are retrieved via <see cref="MGResources.ElementTemplates"/><para/>
+        /// <summary>The name of the <see cref="MGElementTemplate"/> to use when generating the Content. <see cref="MGElementTemplate"/>s are retrieved via <see cref="MGResources.ElementTemplates"/><para/>
         /// You should only specify either <see cref="ContentTemplateName"/> or <see cref="Content"/>, not both.<para/>
         /// See also: <see cref="MGDesktop.Resources"/>, <see cref="MGResources.ElementTemplates"/></summary>
         [Category("Data")]

@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XNAColor = Microsoft.Xna.Framework.Color;
+using MGUI.Core.UI.Data_Binding;
+using System.Diagnostics;
 
 #if UseWPF
 using System.Windows.Markup;
@@ -60,7 +62,7 @@ namespace MGUI.Core.UI.XAML
 
     #region Fill Brush
     [TypeConverter(typeof(FillBrushStringConverter))]
-    public abstract class FillBrush
+    public abstract class FillBrush : XAMLBindableBase
     {
         public abstract IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element);
     }
@@ -199,6 +201,14 @@ namespace MGUI.Core.UI.XAML
 
         public override IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element) => 
             new MGBorderedFillBrush(BorderThickness.ToThickness(), BorderBrush?.ToBorderBrush(Desktop, Element), FillBrush?.ToFillBrush(Desktop, Element), PadFillBoundsByBorderThickness);
+
+        protected internal override IEnumerable<(XAMLBindableBase, string)> GetNestedBindableObjects()
+        {
+            foreach (var Item in base.GetNestedBindableObjects())
+                yield return Item;
+            yield return (BorderBrush, nameof(BorderBrush));
+            yield return (FillBrush, nameof(FillBrush));
+        }
     }
 
     [ContentProperty(nameof(Brushes))]
@@ -215,6 +225,14 @@ namespace MGUI.Core.UI.XAML
         public override string ToString() => $"{nameof(CompositedFillBrush)}: {Brushes.Count} brush(es)";
 
         public override IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element) => new MGCompositedFillBrush(Brushes.Select(x => x.ToFillBrush(Desktop, Element)).ToArray());
+
+        protected internal override IEnumerable<(XAMLBindableBase, string)> GetNestedBindableObjects()
+        {
+            foreach (var Item in base.GetNestedBindableObjects())
+                yield return Item;
+            foreach (FillBrush Brush in Brushes)
+                yield return (Brush, nameof(Brushes));
+        }
     }
 
     [ContentProperty(nameof(Brush))]
@@ -250,13 +268,49 @@ namespace MGUI.Core.UI.XAML
 
         public override string ToString() => $"{nameof(PaddedFillBrush)}: {Brush}";
 
-        public override IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element) => new MGPaddedFillBrush(Brush?.ToFillBrush(Desktop, Element), Padding.ToThickness(), Scale, MinWidth, MinHeight, MaxWidth, MaxHeight, HorizontalAlignment, VerticalAlignment);
+        public override IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element) 
+            => new MGPaddedFillBrush(Brush?.ToFillBrush(Desktop, Element), Padding.ToThickness(), Scale, MinWidth, MinHeight, MaxWidth, MaxHeight, HorizontalAlignment, VerticalAlignment);
+
+        protected internal override IEnumerable<(XAMLBindableBase, string)> GetNestedBindableObjects()
+        {
+            foreach (var Item in base.GetNestedBindableObjects())
+                yield return Item;
+            yield return (Brush, nameof(Brush));
+        }
+    }
+
+    public class HighlightFillBrush : FillBrush
+    {
+        public bool IsEnabled { get; set; } = true;
+        public bool FillFocusedRegion { get; set; } = false;
+        public XAMLColor? FocusedColor { get; set; }
+        public bool FillUnfocusedRegion { get; set; } = true;
+        public XAMLColor? UnfocusedColor { get; set; }
+        public IReadOnlyList<Microsoft.Xna.Framework.Rectangle> FocusedBounds { get; set; }
+        public IReadOnlyList<MGElement> FocusedElements { get; set; }
+        public MGElement FocusedElement { get; set; }
+        public int FocusedElementPadding { get; set; }
+
+        public override string ToString() => $"{nameof(HighlightFillBrush)}: {FocusedColor} / {UnfocusedColor}";
+
+        public override IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element)
+        {
+            MGHighlightFillBrush Brush = new(FillFocusedRegion, FocusedColor?.ToXNAColor(), FillUnfocusedRegion, UnfocusedColor?.ToXNAColor())
+            {
+                IsEnabled = IsEnabled,
+                FocusedBounds = FocusedBounds,
+                FocusedElements = FocusedElements,
+                FocusedElementPadding = FocusedElementPadding,
+                SourceElement = Element
+            };
+            return Brush;
+        }
     }
     #endregion Fill Brush
 
     #region Border Brush
     [TypeConverter(typeof(BorderBrushStringConverter))]
-    public abstract class BorderBrush
+    public abstract class BorderBrush : XAMLBindableBase
     {
         public abstract IBorderBrush ToBorderBrush(MGDesktop Desktop, MGElement Element);
     }
@@ -326,6 +380,16 @@ namespace MGUI.Core.UI.XAML
 
         public override IBorderBrush ToBorderBrush(MGDesktop Desktop, MGElement Element) => 
             new MGDockedBorderBrush(Left.ToFillBrush(Desktop, Element), Top.ToFillBrush(Desktop, Element), Right.ToFillBrush(Desktop, Element), Bottom.ToFillBrush(Desktop, Element));
+
+        protected internal override IEnumerable<(XAMLBindableBase, string)> GetNestedBindableObjects()
+        {
+            foreach (var Item in base.GetNestedBindableObjects())
+                yield return Item;
+            yield return (Left, nameof(Left));
+            yield return (Top, nameof(Top));
+            yield return (Right, nameof(Right));
+            yield return (Bottom, nameof(Bottom));
+        }
     }
 
     [ContentProperty(nameof(Bands))]
@@ -455,6 +519,13 @@ namespace MGUI.Core.UI.XAML
 
             return Brush;
         }
+
+        protected internal override IEnumerable<(XAMLBindableBase, string)> GetNestedBindableObjects()
+        {
+            foreach (var Item in base.GetNestedBindableObjects())
+                yield return Item;
+            yield return (Underlay, nameof(Underlay));
+        }
     }
 
     [ContentProperty(nameof(Brushes))]
@@ -471,6 +542,14 @@ namespace MGUI.Core.UI.XAML
         public override string ToString() => $"{nameof(CompositedBorderBrush)}: {Brushes.Count} brush(es)";
 
         public override IBorderBrush ToBorderBrush(MGDesktop Desktop, MGElement Element) => new MGCompositedBorderBrush(Brushes.Select(x => x.ToBorderBrush(Desktop, Element)).ToArray());
+
+        protected internal override IEnumerable<(XAMLBindableBase, string)> GetNestedBindableObjects()
+        {
+            foreach (var Item in base.GetNestedBindableObjects())
+                yield return Item;
+            foreach (BorderBrush Brush in Brushes)
+                yield return (Brush, nameof(Brushes));
+        }
     }
     #endregion Border Brush
 }
