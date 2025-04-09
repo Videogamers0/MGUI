@@ -37,6 +37,30 @@
 /processorParam:TextureFormat=Color
 /build:Border Textures/1_RightEdge.png
 
+#begin Brush Textures/9SliceTexture-1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Brush Textures/9SliceTexture-1.png
+
+#begin Brush Textures/9SliceTextures-2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Brush Textures/9SliceTextures-2.png
+
 #begin Icons/Item.png
 /importer:TextureImporter
 /processor:TextureProcessor

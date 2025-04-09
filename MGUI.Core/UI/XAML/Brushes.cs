@@ -306,6 +306,24 @@ namespace MGUI.Core.UI.XAML
             return Brush;
         }
     }
+
+    public class NineSliceFillBrush : FillBrush
+    {
+        public string SourceName { get; set; }
+        public Thickness? SourceMargin { get; set; }
+        public Thickness TargetMargin { get; set; }
+
+        public override IFillBrush ToFillBrush(MGDesktop Desktop, MGElement Element)
+        {
+            if (SourceName == null)
+                throw new ArgumentNullException(nameof(SourceName));
+            if (!Desktop.Resources.TryGetTexture(SourceName, out MGTextureData Source))
+                throw new InvalidOperationException($"No Texture was found with the name '{SourceName}' in {nameof(MGResources)}.{nameof(MGResources.Textures)}.");
+
+            IFillBrush Brush = new MGNineSliceFillBrush(TargetMargin.ToThickness(), Source, SourceMargin?.ToThickness());
+            return Brush;
+        }
+    }
     #endregion Fill Brush
 
     #region Border Brush

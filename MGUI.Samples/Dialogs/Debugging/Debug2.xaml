@@ -11,6 +11,13 @@
         </Border.BorderBrush>
 
         <DockPanel>
+            <!-- Testing a NineSliceFillBrush -->
+            <!--<Border Dock="Top" BorderThickness="0" Margin="5" Height="220" Width="150">
+                <Border.Background>
+                    <NineSliceFillBrush SourceName="DEBUG_9SliceTexture3" SourceMargin="40" TargetMargin="32" />
+                </Border.Background>
+            </Border>-->
+
             <!-- Testing an MGBinding on a non-MGElement property -->
             <!--<Border BorderBrush="Black" Dock="Top" BorderThickness="1" Height="50" Width="150" HA="Center" Padding="10">
                 <Border.Background>
