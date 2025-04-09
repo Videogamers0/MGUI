@@ -362,6 +362,7 @@ namespace MGUI.Core.UI.XAML
         private static readonly Dictionary<string, string> BindingPathMappings = new()
         {
             { nameof(Background), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.NormalValue)}" },
+            { nameof(TextBlock.Foreground), $"{nameof(MGTextBlock.Foreground)}.{nameof(VisualStateFillBrush.NormalValue)}" },
             { nameof(Overlay), $"{nameof(MGElement.OverlayBrush)}" },
             { nameof(SelectedBackground), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.SelectedValue)}" },
             { nameof(DisabledBackground), $"{nameof(MGElement.BackgroundBrush)}.{nameof(VisualStateFillBrush.DisabledValue)}" },

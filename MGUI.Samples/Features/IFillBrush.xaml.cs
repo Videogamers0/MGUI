@@ -2,12 +2,15 @@
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Thickness = MonoGame.Extended.Thickness;
 
 namespace MGUI.Samples.Features
 {
@@ -173,8 +176,125 @@ namespace MGUI.Samples.Features
         }
         #endregion MGHighlightFillBrush samples
 
+        #region MGNineSliceFillBrush samples
+        private MGBorder NineSliceResult { get; }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string _NineSliceSourceName;
+        public string NineSliceSourceName
+        {
+            get => _NineSliceSourceName;
+            set
+            {
+                if (_NineSliceSourceName != value)
+                {
+                    _NineSliceSourceName = value;
+                    NPC(nameof(NineSliceSourceName));
+                    NPC(nameof(NineSlicePlaceholderTextMargin));
+                    NPC(nameof(NineSlicePlaceholderTextColor));
+                    UpdateNineSliceBrush();
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _NineSliceSourceSample1;
+        public bool NineSliceSourceSample1
+        {
+            get => _NineSliceSourceSample1;
+            set
+            {
+                if (_NineSliceSourceSample1 != value)
+                {
+                    _NineSliceSourceSample1 = value;
+                    NPC(nameof(NineSliceSourceSample1));
+                    NineSliceSourceName = "Samples_9SliceTexture1";
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _NineSliceSourceSample2;
+        public bool NineSliceSourceSample2
+        {
+            get => _NineSliceSourceSample2;
+            set
+            {
+                if (_NineSliceSourceSample2 != value)
+                {
+                    _NineSliceSourceSample2 = value;
+                    NPC(nameof(NineSliceSourceSample2));
+                    NineSliceSourceName = "Samples_9SliceTexture2";
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _NineSliceSourceSample3;
+        public bool NineSliceSourceSample3
+        {
+            get => _NineSliceSourceSample3;
+            set
+            {
+                if (_NineSliceSourceSample3 != value)
+                {
+                    _NineSliceSourceSample3 = value;
+                    NPC(nameof(NineSliceSourceSample3));
+                    NineSliceSourceName = "Samples_9SliceTexture3";
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _NineSliceTargetMargin;
+        public int NineSliceTargetMargin
+        {
+            get => _NineSliceTargetMargin;
+            set
+            {
+                if (_NineSliceTargetMargin != value)
+                {
+                    _NineSliceTargetMargin = value;
+                    NPC(nameof(NineSliceTargetMargin));
+                    NPC(nameof(NineSlicePlaceholderTextMargin));
+                    UpdateNineSliceBrush();
+                }
+            }
+        }
+
+        public Thickness NineSlicePlaceholderTextMargin => NineSliceSourceSample1 ? new(NineSliceTargetMargin + 5) : new(NineSliceTargetMargin / 2 + 2);
+        public Color NineSlicePlaceholderTextColor => NineSliceSourceSample3 ? Color.Black : Color.White;
+
+        private static readonly IReadOnlyDictionary<string, int> NineSliceSourceMargins = new Dictionary<string, int>()
+        {
+            { "Samples_9SliceTexture1", 52 },
+            { "Samples_9SliceTexture2", 40 },
+            { "Samples_9SliceTexture3", 40 }
+        };
+
+        private void UpdateNineSliceBrush()
+        {
+            MGNineSliceFillBrush NineSliceBrush = new MGNineSliceFillBrush(new Thickness(NineSliceTargetMargin), Resources.Textures[NineSliceSourceName], NineSliceSourceMargins[NineSliceSourceName]);
+            NineSliceResult.BackgroundBrush.SetAll(NineSliceBrush);
+        }
+        #endregion MGNineSliceFillBrush samples
+
+        private static void InitializeResources(ContentManager Content, MGDesktop Desktop)
+        {
+            MGResources Resources = Desktop.Resources;
+
+            //  SourceMargin=52
+            Resources.AddTexture("Samples_9SliceTexture1", new MGTextureData(Content.Load<Texture2D>(Path.Combine("Brush Textures", "9SliceTexture-1"))));
+
+            //  SourceMargin=40
+            Texture2D NineSliceTextureAtlas = Content.Load<Texture2D>(Path.Combine("Brush Textures", "9SliceTextures-2"));
+            Resources.AddTexture("Samples_9SliceTexture2", new MGTextureData(NineSliceTextureAtlas, new Rectangle(136, 532, 128, 128)));
+            Resources.AddTexture("Samples_9SliceTexture3", new MGTextureData(NineSliceTextureAtlas, new Rectangle(4, 400, 128, 128)));
+            //Resources.AddTexture("9SliceTexture3", new MGTextureData(NineSliceTextureAtlas, new Rectangle(136, 532, 128, 128)));
+        }
+
         public IFillBrushSamples(ContentManager Content, MGDesktop Desktop)
-            : base(Content, Desktop, $"{nameof(Features)}", "IFillBrush.xaml")
+            : base(Content, Desktop, $"{nameof(Features)}", "IFillBrush.xaml", () => InitializeResources(Content, Desktop))
         {
             HighlightBrushFocusCheckBox = false;
             HighlightBrushFocusButton = false;
@@ -184,6 +304,11 @@ namespace MGUI.Samples.Features
             HighlightBrushUnfocusedColor = Color.Black;
             HighlightBrushUnfocusedColorOpacity = 0.35f;
             HighlightBrushFocusedElementPadding = 3;
+
+            NineSliceResult = Window.GetElementByName<MGBorder>("NineSliceResult");
+            NineSliceSourceSample1 = true;
+            MGResizeGrip NineSliceResizeGrip = new(Window, NineSliceResult);
+            NineSliceTargetMargin = 26;
 
             Window.GetElementByName<MGTextBox>("TB1").Text = @"<Button Background=""Red"" />";
 

@@ -165,7 +165,7 @@
             </Expander>
             <Separator/>
 
-            <!-- MGTextureFillBrush -->
+            <!-- TextureFillBrush -->
             <Expander IsExpanded="False" Header="[c=Turquoise]MGTextureFillBrush[/c]">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
@@ -265,7 +265,7 @@
             </Expander>
             <Separator/>
 
-            <!-- MGProgressBarGradientBrush -->
+            <!-- ProgressBarGradientBrush -->
             <Expander IsExpanded="False" Header="[c=Turquoise]MGProgressBarGradientBrush[/c]">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
@@ -284,7 +284,7 @@
             </Expander>
             <Separator/>
 
-            <!-- MGCompositedFillBrush -->
+            <!-- CompositedFillBrush -->
             <Expander IsExpanded="False" Header="[c=Turquoise]MGCompositedFillBrush[/c]">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
@@ -308,7 +308,7 @@
             </Expander>
             <Separator/>
 
-            <!-- MGPaddedFillBrush -->
+            <!-- PaddedFillBrush -->
             <Expander IsExpanded="False" Header="[c=Turquoise]MGPaddedFillBrush[/c]">
                 <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
                     <TextBlock>
@@ -466,6 +466,63 @@
                             </StackPanel>
                         </StackPanel>
 
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Separator/>
+
+            <!-- NineSliceFillBrush -->
+            <Expander IsExpanded="False" Header="[c=Turquoise]MGNineSliceFillBrush[/c]">
+                <StackPanel Orientation="Vertical" Background="White * 0.1" Padding="4" Margin="0,4,0,0" Spacing="2">
+                    <TextBlock>
+                        9-slicing (or 9-patch) is a scaling technique that prevents the corners of a texture from being stretched/distorted 
+                        when the texture is drawn to a destination rectangle with a different aspect ratio than the input texture. 
+                        It divides the input texture into a 3x3 grid (based on the [c=Turquoise]SourceMargin[/c] property). 
+                        When drawing the texture, it computes a 3x3 grid of destination rectangles (based on the [c=Turquoise]TargetMargin[/c] property) 
+                        to draw each of the 9 regions to. This means that the corners of the texture can be drawn with a fixed size, 
+                        regardless of the destination that the texture is drawn to, while only the center region of the texture gets scaled to fit the destination bounds 
+                        (and each edge is only scaled in 1 axis instead of 2).
+                    </TextBlock>
+                    <TextBlock>
+                        9-slicing is commonly used for the background brush of menu panels and dialog boxes.
+                    </TextBlock>
+                    <Separator Margin="0,5" />
+                    <StackPanel Orientation="Vertical" Spacing="5" Margin="0,5">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Spacing="5">
+                            <TextBlock Text="Input Texture:" />
+                            <Image SourceName="{MGBinding Path=NineSliceSourceName, Mode=OneWay}" Width="128" Height="128" HorizontalAlignment="Left" />
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <RadioButton GroupName="NineSliceInput" Content="Sample1" IsChecked="{MGBinding NineSliceSourceSample1, Mode=TwoWay}" />
+                                <RadioButton GroupName="NineSliceInput" Content="Sample2" IsChecked="{MGBinding NineSliceSourceSample2, Mode=TwoWay}" />
+                                <RadioButton GroupName="NineSliceInput" Content="Sample3" IsChecked="{MGBinding NineSliceSourceSample3, Mode=TwoWay}" />
+                            </StackPanel>
+                        </StackPanel>
+                        <Separator Margin="0,5" />
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Spacing="5">
+                            <TextBlock Text="Result:" />
+                            <TextBlock Text="(Use the ResizeGrip in the bottom-right corner to resize the texture and see how it scales to fit the bounds)" />
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <TextBlock Text="[c=Turquoise]TargetMargin[/c]:" />
+                                <Slider Width="250" Minimum="13" Maximum="104" UseDiscreteValues="True" DiscreteValueInterval="1" DrawTicks="False"
+                                            Value="{MGBinding Path=NineSliceTargetMargin, Mode=TwoWay}" />
+                            </StackPanel>
+                            <Border BorderThickness="0" MinHeight="300">
+                                <Border Width="320" Height="240" MinWidth="200" MinHeight="200" MaxWidth="800" MaxHeight="500"
+                                        Name="NineSliceResult" BorderBrush="Black" BorderThickness="2" Padding="5" 
+                                        HorizontalAlignment="Left" VerticalAlignment="Top">
+                                    <Border.Background>
+                                        <NineSliceFillBrush SourceName="Samples_9SliceTexture1" SourceMargin="52" TargetMargin="26" />
+                                    </Border.Background>
+                                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" TextAlignment="Center" ClipToBounds="False"
+                                               Foreground="{MGBinding Path=NineSlicePlaceholderTextColor, Mode=OneWay}"
+                                               Margin="{MGBinding Path=NineSlicePlaceholderTextMargin, Mode=OneWay}">
+                                        Lorem ipsum dolor sit amet. Sed excepturi nemo aut fugiat rerum est delectus saepe est dolores minima.
+                                    </TextBlock>
+                                </Border>
+                            </Border>
+                        </StackPanel>
+
+                        <Spacer Height="50" />
                     </StackPanel>
                 </StackPanel>
             </Expander>
