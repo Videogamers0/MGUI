@@ -111,6 +111,8 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
         {
             DrawTransaction DT = DA.DT;
 
+            Bounds = Bounds.GetTranslated(DA.Offset);
+
             int LeftColumnSize = TargetMargin.Left;
             int RightColumnSize = TargetMargin.Right;
             int CenterColumnSize = Bounds.Width - LeftColumnSize - RightColumnSize;
