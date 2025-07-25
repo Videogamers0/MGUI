@@ -43,7 +43,7 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
 
             Rectangle Bounds = Source.SourceRect ?? Texture.Bounds;
 
-            //  Value the source margin
+            //  Validate the source margin
             Thickness Margin;
             if (SourceMargin.HasValue)
             {

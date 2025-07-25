@@ -1603,7 +1603,7 @@ namespace MGUI.Core.UI
                     foreach (MGElement Component in Components.Where(x => x.DrawAfterContents).Select(x => x.BaseElement))
                         Component.Draw(DA);
 
-                    OverlayBrush?.Draw(DA, this, GetBackgroundBounds());
+                    OverlayBrush?.Draw(DA, this, GetBackgroundBounds(LayoutBounds));
 
                     OnEndingDraw?.Invoke(this, DrawEventArgs);
                 }
@@ -1644,7 +1644,7 @@ namespace MGUI.Core.UI
 
         protected void DrawBackground(ElementDrawArgs DA) => DrawBackground(DA, this.LayoutBounds);
 
-        private Rectangle GetBackgroundBounds()
+        private Rectangle GetBackgroundBounds(Rectangle LayoutBounds)
         {
             Rectangle BorderlessBounds = !HasBorder ? LayoutBounds : LayoutBounds.GetCompressed(GetBorder().BorderThickness);
             Rectangle BackgroundBounds = BorderlessBounds.GetCompressed(BackgroundRenderPadding);
@@ -1653,7 +1653,7 @@ namespace MGUI.Core.UI
 
         public virtual void DrawBackground(ElementDrawArgs DA, Rectangle LayoutBounds)
 		{
-            Rectangle BackgroundBounds = GetBackgroundBounds();
+            Rectangle BackgroundBounds = GetBackgroundBounds(LayoutBounds);
             BackgroundBrush.GetUnderlay(DA.VisualState.Primary)?.Draw(DA, this, BackgroundBounds);
             SecondaryVisualState SecondaryState = DA.VisualState.GetSecondaryState(SpoofIsPressedWhileDrawingBackground, SpoofIsHoveredWhileDrawingBackground);
             BackgroundBrush.GetFillOverlay(SecondaryState)?.Draw(DA, this, BackgroundBounds);
