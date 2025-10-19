@@ -2,17 +2,13 @@
 using MGUI.Shared.Helpers;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MonoGame.Extended;
 using MGUI.Shared.Input.Mouse;
 using MGUI.Shared.Input.Keyboard;
 using MGUI.Shared.Input;
 using MGUI.Shared.Text;
 using MGUI.Shared.Rendering;
-using MGUI.Core.UI.Brushes.Fill_Brushes;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using System.IO;

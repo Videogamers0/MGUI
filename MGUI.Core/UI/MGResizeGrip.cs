@@ -1,14 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MonoGame.Extended;
 using MGUI.Shared.Helpers;
 using System.Diagnostics;
 using MGUI.Shared.Input.Mouse;
-using MGUI.Core.UI.Brushes.Fill_Brushes;
 
 namespace MGUI.Core.UI
 {

@@ -2,10 +2,6 @@
 using MonoGame.Extended;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MGUI.Shared.Rendering;
 
 namespace MGUI.Core.UI.Brushes.Border_Brushes

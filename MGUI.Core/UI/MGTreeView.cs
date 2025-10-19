@@ -2,15 +2,11 @@ using Microsoft.Xna.Framework;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Core.UI.Containers;
-using MGUI.Core.UI.XAML;
-using MGUI.Shared.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MGUI.Core.UI
 {

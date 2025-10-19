@@ -5,11 +5,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using XNAColor = Microsoft.Xna.Framework.Color;
 using MGUI.Core.UI.Data_Binding;
-using System.Diagnostics;
 
 #if UseWPF
 using System.Windows.Markup;

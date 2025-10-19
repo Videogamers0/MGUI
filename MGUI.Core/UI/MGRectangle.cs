@@ -1,13 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using MGUI.Shared.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MonoGame.Extended;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using System.Diagnostics;

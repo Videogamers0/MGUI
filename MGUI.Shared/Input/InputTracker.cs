@@ -2,8 +2,6 @@
 using MGUI.Shared.Input.Mouse;
 using MGUI.Shared.Rendering;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MGUI.Shared.Input
 {

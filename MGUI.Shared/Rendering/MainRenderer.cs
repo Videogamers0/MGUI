@@ -8,11 +8,8 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.VectorDraw;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MGUI.Shared.Rendering
 {

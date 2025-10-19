@@ -1,13 +1,8 @@
 ﻿using MGUI.Core.UI;
-using MGUI.Core.UI.Brushes.Fill_Brushes;
-using MGUI.Shared.Helpers;
-using MGUI.Shared.Input.Keyboard;
 using MGUI.Shared.Rendering;
 using MGUI.Shared.Text;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using SpriteFontPlus;
 using System;
 using System.Collections.Generic;
