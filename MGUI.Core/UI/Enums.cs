@@ -57,7 +57,8 @@ namespace MGUI.Core.UI
         //  Data Display
         ListView,
         ListBox,
-        //TreeView?
+        TreeView,
+        TreeViewItem,
 
         //  User Info
         ProgressBar,

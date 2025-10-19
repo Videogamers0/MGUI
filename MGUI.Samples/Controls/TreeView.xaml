@@ -1,0 +1,65 @@
+<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        Left="440" Top="20" MinHeight="0" Width="500" Height="600" TitleText="TreeView" Padding="10">
+    <Window.Styles>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10" />
+        </Style>
+        <Style Name="Header1" TargetType="TextBlock">
+            <Setter Property="IsBold" Value="True" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+        <Style TargetType="Separator">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Height" Value="2" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Opacity" Value="0.25" />
+        </Style>
+    </Window.Styles>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Background="rgb(64,64,64)" Padding="6,3">
+        <StackPanel Orientation="Vertical" Spacing="10">
+            <TextBlock StyleNames="Header1" Text="TreeView:" HorizontalAlignment="Center" />
+            <Separator/>
+            
+            <TextBlock Text="Basic TreeView with hierarchical items:" />
+            <TreeView Width="400" Height="300" IndentSize="20">
+                <TreeViewItem Header="Root Item 1" IsExpanded="True">
+                    <TreeViewItem Header="Child 1.1" />
+                    <TreeViewItem Header="Child 1.2" IsExpanded="True">
+                        <TreeViewItem Header="Grandchild 1.2.1" />
+                        <TreeViewItem Header="Grandchild 1.2.2" />
+                    </TreeViewItem>
+                    <TreeViewItem Header="Child 1.3" />
+                </TreeViewItem>
+                <TreeViewItem Header="Root Item 2" IsExpanded="True">
+                    <TreeViewItem Header="Child 2.1" />
+                    <TreeViewItem Header="Child 2.2" />
+                </TreeViewItem>
+                <TreeViewItem Header="Root Item 3">
+                    <TreeViewItem Header="Child 3.1" />
+                </TreeViewItem>
+            </TreeView>
+            
+            <Separator/>
+            
+            <TextBlock Text="TreeView with custom indent size:" />
+            <TreeView Width="400" Height="200" IndentSize="30">
+                <TreeViewItem Header="Documents" IsExpanded="True">
+                    <TreeViewItem Header="Work" IsExpanded="True">
+                        <TreeViewItem Header="Project A" />
+                        <TreeViewItem Header="Project B" />
+                    </TreeViewItem>
+                    <TreeViewItem Header="Personal">
+                        <TreeViewItem Header="Photos" />
+                        <TreeViewItem Header="Videos" />
+                    </TreeViewItem>
+                </TreeViewItem>
+                <TreeViewItem Header="Downloads">
+                    <TreeViewItem Header="Software" />
+                    <TreeViewItem Header="Documents" />
+                </TreeViewItem>
+            </TreeView>
+            
+        </StackPanel>
+    </ScrollViewer>
+</Window>
