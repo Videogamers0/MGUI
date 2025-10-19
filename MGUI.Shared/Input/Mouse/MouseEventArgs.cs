@@ -65,7 +65,7 @@ namespace MGUI.Shared.Input.Mouse
             : base()
         {
             this.Tracker = Tracker;
-            this.PressedAt = DateTime.Now;
+            PressedAt = DateTime.Now;
             this.Button = Button;
             this.Position = Position;
         }
@@ -95,7 +95,7 @@ namespace MGUI.Shared.Input.Mouse
             : base()
         {
             this.Tracker = Tracker;
-            this.ReleasedAt = DateTime.Now;
+            ReleasedAt = DateTime.Now;
             this.PressedArgs = PressedArgs;
             this.Button = Button;
             this.Position = Position;
@@ -153,7 +153,7 @@ namespace MGUI.Shared.Input.Mouse
         public BaseMouseDragStartEventArgs(MouseTracker Tracker, MouseButton Button, Point Position, DragStartCondition Condition)
         {
             this.Tracker = Tracker;
-            this.StartedAt = DateTime.Now;
+            StartedAt = DateTime.Now;
             this.Button = Button;
             this.Position = Position;
             this.Condition = Condition;
@@ -186,7 +186,7 @@ namespace MGUI.Shared.Input.Mouse
         {
             this.Tracker = Tracker;
             this.DragStartArgs = DragStartArgs;
-            this.Timestamp = DateTime.Now;
+            Timestamp = DateTime.Now;
             this.Button = Button;
             this.Position = Position;
         }
@@ -235,7 +235,7 @@ namespace MGUI.Shared.Input.Mouse
         {
             this.Tracker = Tracker;
             this.DragStartArgs = DragStartArgs;
-            this.Timestamp = DateTime.Now;
+            Timestamp = DateTime.Now;
             this.Button = Button;
             this.Position = Position;
         }

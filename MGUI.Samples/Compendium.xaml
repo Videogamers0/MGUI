@@ -66,6 +66,7 @@
                         <ToggleButton Content="TextBlock" IsChecked="{MGBinding Path=TextBlockSamples.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="TextBox" IsChecked="{MGBinding Path=TextBoxSamples.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="ToolTip" IsChecked="{MGBinding Path=ToolTipSamples.IsVisible, Mode=TwoWay}" Opacity="0.25" />
+                        <ToggleButton Content="TreeView" IsChecked="{MGBinding Path=TreeViewSamples.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="UniformGrid" IsChecked="{MGBinding Path=UniformGridSamples.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="Window" IsChecked="{MGBinding Path=WindowSamples.IsVisible, Mode=TwoWay}" Opacity="0.25" />
                     </UniformGrid>

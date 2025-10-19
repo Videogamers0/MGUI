@@ -318,8 +318,8 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
-                this.HeadersPanelElement = new(Window, Orientation.Horizontal) { Spacing = 6 };
-                this.HeadersPanelComponent = new(HeadersPanelElement, ComponentUpdatePriority.BeforeContents, ComponentDrawPriority.AfterContents,
+                HeadersPanelElement = new(Window, Orientation.Horizontal) { Spacing = 6 };
+                HeadersPanelComponent = new(HeadersPanelElement, ComponentUpdatePriority.BeforeContents, ComponentDrawPriority.AfterContents,
                     true, false, true, true, false, false, true,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds.GetCompressed(Padding), HorizontalAlignment.Stretch, VerticalAlignment.Top, ComponentSize.Size));
                 AddComponent(HeadersPanelComponent);
@@ -327,19 +327,19 @@ namespace MGUI.Core.UI
                 ExpandedVisibility = Visibility.Visible;
                 CollapsedVisibility = Visibility.Collapsed;
 
-                this.HeaderBottomMargin = 3;
+                HeaderBottomMargin = 3;
 
-                this.ExpanderToggleButton = new(Window, IsExpanded);
+                ExpanderToggleButton = new(Window, IsExpanded);
                 ExpanderToggleButton.VerticalAlignment = VerticalAlignment.Center;
                 ExpanderToggleButton.ManagedParent = this;
 
-                this.ExpanderButtonSize = DefaultExpanderButtonSize;
+                ExpanderButtonSize = DefaultExpanderButtonSize;
 
                 HeadersPanelElement.TryAddChild(ExpanderToggleButton);
                 HeadersPanelElement.CanChangeContent = false;
 
-                this.ExpanderDropdownArrowColor = GetTheme().DropdownArrowColor;
-                this.ExpanderDropdownArrowSize = DefaultExpanderDropdownArrowSize;
+                ExpanderDropdownArrowColor = GetTheme().DropdownArrowColor;
+                ExpanderDropdownArrowSize = DefaultExpanderDropdownArrowSize;
 
                 ExpanderToggleButton.OnCheckStateChanged += (sender, e) =>
                 {
@@ -370,17 +370,17 @@ namespace MGUI.Core.UI
                         };
                     }
 
-                    e.DA.DT.FillPolygon(e.DA.Offset.ToVector2(), DropdownArrowVertices.Select(x => x.ToVector2()), ExpanderDropdownArrowColor * e.DA.Opacity * this.Opacity);
+                    e.DA.DT.FillPolygon(e.DA.Offset.ToVector2(), DropdownArrowVertices.Select(x => x.ToVector2()), ExpanderDropdownArrowColor * e.DA.Opacity * Opacity);
                 };
 
-                this.BoundItems = new();
-                this.BoundItems.CollectionChanged += (sender, e) =>
+                BoundItems = new();
+                BoundItems.CollectionChanged += (sender, e) =>
                 {
                     if (e.NewItems != null)
                     {
                         foreach (MGElement Item in e.NewItems)
                         {
-                            Item.Visibility = this.IsExpanded? this.ExpandedVisibility : this.CollapsedVisibility;
+                            Item.Visibility = this.IsExpanded? ExpandedVisibility : CollapsedVisibility;
                         }
                     }
                 };

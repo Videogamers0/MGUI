@@ -27,10 +27,10 @@ namespace MGUI.Shared.Helpers
         /// <returns>A negative value if the ranges overlap. Positive value if they don't overlap. Zero if they are touching along the edge.</returns>
         public float SignedDistance(FloatRange Other)
         {
-            if (this.Minimum < Other.Minimum)
-                return Other.Minimum - this.Maximum;
+            if (Minimum < Other.Minimum)
+                return Other.Minimum - Maximum;
             else
-                return this.Minimum - Other.Maximum;
+                return Minimum - Other.Maximum;
         }
 
         public bool Intersects(FloatRange Other, out bool IsTouching, bool TreatTouchingAsIntersection = true) => Intersects(this, Other, out IsTouching, TreatTouchingAsIntersection);
@@ -53,7 +53,7 @@ namespace MGUI.Shared.Helpers
                 return !(A.Maximum <= B.Minimum || B.Maximum <= A.Minimum);
         }
 
-        public FloatRange Union(FloatRange Other) => new(Math.Min(this.Minimum, Other.Minimum), Math.Max(this.Maximum, Other.Maximum));
+        public FloatRange Union(FloatRange Other) => new(Math.Min(Minimum, Other.Minimum), Math.Max(Maximum, Other.Maximum));
 
         public static FloatRange operator +(FloatRange r) => r;
         public static FloatRange operator -(FloatRange r) => new(-r.Maximum, -r.Minimum);
@@ -68,7 +68,7 @@ namespace MGUI.Shared.Helpers
             return new(r1.Minimum / scalar, r1.Maximum / scalar);
         }
 
-        public override bool Equals(object obj) => obj is FloatRange other && this.Equals(other);
+        public override bool Equals(object obj) => obj is FloatRange other && Equals(other);
         public bool Equals(FloatRange other) => Minimum.Equals(other.Minimum) && Maximum.Equals(other.Maximum);
         public override int GetHashCode() => (Minimum, Maximum).GetHashCode();
         public static bool operator ==(FloatRange left, FloatRange right) => left.Equals(right);

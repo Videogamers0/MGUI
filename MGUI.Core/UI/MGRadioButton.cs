@@ -101,9 +101,9 @@ namespace MGUI.Core.UI
                 throw new ArgumentException($"{nameof(Name)} '{Name}' must be unique within the scope of its {nameof(MGWindow)}.");
 
             this.Name = Name;
-            this._RadioButtons = new();
-            this.AllowUnchecking = false;
-            this.AllowNullCheckedItem = false;
+            _RadioButtons = new();
+            AllowUnchecking = false;
+            AllowNullCheckedItem = false;
 
             _RadioButtons.CollectionChanged += (sender, e) =>
             {
@@ -277,23 +277,23 @@ namespace MGUI.Core.UI
                 this.Group = Group;
                 Group.AddRadioButton(this);
 
-                this.ButtonElement = new(Window, x => this.IsChecked = !this.IsChecked);
-                this.ButtonElement.MinHeight = 8;
-                this.ButtonElement.MinWidth = 8;
-                this.ButtonElement.Visibility = Visibility.Hidden;
-                this.ButtonElement.CanHandleInputsWhileHidden = true;
+                ButtonElement = new(Window, x => IsChecked = !IsChecked);
+                ButtonElement.MinHeight = 8;
+                ButtonElement.MinWidth = 8;
+                ButtonElement.Visibility = Visibility.Hidden;
+                ButtonElement.CanHandleInputsWhileHidden = true;
 
-                this.ButtonComponent = new(ButtonElement, false, true, true, true, false, false, false,
+                ButtonComponent = new(ButtonElement, false, true, true, true, false, false, false,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Left, VerticalAlignment.Center, ComponentSize.Size));
                 AddComponent(ButtonComponent);
 
-                this.BubbleComponentSize = DefaultBubbleSize;
-                this.BubbleComponentBorderColor = Color.Black;
-                this.BubbleComponentBorderThickness = 1;
-                this.BubbleComponentBackground = GetTheme().RadioButtonBubbleBackground.GetValue(true);
-                this.BubbleCheckedColor = GetTheme().RadioButtonCheckedFillColor;
+                BubbleComponentSize = DefaultBubbleSize;
+                BubbleComponentBorderColor = Color.Black;
+                BubbleComponentBorderThickness = 1;
+                BubbleComponentBackground = GetTheme().RadioButtonBubbleBackground.GetValue(true);
+                BubbleCheckedColor = GetTheme().RadioButtonCheckedFillColor;
 
-                this.SpacingWidth = DefaultBubbleSpacingWidth;
+                SpacingWidth = DefaultBubbleSpacingWidth;
             }
         }
 

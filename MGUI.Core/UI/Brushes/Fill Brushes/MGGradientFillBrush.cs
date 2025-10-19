@@ -19,10 +19,10 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
 
         public MGGradientFillBrush(Color TopLeft, Color TopRight, Color BottomRight, Color BottomLeft)
         {
-            this.TopLeftColor = TopLeft;
-            this.TopRightColor = TopRight;
-            this.BottomLeftColor = BottomLeft;
-            this.BottomRightColor = BottomRight;
+            TopLeftColor = TopLeft;
+            TopRightColor = TopRight;
+            BottomLeftColor = BottomLeft;
+            BottomRightColor = BottomRight;
         }
 
         public void Draw(ElementDrawArgs DA, MGElement Element, Rectangle Bounds)

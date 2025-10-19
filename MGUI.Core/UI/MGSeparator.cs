@@ -64,7 +64,7 @@ namespace MGUI.Core.UI
             using (BeginInitializing())
             {
                 this.Orientation = Orientation;
-                this.Margin = AutoMargin;
+                Margin = AutoMargin;
                 this.Size = Size;
             }
         }

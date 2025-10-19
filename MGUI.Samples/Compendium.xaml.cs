@@ -137,6 +137,7 @@ namespace MGUI.Samples
         public TextBlockSamples TextBlockSamples { get; }
         public TextBoxSamples TextBoxSamples { get; }
         public ToolTipSamples ToolTipSamples { get; }
+        public TreeViewSamples TreeViewSamples { get; }
         public UniformGridSamples UniformGridSamples { get; }
         public WindowSamples WindowSamples { get; }
         #endregion Controls
@@ -189,6 +190,7 @@ namespace MGUI.Samples
             TextBlockSamples = new(Content, Desktop);
             TextBoxSamples = new(Content, Desktop);
             ToolTipSamples = new(Content, Desktop);
+            TreeViewSamples = new(Content, Desktop);
             UniformGridSamples = new(Content, Desktop);
             WindowSamples = new(Content, Desktop);
             #endregion Controls

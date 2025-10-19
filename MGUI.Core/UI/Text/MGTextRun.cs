@@ -344,7 +344,7 @@ namespace MGUI.Core.UI.Text
         public MGTextRunLineBreak(int LineBreakCharactersCount)
             : base(TextRunType.LineBreak, null, null)
         {
-            this.LineBreakCharacterCount = LineBreakCharactersCount;
+            LineBreakCharacterCount = LineBreakCharactersCount;
         }
 
         public override string ToString() => $"{nameof(MGTextRunLineBreak)}: {LineBreakCharacterCount} characters";

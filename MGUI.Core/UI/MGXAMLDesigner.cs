@@ -50,7 +50,7 @@ namespace MGUI.Core.UI
             using (BeginInitializing())
             {
                 //  Detect when the selected file is saved, and auto-refresh the parsed content if necessary
-                this.FileWatcher = new();
+                FileWatcher = new();
                 FileWatcher.NotifyFilter = NotifyFilters.LastWrite;
                 FileWatcher.Changed += (sender, e) =>
                 {
@@ -63,7 +63,7 @@ namespace MGUI.Core.UI
 
                 //  Create the textbox that the xaml string is read from
                 MGScrollViewer MarkupScrollViewer = new(ParentWindow);
-                this.FromStringTextBoxComponent = new(ParentWindow, null);
+                FromStringTextBoxComponent = new(ParentWindow, null);
                 string SampleXAML = 
 @"<Button Background=""RoyalBlue|DarkBlue"" Padding=""10,8"" VerticalAlignment=""Center"">
     <TextBlock IsBold=""true"" FontSize=""14"" TextAlignment=""Center"" Text=""Hello\nWorld"" />
@@ -73,7 +73,7 @@ namespace MGUI.Core.UI
                 MarkupScrollViewer.CanChangeContent = false;
 
                 //  Create the refresh button
-                this.RefreshButton = new(ParentWindow);
+                RefreshButton = new(ParentWindow);
                 RefreshButton.HorizontalAlignment = HorizontalAlignment.Center;
                 RefreshButton.Padding = new(10, 5);
                 RefreshButton.Margin = new(0, 0, 15, 0);
@@ -135,7 +135,7 @@ namespace MGUI.Core.UI
                 TabControlComponent.AddTab("From String", MarkupScrollViewer);
                 TabControlComponent.SelectedTabChanged += (sender, e) => { RefreshParsedContent(); };
 
-                this.MarkupPresenter = new(ParentWindow);
+                MarkupPresenter = new(ParentWindow);
                 MarkupPresenter.BackgroundBrush.NormalValue = new MGBorderedFillBrush(new(2), MGUniformBorderBrush.Black, Color.Black.AsFillBrush() * 0.75f, true);
 
                 MGHeaderedContentPresenter Tmp = new(ParentWindow, RefreshButton, TabControlComponent) { HeaderPosition = Dock.Bottom, Spacing = 2 };
@@ -153,7 +153,7 @@ namespace MGUI.Core.UI
                 DockPanel.TryAddChild(MainGrid, Dock.Right);
                 DockPanel.CanChangeContent = false;
                 DockPanel.SetParent(this);
-                this.MainContent = new(DockPanel, false, false, true, true, false, false, true,
+                MainContent = new(DockPanel, false, false, true, true, false, false, true,
                     (AvailableBounds, ComponentSize) => AvailableBounds);
                 AddComponent(MainContent);
 

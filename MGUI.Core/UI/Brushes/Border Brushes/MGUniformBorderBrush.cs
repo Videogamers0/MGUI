@@ -28,12 +28,12 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
         /// <param name="Color"></param>
         public MGUniformBorderBrush(Color Color)
         {
-            this._Brush = new MGSolidFillBrush(Color);
+            _Brush = new MGSolidFillBrush(Color);
         }
 
         public MGUniformBorderBrush(IFillBrush Brush)
         {
-            this._Brush = Brush ?? throw new ArgumentNullException(nameof(Brush));
+            _Brush = Brush ?? throw new ArgumentNullException(nameof(Brush));
         }
 
         public void Draw(ElementDrawArgs DA, MGElement Element, Rectangle Bounds, Thickness BT)

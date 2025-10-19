@@ -109,15 +109,15 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
 
         public MGTexturedBorderBrush()
         {
-            this.EdgeTexture = default;
-            this.EdgeColor = Color.White;
+            EdgeTexture = default;
+            EdgeColor = Color.White;
 
-            this.CornerTexture = default;
-            this.CornerColor = Color.White;
+            CornerTexture = default;
+            CornerColor = Color.White;
 
-            this.Opacity = 1.0f;
+            Opacity = 1.0f;
 
-            this.Transforms = new();
+            Transforms = new();
         }
 
         /// <param name="EdgeTextureName">The name of the <see cref="MGTextureData"/> used to reference the <see cref="EdgeTexture"/> settings by.<br/>

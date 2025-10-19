@@ -38,7 +38,7 @@ namespace MGUI.Core.UI.Text
             this.TextBox = TextBox;
             this.TextBlockElement = TextBlockElement;
 
-            this._Lines = new();
+            _Lines = new();
 
             this.TextBox.TextChanged += (sender, e) => { IsDirty = true; };
             this.TextBlockElement.OnLayoutBoundsChanged += (sender, e) => { IsDirty = true; };
@@ -195,7 +195,7 @@ namespace MGUI.Core.UI.Text
             this.LineIndex = LineIndex;
             this.YPosition = YPosition;
             this.Height = Height;
-            this._Characters = new();
+            _Characters = new();
         }
 
         internal bool TryGetCharAtOriginalIndex(int Index, out CharRenderInfo Result)

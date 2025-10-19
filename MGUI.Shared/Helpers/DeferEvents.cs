@@ -20,7 +20,7 @@ namespace MGUI.Shared.Helpers
         {
             if (!IsDisposed)
             {
-                this.IsDisposed = true;
+                IsDisposed = true;
                 Item.EndTransaction();
             }
         }

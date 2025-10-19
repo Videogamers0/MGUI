@@ -38,7 +38,7 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
 
         public void Draw(ElementDrawArgs DA, MGElement Element, Rectangle Bounds)
         {
-            Color ActualColor = this.Color * DA.Opacity;
+            Color ActualColor = Color * DA.Opacity;
             if (ActualColor != Color.Transparent)
                 DA.DT.FillRectangle(DA.Offset.ToVector2(), Bounds, ActualColor);
         }

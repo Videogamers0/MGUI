@@ -172,7 +172,7 @@ namespace MGUI.Core.UI.Containers.Grids
             if (GridLinesVisibility.HasFlag(GridLinesVisibility.LeftEdge))
                 CurrentX += Math.Max(0, ColumnSpacing - GridLineMargin);
 
-            for (int ColumnIndex = 0; ColumnIndex < this.Columns; ColumnIndex++)
+            for (int ColumnIndex = 0; ColumnIndex < Columns; ColumnIndex++)
             {
                 int ColumnWidth = ColumnIndex == 0 && HeaderColumnWidth.HasValue ? HeaderColumnWidth.Value : CellSize.Width;
 
@@ -180,7 +180,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 if (GridLinesVisibility.HasFlag(GridLinesVisibility.TopEdge))
                     CurrentY += Math.Max(0, RowSpacing - GridLineMargin);
 
-                for (int RowIndex = 0; RowIndex < this.Rows; RowIndex++)
+                for (int RowIndex = 0; RowIndex < Rows; RowIndex++)
                 {
                     int RowHeight = RowIndex == 0 && HeaderRowHeight.HasValue ? HeaderRowHeight.Value : CellSize.Height;
 
@@ -253,7 +253,7 @@ namespace MGUI.Core.UI.Containers.Grids
             if (_Children.Contains(Item))
                 throw new InvalidOperationException($"{nameof(MGUniformGrid)} does not support adding the same {nameof(MGElement)} multiple times.");
             if (!IsValidCellIndex(Cell))
-                throw new ArgumentOutOfRangeException($"Cell: {Cell.Row},{Cell.Column}. Row must be >= 0 and < {nameof(MGUniformGrid)}.{nameof(Rows)}, Column must be >= 0 and < {nameof(MGUniformGrid)}.{nameof(MGUniformGrid.Columns)}");
+                throw new ArgumentOutOfRangeException($"Cell: {Cell.Row},{Cell.Column}. Row must be >= 0 and < {nameof(MGUniformGrid)}.{nameof(Rows)}, Column must be >= 0 and < {nameof(MGUniformGrid)}.{nameof(Columns)}");
 
             if (!ChildrenByRC.TryGetValue(Cell, out var CellContent))
             {
@@ -687,11 +687,11 @@ namespace MGUI.Core.UI.Containers.Grids
                 this.Rows = Rows;
                 this.Columns = Columns;
                 this.CellSize = CellSize;
-                this.HeaderRowHeight = null;
-                this.HeaderColumnWidth = null;
+                HeaderRowHeight = null;
+                HeaderColumnWidth = null;
 
-                this.RowSpacing = 0;
-                this.ColumnSpacing = 0;
+                RowSpacing = 0;
+                ColumnSpacing = 0;
 
                 _CellBounds = new();
 
@@ -739,8 +739,8 @@ namespace MGUI.Core.UI.Containers.Grids
 
                 OnLayoutBoundsChanged += (sender, e) => { _CellBounds = GetCellBounds(e.NewValue, true); };
 
-                this.CellBackground = new(null);
-                this.DrawEmptyCells = true;
+                CellBackground = new(null);
+                DrawEmptyCells = true;
             }
         }
 

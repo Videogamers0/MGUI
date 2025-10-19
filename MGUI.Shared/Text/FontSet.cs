@@ -80,7 +80,7 @@ namespace MGUI.Shared.Text
         /// and then adding the generated .spritefont files to your MonoGame Content</summary>
         public FontSet(ContentManager Content, string FontName)
         {
-            this.Name = FontName;
+            Name = FontName;
 
             string FontDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Content.RootDirectory, FontsBasePath, Name);
             List<string> FontFilenames = !Directory.Exists(FontDirectory) ?
@@ -159,7 +159,7 @@ namespace MGUI.Shared.Text
 
         public FontSet(string FontName, Dictionary<SpriteFont, FontMetadata> SpriteFonts)
         {
-            this.Name = FontName;
+            Name = FontName;
 
             if (!SpriteFonts.Any())
             {

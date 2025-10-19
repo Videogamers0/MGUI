@@ -150,8 +150,8 @@ namespace MGUI.Core.UI.Containers
         {
             using (BeginInitializing())
             {
-                this.BorderElement = new(Window, 0, null as IFillBrush);
-                this.BorderComponent = MGComponentBase.Create(BorderElement);
+                BorderElement = new(Window, 0, null as IFillBrush);
+                BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
                 BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
                 BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };

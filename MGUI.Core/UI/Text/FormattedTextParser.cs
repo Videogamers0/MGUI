@@ -97,7 +97,7 @@ namespace MGUI.Core.UI.Text
 
         public FTParser()
         {
-            this.Definitions = new List<FTActionDefinition>();
+            Definitions = new List<FTActionDefinition>();
 
             //  Bold
             Definitions.Add(new(FTActionType.EnableBold, FTTokenType.BoldOpenTagType, 

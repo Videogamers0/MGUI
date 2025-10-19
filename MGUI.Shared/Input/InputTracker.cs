@@ -25,8 +25,8 @@ namespace MGUI.Shared.Input
 
         public HandledByEventArgs()
         {
-            this.IsHandled = false;
-            this.HandledBy = default;
+            IsHandled = false;
+            HandledBy = default;
         }
 
         /// <summary>Deprecated - use <see cref="SetHandledBy{T}(T, bool)"/> instead.</summary>
@@ -37,9 +37,9 @@ namespace MGUI.Shared.Input
         public void SetHandledBy<T>(T HandledBy, bool OverwriteIfAlreadyHandled = false)
             where T : THandlerType
         {
-            if (!this.IsHandled || OverwriteIfAlreadyHandled)
+            if (!IsHandled || OverwriteIfAlreadyHandled)
             {
-                this.IsHandled = true;
+                IsHandled = true;
                 this.HandledBy = HandledBy;
             }
         }
@@ -48,8 +48,8 @@ namespace MGUI.Shared.Input
         /// (<see cref="IsHandled"/>=false, <see cref="HandledBy"/>=default)</summary>
         public void Reset()
         {
-            this.IsHandled = false;
-            this.HandledBy = default;
+            IsHandled = false;
+            HandledBy = default;
         }
     }
 
@@ -60,8 +60,8 @@ namespace MGUI.Shared.Input
 
         public InputTracker()
         {
-            this.Mouse = new(this);
-            this.Keyboard = new(this);
+            Mouse = new(this);
+            Keyboard = new(this);
         }
 
         /// <summary>Should be invoked exactly once per Update tick, at the very start of your Game's Update method.<para/>
