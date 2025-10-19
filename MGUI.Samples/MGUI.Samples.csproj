@@ -44,6 +44,7 @@
     <None Remove="Controls\TextBlock.xaml" />
     <None Remove="Controls\TextBox.xaml" />
     <None Remove="Controls\ToolTip.xaml" />
+    <None Remove="Controls\TreeView.xaml" />
     <None Remove="Controls\UniformGrid.xaml" />
     <None Remove="Controls\Window.xaml" />
     <None Remove="Dialogs\Debugging\Debug1.xaml" />
@@ -125,6 +126,9 @@
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ToolTip.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TreeView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\UniformGrid.xaml" />
