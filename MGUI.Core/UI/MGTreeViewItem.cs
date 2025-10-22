@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using MGUI.Core.UI.Containers;
 using Microsoft.Xna.Framework;
+using MGUI.Shared.Helpers; // Added to resolve generic EventArgs<T>
 
 namespace MGUI.Core.UI;
 
@@ -45,31 +46,16 @@ public class MGTreeViewItem : MGSingleContentHost
     {
         // Create new HeaderContent based on Header type
         if (_Header is string text)
-        {
-            // If Header is string, create MGTextBlock with the text
             HeaderContent = new MGTextBlock(SelfOrParentWindow, text);
-        }
         else if (_Header is MGElement element)
-        {
-            // If Header is MGElement, use it directly
             HeaderContent = element;
-        }
         else if (_Header != null)
-        {
-            // Otherwise, create MGTextBlock with Header?.ToString()
             HeaderContent = new MGTextBlock(SelfOrParentWindow, _Header.ToString());
-        }
         else
-        {
-            // If Header is null, create empty MGTextBlock
             HeaderContent = new MGTextBlock(SelfOrParentWindow, string.Empty);
-        }
 
-        // Set HeaderContent to HeaderContainer
         using (HeaderContainer.AllowChangingContentTemporarily())
-        {
             HeaderContainer.SetContent(HeaderContent);
-        }
     }
 
     /// <summary>Gets or sets the depth level of this item in the tree hierarchy (0 for root items).</summary>
@@ -318,10 +304,14 @@ public class MGTreeViewItem : MGSingleContentHost
         ExpanderButton.OnCheckStateChanged += OnExpanderButtonCheckStateChanged;
     }
 
-    /// <summary>Handles the check state changed event of the ExpanderButton.</summary>
-    private void OnExpanderButtonCheckStateChanged(object sender, EventArgs e)
+    // Correct handler uses generic EventArgs<bool> defined in MGUI.Shared.Helpers
+    private void OnExpanderButtonCheckStateChanged(object sender, EventArgs<bool> e)
     {
-        ToggleExpansion();
+        // Instead of blindly toggling, apply the new checked state as expansion state
+        if (e.NewValue)
+            Expand();
+        else
+            Collapse();
     }
 
     /// <summary>Expands this item to show its children.</summary>
@@ -433,7 +423,6 @@ public class MGTreeViewItem : MGSingleContentHost
 
     /// <summary>Removes a child item from this tree view item.</summary>
     /// <param name="item">The item to remove.</param>
-
     public void RemoveItem(MGTreeViewItem item)
     {
         // Remove item from _Items collection
@@ -512,28 +501,36 @@ public class MGTreeViewItem : MGSingleContentHost
     /// <summary>Handles the click event on the header panel.</summary>
     private void OnHeaderPanelClick(object sender, MGUI.Shared.Input.Mouse.BaseMouseReleasedEventArgs e)
     {
-        // Calculate time elapsed since last click
         var currentTime = DateTime.Now;
         var timeSinceLastClick = currentTime - _lastClickTime;
+        bool isDoubleClick = timeSinceLastClick.TotalMilliseconds <500;
+        _lastClickTime = currentTime;
 
-        // Check if this is a double-click (less than 500ms since last click)
-        if (timeSinceLastClick.TotalMilliseconds < 500)
+        // Convertir la position écran -> layout pour tester précisément le bouton
+        Point layoutPos = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.Position);
+        bool clickedExpander = ExpanderButton != null && ExpanderButton.LayoutBounds.ContainsInclusive(layoutPos);
+
+        if (clickedExpander)
         {
-            // Trigger ItemDoubleClicked event on the owner TreeView
+            // Laisser MGToggleButton gérer IsChecked -> Expand/Collapse (ne pas sélectionner ici)
+            return;
+        }
+
+        // Sélection sur simple clic
+        OwnerTreeView?.NotifyItemSelected(this);
+
+        // Toggle sur simple clic (comportement attendu classique)
+        if (HasItems && !isDoubleClick)
+            ToggleExpansion();
+        // Double-clic: ne togglera qu'une fois (déjà fait ci-dessus si single). Si on veut un comportement distinct, on pourrait forcer ici.
+        // Optionnel: si on veut que le double-clic force aussi toggle même si déjà togglé par le single précédent, commenter la condition précédente.
+
+        if (isDoubleClick && HasItems)
+        {
+            // Rien d'autre à faire; déjà togglé par le simple clic précédent.
             OwnerTreeView?.RaiseItemDoubleClicked(this);
         }
 
-        // Update last click time
-        _lastClickTime = currentTime;
-
-        // Notify the owner TreeView that this item was selected
-        OwnerTreeView?.NotifyItemSelected(this);
-
-        // Single click on header also toggles expansion if this item has children
-        if (HasItems)
-            ToggleExpansion();
-
-        // Rebuild visible items cache after potential expansion change
         OwnerTreeView?.RebuildVisibleItemsCache();
     }
 
