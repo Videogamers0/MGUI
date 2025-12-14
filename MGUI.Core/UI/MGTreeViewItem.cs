@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using MGUI.Core.UI.Containers;
 using Microsoft.Xna.Framework;
@@ -188,8 +187,7 @@ public class MGTreeViewItem : MGSingleContentHost
     private MGDockPanel HeaderPanel { get; set; }
     private DateTime _lastClickTime;
 
-    public MGTreeViewItem(MGWindow Window)
-    : base(Window, MGElementType.TreeViewItem)
+    public MGTreeViewItem(MGWindow Window) : base(Window, MGElementType.TreeViewItem)
     {
         using (BeginInitializing())
         {
@@ -217,7 +215,8 @@ public class MGTreeViewItem : MGSingleContentHost
         }
     }
 
-    private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    private void Items_CollectionChanged(object sender,
+        System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         using (ChildrenPanel.AllowChangingContentTemporarily())
         {
@@ -233,6 +232,7 @@ public class MGTreeViewItem : MGSingleContentHost
                                 OwnerTreeView.RegisterItemRecursive(item);
                         }
                     }
+
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     if (e.OldItems != null)
@@ -242,12 +242,14 @@ public class MGTreeViewItem : MGSingleContentHost
                             ChildrenPanel.TryRemoveChild(item);
                         }
                     }
+
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                     ChildrenPanel.TryRemoveAll();
                     break;
             }
         }
+
         UpdateExpanderVisibility();
     }
 
@@ -256,7 +258,6 @@ public class MGTreeViewItem : MGSingleContentHost
         int indent = Level * (OwnerTreeView?.IndentSize ?? 20);
         if (IndentationBorder.PreferredWidth != indent)
         {
-            Debug.WriteLine($"[TreeView] UpdateIndentation: Item='{Header}', Level={Level}, OldIndent={IndentationBorder.PreferredWidth}, NewIndent={indent}");
             IndentationBorder.PreferredWidth = indent;
         }
     }
@@ -292,7 +293,8 @@ public class MGTreeViewItem : MGSingleContentHost
 
     private void OnExpanderButtonCheckStateChanged(object sender, EventArgs<bool> e)
     {
-        if (e.NewValue) Expand(); else Collapse();
+        if (e.NewValue) Expand();
+        else Collapse();
     }
 
     /// <summary>
@@ -320,7 +322,8 @@ public class MGTreeViewItem : MGSingleContentHost
     /// </summary>
     public void ToggleExpansion()
     {
-        if (IsExpanded) Collapse(); else Expand();
+        if (IsExpanded) Collapse();
+        else Expand();
     }
 
     /// <summary>
@@ -359,6 +362,7 @@ public class MGTreeViewItem : MGSingleContentHost
                 return true;
             current = current.ParentItem;
         }
+
         return false;
     }
 
@@ -440,6 +444,7 @@ public class MGTreeViewItem : MGSingleContentHost
         {
             HeaderPanel.BackgroundBrush = _PreviousHeaderBackgroundBrush;
         }
+
         NPC(nameof(IsSelected));
     }
 
@@ -486,21 +491,22 @@ public class MGTreeViewItem : MGSingleContentHost
         if (!IsExpanded)
         {
             arrowVertices = new List<Point>
- {
- new Point(center.X - size /2, center.Y - size),
- new Point(center.X - size /2, center.Y + size),
- new Point(center.X + size /2, center.Y)
- };
+            {
+                new(center.X - size / 2, center.Y - size),
+                new(center.X - size / 2, center.Y + size),
+                new(center.X + size / 2, center.Y)
+            };
         }
         else
         {
             arrowVertices = new List<Point>
- {
- new Point(center.X - size, center.Y - size /2),
- new Point(center.X + size, center.Y - size /2),
- new Point(center.X, center.Y + size /2)
- };
+            {
+                new(center.X - size, center.Y - size / 2),
+                new(center.X + size, center.Y - size / 2),
+                new(center.X, center.Y + size / 2)
+            };
         }
+
         DA.DT.FillPolygon(DA.Offset.ToVector2(), arrowVertices.Select(x => x.ToVector2()), Color.Black * DA.Opacity);
     }
 }
