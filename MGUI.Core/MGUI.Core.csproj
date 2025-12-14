@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net9.0-windows</TargetFramework>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	<IsWindowsOS Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindowsOS>
 	<OutputType>Library</OutputType>
@@ -20,10 +20,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Portable.Xaml" Version="0.26.0" />
-    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4.1" />
     <PackageReference Include="MonoGame.Extended" Version="3.8.0" />
     <PackageReference Include="MonoGame.Extended.Content.Pipeline" Version="3.8.0" />
-    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303">
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4.1">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Prism.Core" Version="8.1.97" />

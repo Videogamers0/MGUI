@@ -62,7 +62,13 @@ namespace MGUI.Samples
                 Window = XAMLParser.LoadRootWindow(Desktop, XAML, false, true);
                 Window.WindowClosed += (sender, e) => IsVisible = false;
             } 
-            catch (Exception ex) { Debug.WriteLine($"Error parsing XAML content for {ResourceName}: {ex}"); }
+            catch (Exception ex) 
+            { 
+                Debug.WriteLine($"Error parsing XAML content for {ResourceName}: {ex}");
+#if DEBUG
+                throw;
+#endif
+            }
         }
 
         protected static void OpenURL(string URL)

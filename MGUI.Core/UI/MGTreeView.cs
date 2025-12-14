@@ -30,11 +30,6 @@ namespace MGUI.Core.UI
         public MGBorder OuterBorder { get; private set; }
 
         /// <summary>
-        /// Gets the component that manages the outer border.
-        /// </summary>
-        private MGComponentBase BorderComponent { get; set; }
-
-        /// <summary>
         /// Gets the scroll viewer that provides scrolling functionality for the tree view.
         /// </summary>
         public MGScrollViewer ScrollViewer { get; private set; }
@@ -238,9 +233,8 @@ namespace MGUI.Core.UI
                 _VisibleItemsCache = new List<MGTreeViewItem>();
 
                 OuterBorder = new MGBorder(Window);
-                BorderComponent = MGComponentBase.Create(OuterBorder);
-                BorderComponent.BaseElement.PropertyChanged += MGTreeView_PropertyChanged;
-                AddComponent(BorderComponent);
+                // Note: Do NOT add OuterBorder as a component via AddComponent(BorderComponent)
+                // because it will be set as Content, which would cause double layout calculation
 
                 ScrollViewer = new MGScrollViewer(Window);
                 ItemsPanel = new MGStackPanel(Window, Orientation.Vertical);

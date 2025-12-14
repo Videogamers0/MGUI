@@ -122,7 +122,7 @@ namespace MGUI.Core.UI.Containers.Grids
             else if (Match.Groups["WeightedLength"].Success)
             {
                 string WeightValueString = Match.Groups["WeightValue"].Value;
-                double Weight = WeightValueString == string.Empty ? 1.0 : double.Parse(WeightValueString);
+                double Weight = WeightValueString == string.Empty ? 1.0 : double.Parse(WeightValueString, CultureInfo.InvariantCulture);
                 return CreateWeightedLength(Weight);
             }
             else
