@@ -344,8 +344,12 @@ public class MGTreeViewItem : MGSingleContentHost
             throw new ArgumentNullException(nameof(item));
         if (item == this)
             throw new InvalidOperationException("Cannot add item as its own child");
-        if (IsAncestorOf(item))
+        // Prevent cycles: do not allow adding an ancestor as a child
+        if (item.IsAncestorOf(this))
             throw new InvalidOperationException("Cannot create circular reference in tree");
+        // Handle re-parenting: remove from previous parent if necessary
+        if (item.ParentItem != null)
+            item.ParentItem.RemoveItem(item);
         _Items.Add(item);
         item.ParentItem = this;
         item.Level = Level + 1;
@@ -452,18 +456,18 @@ public class MGTreeViewItem : MGSingleContentHost
         Point center = expanderBounds.Center;
         int size = 8;
         List<Point> arrowVertices = !IsExpanded
-            ? new List<Point>
-            {
+            ?
+            [
                 new(center.X - size / 2, center.Y - size),
                 new(center.X - size / 2, center.Y + size),
                 new(center.X + size / 2, center.Y)
-            }
-            : new List<Point>
-            {
+            ]
+            :
+            [
                 new(center.X - size, center.Y - size / 2),
                 new(center.X + size, center.Y - size / 2),
                 new(center.X, center.Y + size / 2)
-            };
+            ];
 
         Color arrowColor = OwnerTreeView?.GetTheme()?.TreeViewExpanderArrowColor ?? Color.Black;
         arrowColor *= DA.Opacity;
