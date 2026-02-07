@@ -17,10 +17,8 @@ public class MGTreeViewItem : MGSingleContentHost
     private int _Level;
     private MGTreeViewItem _ParentItem;
     private bool _IsExpanded;
-    private bool _IsSelected;
-    private ObservableCollection<MGTreeViewItem> _Items;
+    private readonly ObservableCollection<MGTreeViewItem> _Items;
     internal MGTreeView _OwnerTreeView;
-    private object _DataContext;
     private object _HeaderTemplate;
     private VisualStateFillBrush _PreviousHeaderBackgroundBrush;
 
@@ -108,22 +106,6 @@ public class MGTreeViewItem : MGSingleContentHost
     }
 
     /// <summary>
-    /// Gets or sets whether this item is currently selected.
-    /// </summary>
-    public new bool IsSelected
-    {
-        get => _IsSelected;
-        internal set
-        {
-            if (_IsSelected != value)
-            {
-                _IsSelected = value;
-                NPC(nameof(IsSelected));
-            }
-        }
-    }
-
-    /// <summary>
     /// Gets the collection of child items.
     /// </summary>
     public IReadOnlyList<MGTreeViewItem> Items => _Items;
@@ -137,22 +119,6 @@ public class MGTreeViewItem : MGSingleContentHost
     /// Gets the <see cref="MGTreeView"/> that owns this item.
     /// </summary>
     public MGTreeView OwnerTreeView => _OwnerTreeView;
-
-    /// <summary>
-    /// Gets or sets the data context for this tree view item (used for data binding).
-    /// </summary>
-    public new object DataContext
-    {
-        get => _DataContext;
-        set
-        {
-            if (_DataContext != value)
-            {
-                _DataContext = value;
-                NPC(nameof(DataContext));
-            }
-        }
-    }
 
     /// <summary>
     /// Gets or sets the template used to display the header content (placeholder for future template support).
@@ -432,9 +398,9 @@ public class MGTreeViewItem : MGSingleContentHost
     /// <param name="selected">True to select this item; false to deselect it.</param>
     internal void SetSelected(bool selected)
     {
-        if (_IsSelected == selected)
+        if (IsSelected == selected)
             return;
-        _IsSelected = selected;
+        IsSelected = selected;
         if (selected && OwnerTreeView != null)
         {
             _PreviousHeaderBackgroundBrush = HeaderPanel.BackgroundBrush;
@@ -444,8 +410,6 @@ public class MGTreeViewItem : MGSingleContentHost
         {
             HeaderPanel.BackgroundBrush = _PreviousHeaderBackgroundBrush;
         }
-
-        NPC(nameof(IsSelected));
     }
 
     /// <summary>
@@ -487,26 +451,22 @@ public class MGTreeViewItem : MGSingleContentHost
         Rectangle expanderBounds = ExpanderButton.LayoutBounds;
         Point center = expanderBounds.Center;
         int size = 8;
-        List<Point> arrowVertices;
-        if (!IsExpanded)
-        {
-            arrowVertices = new List<Point>
+        List<Point> arrowVertices = !IsExpanded
+            ? new List<Point>
             {
                 new(center.X - size / 2, center.Y - size),
                 new(center.X - size / 2, center.Y + size),
                 new(center.X + size / 2, center.Y)
-            };
-        }
-        else
-        {
-            arrowVertices = new List<Point>
+            }
+            : new List<Point>
             {
                 new(center.X - size, center.Y - size / 2),
                 new(center.X + size, center.Y - size / 2),
                 new(center.X, center.Y + size / 2)
             };
-        }
 
-        DA.DT.FillPolygon(DA.Offset.ToVector2(), arrowVertices.Select(x => x.ToVector2()), Color.Black * DA.Opacity);
+        Color arrowColor = OwnerTreeView?.GetTheme()?.TreeViewExpanderArrowColor ?? Color.Black;
+        arrowColor *= DA.Opacity;
+        DA.DT.FillPolygon(DA.Offset.ToVector2(), arrowVertices.Select(x => x.ToVector2()), arrowColor);
     }
 }

@@ -15,9 +15,9 @@ namespace MGUI.Core.UI
     /// </summary>
     public class MGTreeView : MGSingleContentHost
     {
-        private ObservableCollection<MGTreeViewItem> _Items;
+        private readonly ObservableCollection<MGTreeViewItem> _Items;
         private MGTreeViewItem _SelectedItem;
-        private List<MGTreeViewItem> _VisibleItemsCache;
+        private readonly List<MGTreeViewItem> _VisibleItemsCache;
         private int _IndentSize = 20;
         private VisualStateFillBrush _SelectionBackgroundBrush;
         private Color _SelectionForeground;
@@ -223,8 +223,6 @@ namespace MGUI.Core.UI
         public MGTreeView(MGWindow Window)
         : base(Window, MGElementType.TreeView)
         {
-            PropertyChanged += MGTreeView_PropertyChanged;
-
             using (BeginInitializing())
             {
                 _Items = new ObservableCollection<MGTreeViewItem>();
@@ -581,22 +579,6 @@ namespace MGUI.Core.UI
         internal void RaiseItemRightClicked(MGTreeViewItem item)
         {
             ItemRightClicked?.Invoke(this, item);
-        }
-
-        //TODO: remove this
-        private void MGTreeView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(LayoutBounds))
-            {
-                Debug.WriteLine($"{sender.GetType().Name}.LayoutBounds {LayoutBounds}");
-                //System.Diagnostics.Debugger.Break();
-            }
-        }
-
-        //TODO: remove this
-        public override void Draw(ElementDrawArgs DA)
-        {
-            base.Draw(DA);
         }
     }
 }
