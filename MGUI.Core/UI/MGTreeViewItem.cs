@@ -344,10 +344,8 @@ public class MGTreeViewItem : MGSingleContentHost
             throw new ArgumentNullException(nameof(item));
         if (item == this)
             throw new InvalidOperationException("Cannot add item as its own child");
-        // Prevent cycles: do not allow adding an ancestor as a child
         if (item.IsAncestorOf(this))
             throw new InvalidOperationException("Cannot create circular reference in tree");
-        // Handle re-parenting: remove from previous parent if necessary
         if (item.ParentItem != null)
             item.ParentItem.RemoveItem(item);
         _Items.Add(item);

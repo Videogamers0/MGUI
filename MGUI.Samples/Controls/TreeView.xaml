@@ -43,7 +43,7 @@
             <Separator/>
             
             <TextBlock Text="TreeView with custom indent size:" />
-			<!--TreeView Width="400" Height="200" IndentSize="30">
+			<TreeView Width="400" Height="200" IndentSize="30">
                 <TreeViewItem Header="Documents" IsExpanded="True">
                     <TreeViewItem Header="Work" IsExpanded="True">
                         <TreeViewItem Header="Project A" />
@@ -58,7 +58,7 @@
                     <TreeViewItem Header="Software" />
                     <TreeViewItem Header="Documents" />
                 </TreeViewItem>
-            </-->
+            </TreeView>
             
         </StackPanel>
     </ScrollViewer>
