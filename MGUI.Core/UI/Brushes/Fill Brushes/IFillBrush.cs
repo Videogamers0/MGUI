@@ -141,7 +141,7 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
                 string opacityScalarString = Value.Substring(asteriskIndex + 1).Trim();
                 if (opacityScalarString.EndsWith("f", StringComparison.CurrentCultureIgnoreCase))
                     opacityScalarString = opacityScalarString[..^1];
-                float opacityScalar = float.Parse(opacityScalarString);
+                float opacityScalar = float.Parse(opacityScalarString, CultureInfo.InvariantCulture);
 
                 return new Color(color.R, color.G, color.B, color.A) * opacityScalar;
             }

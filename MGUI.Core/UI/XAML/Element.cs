@@ -547,7 +547,7 @@ namespace MGUI.Core.UI.XAML
                                 foreach (object Value in KVP.Value)
                                 {
                                     if (Value is string StringValue)
-                                        PropertyInfo.SetValue(this, Converter.ConvertFromString(StringValue));
+                                        PropertyInfo.SetValue(this, Converter.ConvertFrom(null, CultureInfo.InvariantCulture, StringValue));
                                     else
                                         PropertyInfo.SetValue(this, Value);
                                 }
@@ -590,7 +590,7 @@ namespace MGUI.Core.UI.XAML
                             {
                                 TypeConverter Converter = TypeDescriptor.GetConverter(PropertyInfo.PropertyType);
                                 if (Setter.Value is string StringValue)
-                                    PropertyInfo.SetValue(this, Converter.ConvertFromString(StringValue));
+                                    PropertyInfo.SetValue(this, Converter.ConvertFrom(null, CultureInfo.InvariantCulture, StringValue));
                                 else
                                     PropertyInfo.SetValue(this, Setter.Value);
 
