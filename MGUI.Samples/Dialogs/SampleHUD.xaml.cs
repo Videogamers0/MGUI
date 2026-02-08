@@ -236,7 +236,7 @@ namespace MGUI.Samples.Dialogs
                 Buff.OnExpired += OnBuffExpired;
             }
 
-            this.ToolBar = new(Desktop, 10);
+            ToolBar = new(Desktop, 10);
 
             //  Create a few sample items and add them to the toolbar
             Item Dagger = new(Desktop, "Dagger", "A small blade.", Resources.Textures["ToolBar_Dagger"]);
@@ -250,7 +250,7 @@ namespace MGUI.Samples.Dialogs
             ToolBar.Slots[6].Item = new(Medkit, 2);
             ToolBar.Slots[9].Item = new(Diamond, 5);
 
-            this.UIToolBar = Window.GetElementByName<MGUniformGrid>("UniformGrid_ToolBar");
+            UIToolBar = Window.GetElementByName<MGUniformGrid>("UniformGrid_ToolBar");
 
             UIToolBar.SelectionChanged += (sender, e) =>
             {
@@ -356,8 +356,8 @@ namespace MGUI.Samples.Dialogs
         {
             this.Desktop = Desktop;
             this.Name = Name;
-            this.TotalDuration = Duration;
-            this.RemainingDuration = Duration;
+            TotalDuration = Duration;
+            RemainingDuration = Duration;
             this.Icon = Icon;
             this.Description = Description;
         }
@@ -390,7 +390,7 @@ namespace MGUI.Samples.Dialogs
         public PlayerToolBar(MGDesktop Desktop, int Size)
         {
             this.Desktop = Desktop;
-            this.Slots = Enumerable.Range(0, Size).Select(x => new ToolBarSlot(this)).ToList().AsReadOnly();
+            Slots = Enumerable.Range(0, Size).Select(x => new ToolBarSlot(this)).ToList().AsReadOnly();
         }
     }
 

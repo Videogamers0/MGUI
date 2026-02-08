@@ -105,8 +105,8 @@ namespace MGUI.Core.UI
                 this.StrokeThickness = StrokeThickness;
                 this.Fill = Fill;
 
-                this.HorizontalAlignment = HorizontalAlignment.Center;
-                this.VerticalAlignment = VerticalAlignment.Center;
+                HorizontalAlignment = HorizontalAlignment.Center;
+                VerticalAlignment = VerticalAlignment.Center;
             }
         }
 

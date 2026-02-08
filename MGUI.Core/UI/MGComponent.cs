@@ -58,7 +58,7 @@ namespace MGUI.Core.UI
             bool IsWidthSharedWithContent, bool IsHeightSharedWithContent, bool ConsumesLeftSpace, bool ConsumesTopSpace, bool ConsumesRightSpace, bool ConsumesBottomSpace, bool UsesOwnersPadding,
             Func<Rectangle, Thickness, Rectangle> Arrange)
         {
-            this.BaseElement = Element;
+            BaseElement = Element;
 
             this.UpdatePriority = UpdatePriority;
             this.DrawPriority = DrawPriority;
@@ -73,7 +73,7 @@ namespace MGUI.Core.UI
 
             this.UsesOwnersPadding = UsesOwnersPadding;
 
-            this.ArrangeMethod = Arrange;
+            ArrangeMethod = Arrange;
         }
 
         public static MGComponent<MGBorder> Create(MGBorder Border)

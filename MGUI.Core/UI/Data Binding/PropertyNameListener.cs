@@ -26,7 +26,7 @@ namespace MGUI.Core.UI.Data_Binding
 
         public void Detach()
         {
-            this.Source.PropertyChanged -= Source_PropertyChanged;
+            Source.PropertyChanged -= Source_PropertyChanged;
         }
     }
 }

@@ -109,24 +109,24 @@ namespace MGUI.Core.UI
             {
                 //this.Padding = new(3);
 
-                this.BorderElement = new(ParentWindow, new(1), MGUniformBorderBrush.Black);
-                this.BorderComponent = MGComponentBase.Create(BorderElement);
+                BorderElement = new(ParentWindow, new(1), MGUniformBorderBrush.Black);
+                BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
 
                 MGDockPanel DockPanel = new(ParentWindow);
-                this.MainContent = new(DockPanel, false, false, true, true, false, false, true,
+                MainContent = new(DockPanel, false, false, true, true, false, false, true,
                     (AvailableBounds, ComponentSize) => AvailableBounds.GetCompressed(Padding));
                 AddComponent(MainContent);
 
                 TimestampFormat = @"'\\['HH:mm:ss']'";
 
-                this.CurrentUserTextBlock = new(ParentWindow, $"{Environment.UserName}:");
+                CurrentUserTextBlock = new(ParentWindow, $"{Environment.UserName}:");
                 CurrentUserTextBlock.IsShadowed = true;
                 CurrentUserTextBlock.Margin = new(0, 0, 2, 0);
                 CurrentUserTextBlock.VerticalAlignment = VerticalAlignment.Center;
                 CurrentUserTextBlock.ManagedParent = this;
 
-                this.InputTextBox = new(ParentWindow, MaxMessageLength);
+                InputTextBox = new(ParentWindow, MaxMessageLength);
                 InputTextBox.AcceptsReturn = false;
                 InputTextBox.ManagedParent = this;
                 InputTextBox.OnCharacterLimitChanged += (sender, e) => { NPC(nameof(MaxMessageLength)); };
@@ -139,11 +139,11 @@ namespace MGUI.Core.UI
                     }
                 };
 
-                this.SendButton = new(ParentWindow, btn => { SendMessage(); });
+                SendButton = new(ParentWindow, btn => { SendMessage(); });
                 SendButton.SetContent("Send");
                 SendButton.ManagedParent = this;
 
-                this.Separator = new(ParentWindow, Orientation.Horizontal, 1);
+                Separator = new(ParentWindow, Orientation.Horizontal, 1);
                 Separator.BackgroundBrush.SetAll(MGSolidFillBrush.Black);
                 Separator.Margin = new(0);
                 Separator.ManagedParent = this;
@@ -156,14 +156,14 @@ namespace MGUI.Core.UI
                 Footer.ManagedParent = this;
                 Footer.CanChangeContent = false;
 
-                this.Messages = new();
+                Messages = new();
                 Messages.CollectionChanged += (sender, e) =>
                 {
                     if (e.Action is NotifyCollectionChangedAction.Add)
                         IsMessagesCountRefreshPending = true;
                 };
-                this.MessagesContainer = new(ParentWindow);
-                MessagesContainer.SetItemsSource(this.Messages);
+                MessagesContainer = new(ParentWindow);
+                MessagesContainer.SetItemsSource(Messages);
                 MessagesContainer.IsTitleVisible = false;
                 MessagesContainer.SelectionMode = ListBoxSelectionMode.None;
                 MessagesContainer.OuterBorderThickness = new(0);
@@ -255,23 +255,23 @@ namespace MGUI.Core.UI
             using (BeginInitializing())
             {
                 this.ChatBox = ChatBox;
-                this.MessageData = Data;
+                MessageData = Data;
 
                 MGDockPanel DockPanel = new(ParentWindow);
-                this.MainContent = new(DockPanel, false, false, true, true, false, false, true,
+                MainContent = new(DockPanel, false, false, true, true, false, false, true,
                     (AvailableBounds, ComponentSize) => AvailableBounds);
                 AddComponent(MainContent);
 
                 const int Spacing = 2;
 
-                this.TimestampTextBlock = new(ParentWindow, Timestamp.ToString(ChatBox.TimestampFormat));
+                TimestampTextBlock = new(ParentWindow, Timestamp.ToString(ChatBox.TimestampFormat));
                 TimestampTextBlock.Opacity = 0.75f;
                 TimestampTextBlock.Margin = new(0, 0, Spacing, 0);
                 TimestampTextBlock.ManagedParent = this;
-                this.UsernameTextBlock = new(ParentWindow, $"{Username}:");
+                UsernameTextBlock = new(ParentWindow, $"{Username}:");
                 UsernameTextBlock.Margin = new(0, 0, Spacing, 0);
                 UsernameTextBlock.ManagedParent = this;
-                this.MessageTextBlock = new(ParentWindow, Message, AllowsInlineFormatting: false);
+                MessageTextBlock = new(ParentWindow, Message, AllowsInlineFormatting: false);
                 MessageTextBlock.ManagedParent = this;
 
                 DockPanel.TryAddChild(TimestampTextBlock, Dock.Left);

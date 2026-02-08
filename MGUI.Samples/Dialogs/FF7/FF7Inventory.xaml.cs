@@ -149,7 +149,7 @@ namespace MGUI.Samples.Dialogs.FF7
             Desktop.Resources.AddTexture("FF7ItemIcon", new MGTextureData(ItemIcon));
 
             //  Create a sample Party
-            this.Party = new();
+            Party = new();
             PartyMember Barret = Party.AddMember("Barret", new MGTextureData(Content.Load<Texture2D>(Path.Combine("Portraits", "Barret"))), 65077, 1601, 199);
             Barret.CurrentHP = (int)(Barret.CurrentHP * 0.92);
             Barret.CurrentMP = (int)(Barret.CurrentMP * 0.90);

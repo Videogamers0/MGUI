@@ -25,8 +25,8 @@ namespace MGUI.Shared.Helpers
         /// <param name="RevertValue">An action to invoke that changes <typeparamref name="TItem"/> back to its previous value.</param>
         public TemporaryChange(TItem PreviousValue, TItem TemporaryValue, Action<TItem> SetValue, Action<TItem> RevertValue)
         {
-            this.Previous = PreviousValue;
-            this.Temporary = TemporaryValue;
+            Previous = PreviousValue;
+            Temporary = TemporaryValue;
             this.SetValue = SetValue;
             this.RevertValue = RevertValue;
             SetValue(Temporary);
@@ -57,8 +57,8 @@ namespace MGUI.Shared.Helpers
         /// <param name="SetValue">An action to invoke that changes <typeparamref name="TItem"/> to a new value.</param>
         public TemporaryChange(TItem PreviousValue, TItem TemporaryValue, TParameter PreviousParameter, TParameter TemporaryParameter, Action<TItem, TParameter> SetValue)
         {
-            this.Previous = PreviousValue;
-            this.Temporary = TemporaryValue;
+            Previous = PreviousValue;
+            Temporary = TemporaryValue;
             this.SetValue = SetValue;
             this.PreviousParameter = PreviousParameter;
             SetValue(TemporaryValue, TemporaryParameter);

@@ -75,17 +75,17 @@ namespace MGUI.Core.UI
                 MGTheme ActualTheme = (this.Theme ?? Window.GetTheme());
 
                 this.Host = Host;
-                this.BorderBrush = Color.Black.AsFillBrush().AsUniformBorderBrush();
-                this.BorderThickness = new(2);
-                this.DrawOffset = ActualTheme.ToolTipOffset;
-                this.ShowOnDisabled = false;
-                this.ShowDelayOverride = null;
-                this.DefaultTextForeground = ActualTheme.ToolTipTextForeground.GetCopy();
-                this.Padding = new(6,3);
-                this.MinWidth = 10;
-                this.MinHeight = 10;
-                this.IsUserResizable = false;
-                this.IsTitleBarVisible = false;
+                BorderBrush = Color.Black.AsFillBrush().AsUniformBorderBrush();
+                BorderThickness = new(2);
+                DrawOffset = ActualTheme.ToolTipOffset;
+                ShowOnDisabled = false;
+                ShowDelayOverride = null;
+                DefaultTextForeground = ActualTheme.ToolTipTextForeground.GetCopy();
+                Padding = new(6,3);
+                MinWidth = 10;
+                MinHeight = 10;
+                IsUserResizable = false;
+                IsTitleBarVisible = false;
 
 #if NEVER
                 Host.OnLayoutBoundsChanged += (sender, e) =>

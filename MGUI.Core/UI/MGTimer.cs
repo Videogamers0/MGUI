@@ -184,25 +184,25 @@ namespace MGUI.Core.UI
             {
                 this.AllowsNegativeDuration = AllowsNegativeDuration;
                 this.IsPaused = IsPaused;
-                this.RemainingDuration = Duration;
+                RemainingDuration = Duration;
 
-                this.BorderElement = new(Window);
-                this.BorderComponent = MGComponentBase.Create(BorderElement);
+                BorderElement = new(Window);
+                BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
                 BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
                 BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
-                this.ValueElement = new(Window, "", Color.White, GetTheme().FontSettings.MediumFontSize);
-                this.ValueComponent = new(ValueElement, false, false, true, true, false, false, true,
+                ValueElement = new(Window, "", Color.White, GetTheme().FontSettings.MediumFontSize);
+                ValueComponent = new(ValueElement, false, false, true, true, false, false, true,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds.GetCompressed(Padding), HorizontalContentAlignment, VerticalContentAlignment, ComponentSize.Size));
                 AddComponent(ValueComponent);
 
-                this.HorizontalContentAlignment = HorizontalAlignment.Center;
-                this.VerticalContentAlignment = VerticalAlignment.Center;
-                this.Padding = new(4, 2, 4, 2);
+                HorizontalContentAlignment = HorizontalAlignment.Center;
+                VerticalContentAlignment = VerticalAlignment.Center;
+                Padding = new(4, 2, 4, 2);
 
-                this.RemainingDurationToString = (TimeSpan Elapsed) => Elapsed.ToString(@"m\:ss\.%f");
-                this.ValueDisplayFormat = DefaultValueDisplayFormat;
+                RemainingDurationToString = (TimeSpan Elapsed) => Elapsed.ToString(@"m\:ss\.%f");
+                ValueDisplayFormat = DefaultValueDisplayFormat;
             }
         }
 

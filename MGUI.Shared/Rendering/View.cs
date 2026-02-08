@@ -13,7 +13,7 @@ namespace MGUI.Shared.Rendering
     public readonly record struct DrawBaseArgs(TimeSpan TS, DrawTransaction DT, float Opacity)
     {
         public DrawBaseArgs SetOpacity(float Value) => new(TS, DT, Value);
-        public DrawBaseArgs MultiplyOpacity(float Scalar) => new(TS, DT, this.Opacity * Scalar);
+        public DrawBaseArgs MultiplyOpacity(float Scalar) => new(TS, DT, Opacity * Scalar);
     }
 
     [DebuggerStepThrough]
@@ -140,9 +140,9 @@ namespace MGUI.Shared.Rendering
         public View(MainRenderer MainRenderer, Rectangle ScreenViewport)
         {
             this.MainRenderer = MainRenderer;
-            this.IsVisible = true;
+            IsVisible = true;
             SetScreenViewportBase(ScreenViewport, null, true);
-            this.Children = new();
+            Children = new();
         }
 
         /// <summary>Invoked at the beginning of the <see cref="Update(UpdateBaseArgs)"/> method.</summary>

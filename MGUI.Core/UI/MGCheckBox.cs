@@ -202,7 +202,7 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
-                this.ButtonElement = new(Window, new(1), MGUniformBorderBrush.Black, x =>
+                ButtonElement = new(Window, new(1), MGUniformBorderBrush.Black, x =>
                 {
                     if (!IsReadonly)
                     {
@@ -243,21 +243,21 @@ namespace MGUI.Core.UI
                     }
                 };
 
-                this.ButtonComponent = new(ButtonElement, false, true, true, true, false, false, false,
+                ButtonComponent = new(ButtonElement, false, true, true, true, false, false, false,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Left, VerticalAlignment.Center, ComponentSize.Size));
 
                 AddComponent(ButtonComponent);
 
-                this.CheckBoxComponentSize = DefaultCheckBoxSize;
-                this.SpacingWidth = DefaultCheckBoxSpacingWidth;
-                this.CheckMarkColor = GetTheme().CheckMarkColor;
-                this.IsCheckMarkShadowed = false;
-                this.CheckMarkShadowColor = Color.Black;
-                this.CheckMarkShadowOffset = new(0, 1);
+                CheckBoxComponentSize = DefaultCheckBoxSize;
+                SpacingWidth = DefaultCheckBoxSpacingWidth;
+                CheckMarkColor = GetTheme().CheckMarkColor;
+                IsCheckMarkShadowed = false;
+                CheckMarkShadowColor = Color.Black;
+                CheckMarkShadowOffset = new(0, 1);
 
-                this.IsThreeState = !IsChecked.HasValue;
+                IsThreeState = !IsChecked.HasValue;
                 this.IsChecked = IsChecked;
-                this.IsReadonly = false;
+                IsReadonly = false;
             }
         }
 

@@ -367,10 +367,10 @@ namespace MGUI.Core.UI
             using (BeginInitializing())
             {
                 //  Create the StackPanel that hosts the Tab Headers
-                this.HeadersPanelElement = new(Window, Orientation.Horizontal);
-                this.HeadersPanelElement.CanChangeContent = false;
-                this.HeadersPanelElement.Spacing = 0;
-                this.Header = HeadersPanelElement;
+                HeadersPanelElement = new(Window, Orientation.Horizontal);
+                HeadersPanelElement.CanChangeContent = false;
+                HeadersPanelElement.Spacing = 0;
+                Header = HeadersPanelElement;
                 HeaderChanging += (sender, e) => { e.Cancel = true; }; // Disallow changing the Header
 
                 void ApplyHeadersPanelSettings()
@@ -417,17 +417,17 @@ namespace MGUI.Core.UI
                 ApplyHeadersPanelSettings();
                 HeaderPositionChanged += (sender, e) => { ApplyHeadersPanelSettings(); };
 
-                this.BorderElement = new(Window);
-                this.BorderComponent = MGComponentBase.Create(BorderElement);
+                BorderElement = new(Window);
+                BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
                 BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
                 BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
-                this.Padding = new(12);
+                Padding = new(12);
 
-                this.ActualTabHeaders = new();
+                ActualTabHeaders = new();
 
-                this._Tabs = new();
+                _Tabs = new();
                 _Tabs.CollectionChanged += (sender, e) =>
                 {
                     if (e.Action is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Replace)
@@ -453,14 +453,14 @@ namespace MGUI.Core.UI
                     }
                 };
 
-                this.SelectedTabHeaderTemplate = (MGTabItem TabItem) =>
+                SelectedTabHeaderTemplate = (MGTabItem TabItem) =>
                 {
                     MGButton Button = new(TabItem.SelfOrParentWindow, x => TabItem.IsTabSelected = true);
                     ApplyDefaultSelectedTabHeaderStyle(Button);
                     return Button;
                 };
 
-                this.UnselectedTabHeaderTemplate = (MGTabItem TabItem) =>
+                UnselectedTabHeaderTemplate = (MGTabItem TabItem) =>
                 {
                     MGButton Button = new(TabItem.SelfOrParentWindow, x => TabItem.IsTabSelected = true);
                     ApplyDefaultUnselectedTabHeaderStyle(Button);
@@ -472,7 +472,7 @@ namespace MGUI.Core.UI
         private void Tab_HeaderChanged(object sender, EventArgs<MGElement> e)
         {
             MGTabItem TabItem = sender as MGTabItem;
-            this.ActualTabHeaders[TabItem].SetContent(e.NewValue);
+            ActualTabHeaders[TabItem].SetContent(e.NewValue);
         }
 
         public override void DrawBackground(ElementDrawArgs DA, Rectangle LayoutBounds)

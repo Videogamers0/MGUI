@@ -23,7 +23,7 @@ namespace MGUI.Shared.Input.Mouse
         public MouseHandlerHost(Func<Rectangle> ComputeBounds, Func<Vector2> ComputeOffset)
         {
             this.ComputeBounds = ComputeBounds;
-            this.ComputeBoundsF = null;
+            ComputeBoundsF = null;
             this.ComputeOffset = ComputeOffset;
         }
 
@@ -33,7 +33,7 @@ namespace MGUI.Shared.Input.Mouse
         public MouseHandlerHost(Func<RectangleF> ComputeBounds, Func<Vector2> ComputeOffset)
         {
             this.ComputeBounds = null;
-            this.ComputeBoundsF = ComputeBounds;
+            ComputeBoundsF = ComputeBounds;
             this.ComputeOffset = ComputeOffset;
         }
 
@@ -102,7 +102,7 @@ namespace MGUI.Shared.Input.Mouse
         internal MouseTracker(InputTracker InputTracker, int ClickPositionThreshold = 2, int DragThreshold = 3)
         {
             this.InputTracker = InputTracker;
-            this._Handlers = new();
+            _Handlers = new();
             this.ClickPositionThreshold = ClickPositionThreshold;
             this.DragThreshold = DragThreshold;
         }

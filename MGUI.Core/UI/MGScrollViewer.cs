@@ -316,14 +316,14 @@ namespace MGUI.Core.UI
             {
                 MGTheme Theme = GetTheme();
 
-                this.VSBVisibility = VerticalScrollBarVisibility;
-                this.HSBVisibility = HorizontalScrollBarVisibility;
+                VSBVisibility = VerticalScrollBarVisibility;
+                HSBVisibility = HorizontalScrollBarVisibility;
 
                 //Padding = new(0, 0, 5, 5);
                 Padding = new(0);
 
-                this.ScrollBarOuterBrush = Theme.ScrollBarOuterBrush.GetValue(true);
-                this.ScrollBarInnerBrush = Theme.ScrollBarInnerBrush.GetValue(true);
+                ScrollBarOuterBrush = Theme.ScrollBarOuterBrush.GetValue(true);
+                ScrollBarInnerBrush = Theme.ScrollBarInnerBrush.GetValue(true);
 
                 OnLayoutBoundsChanged += (sender, e) =>
                 {

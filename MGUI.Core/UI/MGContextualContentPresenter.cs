@@ -111,7 +111,7 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
-                this.CanChangeContent = false;
+                CanChangeContent = false;
 
                 this.Value = Value;
                 this.TrueContent = TrueContent;
@@ -131,7 +131,7 @@ namespace MGUI.Core.UI
 
             if (IncludeActive)
             {
-                MGElement Current = this.CurrentContent;
+                MGElement Current = CurrentContent;
                 if (Current != null)
                     yield return Current;
             }

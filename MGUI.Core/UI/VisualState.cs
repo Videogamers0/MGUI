@@ -107,9 +107,9 @@ namespace MGUI.Core.UI
 
         public void SetAll(TDataType Value)
         {
-            this.DisabledValue = Value;
-            this.SelectedValue = Value;
-            this.NormalValue = Value;
+            DisabledValue = Value;
+            SelectedValue = Value;
+            NormalValue = Value;
         }
 
         public VisualStateSetting(TDataType Value)
@@ -275,7 +275,7 @@ namespace MGUI.Core.UI
             Color? HoveredColor, PressedModifierType PressedModifierType, float PressedModifier)
             : base(NormalValue, SelectedValue, DisabledValue)
         {
-            this.FocusedColor = HoveredColor;
+            FocusedColor = HoveredColor;
             this.PressedModifierType = PressedModifierType;
             this.PressedModifier = PressedModifier;
         }

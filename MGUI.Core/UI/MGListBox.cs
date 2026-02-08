@@ -340,7 +340,7 @@ namespace MGUI.Core.UI
                     else
                     {
                         IEnumerable<MGListBoxItem<TItemType>> Values = ItemsSource.Select((x, Index) => new MGListBoxItem<TItemType>(this, x));
-                        this.InternalItems = new ObservableCollection<MGListBoxItem<TItemType>>(Values);
+                        InternalItems = new ObservableCollection<MGListBoxItem<TItemType>>(Values);
                     }
 
                     NPC(nameof(ItemsSource));
@@ -404,7 +404,7 @@ namespace MGUI.Core.UI
         }
 #else
         /// <summary>Deprecated. Set <see cref="ItemsSource"/> directly.</summary>
-        public void SetItemsSource(ICollection<TItemType> Value) => this.ItemsSource = Value;
+        public void SetItemsSource(ICollection<TItemType> Value) => ItemsSource = Value;
 #endif
 #endregion Items Source
 
@@ -526,7 +526,7 @@ namespace MGUI.Core.UI
                 if (EqualityComparer.Equals(LBI.Data, Item))
                 {
                     //  Select it
-                    this.SelectedItems = new List<MGListBoxItem<TItemType>>() { LBI }.AsReadOnly();
+                    SelectedItems = new List<MGListBoxItem<TItemType>>() { LBI }.AsReadOnly();
                     return;
                 }
             }
@@ -678,41 +678,41 @@ namespace MGUI.Core.UI
             using (BeginInitializing())
             {
                 //  Create the outer border
-                this.OuterBorder = new(ParentWindow, 0, MGSolidFillBrush.Black);
-                this.OuterBorderComponent = MGComponentBase.Create(OuterBorder);
+                OuterBorder = new(ParentWindow, 0, MGSolidFillBrush.Black);
+                OuterBorderComponent = MGComponentBase.Create(OuterBorder);
                 AddComponent(OuterBorderComponent);
                 OuterBorder.OnBorderBrushChanged += (sender, e) => { NPC(nameof(OuterBorderBrush)); };
                 OuterBorder.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(OuterBorderThickness)); };
 
                 //  Create the title bar
-                this.TitleBorder = new(ParentWindow);
+                TitleBorder = new(ParentWindow);
                 TitleBorder.Padding = new(6, 3);
                 TitleBorder.BackgroundBrush = GetTheme().TitleBackground.GetValue(true);
                 TitleBorder.DefaultTextForeground.SetAll(Color.White);
                 TitleBorder.OnBorderBrushChanged += (sender, e) => { NPC(nameof(TitleBorderBrush)); };
                 TitleBorder.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(TitleBorderThickness)); };
-                this.TitlePresenter = new(ParentWindow);
+                TitlePresenter = new(ParentWindow);
                 TitlePresenter.VerticalAlignment = VerticalAlignment.Center;
                 TitleBorder.SetContent(TitlePresenter);
                 TitleBorder.CanChangeContent = false;
                 TitlePresenter.CanChangeContent = false;
-                this.TitleComponent = new(TitleBorder, true, false, false, true, false, false, false,
+                TitleComponent = new(TitleBorder, true, false, false, true, false, false, false,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Top, ComponentSize.Size));
                 AddComponent(TitleComponent);
 
                 //  Create the inner border
-                this.InnerBorder = new(ParentWindow);
-                this.InnerBorderComponent = new(InnerBorder, true, false, true, true, false, false, false,
+                InnerBorder = new(ParentWindow);
+                InnerBorderComponent = new(InnerBorder, true, false, true, true, false, false, false,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Stretch, ComponentSize.Size));
                 AddComponent(InnerBorderComponent);
                 InnerBorder.OnBorderBrushChanged += (sender, e) => { NPC(nameof(InnerBorderBrush)); };
                 InnerBorder.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(InnerBorderThickness)); };
 
                 //  Create the scrollviewer and itemspanel
-                this.ItemsPanel = new(ParentWindow, Orientation.Vertical);
+                ItemsPanel = new(ParentWindow, Orientation.Vertical);
                 ItemsPanel.VerticalAlignment = VerticalAlignment.Top;
                 ItemsPanel.CanChangeContent = false;
-                this.ScrollViewer = new(ParentWindow);
+                ScrollViewer = new(ParentWindow);
                 ScrollViewer.Padding = new(0, 0);
                 ScrollViewer.SetContent(ItemsPanel);
                 ScrollViewer.CanChangeContent = false;
@@ -728,12 +728,12 @@ namespace MGUI.Core.UI
                 ItemsPanel.BorderThickness = DefaultItemBorderThickness;
                 ItemsPanel.BorderBrush = DefaultItemBorderBrush;
 
-                this.ItemContainerStyle = ApplyDefaultItemContainerStyle;
-                this.ItemTemplate = (item) => new MGTextBlock(ParentWindow, item.ToString()) { Padding = new(1,0) };
+                ItemContainerStyle = ApplyDefaultItemContainerStyle;
+                ItemTemplate = (item) => new MGTextBlock(ParentWindow, item.ToString()) { Padding = new(1,0) };
 
-                this.SelectedItems = new List<MGListBoxItem<TItemType>>().AsReadOnly();
-                this.SelectionMode = ListBoxSelectionMode.Single;
-                this.CanDeselectByClickingSelectedItem = true;
+                SelectedItems = new List<MGListBoxItem<TItemType>>().AsReadOnly();
+                SelectionMode = ListBoxSelectionMode.Single;
+                CanDeselectByClickingSelectedItem = true;
 
                 GetDesktop().Renderer.Host.EndUpdate += (sender, e) =>
                 {
@@ -799,7 +799,7 @@ namespace MGUI.Core.UI
                             }
                         }
 
-                        switch (this.SelectionMode)
+                        switch (SelectionMode)
                         {
                             case ListBoxSelectionMode.None:
                                 break;
@@ -892,12 +892,12 @@ namespace MGUI.Core.UI
 
             if (Settings.ItemContainerStyle != null)
             {
-                this.ItemContainerStyle = (Border) => { Settings.ItemContainerStyle.ApplySettings(this, Border, false); };
+                ItemContainerStyle = (Border) => { Settings.ItemContainerStyle.ApplySettings(this, Border, false); };
             }
 
             if (Settings.ItemTemplate != null)
             {
-                this.ItemTemplate = (Item) => Settings.ItemTemplate.GetContent(SelfOrParentWindow, this, Item);
+                ItemTemplate = (Item) => Settings.ItemTemplate.GetContent(SelfOrParentWindow, this, Item);
             }
         }
     }
@@ -938,18 +938,18 @@ namespace MGUI.Core.UI
         {
             this.ListBox = ListBox ?? throw new ArgumentNullException(nameof(ListBox));
             this.Data = Data ?? throw new ArgumentNullException(nameof(Data));
-            this.ContentPresenter = new(ListBox.SelfOrParentWindow);
+            ContentPresenter = new(ListBox.SelfOrParentWindow);
 
             ListBox.ItemTemplateChanged += (sender, e) =>
             {
                 Content?.RemoveDataBindings(true);
                 Content = ListBox.ItemTemplate?.Invoke(this.Data);
             };
-            this.Content = ListBox.ItemTemplate?.Invoke(this.Data);
+            Content = ListBox.ItemTemplate?.Invoke(this.Data);
             ContentPresenter.CanChangeContent = false;
 
-            ListBox.ItemContainerStyleChanged += (sender, e) => { ListBox.ItemContainerStyle?.Invoke(this.ContentPresenter); };
-            ListBox.ItemContainerStyle?.Invoke(this.ContentPresenter);
+            ListBox.ItemContainerStyleChanged += (sender, e) => { ListBox.ItemContainerStyle?.Invoke(ContentPresenter); };
+            ListBox.ItemContainerStyle?.Invoke(ContentPresenter);
         }
     }
 }

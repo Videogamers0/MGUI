@@ -14,7 +14,7 @@ namespace MGUI.Core.UI.Text
         internal record struct CaretPosition(int LineIndex, int IndexInOriginalText, int IndexInParsedText, Rectangle Bounds)
         {
             public DateTime InitialShowTime { get; init; } = DateTime.Now;
-            public CaretPosition Translate(Point Offset) => new(LineIndex, IndexInOriginalText, IndexInParsedText, Bounds.GetTranslated(Offset)) { InitialShowTime = this.InitialShowTime };
+            public CaretPosition Translate(Point Offset) => new(LineIndex, IndexInOriginalText, IndexInParsedText, Bounds.GetTranslated(Offset)) { InitialShowTime = InitialShowTime };
         }
 
         private CaretPosition? _Position;
@@ -39,8 +39,8 @@ namespace MGUI.Core.UI.Text
             this.TextBox = TextBox;
             this.TextBlockElement = TextBlockElement;
 
-            this.Color = TextBox.GetTheme().TextBlockFallbackForeground.GetValue(true).NormalValue;
-            this.Position = null;
+            Color = TextBox.GetTheme().TextBlockFallbackForeground.GetValue(true).NormalValue;
+            Position = null;
 
             this.TextBlockElement.OnLayoutBoundsChanged += (sender, e) =>
             {

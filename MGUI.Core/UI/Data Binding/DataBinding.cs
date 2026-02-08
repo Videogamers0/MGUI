@@ -286,7 +286,7 @@ namespace MGUI.Core.UI.Data_Binding
             ConvertSettings = Config.Converter == null ? null : new(Config.Converter, Config.ConverterParameter, false);
             ConvertBackSettings = Config.Converter == null ? null : new(Config.Converter, Config.ConverterParameter, true);
 
-            this.TargetObject = ResolvePath(Object, Config.TargetPaths, true);
+            TargetObject = ResolvePath(Object, Config.TargetPaths, true);
             TargetPropertyName = Config.TargetPaths[^1];
             TargetProperty = GetPublicProperty(TargetObject, TargetPropertyName);
             TargetPropertyType = GetUnderlyingType(TargetProperty);

@@ -2579,7 +2579,7 @@ namespace MGUI.Core.UI.XAML
 
             //  Apply these properties after setting WindowStyle because they may have been overwrriten when setting WindowStyle to WindowStyle.None
             if (Padding != null)
-                Window.Padding = this.Padding.Value.ToThickness();
+                Window.Padding = Padding.Value.ToThickness();
             if (IsTitleBarVisible.HasValue)
                 Window.IsTitleBarVisible = IsTitleBarVisible.Value;
             if (IsCloseButtonVisible.HasValue)

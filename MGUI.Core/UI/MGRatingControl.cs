@@ -402,14 +402,14 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
-                this.ItemShape = Shape;
-                this.ItemSize = Size;
-                this.Spacing = 3;
+                ItemShape = Shape;
+                ItemSize = Size;
+                Spacing = 3;
                 this.UseDiscreteValues = UseDiscreteValues;
                 this.DiscreteValueInterval = DiscreteValueInterval;
                 SetRange(MinimumValue, MaximumValue);
 
-                this.IsReadonly = false;
+                IsReadonly = false;
 
                 UnfilledShapeStrokeThickness = 1;
                 UnfilledShapeStrokeColor = Color.Black;
@@ -495,10 +495,10 @@ namespace MGUI.Core.UI
             else
             {
                 int RelativePosition = Position - PaddedBounds.Left;
-                int PaddedItemSize = this.ItemSize + Spacing;
+                int PaddedItemSize = ItemSize + Spacing;
                 int FilledValue = (RelativePosition + Spacing) / PaddedItemSize;
-                float PartialValue = Math.Max(0, (RelativePosition - FilledValue * PaddedItemSize)) * 1.0f / this.ItemSize;
-                this.PreviewValue = FilledValue + PartialValue;
+                float PartialValue = Math.Max(0, (RelativePosition - FilledValue * PaddedItemSize)) * 1.0f / ItemSize;
+                PreviewValue = FilledValue + PartialValue;
             }
         }
 
@@ -548,7 +548,7 @@ namespace MGUI.Core.UI
             if (IsCompletelyUnfilled)
                 return;
 
-            switch (this.ItemShape)
+            switch (ItemShape)
             {
                 case RatingItemShape.Star:
                 case RatingItemShape.Diamond:

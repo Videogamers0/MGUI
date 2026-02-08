@@ -128,10 +128,10 @@ namespace MGUI.Core.UI.XAML
         public GradientFillBrush() : this(new XAMLColor(), new XAMLColor(), new XAMLColor(), new XAMLColor()) { }
         public GradientFillBrush(XAMLColor TopLeft, XAMLColor TopRight, XAMLColor BottomRight, XAMLColor BottomLeft)
         {
-            this.TopLeftColor = TopLeft;
-            this.TopRightColor = TopRight;
-            this.BottomRightColor = BottomRight;
-            this.BottomLeftColor = BottomLeft;
+            TopLeftColor = TopLeft;
+            TopRightColor = TopRight;
+            BottomRightColor = BottomRight;
+            BottomLeftColor = BottomLeft;
         }
 
         public override string ToString() => $"{nameof(GradientFillBrush)}: {TopLeftColor} {TopRightColor} {BottomRightColor} {BottomLeftColor}";

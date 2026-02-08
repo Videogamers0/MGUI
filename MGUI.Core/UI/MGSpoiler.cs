@@ -114,7 +114,7 @@ namespace MGUI.Core.UI
 
                     _IsRevealed = value;
 
-                    this.ButtonElement.Visibility = IsRevealed ? Visibility.Collapsed : Visibility.Visible;
+                    ButtonElement.Visibility = IsRevealed ? Visibility.Collapsed : Visibility.Visible;
                     UpdateContentVisibility();
 
                     NPC(nameof(IsRevealed));
@@ -152,18 +152,18 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
-                this.ButtonElement = new(Window, new(1), MGUniformBorderBrush.Black, x => IsRevealed = true);
-                this.TextElement = new(Window, DefaultUnspoiledText, Color.White);
+                ButtonElement = new(Window, new(1), MGUniformBorderBrush.Black, x => IsRevealed = true);
+                TextElement = new(Window, DefaultUnspoiledText, Color.White);
                 TextElement.ManagedParent = this;
-                this.ButtonElement.SetContent(TextElement);
-                this.ButtonComponent = new(ButtonElement, ComponentUpdatePriority.BeforeContents, ComponentDrawPriority.AfterContents,
+                ButtonElement.SetContent(TextElement);
+                ButtonComponent = new(ButtonElement, ComponentUpdatePriority.BeforeContents, ComponentDrawPriority.AfterContents,
                     true, true, true, true, false, false, false,
                     (AvailableBounds, ComponentSize) => AvailableBounds);
                 AddComponent(ButtonComponent);
 
-                this.UnspoiledTextAlignment = HorizontalAlignment.Center;
-                this.UnspoiledBackgroundBrush = GetTheme().SpoilerUnspoiledBackground.GetValue(true);
-                this.IsRevealed = false;
+                UnspoiledTextAlignment = HorizontalAlignment.Center;
+                UnspoiledBackgroundBrush = GetTheme().SpoilerUnspoiledBackground.GetValue(true);
+                IsRevealed = false;
 
                 OnContentAdded += (sender, e) => { UpdateContentVisibility(); };
             }

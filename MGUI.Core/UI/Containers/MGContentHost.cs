@@ -420,7 +420,7 @@ namespace MGUI.Core.UI.Containers
                         HeaderPresenterComponent.ConsumesRightSpace = false;
                         HeaderPresenterComponent.ConsumesBottomSpace = true;
                         break;
-                    default: throw new NotImplementedException($"Unrecognized {nameof(Dock)}: {this.HeaderPosition}");
+                    default: throw new NotImplementedException($"Unrecognized {nameof(Dock)}: {HeaderPosition}");
                 }
 
                 UpdateHeaderMargin();
@@ -463,7 +463,7 @@ namespace MGUI.Core.UI.Containers
                 Dock.Top => new(0, 0, 0, Spacing),
                 Dock.Right => new(Spacing, 0, 0, 0),
                 Dock.Bottom => new(0, Spacing, 0, 0),
-                _ => throw new NotImplementedException($"Unrecognized {nameof(Dock)}: {this.HeaderPosition}")
+                _ => throw new NotImplementedException($"Unrecognized {nameof(Dock)}: {HeaderPosition}")
             };
         }
 
@@ -477,17 +477,17 @@ namespace MGUI.Core.UI.Containers
         {
             using (BeginInitializing())
             {
-                this.HeaderPresenter = new(Window);
-                this.HeaderPresenter.HorizontalAlignment = HorizontalAlignment.Center;
-                this.HeaderPresenter.VerticalAlignment = VerticalAlignment.Center;
-                this.HeaderPresenterComponent = new(HeaderPresenter, false, false, false, false, false, false, false,
-                    (AvailableBounds, ComponentSize) => this.HeaderPosition switch
+                HeaderPresenter = new(Window);
+                HeaderPresenter.HorizontalAlignment = HorizontalAlignment.Center;
+                HeaderPresenter.VerticalAlignment = VerticalAlignment.Center;
+                HeaderPresenterComponent = new(HeaderPresenter, false, false, false, false, false, false, false,
+                    (AvailableBounds, ComponentSize) => HeaderPosition switch
                     {
                         Dock.Left => ApplyAlignment(AvailableBounds, HorizontalAlignment.Left, VerticalAlignment.Stretch, ComponentSize.Size),
                         Dock.Top => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Top, ComponentSize.Size),
                         Dock.Right => ApplyAlignment(AvailableBounds, HorizontalAlignment.Right, VerticalAlignment.Stretch, ComponentSize.Size),
                         Dock.Bottom => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Bottom, ComponentSize.Size),
-                        _ => throw new NotImplementedException($"Unrecognized {nameof(Dock)}: {this.HeaderPosition}")
+                        _ => throw new NotImplementedException($"Unrecognized {nameof(Dock)}: {HeaderPosition}")
                     });
                 AddComponent(HeaderPresenterComponent);
 

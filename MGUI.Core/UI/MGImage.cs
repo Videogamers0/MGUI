@@ -180,7 +180,7 @@ namespace MGUI.Core.UI
             using (BeginInitializing())
             {
                 this.SourceName = SourceName;
-                this.TextureColor = null;
+                TextureColor = null;
                 this.Stretch = Stretch;
 
                 HorizontalContentAlignment = HorizontalAlignment.Center;
@@ -351,7 +351,7 @@ namespace MGUI.Core.UI
                 throw new NotImplementedException($"Unrecognized {nameof(Stretch)}: {Stretch}");
             }
 
-            DA.DT.DrawTextureTo(ActualSource.Value.Texture, ActualSource.Value.SourceRect, Bounds.GetTranslated(DA.Offset), (this.TextureColor ?? Color.White) * DA.Opacity * ActualSource.Value.Opacity);
+            DA.DT.DrawTextureTo(ActualSource.Value.Texture, ActualSource.Value.SourceRect, Bounds.GetTranslated(DA.Offset), (TextureColor ?? Color.White) * DA.Opacity * ActualSource.Value.Opacity);
         }
     }
 }

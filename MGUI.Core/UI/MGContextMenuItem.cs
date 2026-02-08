@@ -107,14 +107,14 @@ namespace MGUI.Core.UI
         {
             this.Menu = Menu;
             this.MenuItemType = MenuItemType;
-            this.CanChangeContent = false;
+            CanChangeContent = false;
 
             Menu.ContextMenuOpening += (sender, e) =>
             {
                 if (ComputeIsVisible != null)
                 {
                     bool IsVisible = ComputeIsVisible();
-                    this.Visibility = IsVisible ? Visibility.Visible : Visibility.Collapsed;
+                    Visibility = IsVisible ? Visibility.Visible : Visibility.Collapsed;
                 }
             };
         }
@@ -223,7 +223,7 @@ namespace MGUI.Core.UI
             {
                 if (_Submenu != value)
                 {
-                    if (value != null && value.Host != this.Menu)
+                    if (value != null && value.Host != Menu)
                         throw new InvalidOperationException($"Cannot set {nameof(MGContextMenuItem)}.{nameof(Submenu)} to an {nameof(MGContextMenu)} whose parent is not the same as this.{nameof(Menu)}.");
 
                     if (Submenu != null)
@@ -301,7 +301,7 @@ namespace MGUI.Core.UI
                 e.DA.DT.FillPolygon(e.DA.Offset.ToVector2(), ArrowVertices, GetTheme().DropdownArrowColor * e.DA.Opacity);
             };
 
-            this.Submenu = null;
+            Submenu = null;
 
             void OpenSubmenu()
             {
@@ -382,7 +382,7 @@ namespace MGUI.Core.UI
         {
             Menu.ButtonWrapperTemplateChanged += (sender, e) =>
             {
-                this.ContentWrapper = Menu.ButtonWrapperTemplate(Menu);
+                ContentWrapper = Menu.ButtonWrapperTemplate(Menu);
             };
 
             OnSelected += (sender, e) => 
@@ -418,7 +418,7 @@ namespace MGUI.Core.UI
         {
             ContentWrapper?.AddCommandHandler((Button, e) =>
             {
-                this.IsChecked = !this.IsChecked;
+                IsChecked = !IsChecked;
             });
         }
 
@@ -427,7 +427,7 @@ namespace MGUI.Core.UI
         {
             Menu.ButtonWrapperTemplateChanged += (sender, e) =>
             {
-                this.ContentWrapper = Menu.ButtonWrapperTemplate(Menu);
+                ContentWrapper = Menu.ButtonWrapperTemplate(Menu);
             };
 
             HeaderPresenter.OnEndingDraw += (sender, e) =>
@@ -465,15 +465,15 @@ namespace MGUI.Core.UI
         internal MGContextMenuSeparator(MGContextMenu Menu, int Height)
             : base(Menu, ContextMenuItemType.Separator)
         {
-            this.SeparatorElement = new(Menu, Orientation.Horizontal, Height);
-            this.SeparatorElement.Margin = new(0);
+            SeparatorElement = new(Menu, Orientation.Horizontal, Height);
+            SeparatorElement.Margin = new(0);
 
-            this.SeparatorComponent = new(SeparatorElement, false, false, true, true, false, false, true,
+            SeparatorComponent = new(SeparatorElement, false, false, true, true, false, false, true,
                 (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalContentAlignment, VerticalContentAlignment, ComponentSize.Size));
             AddComponent(SeparatorComponent);
 
-            this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-            this.VerticalContentAlignment = VerticalAlignment.Stretch;
+            HorizontalContentAlignment = HorizontalAlignment.Stretch;
+            VerticalContentAlignment = VerticalAlignment.Stretch;
         }
     }
 }

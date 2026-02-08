@@ -120,7 +120,7 @@ namespace MGUI.Core.UI
         private void Host_EndingDraw(object sender, MGElementDrawEventArgs e)
         {
             if (!Host.RecentDrawWasClipped)
-                DrawSelf(e.DA, this.LayoutBounds);
+                DrawSelf(e.DA, LayoutBounds);
         }
 
         private int InitialWidth;
@@ -152,12 +152,12 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
-                this.Foreground = GetTheme().ResizeGripForeground.GetValue(true);
+                Foreground = GetTheme().ResizeGripForeground.GetValue(true);
 
-                this.Margin = new(2);
+                Margin = new(2);
 
-                this.MaxDots = 4;
-                this.Spacing = 3;
+                MaxDots = 4;
+                Spacing = 3;
                 OnMarginChanged += (sender, e) => { NPC(nameof(Size)); };
 
                 MouseHandler.DragStartCondition = DragStartCondition.MousePressed;
@@ -233,7 +233,7 @@ namespace MGUI.Core.UI
                 }
             }
 
-            FillPoints(Foreground.GetUnderlay(this.VisualState.Primary) * DA.Opacity);
+            FillPoints(Foreground.GetUnderlay(VisualState.Primary) * DA.Opacity);
 
             if (!ParentWindow.HasModalWindow)
             {

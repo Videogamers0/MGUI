@@ -302,17 +302,17 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
-                this.BorderElement = new(Window);
-                this.BorderComponent = MGComponentBase.Create(BorderElement);
+                BorderElement = new(Window);
+                BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
                 BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
                 BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
-                this.NumberFormat = "0.0";
+                NumberFormat = "0.0";
 
-                this.ValueElement = new(Window, "", Color.White, GetTheme().FontSettings.MediumFontSize);
+                ValueElement = new(Window, "", Color.White, GetTheme().FontSettings.MediumFontSize);
                 //this.ValueElement.WrapText = false;
-                this.ValueComponent = new(ValueElement, ComponentUpdatePriority.AfterContents, ComponentDrawPriority.BeforeContents,
+                ValueComponent = new(ValueElement, ComponentUpdatePriority.AfterContents, ComponentDrawPriority.BeforeContents,
                     true, true, false, false, false, false, false,
                     (AvailableBounds, ComponentSize) =>
                     {
@@ -323,14 +323,14 @@ namespace MGUI.Core.UI
                             _ => throw new NotImplementedException($"Unrecognized {nameof(Orientation)}: {Orientation}")
                         };
                     });
-                this.ValueElement.Padding = new(4);
+                ValueElement.Padding = new(4);
                 AddComponent(ValueComponent);
 
-                this.CompletedBrush = GetTheme().ProgressBarCompletedBrush.GetValue(true);
-                this.IncompleteBrush = GetTheme().ProgressBarIncompleteBrush.GetValue(true);
+                CompletedBrush = GetTheme().ProgressBarCompletedBrush.GetValue(true);
+                IncompleteBrush = GetTheme().ProgressBarIncompleteBrush.GetValue(true);
 
                 this.ShowValue = ShowValue;
-                this.ValueDisplayFormat = RecommendedPercentageValueDisplayFormat;
+                ValueDisplayFormat = RecommendedPercentageValueDisplayFormat;
 
                 this.Size = Size;
 
@@ -338,9 +338,9 @@ namespace MGUI.Core.UI
                 this.Maximum = Maximum;
                 this.Value = Value;
 
-                this.Padding = new(0);
+                Padding = new(0);
                 this.Orientation = Orientation;
-                this.IsReversed = false;
+                IsReversed = false;
             }
         }
 

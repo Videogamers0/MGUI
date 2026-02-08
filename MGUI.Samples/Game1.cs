@@ -41,8 +41,8 @@ namespace MGUI.Samples
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            this.MGUIRenderer = new(new GameRenderHost<Game1>(this));
-            this.Desktop = new(MGUIRenderer);
+            MGUIRenderer = new(new GameRenderHost<Game1>(this));
+            Desktop = new(MGUIRenderer);
 
             //  Optional: Use the SpriteFontPlus library (nuget pkg: https://www.nuget.org/packages/SpriteFontPlus) to dynamically create SpriteFonts at runtime
             //  and add them to MGDesktop.FontManager so they can be used by MGTextBlocks/MGTextBoxes etc

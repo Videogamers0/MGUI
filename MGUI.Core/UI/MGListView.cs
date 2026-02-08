@@ -130,7 +130,7 @@ namespace MGUI.Core.UI
                     else
                     {
                         IEnumerable<MGListViewItem<TItemType>> Values = ItemsSource.Select((x, Index) => new MGListViewItem<TItemType>(this, x, DataGrid.Rows[Index]));
-                        this.InternalRowItems = new ObservableCollection<MGListViewItem<TItemType>>(Values);
+                        InternalRowItems = new ObservableCollection<MGListViewItem<TItemType>>(Values);
                     }
 
                     NPC(nameof(ItemsSource));
@@ -185,9 +185,9 @@ namespace MGUI.Core.UI
         public void SetItemsSource(ICollection<TItemType> Value)
         {
             if (Value is ObservableCollection<TItemType> Observable)
-                this.ItemsSource = Observable;
+                ItemsSource = Observable;
             else
-                this.ItemsSource = new ObservableCollection<TItemType>(Value.ToList());
+                ItemsSource = new ObservableCollection<TItemType>(Value.ToList());
         }
         #endregion Items Source
 
@@ -282,7 +282,7 @@ namespace MGUI.Core.UI
             {
                 IFillBrush GridLineBrush = MGSolidFillBrush.Black;
 
-                this.HeaderGrid = new(Window);
+                HeaderGrid = new(Window);
                 HeaderGrid.AddRow(GridLength.Auto);
                 HeaderGrid.GridLinesVisibility = GridLinesVisibility.All;
                 HeaderGrid.RowSpacing = Spacing;
@@ -294,7 +294,7 @@ namespace MGUI.Core.UI
                 HeaderGrid.DefaultTextForeground.SetAll(Color.White);
                 HeaderGrid.CanChangeContent = false;
 
-                this.DataGrid = new(Window);
+                DataGrid = new(Window);
                 DataGrid.GridLinesVisibility = GridLinesVisibility.AllVertical | GridLinesVisibility.InnerHorizontal | GridLinesVisibility.BottomEdge; // Don't draw TopEdge gridline since the header grid already has a BottomEdge gridline
                 DataGrid.Padding = new(0, GridLineMargin, 0, 0); // Normally the top would already be padded if we were drawing a TopEdge gridline. But since we're not, manually pad it
                 DataGrid.RowSpacing = Spacing;
@@ -312,7 +312,7 @@ namespace MGUI.Core.UI
                 MGBorder TopRightCornerPlaceholder = new(Window, new Thickness(0, TopRightCornerBorderThickness, TopRightCornerBorderThickness, TopRightCornerBorderThickness), MGUniformBorderBrush.Black); //null as IBorderBrush);
                 TopRightCornerPlaceholder.BackgroundBrush = HeaderGrid.BackgroundBrush;
 
-                this.ScrollViewer = new(Window, ScrollBarVisibility.Auto, ScrollBarVisibility.Disabled);
+                ScrollViewer = new(Window, ScrollBarVisibility.Auto, ScrollBarVisibility.Disabled);
                 ScrollViewer.SetContent(DataGrid);
                 ScrollViewer.CanChangeContent = false;
                 ScrollViewer.VerticalScrollBarBoundsChanged += (sender, e) => {
@@ -324,25 +324,25 @@ namespace MGUI.Core.UI
                 HeaderGridWrapper.TryAddChild(HeaderGrid, Dock.Left);
                 HeaderGridWrapper.CanChangeContent = false;
 
-                this.DockPanelElement = new(Window);
+                DockPanelElement = new(Window);
                 DockPanelElement.TryAddChild(HeaderGridWrapper, Dock.Top);
                 DockPanelElement.TryAddChild(ScrollViewer, Dock.Bottom);
                 //DockPanelElement.VerticalAlignment = VerticalAlignment.Top;
                 DockPanelElement.CanChangeContent = false;
                 SetContent(DockPanelElement);
-                this.CanChangeContent = false;
+                CanChangeContent = false;
 
                 HeaderGrid.ManagedParent = this;
                 DataGrid.ManagedParent = this;
                 ScrollViewer.ManagedParent = this;
                 DockPanelElement.ManagedParent = this;
 
-                this.VerticalAlignment = VerticalAlignment.Top;
+                VerticalAlignment = VerticalAlignment.Top;
 
-                this.RowHeight = null;
-                this.RowLength = GridLength.Auto;
+                RowHeight = null;
+                RowLength = GridLength.Auto;
 
-                this._Columns = new();
+                _Columns = new();
 
                 SelectionMode = GridSelectionMode.None;
             }
@@ -468,7 +468,7 @@ namespace MGUI.Core.UI
         {
             this.ListView = ListView ?? throw new ArgumentNullException(nameof(ListView));
             this.Data = Data ?? throw new ArgumentNullException(nameof(Data));
-            this.DataRow = Row ?? throw new ArgumentNullException(nameof(Row));
+            DataRow = Row ?? throw new ArgumentNullException(nameof(Row));
         }
 
         internal void RefreshRowContent()
@@ -570,12 +570,12 @@ namespace MGUI.Core.UI
                 DataColumn.Length = Width.Length;
             };
 
-            this.HeaderColumn = HeaderGrid.AddColumn(Width.Length);
-            this.DataColumn = DataGrid.AddColumn(Width.Length);
+            HeaderColumn = HeaderGrid.AddColumn(Width.Length);
+            DataColumn = DataGrid.AddColumn(Width.Length);
 
             this.Header = Header;
 
-            this.CellTemplate = ItemTemplate;
+            CellTemplate = ItemTemplate;
         }
     }
 }

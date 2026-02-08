@@ -157,29 +157,29 @@ namespace MGUI.Core.UI.Containers.Grids
 
             internal GridDragData(GridDragData InheritFrom)
             {
-                this.GridSplitter = InheritFrom.GridSplitter;
-                this.GridSplitterCell = InheritFrom.GridSplitterCell;
-                this.OwnerGrid = InheritFrom.OwnerGrid;
+                GridSplitter = InheritFrom.GridSplitter;
+                GridSplitterCell = InheritFrom.GridSplitterCell;
+                OwnerGrid = InheritFrom.OwnerGrid;
 
-                this.ActualColumns = InheritFrom.ActualColumns;
-                this.OriginalColumns = InheritFrom.OriginalColumns.Select(x => x.GetCopy()).ToList();
+                ActualColumns = InheritFrom.ActualColumns;
+                OriginalColumns = InheritFrom.OriginalColumns.Select(x => x.GetCopy()).ToList();
 
-                this._ActualToOriginalColumn = new();
+                _ActualToOriginalColumn = new();
                 for (int i = 0; i < ActualColumns.Count; i++)
                     _ActualToOriginalColumn.Add(ActualColumns[i], OriginalColumns[i]);
 
-                this._OriginalToActualColumn = new();
+                _OriginalToActualColumn = new();
                 for (int i = 0; i < OriginalColumns.Count; i++)
                     _OriginalToActualColumn.Add(OriginalColumns[i], ActualColumns[i]);
 
-                this.ActualRows = InheritFrom.ActualRows;
-                this.OriginalRows = InheritFrom.OriginalRows.Select(x => x.GetCopy()).ToList();
+                ActualRows = InheritFrom.ActualRows;
+                OriginalRows = InheritFrom.OriginalRows.Select(x => x.GetCopy()).ToList();
 
-                this._ActualToOriginalRow = new();
+                _ActualToOriginalRow = new();
                 for (int i = 0; i < ActualRows.Count; i++)
                     _ActualToOriginalRow.Add(ActualRows[i], OriginalRows[i]);
 
-                this._OriginalToActualRow = new();
+                _OriginalToActualRow = new();
                 for (int i = 0; i < OriginalRows.Count; i++)
                     _OriginalToActualRow.Add(OriginalRows[i], ActualRows[i]);
             }
@@ -188,31 +188,31 @@ namespace MGUI.Core.UI.Containers.Grids
             {
                 this.GridSplitter = GridSplitter;
                 OwnerGrid.TryGetCell(GridSplitter, out GridCell Cell);
-                this.GridSplitterCell = Cell;
+                GridSplitterCell = Cell;
                 this.OwnerGrid = OwnerGrid;
 
                 if (NormalizeWeightedLengths)
                     OwnerGrid.NormalizeWeightedLengths();
 
-                this.ActualColumns = OwnerGrid.Columns;
-                this.OriginalColumns = ActualColumns.Select(x => x.GetCopy()).ToList();
+                ActualColumns = OwnerGrid.Columns;
+                OriginalColumns = ActualColumns.Select(x => x.GetCopy()).ToList();
 
-                this._ActualToOriginalColumn = new();
+                _ActualToOriginalColumn = new();
                 for (int i = 0; i < ActualColumns.Count; i++)
                     _ActualToOriginalColumn.Add(ActualColumns[i], OriginalColumns[i]);
 
-                this._OriginalToActualColumn = new();
+                _OriginalToActualColumn = new();
                 for (int i = 0; i < OriginalColumns.Count; i++)
                     _OriginalToActualColumn.Add(OriginalColumns[i], ActualColumns[i]);
 
-                this.ActualRows = OwnerGrid.Rows;
-                this.OriginalRows = ActualRows.Select(x => x.GetCopy()).ToList();
+                ActualRows = OwnerGrid.Rows;
+                OriginalRows = ActualRows.Select(x => x.GetCopy()).ToList();
 
-                this._ActualToOriginalRow = new();
+                _ActualToOriginalRow = new();
                 for (int i = 0; i < ActualRows.Count; i++)
                     _ActualToOriginalRow.Add(ActualRows[i], OriginalRows[i]);
 
-                this._OriginalToActualRow = new();
+                _OriginalToActualRow = new();
                 for (int i = 0; i < OriginalRows.Count; i++)
                     _OriginalToActualRow.Add(OriginalRows[i], ActualRows[i]);
             }
@@ -223,20 +223,20 @@ namespace MGUI.Core.UI.Containers.Grids
         {
             using (BeginInitializing())
             {
-                this.BorderElement = new(ParentWindow, new(0), MGUniformBorderBrush.Black);
-                this.BorderComponent = MGComponentBase.Create(BorderElement);
+                BorderElement = new(ParentWindow, new(0), MGUniformBorderBrush.Black);
+                BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
                 BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
                 BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
                 MGTheme Theme = GetTheme();
 
-                this.VerticalAlignment = VerticalAlignment.Stretch;
-                this.HorizontalAlignment = HorizontalAlignment.Stretch;
-                this.Size = 12;
-                this.TickSize = DefaultTickSize;
+                VerticalAlignment = VerticalAlignment.Stretch;
+                HorizontalAlignment = HorizontalAlignment.Stretch;
+                Size = 12;
+                TickSize = DefaultTickSize;
 
-                this.Foreground = GetTheme().GridSplitterForeground.GetValue(true);
+                Foreground = GetTheme().GridSplitterForeground.GetValue(true);
 
                 OnLayoutUpdated += (sender, e) => { NPC(nameof(Orientation)); };
 
@@ -244,7 +244,7 @@ namespace MGUI.Core.UI.Containers.Grids
                 {
                     if (e.IsLMB && Parent is MGGrid OwnerGrid)
                     {
-                        this.GridData = new(this, OwnerGrid, true);
+                        GridData = new(this, OwnerGrid, true);
                         IsDragging = true;
                         SpoofIsPressedWhileDrawingBackground = true;
                         e.SetHandledBy(this, false);
@@ -293,7 +293,7 @@ namespace MGUI.Core.UI.Containers.Grids
 
             int GridSplitterIndex;
             int Delta;
-            switch (this.Orientation)
+            switch (Orientation)
             {
                 case Orientation.Horizontal:
                     GridSplitterIndex = Data.GridSplitterCell.Row.Index;
@@ -477,7 +477,7 @@ namespace MGUI.Core.UI.Containers.Grids
                         }
                     }
                     break;
-                default: throw new NotImplementedException($"Unrecognized {nameof(Orientation)}: {this.Orientation}");
+                default: throw new NotImplementedException($"Unrecognized {nameof(Orientation)}: {Orientation}");
             }
         }
 

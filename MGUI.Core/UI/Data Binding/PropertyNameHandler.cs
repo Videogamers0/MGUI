@@ -11,15 +11,15 @@ namespace MGUI.Core.UI.Data_Binding
 
         public PropertyNameHandler(INotifyPropertyChanged Source, string PropertyName, Action<object, PropertyChangedEventArgs> Handler)
         {
-            this.Listener = new(Source, PropertyName);
+            Listener = new(Source, PropertyName);
             this.Handler = new(Handler);
-            this.Listener.PropertyChanged += this.Handler;
+            Listener.PropertyChanged += this.Handler;
         }
 
         public void Detach()
         {
-            this.Listener.PropertyChanged -= this.Handler;
-            this.Listener.Detach();
+            Listener.PropertyChanged -= Handler;
+            Listener.Detach();
         }
     }
 }

@@ -327,22 +327,22 @@ namespace MGUI.Core.UI
             if (ThreadState != ApartmentState.STA)
             {
                 Debug.WriteLine(
-                    $"WARNING: {nameof(MGUI)}.{nameof(MGUI.Core)}.{nameof(MGUI.Core.UI)}.{nameof(MGDesktop)} is being instantiated from a thread whose {nameof(ApartmentState)}={ThreadState}. " +
+                    $"WARNING: {nameof(MGUI)}.{nameof(Core)}.{nameof(UI)}.{nameof(MGDesktop)} is being instantiated from a thread whose {nameof(ApartmentState)}={ThreadState}. " +
                     $"You may experience unforeseen issues when running from a non-{ApartmentState.STA} {nameof(ApartmentState)}. " +
                     $"It is recommended to add the {nameof(STAThreadAttribute)} (\"[STAThread]\") to your program's main entry function to avoid issues."
                 );
             }
 
             this.Renderer = Renderer;
-            this.Windows = new();
-            this.Resources = new(new MGTheme(Renderer.FontManager.DefaultFontFamily));
+            Windows = new();
+            Resources = new(new MGTheme(Renderer.FontManager.DefaultFontFamily));
 
-            this.OverlayWindow = new(this, 0, 0, ValidScreenBounds.Width, ValidScreenBounds.Height)
+            OverlayWindow = new(this, 0, 0, ValidScreenBounds.Width, ValidScreenBounds.Height)
             {
                 WindowStyle = WindowStyle.None,
                 AllowsClickThrough = true
             };
-            this.OverlayHost = new(OverlayWindow) { Name = OverlayName };
+            OverlayHost = new(OverlayWindow) { Name = OverlayName };
             OverlayWindow.SetContent(OverlayHost);
             OverlayWindow.CanChangeContent = false;
 
@@ -413,10 +413,10 @@ namespace MGUI.Core.UI
             }
             #endregion Sample Icons
 
-            this.ToolTipShowDelay = DefaultToolTipShowDelay;
+            ToolTipShowDelay = DefaultToolTipShowDelay;
 
-            this.HighPriorityMouseHandler = InputTracker.Mouse.CreateHandler(this, null);
-            this.HighPriorityKeyboardHandler = InputTracker.Keyboard.CreateHandler(this, null);
+            HighPriorityMouseHandler = InputTracker.Mouse.CreateHandler(this, null);
+            HighPriorityKeyboardHandler = InputTracker.Keyboard.CreateHandler(this, null);
 
             HighPriorityMouseHandler.PressedInside += (sender, e) => { QueuedFocusedKeyboardHandler = null; };
             HighPriorityMouseHandler.PressedOutside += (sender, e) => { QueuedFocusedKeyboardHandler = null; };
@@ -480,8 +480,8 @@ namespace MGUI.Core.UI
                 }
             }
 
-            this.ActiveToolTip = QueuedToolTip;
-            this.FocusedKeyboardHandler = QueuedFocusedKeyboardHandler;
+            ActiveToolTip = QueuedToolTip;
+            FocusedKeyboardHandler = QueuedFocusedKeyboardHandler;
         }
 
         /// <summary>Traverses up the visual tree, starting from the given <paramref name="Element"/>, looking for an <see cref="MGElement"/> that is fully opaque (<see cref="MGElement.Opacity"/> >= 1.0f)</summary>

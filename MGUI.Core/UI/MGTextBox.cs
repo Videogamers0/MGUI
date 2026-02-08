@@ -486,7 +486,7 @@ namespace MGUI.Core.UI
                 return false;
             else
             {
-                this.CurrentSelection = new(Index, Index + Text.Length);
+                CurrentSelection = new(Index, Index + Text.Length);
                 return true;
             }
         }
@@ -775,8 +775,8 @@ namespace MGUI.Core.UI
                     RestorableState RedoState = CreateRestorableState();
                     if (SetText(State.Text))
                     {
-                        this.Caret.Position = State.CaretPosition;
-                        this.CurrentSelection = State.Selection;
+                        Caret.Position = State.CaretPosition;
+                        CurrentSelection = State.Selection;
                         AddRedoState(RedoState);
                         return true;
                     }
@@ -805,8 +805,8 @@ namespace MGUI.Core.UI
                     RestorableState UndoState = CreateRestorableState();
                     if (SetText(State.Text))
                     {
-                        this.Caret.Position = State.CaretPosition;
-                        this.CurrentSelection = State.Selection;
+                        Caret.Position = State.CaretPosition;
+                        CurrentSelection = State.Selection;
                         AddUndoState(UndoState);
                         return true;
                     }
@@ -833,9 +833,9 @@ namespace MGUI.Core.UI
                     _IsReadonly = value;
                     if (IsReadonly)
                     {
-                        this.IsDraggingSelection = false;
-                        this.Caret.Position = null;
-                        this.CurrentSelection = null;
+                        IsDraggingSelection = false;
+                        Caret.Position = null;
+                        CurrentSelection = null;
                     }
 
                     NPC(nameof(IsReadonly));
@@ -945,7 +945,7 @@ namespace MGUI.Core.UI
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private TextEntryMode _TextEntryMode = UI.TextEntryMode.Insert;
+        private TextEntryMode _TextEntryMode = TextEntryMode.Insert;
         public TextEntryMode TextEntryMode
         {
             get => _TextEntryMode;
@@ -998,62 +998,62 @@ namespace MGUI.Core.UI
             {
                 MGTheme Theme = GetTheme();
 
-                this.BorderElement = new(Window);
-                this.BorderComponent = MGComponentBase.Create(BorderElement);
+                BorderElement = new(Window);
+                BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
                 BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
                 BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
-                this.ResizeGripElement = new(Window);
-                this.ResizeGripComponent = MGComponentBase.Create(ResizeGripElement);
+                ResizeGripElement = new(Window);
+                ResizeGripComponent = MGComponentBase.Create(ResizeGripElement);
                 AddComponent(ResizeGripComponent);
                 this.IsUserResizable = IsUserResizable;
 
-                this.PlaceholderTextBlockElement = new(Window, "");
-                this.PlaceholderTextBlockComponent = new(PlaceholderTextBlockElement, ComponentUpdatePriority.AfterContents, ComponentDrawPriority.BeforeSelf,
+                PlaceholderTextBlockElement = new(Window, "");
+                PlaceholderTextBlockComponent = new(PlaceholderTextBlockElement, ComponentUpdatePriority.AfterContents, ComponentDrawPriority.BeforeSelf,
                     true, true, false, false, false, false, true,
                     (AvailableBounds, ComponentSize) => AvailableBounds.GetCompressed(Padding));
                 AddComponent(PlaceholderTextBlockComponent);
-                this.PlaceholderText = null;
-                this.PlaceholderTextBlockElement.Visibility = Visibility.Collapsed;
+                PlaceholderText = null;
+                PlaceholderTextBlockElement.Visibility = Visibility.Collapsed;
 
-                this.CharacterCountElement = new(Window, (Text?.Length ?? 0).ToString());
-                this.CharacterCountElement.Margin = new(0, 0, 8, 4);
-                this.CharacterCountElement.TrySetFont(GetDesktop().FontManager.DefaultFontFamily, 9);
-                this.CharacterCountComponent = new(CharacterCountElement, ComponentUpdatePriority.AfterContents, ComponentDrawPriority.BeforeSelf,
+                CharacterCountElement = new(Window, (Text?.Length ?? 0).ToString());
+                CharacterCountElement.Margin = new(0, 0, 8, 4);
+                CharacterCountElement.TrySetFont(GetDesktop().FontManager.DefaultFontFamily, 9);
+                CharacterCountComponent = new(CharacterCountElement, ComponentUpdatePriority.AfterContents, ComponentDrawPriority.BeforeSelf,
                     true, false, false, false, false, true, true,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Right, VerticalAlignment.Bottom, ComponentSize.Size));
                 AddComponent(CharacterCountComponent);
                 this.ShowCharacterCount = ShowCharacterCount;
 
-                this.LimitedCharacterCountFormatString = "[b]{{CharacterCount}}[/b] / [b]{{CharacterLimit}}[/b]";
-                this.LimitlessCharacterCountFormatString = "[b]{{CharacterCount}}[/b] character(s)";
+                LimitedCharacterCountFormatString = "[b]{{CharacterCount}}[/b] / [b]{{CharacterLimit}}[/b]";
+                LimitlessCharacterCountFormatString = "[b]{{CharacterCount}}[/b] character(s)";
 
-                this.TextBlockElement = new(Window, "");
+                TextBlockElement = new(Window, "");
                 TextBlockElement.ClipToBounds = false;
-                this.TextBlockComponent = new(TextBlockElement, ComponentUpdatePriority.AfterContents, ComponentDrawPriority.BeforeSelf, 
+                TextBlockComponent = new(TextBlockElement, ComponentUpdatePriority.AfterContents, ComponentDrawPriority.BeforeSelf, 
                     false, false, true, true, false, false, true,
                     (AvailableBounds, ComponentSize) => AvailableBounds.GetCompressed(Padding));
                 AddComponent(TextBlockComponent);
 
-                this.TextRenderInfo = new(this, TextBlockElement);
+                TextRenderInfo = new(this, TextBlockElement);
 
-                this.Padding = new(6, 2, 6, 2);
+                Padding = new(6, 2, 6, 2);
 
-                this.MinHeight = 26;
+                MinHeight = 26;
 
-                this.IsReadonly = false;
+                IsReadonly = false;
                 this.CharacterLimit = CharacterLimit;
 
-                this.AcceptsReturn = true;
-                this.AcceptsTab = true;
+                AcceptsReturn = true;
+                AcceptsTab = true;
 
-                this.Caret = new(this, TextBlockElement);
+                Caret = new(this, TextBlockElement);
 
-                this.FocusedSelectionForegroundColor = Theme.TextBoxFocusedSelectionForeground;
-                this.FocusedSelectionBackgroundColor = Theme.TextBoxFocusedSelectionBackground;
-                this.UnfocusedSelectionForegroundColor = Theme.TextBoxUnfocusedSelectionForeground;
-                this.UnfocusedSelectionBackgroundColor = Theme.TextBoxUnfocusedSelectionBackground;
+                FocusedSelectionForegroundColor = Theme.TextBoxFocusedSelectionForeground;
+                FocusedSelectionBackgroundColor = Theme.TextBoxFocusedSelectionBackground;
+                UnfocusedSelectionForegroundColor = Theme.TextBoxUnfocusedSelectionForeground;
+                UnfocusedSelectionBackgroundColor = Theme.TextBoxUnfocusedSelectionBackground;
 
                 MouseHandler.LMBPressedInside += (sender, e) =>
                 {
@@ -1072,7 +1072,7 @@ namespace MGUI.Core.UI
                             if (IsQuadruplePress)
                                 SelectAll();
                             else if (IsTriplePress)
-                                this.CurrentSelection = new(CharInfo.Line.FirstCharacter.IndexInOriginalText, CharInfo.Line.LastCharacter.IndexInOriginalText + 1);
+                                CurrentSelection = new(CharInfo.Line.FirstCharacter.IndexInOriginalText, CharInfo.Line.LastCharacter.IndexInOriginalText + 1);
                             else if (IsDoublePress)
                             {
                                 int Index = CharInfo.IndexInOriginalText;
@@ -1090,7 +1090,7 @@ namespace MGUI.Core.UI
                                         if (CharInfo.IndexInOriginalText + NextCharacters < Text.Length && Text[CharInfo.IndexInOriginalText + NextCharacters] == ' ')
                                             NextCharacters++;
 
-                                        this.CurrentSelection = new(CharInfo.IndexInOriginalText - PreviousCharacters, Math.Min(Text.Length, CharInfo.IndexInOriginalText + NextCharacters));
+                                        CurrentSelection = new(CharInfo.IndexInOriginalText - PreviousCharacters, Math.Min(Text.Length, CharInfo.IndexInOriginalText + NextCharacters));
                                     }
                                     else
                                     {
@@ -1099,7 +1099,7 @@ namespace MGUI.Core.UI
                                         //  Get all non-word characters to the right of the pressed character
                                         int NextCharacters = Text.Skip(Index).TakeWhile(x => Regex.IsMatch(x.ToString(), @"\W")).Count();
 
-                                        this.CurrentSelection = new(CharInfo.IndexInOriginalText - PreviousCharacters, Math.Min(Text.Length, CharInfo.IndexInOriginalText + NextCharacters));
+                                        CurrentSelection = new(CharInfo.IndexInOriginalText - PreviousCharacters, Math.Min(Text.Length, CharInfo.IndexInOriginalText + NextCharacters));
                                     }
                                 }
                             }
@@ -1179,14 +1179,14 @@ namespace MGUI.Core.UI
                     }
                 };
 
-                this.KeyboardHandler.Pressed += (sender, e) =>
+                KeyboardHandler.Pressed += (sender, e) =>
                 {
                     LastKeyPress = new(e);
                     HandleKeyPress(e);
                     e.SetHandledBy(this, false);
                 };
 
-                this.KeyboardHandler.Released += (sender, e) =>
+                KeyboardHandler.Released += (sender, e) =>
                 {
                     if (e.Key == LastKeyPress?.KeyArgs.Key)
                     {

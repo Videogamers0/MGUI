@@ -489,7 +489,7 @@ namespace MGUI.Core.UI.XAML
             Dictionary<string, List<object>> ValuesByProperty;
 
             //  Append current style setters to indexed data
-            foreach (Style Style in this.Styles.Where(x => x.Setters.Any()))
+            foreach (Style Style in Styles.Where(x => x.Setters.Any()))
             {
                 if (Style.Name != null)
                 {
@@ -519,14 +519,14 @@ namespace MGUI.Core.UI.XAML
             }
 
             //  Apply the appropriate style setters to this instance
-            if (this.IsStyleable)
+            if (IsStyleable)
             {
                 Type ThisType = GetType();
 
                 HashSet<string> ModifiedPropertyNames = new();
 
                 //  Apply implicit styles (styles that aren't referenced by a Name)
-                if (StylesByType.TryGetValue(this.ElementType, out ValuesByProperty))
+                if (StylesByType.TryGetValue(ElementType, out ValuesByProperty))
                 {
                     foreach (KeyValuePair<string, List<object>> KVP in ValuesByProperty)
                     {
@@ -562,7 +562,7 @@ namespace MGUI.Core.UI.XAML
                 if (StyleNames != null)
                 {
                     string[] Names = StyleNames.Split(',');
-                    List<Style> ExplicitStyles = Names.Select(x => StylesByName[x]).Where(x => x.TargetType == this.ElementType).ToList();
+                    List<Style> ExplicitStyles = Names.Select(x => StylesByName[x]).Where(x => x.TargetType == ElementType).ToList();
 
                     //  Get all the properties that the explicit styles will modify
                     HashSet<string> PropertyNames = ExplicitStyles.SelectMany(x => x.Setters).Select(x => x.Property).ToHashSet();
@@ -608,7 +608,7 @@ namespace MGUI.Core.UI.XAML
             }
 
             //  Remove current style setters from indexed data
-            foreach (Style Style in this.Styles.Where(x => x.Setters.Any()))
+            foreach (Style Style in Styles.Where(x => x.Setters.Any()))
             {
                 if (Style.Name != null)
                 {

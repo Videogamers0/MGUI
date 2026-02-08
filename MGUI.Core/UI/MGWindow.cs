@@ -192,8 +192,8 @@ namespace MGUI.Core.UI
             Size AvailableSize = GetActualAvailableSize(new Size(WindowWidth, WindowHeight), Value).Clamp(MinSize, MaxSize);
             UpdateMeasurement(AvailableSize, out _, out Thickness FullSize, out _, out _);
             Size Size = FullSize.Size.Clamp(MinSize, MaxSize);
-            this.WindowWidth = Size.Width;
-            this.WindowHeight = Size.Height;
+            WindowWidth = Size.Width;
+            WindowHeight = Size.Height;
             LayoutChanged(this, true);
 
             if (UpdateLayoutImmediately)
@@ -372,8 +372,8 @@ namespace MGUI.Core.UI
                     _ModalWindow = value;
                     NPC(nameof(ModalWindow));
                     NPC(nameof(HasModalWindow));
-                    Previous?.NPC(nameof(MGWindow.IsModalWindow));
-                    ModalWindow?.NPC(nameof(MGWindow.IsModalWindow));
+                    Previous?.NPC(nameof(IsModalWindow));
+                    ModalWindow?.NPC(nameof(IsModalWindow));
                 }
             }
         }
@@ -805,43 +805,43 @@ namespace MGUI.Core.UI
             using (BeginInitializing())
             {
                 this.Desktop = Desktop ?? throw new ArgumentNullException(nameof(Desktop));
-                this.Theme = WindowTheme;
+                Theme = WindowTheme;
 
                 MGTheme ActualTheme = GetTheme();
 
-                this.WindowMouseHandler = InputTracker.Mouse.CreateHandler(this, null);
-                this.WindowKeyboardHandler = InputTracker.Keyboard.CreateHandler(this, null);
-                this.MouseHandler.DragStartCondition = DragStartCondition.Both;
+                WindowMouseHandler = InputTracker.Mouse.CreateHandler(this, null);
+                WindowKeyboardHandler = InputTracker.Keyboard.CreateHandler(this, null);
+                MouseHandler.DragStartCondition = DragStartCondition.Both;
 
-                this.RadioButtonGroups = new();
-                this._NestedWindows = new();
-                this._NamedToolTips = new();
-                this.ModalWindow = null;
+                RadioButtonGroups = new();
+                _NestedWindows = new();
+                _NamedToolTips = new();
+                ModalWindow = null;
 
                 this.Left = Left;
-                this.PreviousLeft = Left;
+                PreviousLeft = Left;
                 this.Top = Top;
-                this.PreviousTop = Top;
+                PreviousTop = Top;
 
-                this.WindowWidth = Width;
-                this.PreviousWidth = Width;
-                this.WindowHeight = Height;
-                this.PreviousHeight = Height;
+                WindowWidth = Width;
+                PreviousWidth = Width;
+                WindowHeight = Height;
+                PreviousHeight = Height;
 
-                this.MinWidth = 50;
-                this.MinHeight = 50;
-                this.MaxWidth = 4000;
-                this.MaxHeight = 2000;
+                MinWidth = 50;
+                MinHeight = 50;
+                MaxWidth = 4000;
+                MaxHeight = 2000;
 
-                this.Padding = DefaultWindowPadding;
+                Padding = DefaultWindowPadding;
 
-                this.BorderElement = new(this, DefaultWindowBorderThickness, MGUniformBorderBrush.Black);
-                this.BorderComponent = MGComponentBase.Create(BorderElement);
+                BorderElement = new(this, DefaultWindowBorderThickness, MGUniformBorderBrush.Black);
+                BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
                 BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
                 BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
-                this.TitleBarElement = new(this);
+                TitleBarElement = new(this);
                 TitleBarElement.Padding = new(2);
                 TitleBarElement.MinHeight = 24;
                 TitleBarElement.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -850,7 +850,7 @@ namespace MGUI.Core.UI
                 TitleBarElement.VerticalContentAlignment = VerticalAlignment.Stretch;
                 TitleBarElement.BackgroundBrush = ActualTheme.TitleBackground.GetValue(true);
 
-                this.TitleBarComponent = new(TitleBarElement, true, false, true, true, false, false, false,
+                TitleBarComponent = new(TitleBarElement, true, false, true, true, false, false, false,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Stretch, VerticalAlignment.Top, ComponentSize.Size));
                 AddComponent(TitleBarComponent);
 #if NEVER
@@ -866,7 +866,7 @@ namespace MGUI.Core.UI
                 };
 #endif
 
-                this.CloseButtonElement = new(this, x => { TryCloseWindow(); });
+                CloseButtonElement = new(this, x => { TryCloseWindow(); });
                 CloseButtonElement.MinWidth = 12;
                 CloseButtonElement.MinHeight = 12;
                 CloseButtonElement.BackgroundBrush = new(Color.Crimson.AsFillBrush() * 0.5f, Color.White * 0.18f, PressedModifierType.Darken, 0.06f);
@@ -880,7 +880,7 @@ namespace MGUI.Core.UI
                 CloseButtonElement.SetContent(new MGTextBlock(this, "[b][shadow=Black 1 1]x[/shadow][/b]", Color.White));
                 //CloseButtonElement.CanChangeContent = false;
 
-                this.TitleBarTextBlockElement = new(this, null, Color.White, ActualTheme.FontSettings.SmallFontSize)
+                TitleBarTextBlockElement = new(this, null, Color.White, ActualTheme.FontSettings.SmallFontSize)
                 {
                     Margin = new(4,0),
                     Padding = new(0),
@@ -897,13 +897,13 @@ namespace MGUI.Core.UI
 
                 IsTitleBarVisible = true;
 
-                this.ResizeGripElement = new(this);
-                this.ResizeGripComponent = MGComponentBase.Create(ResizeGripElement);
+                ResizeGripElement = new(this);
+                ResizeGripComponent = MGComponentBase.Create(ResizeGripElement);
                 AddComponent(ResizeGripComponent);
-                this.IsUserResizable = true;
+                IsUserResizable = true;
 
-                this.HorizontalAlignment = HorizontalAlignment.Stretch;
-                this.VerticalAlignment = VerticalAlignment.Stretch;
+                HorizontalAlignment = HorizontalAlignment.Stretch;
+                VerticalAlignment = VerticalAlignment.Stretch;
 
                 OnHorizontalAlignmentChanged += (sender, e) =>
                 {
@@ -943,7 +943,7 @@ namespace MGUI.Core.UI
                         if (RecentSizeToContentSettings.HasValue)
                             RevalidateSizeToContent(true);
                         else
-                            UpdateLayout(new(this.Left, this.Top, this.WindowWidth, this.WindowHeight));
+                            UpdateLayout(new(this.Left, this.Top, WindowWidth, WindowHeight));
                     }
 
                     if (ShouldUpdateHoveredElement)
@@ -1004,7 +1004,7 @@ namespace MGUI.Core.UI
 
                 OnBeginUpdateContents += (sender, e) =>
                 {
-                    ElementUpdateArgs UpdateArgs = e.UA.ChangeOffset(this.Origin);
+                    ElementUpdateArgs UpdateArgs = e.UA.ChangeOffset(Origin);
 
                     //TODO does this order make sense?
                     //What if this window has both a ModalWindow and a NestedWindow, and the NestedWindow has a ModalWindow.
@@ -1086,10 +1086,10 @@ namespace MGUI.Core.UI
                     {
                         Point Delta = new((int)(DragWindowPositionOffset.Value.X * Scale), (int)(DragWindowPositionOffset.Value.Y * Scale));
 
-                        this.Left += Delta.X;
-                        this.Top += Delta.Y;
+                        Left += Delta.X;
+                        Top += Delta.Y;
 
-                        foreach (MGWindow Nested in this._NestedWindows)
+                        foreach (MGWindow Nested in _NestedWindows)
                         {
                             Nested.Left += Delta.X;
                             Nested.Top += Delta.Y;
@@ -1118,23 +1118,23 @@ namespace MGUI.Core.UI
                             //  Shift the window up so the bottom of the title bar is above the bottom of the desktop bounds
                             if (TitleBarScreenBounds.Bottom > ValidScreenBounds.Bottom)
                             {
-                                this.Top -= Math.Abs(TitleBarScreenBounds.Bottom - ValidScreenBounds.Bottom);
+                                Top -= Math.Abs(TitleBarScreenBounds.Bottom - ValidScreenBounds.Bottom);
                             }
                             //  Shift the window down so the top of the title bar is below the top of the desktop bounds
                             else if (TitleBarScreenBounds.Top < ValidScreenBounds.Top)
                             {
-                                this.Top += Math.Abs(ValidScreenBounds.Top - TitleBarScreenBounds.Top);
+                                Top += Math.Abs(ValidScreenBounds.Top - TitleBarScreenBounds.Top);
                             }
 
                             //  Shift the window left so the right of the title bar is left of the rightmost desktop bounds
                             if (TitleBarScreenBounds.Right > ValidScreenBounds.Right)
                             {
-                                this.Left -= Math.Abs(TitleBarScreenBounds.Right - ValidScreenBounds.Right);
+                                Left -= Math.Abs(TitleBarScreenBounds.Right - ValidScreenBounds.Right);
                             }
                             //  Shift the window right so the left of the title bar is right of the leftmost desktop bounds
                             else if (TitleBarScreenBounds.Left < ValidScreenBounds.Left)
                             {
-                                this.Left += Math.Abs(ValidScreenBounds.Left - TitleBarScreenBounds.Left);
+                                Left += Math.Abs(ValidScreenBounds.Left - TitleBarScreenBounds.Left);
                             }
                         }
 
@@ -1291,21 +1291,21 @@ namespace MGUI.Core.UI
                     switch (_WindowStyle)
                     {
                         case WindowStyle.Default:
-                            this.IsTitleBarVisible = true;
-                            this.IsCloseButtonVisible = true;
-                            this.IsUserResizable = true;
-                            this.Padding = DefaultWindowPadding;
-                            this.BorderThickness = DefaultWindowBorderThickness;
-                            this.BackgroundBrush = PreviousBackgroundBrush ?? BackgroundBrush;
+                            IsTitleBarVisible = true;
+                            IsCloseButtonVisible = true;
+                            IsUserResizable = true;
+                            Padding = DefaultWindowPadding;
+                            BorderThickness = DefaultWindowBorderThickness;
+                            BackgroundBrush = PreviousBackgroundBrush ?? BackgroundBrush;
                             break;
                         case WindowStyle.None:
-                            this.IsTitleBarVisible = false;
-                            this.IsCloseButtonVisible = false;
-                            this.IsUserResizable = false;
-                            this.Padding = new(0);
-                            this.BorderThickness = new(0);
-                            this.PreviousBackgroundBrush = BackgroundBrush.Copy();
-                            this.BackgroundBrush.SetAll(MGSolidFillBrush.Transparent); // Set this to MGSolidFillBrush.White * 0.2f while testing the AllowsClickThrough issue below
+                            IsTitleBarVisible = false;
+                            IsCloseButtonVisible = false;
+                            IsUserResizable = false;
+                            Padding = new(0);
+                            BorderThickness = new(0);
+                            PreviousBackgroundBrush = BackgroundBrush.Copy();
+                            BackgroundBrush.SetAll(MGSolidFillBrush.Transparent); // Set this to MGSolidFillBrush.White * 0.2f while testing the AllowsClickThrough issue below
                                                                                        //this.AllowsClickThrough = true;   //TODO we probably want AllowsClickThrough=false, but to then handle any unhandled events that occurred overtop of this window's content.
                                                                                        //That way, an invisible window with margin around the content (such as horizontally-centered content) won't auto-handle clicks within the
                                                                                        //window that are outside the content.
@@ -1322,7 +1322,7 @@ namespace MGUI.Core.UI
             }
         }
 
-        public void Draw(DrawBaseArgs BA) => Draw(new ElementDrawArgs(BA, this.VisualState, Point.Zero));
+        public void Draw(DrawBaseArgs BA) => Draw(new ElementDrawArgs(BA, VisualState, Point.Zero));
 
         public event EventHandler<ElementDrawArgs> OnBeginDrawNestedWindows;
         public event EventHandler<ElementDrawArgs> OnEndDrawNestedWindows;
@@ -1368,7 +1368,7 @@ namespace MGUI.Core.UI
 
             //  Draw a transparent black overlay if there is a Modal window overtop of this window
             if (ModalWindow != null)
-                DA.DT.FillRectangle(DA.Offset.ToVector2(), this.LayoutBounds, Color.Black * 0.5f);
+                DA.DT.FillRectangle(DA.Offset.ToVector2(), LayoutBounds, Color.Black * 0.5f);
 
             foreach (MGWindow Nested in _NestedWindows.OrderBy(x => x.IsTopmost))
                 Nested.Draw(DA);

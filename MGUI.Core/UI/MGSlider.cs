@@ -588,42 +588,42 @@ namespace MGUI.Core.UI
                 SetRange(Minimum, Maximum);
                 SetValue(Value);
 
-                this.FocusBrush = Theme.SliderOverlay.GetValue(true);
-                this.Foreground = Theme.SliderForeground.GetValue(true);
+                FocusBrush = Theme.SliderOverlay.GetValue(true);
+                Foreground = Theme.SliderForeground.GetValue(true);
 
-                this.NumberLineSize = 8;
-                this.NumberLineFillBrush = null;
-                this.NumberLineBorderBrush = BorderBrush;
-                this.NumberLineBorderThickness = new(1);
+                NumberLineSize = 8;
+                NumberLineFillBrush = null;
+                NumberLineBorderBrush = BorderBrush;
+                NumberLineBorderThickness = new(1);
 
                 this.DrawTicks = DrawTicks;
                 this.TickFrequency = TickFrequency;
-                this.UseDiscreteValues = DrawTicks;
-                this.DiscreteValueInterval = TickFrequency;
+                UseDiscreteValues = DrawTicks;
+                DiscreteValueInterval = TickFrequency;
 
-                this.TickFillBrush = null;
-                this.TickBorderBrush = BorderBrush;
-                this.TickBorderThickness = new(0);
+                TickFillBrush = null;
+                TickBorderBrush = BorderBrush;
+                TickBorderThickness = new(0);
 
-                this.ThumbFillBrush = Theme.SliderThumbFillBrush.GetValue(true);
-                this.ThumbBorderBrush = BorderBrush;
-                this.ThumbBorderThickness = new(1);
+                ThumbFillBrush = Theme.SliderThumbFillBrush.GetValue(true);
+                ThumbBorderBrush = BorderBrush;
+                ThumbBorderThickness = new(1);
 
                 this.Orientation = Orientation;
                 if (Orientation == Orientation.Horizontal)
                 {
-                    this.MinWidth = DefaultThumbPrimarySize * 4;
-                    this.VerticalAlignment = VerticalAlignment.Top;
+                    MinWidth = DefaultThumbPrimarySize * 4;
+                    VerticalAlignment = VerticalAlignment.Top;
                 }
                 else if (Orientation == Orientation.Vertical)
                 {
-                    this.MinHeight = DefaultThumbPrimarySize * 4;
-                    this.HorizontalAlignment = HorizontalAlignment.Left;
+                    MinHeight = DefaultThumbPrimarySize * 4;
+                    HorizontalAlignment = HorizontalAlignment.Left;
                 }
                 else
                     throw new NotImplementedException($"Unrecognized {nameof(Orientation)}: {Orientation}");
 
-                this.AcceptsMouseScrollWheel = false;
+                AcceptsMouseScrollWheel = false;
 
                 MouseHandler.LMBReleasedInside += (sender, e) =>
                 {
@@ -702,7 +702,7 @@ namespace MGUI.Core.UI
 
         private void HandleSliderInput(Vector2 CursorPosition)
         {
-            Rectangle NumberLineBounds = ComputeNumberLineBounds(this.LayoutBounds);
+            Rectangle NumberLineBounds = ComputeNumberLineBounds(LayoutBounds);
             if (Orientation == Orientation.Horizontal)
             {
                 float Percent = (CursorPosition.X - NumberLineBounds.Left) / NumberLineBounds.Width;
@@ -808,7 +808,7 @@ namespace MGUI.Core.UI
             LayoutBounds = new(LayoutBounds.Left + Padding.Left, LayoutBounds.Top + Padding.Top, LayoutBounds.Width - Padding.Width, LayoutBounds.Height - Padding.Height);
 
             Rectangle NumberLineBounds = ComputeNumberLineBounds(LayoutBounds);
-            this.RecentNumberLineBounds = NumberLineBounds;
+            RecentNumberLineBounds = NumberLineBounds;
 
             bool DrawTicks = CanDrawTickMarks && this.DrawTicks;
             if (Orientation == Orientation.Horizontal)

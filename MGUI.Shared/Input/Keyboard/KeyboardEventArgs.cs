@@ -20,9 +20,9 @@ namespace MGUI.Shared.Input.Keyboard
             : base()
         {
             this.Tracker = Tracker;
-            this.PressedAt = DateTime.Now;
+            PressedAt = DateTime.Now;
             this.Key = Key;
-            this.IsPrintableKey = !string.IsNullOrEmpty(PrintableValue);
+            IsPrintableKey = !string.IsNullOrEmpty(PrintableValue);
             this.PrintableValue = PrintableValue;
         }
     }
@@ -49,9 +49,9 @@ namespace MGUI.Shared.Input.Keyboard
         {
             this.Tracker = Tracker;
             this.PressedArgs = PressedArgs;
-            this.ReleasedAt = DateTime.Now;
+            ReleasedAt = DateTime.Now;
             this.Key = Key;
-            this.IsPrintableKey = !string.IsNullOrEmpty(PrintableValue);
+            IsPrintableKey = !string.IsNullOrEmpty(PrintableValue);
             this.PrintableValue = PrintableValue;
         }
     }
@@ -76,7 +76,7 @@ namespace MGUI.Shared.Input.Keyboard
             this.Tracker = Tracker;
             this.ReleasedArgs = ReleasedArgs;
             this.Key = Key;
-            this.IsPrintableKey = !string.IsNullOrEmpty(PrintableValue);
+            IsPrintableKey = !string.IsNullOrEmpty(PrintableValue);
             this.PrintableValue = PrintableValue;
         }
     }

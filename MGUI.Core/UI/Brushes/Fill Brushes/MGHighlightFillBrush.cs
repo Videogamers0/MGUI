@@ -157,7 +157,7 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
 			{
 				if (_FocusedElements != value)
 				{
-					void HandleLayoutBoundsChanged(object sender, Shared.Helpers.EventArgs<Rectangle> e) => CachedUnfocusedRegions.Clear();
+					void HandleLayoutBoundsChanged(object sender, EventArgs<Rectangle> e) => CachedUnfocusedRegions.Clear();
 
 					if (FocusedElements != null)
 					{
@@ -216,13 +216,13 @@ namespace MGUI.Core.UI.Brushes.Fill_Brushes
 			IsEnabled = true;
 
 			this.FillFocusedRegion = FillFocusedRegion;
-			this.FocusedColor = FocusedOverlayColor ?? Color.White * 0.35f;
+			FocusedColor = FocusedOverlayColor ?? Color.White * 0.35f;
             this.FillUnfocusedRegion = FillUnfocusedRegion;
-            this.UnfocusedColor = UnfocusedOverlayColor ?? Color.Black * 0.35f;
+            UnfocusedColor = UnfocusedOverlayColor ?? Color.Black * 0.35f;
 
-			this.FocusedBounds = null;
-			this.FocusedElements = null;
-			this.FocusedElementPadding = 0;
+			FocusedBounds = null;
+			FocusedElements = null;
+			FocusedElementPadding = 0;
 		}
 
 		public void Draw(ElementDrawArgs DA, MGElement Element, Rectangle Bounds)
