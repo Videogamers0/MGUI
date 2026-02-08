@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel;
 using Microsoft.Xna.Framework;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
-using MGUI.Core.UI.XAML;
 
 #if UseWPF
-using System.Windows.Markup;
 using System.Windows.Data;
 #else
 using Portable.Xaml.Markup;

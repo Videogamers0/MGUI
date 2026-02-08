@@ -1,6 +1,5 @@
 ﻿using MGUI.Core.UI.Data_Binding;
 using MGUI.Core.UI.Data_Binding.Converters;
-using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,8 +7,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using XNAColor = Microsoft.Xna.Framework.Color;
 
 namespace MGUI.Core.UI.XAML

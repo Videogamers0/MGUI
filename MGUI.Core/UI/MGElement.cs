@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using MonoGame.Extended;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.ObjectModel;
@@ -13,10 +12,8 @@ using MGUI.Shared.Rendering;
 using MGUI.Shared.Input.Mouse;
 using MGUI.Shared.Input.Keyboard;
 using MGUI.Shared.Input;
-using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Containers.Grids;
 using MGUI.Core.UI.Data_Binding;
-using System.ComponentModel;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 
 namespace MGUI.Core.UI

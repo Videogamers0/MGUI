@@ -1,9 +1,6 @@
 ﻿using MGUI.Core.UI.XAML;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MGUI.Core.UI
 {

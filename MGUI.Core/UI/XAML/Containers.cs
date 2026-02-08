@@ -1,15 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using MGUI.Core.UI.Containers;
+﻿using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Containers.Grids;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MGUI.Core.UI.Brushes.Border_Brushes;
-using MonoGame.Extended;
 using System.Diagnostics;
 using MGUI.Core.UI.Data_Binding;
 

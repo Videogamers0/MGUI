@@ -1,11 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using MGUI.Core.UI.Brushes.Border_Brushes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
 
 namespace MGUI.Core.UI.Brushes.Fill_Brushes
 {

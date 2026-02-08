@@ -1,14 +1,5 @@
-﻿using MGUI.Core.UI.XAML;
-using MGUI.Core.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using MGUI.Shared.Helpers;
+﻿using MGUI.Core.UI;
 using Microsoft.Xna.Framework.Content;
-using System.Diagnostics;
 
 namespace MGUI.Samples.Controls
 {

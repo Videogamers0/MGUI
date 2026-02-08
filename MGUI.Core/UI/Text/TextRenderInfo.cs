@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
-using MGUI.Shared.Helpers;
 using MonoGame.Extended;
 
 namespace MGUI.Core.UI.Text

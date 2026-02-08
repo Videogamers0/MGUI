@@ -1,5 +1,4 @@
-﻿using MGUI.Core.UI.XAML;
-using MGUI.Core.UI;
+﻿using MGUI.Core.UI;
 using MGUI.Shared.Helpers;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,9 +7,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using System.Collections.ObjectModel;
 

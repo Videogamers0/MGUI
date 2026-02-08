@@ -1,13 +1,8 @@
 ﻿using MGUI.Core.UI;
 using MGUI.Shared.Helpers;
-using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MGUI.Samples.Dialogs.FF7
 {

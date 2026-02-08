@@ -6,19 +6,14 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MonoGame.Extended;
 using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Core.UI.XAML;
-using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using Thickness = MonoGame.Extended.Thickness;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using Size = MonoGame.Extended.Size;
-using MGUI.Core.UI.Data_Binding;
 
 namespace MGUI.Core.UI
 {
