@@ -241,7 +241,7 @@ namespace MGUI.Core.UI.XAML
             if (Value.EndsWith('*'))
             {
                 string WeightString = Value.Substring(0, Value.Length - 1);
-                double Weight = WeightString == string.Empty ? 1.0 : double.Parse(WeightString);
+                double Weight = WeightString == string.Empty ? 1.0 : double.Parse(WeightString, CultureInfo.InvariantCulture);
                 return new ListViewColumnWidth() { WidthWeight = Weight };
             }
             else
