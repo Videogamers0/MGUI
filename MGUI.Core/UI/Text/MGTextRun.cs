@@ -3,6 +3,7 @@ using MGUI.Shared.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using ColorTranslator = System.Drawing.ColorTranslator;
 using System.IO;
 using System.Linq;
@@ -73,7 +74,7 @@ namespace MGUI.Core.UI.Text
                 case FTActionType.SetOpacity:
                     {
                         PreviousOpacities.Add(Opacity);
-                        float Value = float.Parse(Action.Parameter.Substring(1));
+                        float Value = float.Parse(Action.Parameter.Substring(1), CultureInfo.InvariantCulture);
                         return this with { Opacity = Value };
                     }
                 case FTActionType.RevertOpacity:
