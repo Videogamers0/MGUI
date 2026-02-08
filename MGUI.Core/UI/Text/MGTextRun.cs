@@ -3,6 +3,7 @@ using MGUI.Shared.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using ColorTranslator = System.Drawing.ColorTranslator;
 using System.IO;
 using System.Linq;
