@@ -10,7 +10,12 @@
 // Specs:       http://avalon/connecteddata/M5%20Specs/Transformer.mht
 //
 //---------------------------------------------------------------------------
-
+ 
+using System;
+using System.Windows;
+using System.Globalization;
+using System.Reflection;
+ 
 namespace MGUI.Core.UI.Data_Binding.Converters
 {
 #if !UseWPF

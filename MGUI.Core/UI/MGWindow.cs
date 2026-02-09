@@ -1,8 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using MGUI.Shared.Helpers;
+using Prism.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Diagnostics;
 using MonoGame.Extended;
@@ -12,6 +16,7 @@ using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Shared.Input.Mouse;
 using MGUI.Shared.Input.Keyboard;
 using MGUI.Shared.Rendering;
+using Microsoft.Xna.Framework.Graphics;
 using MGUI.Core.UI.Containers.Grids;
 
 namespace MGUI.Core.UI

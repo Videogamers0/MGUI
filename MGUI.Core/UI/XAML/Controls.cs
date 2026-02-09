@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Core.UI.Containers;
+using MGUI.Core.UI.Containers.Grids;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +10,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using MGUI.Core.UI.Data_Binding;
 
 #if UseWPF

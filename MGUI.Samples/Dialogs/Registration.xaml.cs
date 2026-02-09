@@ -1,5 +1,13 @@
-﻿using MGUI.Core.UI;
+﻿using MGUI.Core.UI.Brushes.Fill_Brushes;
+using MGUI.Core.UI;
 using Microsoft.Xna.Framework.Content;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using MGUI.Core.UI.XAML;
+using MGUI.Shared.Helpers;
 using System.Diagnostics;
 
 namespace MGUI.Samples.Dialogs

@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using MGUI.Shared.Helpers;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 
 namespace MGUI.Core.UI.Text
 {

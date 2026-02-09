@@ -1,7 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Security.Policy;
+using System.Text;
+using System.Threading.Tasks;
 using MGUI.Core.UI;
 using MGUI.Core.UI.XAML;
 using MGUI.Samples.Controls;
@@ -12,6 +18,7 @@ using MGUI.Samples.Dialogs.Stardew_Valley;
 using MGUI.Samples.Features;
 using MGUI.Shared.Helpers;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MGUI.Samples
 {

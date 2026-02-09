@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Core.UI.Containers;
 using MGUI.Core.UI.Containers.Grids;
@@ -9,8 +10,11 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using MGUI.Shared.Helpers;
 using MGUI.Core.UI.Brushes.Border_Brushes;
+using MonoGame.Extended;
 using Thickness = MonoGame.Extended.Thickness;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using RowDefinition = MGUI.Core.UI.Containers.Grids.RowDefinition;

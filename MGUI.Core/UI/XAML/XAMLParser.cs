@@ -1,4 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using MonoGame.Extended;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
+using MGUI.Core.UI.Brushes.Fill_Brushes;
+using MGUI.Core.UI.Brushes.Border_Brushes;
+using Microsoft.Xna.Framework.Graphics;
 using System.IO;
 using System.Xml;
 using System.Xml.Linq;

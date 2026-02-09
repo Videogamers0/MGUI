@@ -5,6 +5,9 @@ using MGUI.Core.UI.Brushes.Fill_Brushes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace MGUI.Core.UI
 {

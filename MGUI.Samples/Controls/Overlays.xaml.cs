@@ -2,6 +2,12 @@
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using MonoGame.Extended;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace MGUI.Samples.Controls
 {

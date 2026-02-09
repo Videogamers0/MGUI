@@ -1,16 +1,21 @@
-﻿using MGUI.Core.UI;
+﻿using MGUI.Core.UI.Brushes.Fill_Brushes;
+using MGUI.Core.UI;
 using Microsoft.Xna.Framework.Content;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using MGUI.Shared.Rendering;
 using Microsoft.Xna.Framework;
+using System.Runtime.CompilerServices;
 using MGUI.Shared.Helpers;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.ObjectModel;
 using MGUI.Core.UI.Containers.Grids;
 using MonoGame.Extended;
 using MGUI.Shared.Text;
+using MGUI.Core.UI.XAML;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using Thickness = MonoGame.Extended.Thickness;
 

@@ -4,9 +4,13 @@ using MGUI.Shared.Rendering;
 using MGUI.Shared.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using Size = MonoGame.Extended.Size;
 

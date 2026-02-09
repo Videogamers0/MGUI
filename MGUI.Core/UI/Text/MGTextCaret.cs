@@ -1,7 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using MGUI.Shared.Helpers;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using MonoGame.Extended;
 
 namespace MGUI.Core.UI.Text
 {

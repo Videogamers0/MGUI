@@ -1,4 +1,10 @@
-﻿using XNAColor = Microsoft.Xna.Framework.Color;
+﻿using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using XNAColor = Microsoft.Xna.Framework.Color;
 using DrawingColor = System.Drawing.Color;
 
 namespace MGUI.Shared.Helpers

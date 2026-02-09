@@ -1,8 +1,14 @@
 ﻿using MGUI.Core.UI.Containers;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MGUI.Shared.Helpers;
 using System.Collections.ObjectModel;
+using MGUI.Core.UI.Text;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using System.Collections.Specialized;
 using Microsoft.Xna.Framework.Input;
