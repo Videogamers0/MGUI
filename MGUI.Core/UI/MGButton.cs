@@ -155,18 +155,18 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
-                this.MinWidth = 16;
-                this.MinHeight = 16;
+                MinWidth = 16;
+                MinHeight = 16;
 
-                this.BorderElement = new(Window, BorderThickness, BorderBrush);
-                this.BorderComponent = MGComponentBase.Create(BorderElement);
+                BorderElement = new(Window, BorderThickness, BorderBrush);
+                BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
                 BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
                 BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
-                this.HorizontalContentAlignment = HorizontalAlignment.Center;
-                this.VerticalContentAlignment = VerticalAlignment.Center;
-                this.Padding = new(4,2,4,2);
+                HorizontalContentAlignment = HorizontalAlignment.Center;
+                VerticalContentAlignment = VerticalAlignment.Center;
+                Padding = new(4,2,4,2);
 
                 MouseHandler.PressedInside += (sender, e) =>
                 { 
@@ -190,7 +190,7 @@ namespace MGUI.Core.UI
 
                 if (HandleLeftClick != null)
                 {
-                    this.Command = (btn) => 
+                    Command = (btn) => 
                     {
                         HandleLeftClick(btn);
                         return true;

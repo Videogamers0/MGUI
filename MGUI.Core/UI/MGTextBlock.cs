@@ -83,14 +83,14 @@ namespace MGUI.Core.UI
                 if (!GetDesktop().FontManager.TryGetFont(FontFamily, CustomFontStyles.Normal, FontSize, true, out FontSet FS, out SpriteFont Font, out int Size, out float ExactScale, out float SuggestedScale))
                     return false;
 
-                this._FontFamily = FontFamily;
-                this._FontSize = FontSize;
+                _FontFamily = FontFamily;
+                _FontSize = FontSize;
 
-                this.SF_Regular = Font;
-                this.FontScale = GetTheme().FontSettings.UseExactScale ? ExactScale : SuggestedScale;
-                this.FontOrigin = FS.Origins[Size];
-                this.FontHeight = FS.Heights[Size];
-                this.SpaceWidth = (SF_Regular.MeasureString(" ") * FontScale).X;
+                SF_Regular = Font;
+                FontScale = GetTheme().FontSettings.UseExactScale ? ExactScale : SuggestedScale;
+                FontOrigin = FS.Origins[Size];
+                FontHeight = FS.Heights[Size];
+                SpaceWidth = (SF_Regular.MeasureString(" ") * FontScale).X;
 
                 SF_Bold = GetFontStyleOrDefault(FS, CustomFontStyles.Bold, Size, SF_Regular);
                 SF_Italic = GetFontStyleOrDefault(FS, CustomFontStyles.Italic, Size, SF_Regular);
@@ -464,7 +464,7 @@ namespace MGUI.Core.UI
 
         internal void UpdateLines()
         {
-            this.Lines = MGTextLine.ParseLines(this, LayoutBounds.Width - Padding.Width, WrapText, Runs, IgnoreEmptySpaceLines).ToList().AsReadOnly();
+            Lines = MGTextLine.ParseLines(this, LayoutBounds.Width - Padding.Width, WrapText, Runs, IgnoreEmptySpaceLines).ToList().AsReadOnly();
             NPC(nameof(Lines));
         }
 
@@ -562,7 +562,7 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
-                this.WrapText = true;
+                WrapText = true;
 
                 MGDesktop Desktop = GetDesktop();
                 MGTheme Theme = GetTheme();
@@ -570,19 +570,19 @@ namespace MGUI.Core.UI
                     throw new ArgumentException($"Default font not found.");
 
                 this.AllowsInlineFormatting = AllowsInlineFormatting;
-                this.IsBold = false;
-                this.IsItalic = false;
-                this.IsUnderlined = false;
+                IsBold = false;
+                IsItalic = false;
+                IsUnderlined = false;
                 this.Text = Text;
-                this.MinLines = 0;
-                this.MaxLines = null;
+                MinLines = 0;
+                MaxLines = null;
                 this.Foreground = new VisualStateSetting<Color?>(Foreground, Foreground, Foreground);
-                this.LinePadding = 2;
-                this.TextAlignment = HorizontalAlignment.Left;
-                this.Padding = new(1,2,1,1);
-                this.VerticalContentAlignment = VerticalAlignment.Center;
-                this.TextProgress = null;
-                this.TextCharactersPerSecond = null;
+                LinePadding = 2;
+                TextAlignment = HorizontalAlignment.Left;
+                Padding = new(1,2,1,1);
+                VerticalContentAlignment = VerticalAlignment.Center;
+                TextProgress = null;
+                TextCharactersPerSecond = null;
 
                 OnLayoutUpdated += (sender, e) => { UpdateLines(); };
             }
@@ -858,7 +858,7 @@ namespace MGUI.Core.UI
             FontManager FontManager = Desktop.FontManager;
             DrawTransaction DT = DA.DT;
             float Opacity = DA.Opacity;
-            Color DefaultForeground = this.ActualForeground;
+            Color DefaultForeground = ActualForeground;
             Vector2 FontOrigin = this.FontOrigin;
 
             Matrix Transform = Matrix.CreateTranslation(new Vector3(DA.Offset.ToVector2(), 0));
@@ -898,7 +898,7 @@ namespace MGUI.Core.UI
 
             float CurrentY = LayoutBounds.Top + Padding.Top;
 
-            foreach (MGTextLine Line in this.Lines)
+            foreach (MGTextLine Line in Lines)
             {
                 Rectangle LineBounds = new(LayoutBounds.Left + Padding.Left, (int)CurrentY, LayoutBounds.Width - PaddingSize.Width, (int)Line.LineTotalHeight);
                 float CurrentX = ApplyAlignment(LineBounds, TextAlignment, VerticalContentAlignment, new Size((int)Line.LineWidth, (int)Line.LineTotalHeight)).Left;

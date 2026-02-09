@@ -134,28 +134,28 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
-                this.HeaderHorizontalMargin = 5;
-                this.HeaderHorizontalPadding = 10;
+                HeaderHorizontalMargin = 5;
+                HeaderHorizontalPadding = 10;
 
-                this.BorderElement = new(Window, new Thickness(2), MGUniformBorderBrush.Black);
+                BorderElement = new(Window, new Thickness(2), MGUniformBorderBrush.Black);
                 BorderElement.SetParent(this);
                 BorderElement.ManagedParent = this;
                 BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
                 BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
-                this.Expander = new(Window);
+                Expander = new(Window);
                 Expander.Margin = new(0, 0, 5, 0);
                 Expander.VerticalAlignment = VerticalAlignment.Center;
-                this.HeaderPresenter = new(Window);
+                HeaderPresenter = new(Window);
                 HeaderPresenter.VerticalAlignment = VerticalAlignment.Center;
                 HeaderPresenter.CanChangeContent = false;
-                this.OuterHeaderPresenter = new(Window, Expander, HeaderPresenter);
+                OuterHeaderPresenter = new(Window, Expander, HeaderPresenter);
                 OuterHeaderPresenter.Spacing = 0;
                 OuterHeaderPresenter.CanChangeContent = false;
                 OuterHeaderPresenter.ManagedParent = this;
                 OuterHeaderPresenter.SetParent(this);
 
-                this.Padding = new(8,4,8,8);
+                Padding = new(8,4,8,8);
 
                 this.Header = Header;
 
@@ -166,9 +166,9 @@ namespace MGUI.Core.UI
                 {
                     Size HeaderlessSize = GetHeaderlessSize();
                     Size AvailableSize = LayoutBounds.Size.AsSize().Subtract(HeaderlessSize, 0, 0);
-                    this.OuterHeaderPresenter.UpdateMeasurement(AvailableSize, out _, out Thickness HeaderContentSize, out _, out _);
+                    OuterHeaderPresenter.UpdateMeasurement(AvailableSize, out _, out Thickness HeaderContentSize, out _, out _);
                     Rectangle HeaderBounds = new(LayoutBounds.Left + BorderThickness.Left + HeaderHorizontalMargin + HeaderHorizontalPadding, LayoutBounds.Top, HeaderContentSize.Width, HeaderContentSize.Height);
-                    this.OuterHeaderPresenter.UpdateLayout(HeaderBounds);
+                    OuterHeaderPresenter.UpdateLayout(HeaderBounds);
                 };
 
             }

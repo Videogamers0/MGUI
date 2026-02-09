@@ -249,7 +249,7 @@ namespace MGUI.Core.UI
                     else
                     {
                         IEnumerable<TemplatedElement<TItemType, MGButton>> Values = ItemsSource.Select(x => new TemplatedElement<TItemType, MGButton>(x, DropdownItemTemplate(x)));
-                        this.TemplatedItems = new ObservableCollection<TemplatedElement<TItemType, MGButton>>(Values);
+                        TemplatedItems = new ObservableCollection<TemplatedElement<TItemType, MGButton>>(Values);
                     }
 
                     NPC(nameof(ItemsSource));
@@ -309,9 +309,9 @@ namespace MGUI.Core.UI
         public void SetItemsSource(ICollection<TItemType> Value)
         {
             if (Value is ObservableCollection<TItemType> Observable)
-                this.ItemsSource = Observable;
+                ItemsSource = Observable;
             else
-                this.ItemsSource = new ObservableCollection<TItemType>(Value.ToList());
+                ItemsSource = new ObservableCollection<TItemType>(Value.ToList());
         }
         #endregion Items Source
 
@@ -365,7 +365,7 @@ namespace MGUI.Core.UI
                     else
                     {
                         IEnumerable<TemplatedElement<TItemType, MGButton>> Values = ItemsSource.Select(x => new TemplatedElement<TItemType, MGButton>(x, DropdownItemTemplate(x)));
-                        this.TemplatedItems = new ObservableCollection<TemplatedElement<TItemType, MGButton>>(Values);
+                        TemplatedItems = new ObservableCollection<TemplatedElement<TItemType, MGButton>>(Values);
                     }
 
                     NPC(nameof(DropdownItemTemplate));
@@ -443,7 +443,7 @@ namespace MGUI.Core.UI
             int ActualAvailableHeight = (int)(AvailableHeightScreenSpace / Dropdown.Scale);
             int ActualMaxHeight = Math.Clamp(MaxDropdownHeight, 0, ActualAvailableHeight);
             int ActualMinHeight = Math.Clamp(MinDropdownHeight, 0, ActualMaxHeight);
-            int ActualMinWidth = Math.Clamp(Math.Max(this.ActualWidth, MinDropdownWidth), 0, MaxDropdownWidth);
+            int ActualMinWidth = Math.Clamp(Math.Max(ActualWidth, MinDropdownWidth), 0, MaxDropdownWidth);
             Dropdown.ApplySizeToContent(SizeToContent.WidthAndHeight, ActualMinWidth, ActualMinHeight, MaxDropdownWidth, ActualMaxHeight);
         }
 
@@ -570,19 +570,19 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
-                this.BorderElement = new(Window, BorderThickness, BorderBrush);
-                this.BorderComponent = MGComponentBase.Create(BorderElement);
+                BorderElement = new(Window, BorderThickness, BorderBrush);
+                BorderComponent = MGComponentBase.Create(BorderElement);
                 AddComponent(BorderComponent);
                 BorderElement.OnBorderBrushChanged += (sender, e) => { NPC(nameof(BorderBrush)); };
                 BorderElement.OnBorderThicknessChanged += (sender, e) => { NPC(nameof(BorderThickness)); };
 
-                this.DropdownArrowElement = new(Window) { PreferredWidth = DropdownArrowPaddedWidth, PreferredHeight = DropdownArrowPaddedHeight };
-                this.DropdownArrowComponent = new(DropdownArrowElement, false, true, false, true, true, false, false,
+                DropdownArrowElement = new(Window) { PreferredWidth = DropdownArrowPaddedWidth, PreferredHeight = DropdownArrowPaddedHeight };
+                DropdownArrowComponent = new(DropdownArrowElement, false, true, false, true, true, false, false,
                     (AvailableBounds, ComponentSize) => ApplyAlignment(AvailableBounds, HorizontalAlignment.Right, VerticalAlignment.Center, ComponentSize.Size));
                 AddComponent(DropdownArrowComponent);
 
-                this.DropdownArrowElement.Margin = new(DefaultDropdownArrowLeftMargin, 0, DefaultDropdownArrowRightMargin, 0);
-                this.DropdownArrowColor = GetTheme().DropdownArrowColor;
+                DropdownArrowElement.Margin = new(DefaultDropdownArrowLeftMargin, 0, DefaultDropdownArrowRightMargin, 0);
+                DropdownArrowColor = GetTheme().DropdownArrowColor;
 
                 DropdownArrowElement.OnEndingDraw += (sender, e) =>
                 {
@@ -591,16 +591,16 @@ namespace MGUI.Core.UI
                     List<Vector2> ArrowVertices = new() {
                         ArrowPartBounds.TopLeft().ToVector2(), ArrowPartBounds.TopRight().ToVector2(), new(ArrowPartBounds.Center.X, ArrowPartBounds.Bottom)
                     };
-                    e.DA.DT.FillPolygon(e.DA.Offset.ToVector2(), ArrowVertices, this.DropdownArrowColor * e.DA.Opacity);
+                    e.DA.DT.FillPolygon(e.DA.Offset.ToVector2(), ArrowVertices, DropdownArrowColor * e.DA.Opacity);
                 };
 
-                this.HorizontalContentAlignment = HorizontalAlignment.Center;
-                this.VerticalContentAlignment = VerticalAlignment.Center;
-                this.Padding = new(4, 2, 4, 2);
+                HorizontalContentAlignment = HorizontalAlignment.Center;
+                VerticalContentAlignment = VerticalAlignment.Center;
+                Padding = new(4, 2, 4, 2);
 
-                this.MinHeight = 26;
+                MinHeight = 26;
 
-                this.CanChangeContent = false;
+                CanChangeContent = false;
 
                 SelfOrParentWindow.ScaleChanged += (sender, e) =>
                 {
@@ -619,7 +619,7 @@ namespace MGUI.Core.UI
                     if (HoveredItem != null)
                     {
                         e.SetHandledBy(Dropdown, false);
-                        this.SelectedTemplatedItem = HoveredItem;
+                        SelectedTemplatedItem = HoveredItem;
                         IsDropdownOpen = false;
                     }
                 };
@@ -755,7 +755,7 @@ namespace MGUI.Core.UI
 
             if (Settings.DropdownItemTemplate != null)
             {
-                this.DropdownItemTemplate = (Item) =>
+                DropdownItemTemplate = (Item) =>
                 {
                     MGElement Content = Settings.DropdownItemTemplate.GetContent(Dropdown, this, Item, x =>
                     {
@@ -778,16 +778,16 @@ namespace MGUI.Core.UI
 
             if (Settings.SelectedItemTemplate != null)
             {
-                this.SelectedItemTemplate = (Item) => Settings.SelectedItemTemplate.GetContent(SelfOrParentWindow, this, Item);
+                SelectedItemTemplate = (Item) => Settings.SelectedItemTemplate.GetContent(SelfOrParentWindow, this, Item);
             }
             //  Use the same template for the selected item if only a DropdownItemTemplate is specified
             else if (Settings.DropdownItemTemplate != null)
             {
-                this.SelectedItemTemplate = (Item) => Settings.DropdownItemTemplate.GetContent(SelfOrParentWindow, this, Item);
+                SelectedItemTemplate = (Item) => Settings.DropdownItemTemplate.GetContent(SelfOrParentWindow, this, Item);
             }
 
             if (Settings.SelectedIndex.HasValue)
-                this.SelectedIndex = Settings.SelectedIndex.Value;
+                SelectedIndex = Settings.SelectedIndex.Value;
         }
     }
 }

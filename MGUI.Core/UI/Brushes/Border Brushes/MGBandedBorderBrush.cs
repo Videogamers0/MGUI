@@ -49,7 +49,7 @@ namespace MGUI.Core.UI.Brushes.Border_Brushes
 
         public MGBandedBorderBrush()
         {
-            this.Bands = new List<MGBorderBand>().AsReadOnly();
+            Bands = new List<MGBorderBand>().AsReadOnly();
         }
 
         private static IEnumerable<T> AsEnum<T>(params T[] values) => values;

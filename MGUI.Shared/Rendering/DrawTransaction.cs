@@ -53,10 +53,10 @@ namespace MGUI.Shared.Rendering
         public DrawTransaction(MainRenderer Renderer, DrawSettings Settings, bool DeferBegin, DrawContext DefaultContext = DrawContext.Sprites)
         {
             this.Renderer = Renderer ?? throw new ArgumentNullException(nameof(Renderer));
-            this.PD = new PrimitiveDrawing(PB);
-            this.CurrentSettings = Settings ?? throw new ArgumentNullException(nameof(Settings));
+            PD = new PrimitiveDrawing(PB);
+            CurrentSettings = Settings ?? throw new ArgumentNullException(nameof(Settings));
 
-            this.PrimitiveProjectionMatrix = Matrix.CreateOrthographicOffCenter(0, GD.Viewport.Width, GD.Viewport.Height, 0, 0, 1);
+            PrimitiveProjectionMatrix = Matrix.CreateOrthographicOffCenter(0, GD.Viewport.Width, GD.Viewport.Height, 0, 0, 1);
 
             if (!DeferBegin)
             {

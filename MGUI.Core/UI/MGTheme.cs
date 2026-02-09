@@ -85,7 +85,7 @@ namespace MGUI.Core.UI
 
         public ThemeFontSettings(string FontFamily)
         {
-            this.DefaultFontFamily = FontFamily;
+            DefaultFontFamily = FontFamily;
         }
     }
 
@@ -439,13 +439,13 @@ namespace MGUI.Core.UI
                     );
                 _Backgrounds[MGElementType.Window] = new ThemeManagedVisualStateFillBrush(WindowBG.GetValue(true));
 
-                this.ComboBoxDropdownBackground =
+                ComboBoxDropdownBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             BrightNeutralBrush,
                             null, PressedModifierType.Darken, 0.06f)
                     );
-                this.ComboBoxDropdownItemBackground =
+                ComboBoxDropdownItemBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             null, ListItemSelectedColor.AsFillBrush() * 0.65f, null,
@@ -454,34 +454,34 @@ namespace MGUI.Core.UI
 
                 this.DropdownArrowColor = DropdownArrowColor;
 
-                this.ListBoxItemBackground =
+                ListBoxItemBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             null, ListItemSelectedColor.AsFillBrush() * 0.65f, null,
                             ListItemHoveredColor * 0.18f, PressedModifierType.Darken, 0.04f)
                     );
-                this.ListBoxItemAlternatingRowBackgrounds = new List<ThemeManagedFillBrush>()
+                ListBoxItemAlternatingRowBackgrounds = new List<ThemeManagedFillBrush>()
                 {
                     new ThemeManagedFillBrush(BrightNeutralColor.Darken(0.04f).AsFillBrush()),
                     new ThemeManagedFillBrush(BrightNeutralColor.Brighten(0.04f).AsFillBrush())
                 };
 
-                this.GridSplitterForeground =
+                GridSplitterForeground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             PrimaryBG,
                             Color.White * 0.22f, PressedModifierType.Darken, 0.06f)
                     );
 
-                this.ProgressButtonForeground = new ThemeManagedFillBrush(new MGSolidFillBrush(PrimaryBG.Color.Darken(0.35f)));
+                ProgressButtonForeground = new ThemeManagedFillBrush(new MGSolidFillBrush(PrimaryBG.Color.Darken(0.35f)));
 
-                this.ProgressBarCompletedBrush =
+                ProgressBarCompletedBrush =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             PrimaryBG,
                             Color.White * 0.02f, PressedModifierType.Darken, 0f)
                     ); ;
-                this.ProgressBarIncompleteBrush =
+                ProgressBarIncompleteBrush =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             MGSolidFillBrush.Transparent,
@@ -489,27 +489,27 @@ namespace MGUI.Core.UI
                     );
 
                 this.CheckMarkColor = CheckMarkColor;
-                this.RadioButtonBubbleBackground =
+                RadioButtonBubbleBackground =
                     new ThemeManagedVisualStateColorBrush(
                         new VisualStateColorBrush(
                             PrimaryColor,
                             Color.White * 0.12f, PressedModifierType.Darken, 0.06f)
                     );
-                this.RadioButtonCheckedFillColor = CheckMarkColor;
+                RadioButtonCheckedFillColor = CheckMarkColor;
 
-                this.ResizeGripForeground =
+                ResizeGripForeground =
                     new ThemeManagedVisualStateColorBrush(
                         new VisualStateColorBrush(
                             PrimaryColor, Color.White * 0.36f, PressedModifierType.Brighten, 0.2f)
                     );
 
-                this.ScrollBarOuterBrush =
+                ScrollBarOuterBrush =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             new MGBorderedFillBrush(new Thickness(1), new MGUniformBorderBrush(ScrollBarBorderColor), DimNeutralBackground, true),
                             Color.White * 0.06f, PressedModifierType.Brighten, 0f)
                     );
-                this.ScrollBarInnerBrush =
+                ScrollBarInnerBrush =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             new MGBorderedFillBrush(new Thickness(1), new MGUniformBorderBrush(ScrollBarBorderColor), new MGSolidFillBrush(AccentColor), false),
@@ -518,48 +518,48 @@ namespace MGUI.Core.UI
                             Color.White * 0.02f, PressedModifierType.Brighten, 0f)
                     );
 
-                this.SliderForeground = new(PrimaryBG.Copy());
-                this.SliderThumbFillBrush = new(PrimaryColor.Darken(0.1f).AsFillBrush());
-                this.SliderOverlay =
+                SliderForeground = new(PrimaryBG.Copy());
+                SliderThumbFillBrush = new(PrimaryColor.Darken(0.1f).AsFillBrush());
+                SliderOverlay =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             null,
                             Color.White * 0.12f, PressedModifierType.Darken, 0.06f)
                     );
 
-                this.SelectedTabHeaderBackground =
+                SelectedTabHeaderBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             PrimaryBG,
                             Color.White * 0.12f, PressedModifierType.Darken, 0.06f)
                     );
-                this.UnselectedTabHeaderBackground =
+                UnselectedTabHeaderBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             AccentBrush,
                             Color.White * 0.12f, PressedModifierType.Darken, 0.06f)
                     );
 
-                this.SpoilerUnspoiledBackground =
+                SpoilerUnspoiledBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             SpoilerUnpsoiledBG,
                             Color.White * 0.15f, PressedModifierType.Darken, 0.06f)
                     );
 
-                this.TextBoxFocusedSelectionForeground = TextColor;
-                this.TextBoxFocusedSelectionBackground = TextBoxFocusedSelectionBG;
-                this.TextBoxUnfocusedSelectionForeground = TextColor;
-                this.TextBoxUnfocusedSelectionBackground = TextBoxUnfocusedSelectionBG * 0.4f;
+                TextBoxFocusedSelectionForeground = TextColor;
+                TextBoxFocusedSelectionBackground = TextBoxFocusedSelectionBG;
+                TextBoxUnfocusedSelectionForeground = TextColor;
+                TextBoxUnfocusedSelectionBackground = TextBoxUnfocusedSelectionBG * 0.4f;
 
-                this.TitleBackground =
+                TitleBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             new MGSolidFillBrush(TitleBG),
                             Color.White * 0.05f, PressedModifierType.Darken, 0.06f)
                     );
 
-                this.TextBlockFallbackForeground =
+                TextBlockFallbackForeground =
                     new ThemeManagedVisualStateColorBrush(
                         new VisualStateColorBrush(TextColor)
                     );
@@ -665,75 +665,75 @@ namespace MGUI.Core.UI
                     );
                 _Backgrounds[MGElementType.Window] = new ThemeManagedVisualStateFillBrush(WindowBG.GetValue(true));
 
-                this.ComboBoxDropdownBackground =
+                ComboBoxDropdownBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             MGSolidFillBrush.White,
                             null, PressedModifierType.Darken, 0.06f)
                     );
-                this.ComboBoxDropdownItemBackground =
+                ComboBoxDropdownItemBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             null, Color.Yellow.AsFillBrush() * 0.65f, null,
                             Color.LightBlue * 0.8f, PressedModifierType.Darken, 0.06f)
                     );
 
-                this.DropdownArrowColor = Color.Black;
+                DropdownArrowColor = Color.Black;
 
-                this.ListBoxItemBackground =
+                ListBoxItemBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             null, Color.Yellow.AsFillBrush() * 0.65f, null,
                             Color.LightBlue * 0.4f, PressedModifierType.Darken, 0.04f)
                     );
-                this.ListBoxItemAlternatingRowBackgrounds = new List<ThemeManagedFillBrush>()
+                ListBoxItemAlternatingRowBackgrounds = new List<ThemeManagedFillBrush>()
                 {
                     new ThemeManagedFillBrush(BrightNeutralColor.Darken(0.04f).AsFillBrush()),
                     new ThemeManagedFillBrush(BrightNeutralColor.Brighten(0.04f).AsFillBrush())
                 };
 
-                this.GridSplitterForeground =
+                GridSplitterForeground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             MGSolidFillBrush.SemiBlack,
                             Color.White * 0.25f, PressedModifierType.Darken, 0.06f)
                     );
 
-                this.ProgressBarCompletedBrush =
+                ProgressBarCompletedBrush =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             Color.Green.AsFillBrush(),
                             Color.White * 0.02f, PressedModifierType.Darken, 0f)
                     );
-                this.ProgressBarIncompleteBrush =
+                ProgressBarIncompleteBrush =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             MGSolidFillBrush.SemiBlack,
                             Color.White * 0.01f, PressedModifierType.Darken, 0f)
                     );
 
-                this.CheckMarkColor = new(0, 128, 0);
-                this.RadioButtonBubbleBackground =
+                CheckMarkColor = new(0, 128, 0);
+                RadioButtonBubbleBackground =
                     new ThemeManagedVisualStateColorBrush(
                         new VisualStateColorBrush(
                             PrimaryColor,
                             Color.White * 0.18f, PressedModifierType.Darken, 0.06f)
                     );
-                this.RadioButtonCheckedFillColor = CheckMarkColor;
+                RadioButtonCheckedFillColor = CheckMarkColor;
 
-                this.ResizeGripForeground =
+                ResizeGripForeground =
                     new ThemeManagedVisualStateColorBrush(
                         new VisualStateColorBrush(
                             Color.Black, Color.White * 0.36f, PressedModifierType.Brighten, 0.2f)
                     );
 
-                this.ScrollBarOuterBrush =
+                ScrollBarOuterBrush =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             new MGBorderedFillBrush(new Thickness(1), MGUniformBorderBrush.Black, new MGSolidFillBrush(new Color(88, 88, 88)), true),
                             Color.White * 0.04f, PressedModifierType.Darken, 0f)
                     );
-                this.ScrollBarInnerBrush =
+                ScrollBarInnerBrush =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             new MGBorderedFillBrush(new Thickness(1), new MGUniformBorderBrush(Color.Black), new MGSolidFillBrush(new Color(204, 204, 204)), false),
@@ -742,48 +742,48 @@ namespace MGUI.Core.UI
                             Color.White * 0.02f, PressedModifierType.Darken, 0f)
                     );
 
-                this.SliderForeground = new(PrimaryBG.Copy());
-                this.SliderThumbFillBrush = new(PrimaryColor.Darken(0.1f).AsFillBrush());
-                this.SliderOverlay =
+                SliderForeground = new(PrimaryBG.Copy());
+                SliderThumbFillBrush = new(PrimaryColor.Darken(0.1f).AsFillBrush());
+                SliderOverlay =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             null,
                             Color.White * 0.18f, PressedModifierType.Darken, 0.06f)
                     );
 
-                this.SelectedTabHeaderBackground =
+                SelectedTabHeaderBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             MGSolidFillBrush.White,
                             Color.White * 0.18f, PressedModifierType.Darken, 0.06f)
                     );
-                this.UnselectedTabHeaderBackground =
+                UnselectedTabHeaderBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             PrimaryBG,
                             Color.White * 0.18f, PressedModifierType.Darken, 0.06f)
                     );
 
-                this.SpoilerUnspoiledBackground =
+                SpoilerUnspoiledBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             MGSolidFillBrush.SemiBlack,
                             Color.White * 0.18f, PressedModifierType.Darken, 0.06f)
                     );
 
-                this.TextBoxFocusedSelectionBackground = new(60, 120, 255);
-                this.TextBoxFocusedSelectionForeground = Color.White;
-                this.TextBoxUnfocusedSelectionBackground = new Color(210, 240, 255) * 0.4f;
-                this.TextBoxUnfocusedSelectionForeground = Color.White;
+                TextBoxFocusedSelectionBackground = new(60, 120, 255);
+                TextBoxFocusedSelectionForeground = Color.White;
+                TextBoxUnfocusedSelectionBackground = new Color(210, 240, 255) * 0.4f;
+                TextBoxUnfocusedSelectionForeground = Color.White;
 
-                this.TitleBackground =
+                TitleBackground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
                             MGSolidFillBrush.SemiBlack,
                             Color.White * 0.05f, PressedModifierType.Darken, 0.06f)
                     );
 
-                this.TextBlockFallbackForeground =
+                TextBlockFallbackForeground =
                     new ThemeManagedVisualStateColorBrush(
                         new VisualStateColorBrush(Color.Black)
                     );

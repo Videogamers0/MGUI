@@ -1075,10 +1075,10 @@ namespace MGUI.Core.UI
 
         protected MGElement(MGDesktop Desktop, MGWindow ParentWindow, MGElementType ElementType, MGTheme Theme = null)
 		{
-			this.InitializationManager = new(() => { LayoutChanged(this, true); });
+			InitializationManager = new(() => { LayoutChanged(this, true); });
 			using (BeginInitializing())
 			{
-				this.UniqueId = Guid.NewGuid().ToString();
+				UniqueId = Guid.NewGuid().ToString();
                 this.ParentWindow = ParentWindow;
                 this.ElementType = ElementType;
 
@@ -1093,24 +1093,24 @@ namespace MGUI.Core.UI
 
                 MGTheme ActualTheme = Theme ?? ParentWindow?.Theme ?? Desktop.Theme;
 
-                this.Margin = new(0);
-				this.Padding = new(0);
+                Margin = new(0);
+				Padding = new(0);
 
-				this.HorizontalAlignment = HorizontalAlignment.Stretch;
-				this.VerticalAlignment = VerticalAlignment.Stretch;
-				this.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-				this.VerticalContentAlignment = VerticalAlignment.Stretch;
+				HorizontalAlignment = HorizontalAlignment.Stretch;
+				VerticalAlignment = VerticalAlignment.Stretch;
+				HorizontalContentAlignment = HorizontalAlignment.Stretch;
+				VerticalContentAlignment = VerticalAlignment.Stretch;
 
-                this.BackgroundRenderPadding = new(0);
-                this.BackgroundBrush = ActualTheme.GetBackgroundBrush(ElementType);
-                this.DefaultTextForeground = new VisualStateSetting<Color?>(null, null, null);
+                BackgroundRenderPadding = new(0);
+                BackgroundBrush = ActualTheme.GetBackgroundBrush(ElementType);
+                DefaultTextForeground = new VisualStateSetting<Color?>(null, null, null);
 
-                this.Visibility = Visibility.Visible;
-                this.IsEnabled = true;
-                this.IsSelected = false;
-				this.IsHitTestVisible = true;
-                this.ClipToBounds = true;
-                this.Opacity = 1.0f;
+                Visibility = Visibility.Visible;
+                IsEnabled = true;
+                IsSelected = false;
+				IsHitTestVisible = true;
+                ClipToBounds = true;
+                Opacity = 1.0f;
 
                 SelfOrParentWindow.OnWindowPositionChanged += (sender, e) =>
 				{
@@ -1246,11 +1246,11 @@ namespace MGUI.Core.UI
             if (Offset != Point.Zero)
             {
                 Rectangle PreviousLayoutBounds = LayoutBounds;
-                this.AllocatedBounds = AllocatedBounds.GetTranslated(Offset);
-                this.RenderBounds = RenderBounds.GetTranslated(Offset);
-                this.LayoutBounds = LayoutBounds.GetTranslated(Offset);
-                this.StretchedContentBounds = StretchedContentBounds.GetTranslated(Offset);
-                this.AlignedContentBounds = AlignedContentBounds.GetTranslated(Offset);
+                AllocatedBounds = AllocatedBounds.GetTranslated(Offset);
+                RenderBounds = RenderBounds.GetTranslated(Offset);
+                LayoutBounds = LayoutBounds.GetTranslated(Offset);
+                StretchedContentBounds = StretchedContentBounds.GetTranslated(Offset);
+                AlignedContentBounds = AlignedContentBounds.GetTranslated(Offset);
                 OnLayoutBoundsChanged?.Invoke(this, new(PreviousLayoutBounds, LayoutBounds));
             }
         }
@@ -1364,8 +1364,8 @@ namespace MGUI.Core.UI
             if (Visibility != Visibility.Visible)
                 return;
 
-            bool ComputedIsEnabled = IsParentEnabled && this.IsEnabled;
-            bool ComputedIsHitTestVisible = IsParentHitTestVisible && this.IsHitTestVisible;
+            bool ComputedIsEnabled = IsParentEnabled && IsEnabled;
+            bool ComputedIsHitTestVisible = IsParentHitTestVisible && IsHitTestVisible;
 
             bool BaseCanReceiveInput = (Visibility == Visibility.Visible || (Visibility == Visibility.Hidden && CanHandleInputsWhileHidden)) && ComputedIsEnabled && ComputedIsHitTestVisible
                 && (!RecentDrawWasClipped || (Visibility == Visibility.Hidden && CanHandleInputsWhileHidden));
@@ -1376,7 +1376,7 @@ namespace MGUI.Core.UI
             foreach (MGElement Component in Components.Where(x => x.DrawBeforeSelf).Select(x => x.BaseElement))
                 Component.ComputeTopmostHoveredElement(ComputedIsEnabled, ComputedIsHitTestVisible, CanReceiveMouseInput, ref Result);
 
-            if (CanReceiveMouseInput && ComputedIsHitTestVisible && !SelfOrParentWindow.HasModalWindow && this.IsHovered)
+            if (CanReceiveMouseInput && ComputedIsHitTestVisible && !SelfOrParentWindow.HasModalWindow && IsHovered)
             {
                 Result = this;
             }
@@ -1391,11 +1391,11 @@ namespace MGUI.Core.UI
 
         public void Update(ElementUpdateArgs UA)
 		{
-            bool ComputedIsEnabled = UA.IsEnabled && this.IsEnabled;
-            bool ComputedIsSelected = UA.IsSelected || this.IsSelected;
-            bool ComputedIsHitTestVisible = UA.IsHitTestVisible && this.IsHitTestVisible;
+            bool ComputedIsEnabled = UA.IsEnabled && IsEnabled;
+            bool ComputedIsSelected = UA.IsSelected || IsSelected;
+            bool ComputedIsHitTestVisible = UA.IsHitTestVisible && IsHitTestVisible;
 
-            this.Origin = UA.Offset;
+            Origin = UA.Offset;
 
             Rectangle UnscaledScreenBounds = ConvertCoordinateSpace(CoordinateSpace.Layout, CoordinateSpace.UnscaledScreen, LayoutBounds);
             //TODO there's a bug with ActualLayoutBounds that I'm too lazy to fix:
@@ -1404,9 +1404,9 @@ namespace MGUI.Core.UI
             //For example, an MGTabControl's padding isn't applied to the HeadersPanel that hosts the TabControl's Tab headers.
 #if true
             if (IsWindow)
-                this.ActualLayoutBounds = UnscaledScreenBounds;
+                ActualLayoutBounds = UnscaledScreenBounds;
             else
-                this.ActualLayoutBounds = Rectangle.Intersect(UA.ActualLayoutBounds, UnscaledScreenBounds);
+                ActualLayoutBounds = Rectangle.Intersect(UA.ActualLayoutBounds, UnscaledScreenBounds);
 #else
             Rectangle ParentLayoutBounds = IsWindow ? GetDesktop().ValidScreenBounds : UA.ActualLayoutBounds;
             this.ActualLayoutBounds = Rectangle.Intersect(ParentLayoutBounds, UnscaledScreenBounds);
@@ -1416,7 +1416,7 @@ namespace MGUI.Core.UI
                 IsEnabled = ComputedIsEnabled, 
                 IsSelected = ComputedIsSelected, 
                 IsHitTestVisible = ComputedIsHitTestVisible, 
-                ActualLayoutBounds = this.ActualLayoutBounds
+                ActualLayoutBounds = ActualLayoutBounds
             };
             //UA = new(UA.BA, ComputedIsEnabled, ComputedIsSelected, ComputedIsHitTestVisible, UA.Offset, this.ActualLayoutBounds);
 
@@ -1426,7 +1426,7 @@ namespace MGUI.Core.UI
                 IsLMBPressed && IsSelfOrAncestorOf(SelfOrParentWindow.PressedElement) ? SecondaryVisualState.Pressed : 
                 IsHovered && IsSelfOrAncestorOf(SelfOrParentWindow.HoveredElement) ? SecondaryVisualState.Hovered : 
                 SecondaryVisualState.None;
-            this.VisualState = new(PrimaryVisualState, SecondaryVisualState);
+            VisualState = new(PrimaryVisualState, SecondaryVisualState);
 
             ElementUpdateEventArgs UpdateEventArgs = new(this, UA);
 
@@ -1459,8 +1459,8 @@ namespace MGUI.Core.UI
 
             bool BaseCanReceiveInput = (Visibility == Visibility.Visible || (Visibility == Visibility.Hidden && CanHandleInputsWhileHidden)) && ComputedIsEnabled && ComputedIsHitTestVisible
             	&& (!RecentDrawWasClipped || (Visibility == Visibility.Hidden && CanHandleInputsWhileHidden));
-            this._CanReceiveMouseInput = BaseCanReceiveInput && (Parent?._CanReceiveMouseInput ?? true);
-            this._CanReceiveKeyboardInput = BaseCanReceiveInput && (Parent?._CanReceiveKeyboardInput ?? true);
+            _CanReceiveMouseInput = BaseCanReceiveInput && (Parent?._CanReceiveMouseInput ?? true);
+            _CanReceiveKeyboardInput = BaseCanReceiveInput && (Parent?._CanReceiveKeyboardInput ?? true);
 
             OnBeginUpdateContents?.Invoke(this, UpdateEventArgs);
 			foreach (MGElement Component in Components.Where(x => x.UpdateBeforeContents).Select(x => x.BaseElement))
@@ -1550,7 +1550,7 @@ namespace MGUI.Core.UI
 		{
 			RecentDrawWasClipped = false;
 
-            DA = DA.SetOpacity(DA.Opacity * this.Opacity) with { VisualState = this.VisualState };
+            DA = DA.SetOpacity(DA.Opacity * Opacity) with { VisualState = VisualState };
             MGElementDrawEventArgs DrawEventArgs = new(DA);
 
 			OnBeginDraw?.Invoke(this, DrawEventArgs);
@@ -1642,7 +1642,7 @@ namespace MGUI.Core.UI
         /// See also: <see cref="OnEndingDraw"/></summary>
 		public event EventHandler<MGElementDrawEventArgs> OnEndDraw;
 
-        protected void DrawBackground(ElementDrawArgs DA) => DrawBackground(DA, this.LayoutBounds);
+        protected void DrawBackground(ElementDrawArgs DA) => DrawBackground(DA, LayoutBounds);
 
         private Rectangle GetBackgroundBounds(Rectangle LayoutBounds)
         {
@@ -1722,19 +1722,19 @@ namespace MGUI.Core.UI
                     RecentMeasurementsFull.Clear();
                 }
 
-                Rectangle PreviousLayoutBounds = this.LayoutBounds;
+                Rectangle PreviousLayoutBounds = LayoutBounds;
 
                 if (Bounds.Width <= 0 || Bounds.Height <= 0)
                 {
-                    this.AllocatedBounds = Rectangle.Empty;
-                    this.RenderBounds = Rectangle.Empty;
-                    this.LayoutBounds = Rectangle.Empty;
-                    this.StretchedContentBounds = Rectangle.Empty;
-                    this.AlignedContentBounds = Rectangle.Empty;
+                    AllocatedBounds = Rectangle.Empty;
+                    RenderBounds = Rectangle.Empty;
+                    LayoutBounds = Rectangle.Empty;
+                    StretchedContentBounds = Rectangle.Empty;
+                    AlignedContentBounds = Rectangle.Empty;
                 }
                 else
                 {
-                    this.AllocatedBounds = Bounds;
+                    AllocatedBounds = Bounds;
 
                     Size BoundsSize = new(Bounds.Width, Bounds.Height);
                     Thickness RequestedSelfSize;
@@ -1757,10 +1757,10 @@ namespace MGUI.Core.UI
                     int ConsumedHeight = Math.Min(MaxSizeIncludingMargin.Height, VerticalAlignment == VerticalAlignment.Stretch ? BoundsSize.Height : Math.Min(BoundsSize.Height, RequestedFullSize.Height));
                     if (ConsumedWidth <= 0 || ConsumedHeight <= 0)
                     {
-                        this.RenderBounds = Rectangle.Empty;
-                        this.LayoutBounds = Rectangle.Empty;
-                        this.StretchedContentBounds = Rectangle.Empty;
-                        this.AlignedContentBounds = Rectangle.Empty;
+                        RenderBounds = Rectangle.Empty;
+                        LayoutBounds = Rectangle.Empty;
+                        StretchedContentBounds = Rectangle.Empty;
+                        AlignedContentBounds = Rectangle.Empty;
                     }
                     else
                     {
@@ -1773,20 +1773,20 @@ namespace MGUI.Core.UI
                             VerticalAlignment;
 
                         Size RenderSize = new(ConsumedWidth, ConsumedHeight);
-                        this.RenderBounds = ApplyAlignment(AllocatedBounds, ActualHorizontalAlignment, ActualVerticalAlignment, RenderSize);
+                        RenderBounds = ApplyAlignment(AllocatedBounds, ActualHorizontalAlignment, ActualVerticalAlignment, RenderSize);
 
-                        this.LayoutBounds = new(RenderBounds.Left + Margin.Left, RenderBounds.Top + Margin.Top,
+                        LayoutBounds = new(RenderBounds.Left + Margin.Left, RenderBounds.Top + Margin.Top,
                             RenderBounds.Width - HorizontalMargin, RenderBounds.Height - VerticalMargin);
                         if (LayoutBounds.Width <= 0 || LayoutBounds.Height <= 0)
                         {
-                            this.LayoutBounds = Rectangle.Empty;
-                            this.StretchedContentBounds = Rectangle.Empty;
-                            this.AlignedContentBounds = Rectangle.Empty;
+                            LayoutBounds = Rectangle.Empty;
+                            StretchedContentBounds = Rectangle.Empty;
+                            AlignedContentBounds = Rectangle.Empty;
                         }
                         else
                         {
                             Rectangle RemainingComponentBounds = LayoutBounds;
-                            foreach (MGComponentBase Component in this.Components)
+                            foreach (MGComponentBase Component in Components)
                             {
                                 Component.BaseElement.UpdateMeasurement(RemainingComponentBounds.Size, out _, out Thickness ComponentSize, out _, out _);
                                 Rectangle ComponentBounds = Component.Arrange(RemainingComponentBounds, ComponentSize);
@@ -1818,7 +1818,7 @@ namespace MGUI.Core.UI
                             int ContentBoundsRight = Math.Max(RenderBounds.Left, RenderBounds.Right - RequestedSelfSize.Right - SharedSize.Right);
                             int ContentBoundsBottom = Math.Max(RenderBounds.Top, RenderBounds.Bottom - RequestedSelfSize.Bottom - SharedSize.Bottom);
 
-                            this.StretchedContentBounds = new(ContentBoundsLeft, ContentBoundsTop,
+                            StretchedContentBounds = new(ContentBoundsLeft, ContentBoundsTop,
                                 Math.Max(0, ContentBoundsRight - ContentBoundsLeft), Math.Max(0, ContentBoundsBottom - ContentBoundsTop));
 
                             //  Determine how much space the content consumes based on VerticalContentAlignment / HorizontalContentAlignment
@@ -1838,12 +1838,12 @@ namespace MGUI.Core.UI
                             //  Set bounds for content
                             if (ContentConsumedWidth <= 0 || ContentConsumedHeight <= 0)
                             {
-                                this.AlignedContentBounds = Rectangle.Empty;
+                                AlignedContentBounds = Rectangle.Empty;
                             }
                             else
                             {
                                 Size ContentSize = new(ContentConsumedWidth, ContentConsumedHeight);
-                                this.AlignedContentBounds = ApplyAlignment(StretchedContentBounds, HorizontalContentAlignment, VerticalContentAlignment, ContentSize);
+                                AlignedContentBounds = ApplyAlignment(StretchedContentBounds, HorizontalContentAlignment, VerticalContentAlignment, ContentSize);
                             }
 
                             UpdateContentLayout(AlignedContentBounds);
@@ -2153,7 +2153,7 @@ namespace MGUI.Core.UI
 
 				if (IncludeComponents)
 				{
-					foreach (MGComponentBase Component in this.Components)
+					foreach (MGComponentBase Component in Components)
 					{
 						foreach (T Item in Component.BaseElement.TraverseVisualTree<T>(true, IncludeComponents, IncludeToolTips, IncludeContextMenus, TraversalMode))
 							yield return Item;
@@ -2183,7 +2183,7 @@ namespace MGUI.Core.UI
 			{
                 if (IncludeComponents)
                 {
-                    foreach (MGComponentBase Component in this.Components)
+                    foreach (MGComponentBase Component in Components)
                     {
                         foreach (T Item in Component.BaseElement.TraverseVisualTree<T>(true, IncludeComponents, IncludeToolTips, IncludeContextMenus, TraversalMode))
                             yield return Item;

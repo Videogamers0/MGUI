@@ -144,7 +144,7 @@ namespace MGUI.Core.UI.Containers.Grids
         }
 
 
-        public ColumnDefinition GetCopy() => new(Grid, Length, MinWidth, MaxWidth) { Left = this.Left, Width = this.Width };
+        public ColumnDefinition GetCopy() => new(Grid, Length, MinWidth, MaxWidth) { Left = Left, Width = Width };
 
         public override string ToString() => $"{nameof(ColumnDefinition)}-{Index}({Length})";
     }
@@ -206,7 +206,7 @@ namespace MGUI.Core.UI.Containers.Grids
             SetSizeConstraints(MinHeight, MaxHeight);
         }
 
-        public RowDefinition GetCopy() => new(Grid, Length, MinHeight, MaxHeight) { Top = this.Top, Height = this.Height };
+        public RowDefinition GetCopy() => new(Grid, Length, MinHeight, MaxHeight) { Top = Top, Height = Height };
 
         public override string ToString() => $"{nameof(RowDefinition)}-{Index}({Length})";
     }

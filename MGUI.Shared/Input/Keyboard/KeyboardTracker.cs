@@ -42,7 +42,7 @@ namespace MGUI.Shared.Input.Keyboard
         internal KeyboardTracker(InputTracker InputTracker)
         {
             this.InputTracker = InputTracker;
-            this._Handlers = new();
+            _Handlers = new();
         }
 
         /// <param name="UpdatePriority">The priority with which the handler receives keyboard events. A higher priority means this handler will have the first chance to receive and handle events.</param>

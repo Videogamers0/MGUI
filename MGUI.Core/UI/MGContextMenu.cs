@@ -319,7 +319,7 @@ namespace MGUI.Core.UI
                 Menu.InvokeContextMenuOpening();
                 _ActiveContextMenu = Menu;
 
-                Menu.Scale = this.Scale;
+                Menu.Scale = Scale;
 
                 int MinWidth = 100;
                 int MinHeight = 40;
@@ -344,7 +344,7 @@ namespace MGUI.Core.UI
         {
             get
             {
-                MGContextMenu Current = this.ActiveContextMenu;
+                MGContextMenu Current = ActiveContextMenu;
                 while (Current != null)
                 {
                     yield return Current;
@@ -450,12 +450,12 @@ namespace MGUI.Core.UI
         public MGContextMenu(MGContextMenu ParentContextMenu)
             : this(ParentContextMenu, ParentContextMenu.TitleText, ParentContextMenu.Theme)
         {
-            this.Host = ParentContextMenu;
-            this.HeaderSize = ParentContextMenu.HeaderSize;
-            this.ButtonWrapperTemplate = ParentContextMenu.ButtonWrapperTemplate;
-            this.StaysOpenOnItemSelected = ParentContextMenu.StaysOpenOnItemSelected;
-            this.StaysOpenOnItemToggled = ParentContextMenu.StaysOpenOnItemToggled;
-            this.AutoCloseThreshold = null;
+            Host = ParentContextMenu;
+            HeaderSize = ParentContextMenu.HeaderSize;
+            ButtonWrapperTemplate = ParentContextMenu.ButtonWrapperTemplate;
+            StaysOpenOnItemSelected = ParentContextMenu.StaysOpenOnItemSelected;
+            StaysOpenOnItemToggled = ParentContextMenu.StaysOpenOnItemToggled;
+            AutoCloseThreshold = null;
         }
 
         /// <summary>Creates a root-level <see cref="MGContextMenu"/></summary>
@@ -471,52 +471,52 @@ namespace MGUI.Core.UI
         {
             using (BeginInitializing())
             {
-                this.Host = Desktop;
+                Host = Desktop;
 
-                this.IsDraggable = false;
-                this.AllowsClickThrough = false;
-                this.IsCloseButtonVisible = false;
+                IsDraggable = false;
+                AllowsClickThrough = false;
+                IsCloseButtonVisible = false;
 
-                this.ItemsPanel = new(this, Orientation.Vertical);
+                ItemsPanel = new(this, Orientation.Vertical);
                 ItemsPanel.Spacing = 2;
                 ItemsPanel.ManagedParent = this;
                 MGScrollViewer SV = new(this, ScrollBarVisibility.Auto, ScrollBarVisibility.Disabled);
-                this.ScrollViewerElement = SV;
+                ScrollViewerElement = SV;
                 SV.Padding = new(0);
                 SV.SetContent(ItemsPanel);
                 SV.ManagedParent = this;
-                this.SetContent(SV);
+                SetContent(SV);
 
                 SV.CanChangeContent = false;
                 ItemsPanel.CanChangeContent = false;
-                this.CanChangeContent = false;
+                CanChangeContent = false;
 
                 this.TitleText = TitleText;
-                this.IsTitleBarVisible = !string.IsNullOrEmpty(TitleText);
-                this.TitleBarTextBlockElement.TextAlignment = HorizontalAlignment.Center;
+                IsTitleBarVisible = !string.IsNullOrEmpty(TitleText);
+                TitleBarTextBlockElement.TextAlignment = HorizontalAlignment.Center;
 
-                this.Padding = new(1);
-                this.BorderBrush = MGUniformBorderBrush.Gray;
-                this.BorderThickness = new(1);
+                Padding = new(1);
+                BorderBrush = MGUniformBorderBrush.Gray;
+                BorderThickness = new(1);
 
-                this.IsUserResizable = false;
+                IsUserResizable = false;
 
-                this.MinWidth = 150;
-                this.MaxWidth = 600;
-                this.MinHeight = 50;
-                this.MaxHeight = 600;
+                MinWidth = 150;
+                MaxWidth = 600;
+                MinHeight = 50;
+                MaxHeight = 600;
 
-                this.HeaderSize = new Size(14, 14);
+                HeaderSize = new Size(14, 14);
 
-                this.StaysOpenOnItemSelected = false;
-                this.StaysOpenOnItemToggled = true;
-                this.AutoCloseThreshold = DefaultAutoCloseThreshold;
-                this.CanContextMenuOpen = true;
+                StaysOpenOnItemSelected = false;
+                StaysOpenOnItemToggled = true;
+                AutoCloseThreshold = DefaultAutoCloseThreshold;
+                CanContextMenuOpen = true;
 
-                this.CanChangeContent = false;
+                CanChangeContent = false;
 
-                this._Items = new();
-                this._Items.CollectionChanged += (sender, e) =>
+                _Items = new();
+                _Items.CollectionChanged += (sender, e) =>
                 {
                     using (ItemsPanel.AllowChangingContentTemporarily())
                     {
@@ -574,14 +574,14 @@ namespace MGUI.Core.UI
                 //  Should try re-testing the issue now and see if it's still reproducible
                 #endregion Bug Workaround
 
-                this.ButtonWrapperTemplate = CreateDefaultDropdownButton;
+                ButtonWrapperTemplate = CreateDefaultDropdownButton;
 
                 MouseHandler.MovedOutside += (sender, e) =>
                 {
                     if (IsContextMenuOpen && !IsSubmenu && !IsHoveringSubmenu(5) && AutoCloseThreshold.HasValue)
                     {
-                        Point LayoutSpacePosition = this.ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.CurrentPosition);
-                        if (((RectangleF)this.LayoutBounds).SquaredDistanceTo(LayoutSpacePosition) >= AutoCloseThreshold.Value * AutoCloseThreshold.Value)
+                        Point LayoutSpacePosition = ConvertCoordinateSpace(CoordinateSpace.Screen, CoordinateSpace.Layout, e.CurrentPosition);
+                        if (((RectangleF)LayoutBounds).SquaredDistanceTo(LayoutSpacePosition) >= AutoCloseThreshold.Value * AutoCloseThreshold.Value)
                             TryCloseContextMenu();
                     }
                 };
@@ -626,7 +626,7 @@ namespace MGUI.Core.UI
                 {
                     ParentWindow.OnWindowPositionChanged += (sender, e) =>
                     {
-                        Point PreviousPosition = this.LayoutBounds.TopLeft();
+                        Point PreviousPosition = LayoutBounds.TopLeft();
                         Point Offset = new(e.NewValue.Left - e.PreviousValue.Left, e.NewValue.Top - e.PreviousValue.Top);
                         InvokeWindowPositionChanged(PreviousPosition, PreviousPosition + Offset);
                     };
@@ -681,7 +681,7 @@ namespace MGUI.Core.UI
         public IEnumerable<TMenuItemType> GetItemsOfType<TMenuItemType>(bool IncludeSubmenus)
             where TMenuItemType : MGContextMenuItem
         {
-            foreach (MGContextMenuItem Item in this.Items)
+            foreach (MGContextMenuItem Item in Items)
             {
                 if (Item is TMenuItemType TypedItem)
                     yield return TypedItem;

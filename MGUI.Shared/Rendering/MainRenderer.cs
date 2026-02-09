@@ -62,8 +62,8 @@ namespace MGUI.Shared.Rendering
         public GameRenderHost(TObservableGame Game)
         {
             this.Game = Game;
-            this.Game.PreviewUpdate += (sender, e) => this.PreviewUpdate?.Invoke(Game, e);
-            this.Game.EndUpdate += (sender, e) => this.EndUpdate?.Invoke(Game, e);
+            this.Game.PreviewUpdate += (sender, e) => PreviewUpdate?.Invoke(Game, e);
+            this.Game.EndUpdate += (sender, e) => EndUpdate?.Invoke(Game, e);
 
             PreviousClientBounds = GetBounds();
             Game.Window.ClientSizeChanged += (sender, e) =>
@@ -101,25 +101,25 @@ namespace MGUI.Shared.Rendering
         public MainRenderer(IRenderHost Host)
         {
             this.Host = Host;
-            this.SpriteBatch = new(GraphicsDevice);
-            this.PrimitiveBatch = new(GraphicsDevice, 1024);
-            this.Content = new(Host, "Content");
-            this.FontManager = new(Content, "Arial");
-            this.Input = new();
+            SpriteBatch = new(GraphicsDevice);
+            PrimitiveBatch = new(GraphicsDevice, 1024);
+            Content = new(Host, "Content");
+            FontManager = new(Content, "Arial");
+            Input = new();
 
-            this.ScrollMarker = Content.Load<Texture2D>(Path.Combine("Icons", "ScrollMarker"));
+            ScrollMarker = Content.Load<Texture2D>(Path.Combine("Icons", "ScrollMarker"));
 
             Host.PreviewUpdate += (sender, e) =>
             {
-                this.UpdateArgs = new(e, e.Subtract(PreviousUpdateTimeSpan), this.Host.GetMouseState(), this.Host.GetKeyboardState());
+                UpdateArgs = new(e, e.Subtract(PreviousUpdateTimeSpan), this.Host.GetMouseState(), this.Host.GetKeyboardState());
                 PreviousUpdateTimeSpan = e;
-                this.Input.Update(UpdateArgs);
+                Input.Update(UpdateArgs);
             };
 
             Host.EndUpdate += (sender, e) =>
             {
-                this.Input.Mouse.UpdateHandlers();
-                this.Input.Keyboard.UpdateHandlers();
+                Input.Mouse.UpdateHandlers();
+                Input.Keyboard.UpdateHandlers();
             };
         }
 
@@ -168,7 +168,7 @@ namespace MGUI.Shared.Rendering
             {
                 DesiredRadius = Math.Min(DesiredRadius, MaximumRadius.Value);
                 int ActualRadius = Math.Clamp(GeneralUtils.NextPowerOf2(DesiredRadius), MinimumRadius.Value, MaximumRadius.Value);
-                Texture2D Circle = TextureUtils.CreateCircleTexture(this.SB, ActualRadius, Color.White, true);
+                Texture2D Circle = TextureUtils.CreateCircleTexture(SB, ActualRadius, Color.White, true);
                 CircleTextures[ActualRadius] = Circle;
                 return Circle;
             }

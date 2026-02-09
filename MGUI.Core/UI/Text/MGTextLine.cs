@@ -71,7 +71,7 @@ namespace MGUI.Core.UI.Text
             this.LineImageHeight = LineImageHeight;
             this.LineNumber = LineNumber;
             this.EndsInLinebreakCharacter = EndsInLinebreakCharacter;
-            this.OriginalCharacterIndices = Indices.ToList().AsReadOnly();
+            OriginalCharacterIndices = Indices.ToList().AsReadOnly();
         }
 
         private class WrappableRunGroup
@@ -88,7 +88,7 @@ namespace MGUI.Core.UI.Text
                 this.WordDelimiters = WordDelimiters.ToList().AsReadOnly();
                 this.OriginalRuns = OriginalRuns.ToList().AsReadOnly();
 
-                this.WrappableRuns = OriginalRuns.Where(x => x.RunType != TextRunType.Text || (!string.IsNullOrEmpty(((MGTextRunText)x).Text)))
+                WrappableRuns = OriginalRuns.Where(x => x.RunType != TextRunType.Text || (!string.IsNullOrEmpty(((MGTextRunText)x).Text)))
                     .Select(Run => new WrappableRun(this, Run)).ToList().AsReadOnly();
 
                 for (int i = 0; i < WrappableRuns.Count; i++)
@@ -108,7 +108,7 @@ namespace MGUI.Core.UI.Text
                     }
                 }
 
-                this.RemainingRuns = new(WrappableRuns);
+                RemainingRuns = new(WrappableRuns);
             }
 
             public WrappableRun GetNext(WrappableRun Current)
@@ -148,7 +148,7 @@ namespace MGUI.Core.UI.Text
                 else
                     OriginalWords = new();
 
-                this.RemainingWords = new List<WrappableRunWord>(OriginalWords);
+                RemainingWords = new List<WrappableRunWord>(OriginalWords);
             }
 
             public MGTextRunText AsTextRun(string Text)
