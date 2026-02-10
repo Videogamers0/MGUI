@@ -69,7 +69,13 @@ namespace MGUI.Samples
                 Window = XAMLParser.LoadRootWindow(Desktop, XAML, false, true);
                 Window.WindowClosed += (sender, e) => IsVisible = false;
             } 
-            catch (Exception ex) { Debug.WriteLine($"Error parsing XAML content for {ResourceName}: {ex}"); }
+            catch (Exception ex) 
+            { 
+                Debug.WriteLine($"Error parsing XAML content for {ResourceName}: {ex}");
+#if DEBUG
+                throw;
+#endif
+            }
         }
 
         protected static void OpenURL(string URL)
@@ -137,6 +143,7 @@ namespace MGUI.Samples
         public TextBlockSamples TextBlockSamples { get; }
         public TextBoxSamples TextBoxSamples { get; }
         public ToolTipSamples ToolTipSamples { get; }
+        public TreeViewSamples TreeViewSamples { get; }
         public UniformGridSamples UniformGridSamples { get; }
         public WindowSamples WindowSamples { get; }
         #endregion Controls
@@ -189,6 +196,7 @@ namespace MGUI.Samples
             TextBlockSamples = new(Content, Desktop);
             TextBoxSamples = new(Content, Desktop);
             ToolTipSamples = new(Content, Desktop);
+            TreeViewSamples = new(Content, Desktop);
             UniformGridSamples = new(Content, Desktop);
             WindowSamples = new(Content, Desktop);
             #endregion Controls
