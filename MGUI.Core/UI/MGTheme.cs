@@ -130,6 +130,21 @@ namespace MGUI.Core.UI
         /// <summary>The default value to use for <see cref="MGListBox{TItemType}.AlternatingRowBackgrounds"/></summary>
         public List<ThemeManagedFillBrush> ListBoxItemAlternatingRowBackgrounds { get; }
 
+        /// <summary>The default value to use for <see cref="MGTreeView.SelectionBackgroundBrush"/>.</summary>
+        public ThemeManagedVisualStateFillBrush TreeViewSelectionBackground { get; }
+        /// <summary>The default value to use for <see cref="MGTreeView.SelectionForeground"/>.</summary>
+        public Color TreeViewSelectionForeground { get; set; }
+        /// <summary>The default color to use for the expander arrow in <see cref="MGTreeViewItem"/>.</summary>
+        public Color TreeViewExpanderArrowColor { get; set; }
+        /// <summary>The default value to use for <see cref="MGTreeView.BorderBrush"/>.</summary>
+        public IBorderBrush TreeViewBorderBrush { get; set; }
+        /// <summary>The default value to use for <see cref="MGTreeView.BorderThickness"/>.</summary>
+        public MonoGame.Extended.Thickness TreeViewBorderThickness { get; set; }
+        /// <summary>The default value to use for <see cref="MGTreeView.IndentSize"/>.</summary>
+        public int TreeViewIndentSize { get; set; }
+        /// <summary>The default size of the expander button in <see cref="MGTreeViewItem"/>.</summary>
+        public int TreeViewExpanderButtonSize { get; set; }
+
         /// <summary>The default value to use for <see cref="MGProgressButton.ProgressBarForeground"/>.</summary>
         public ThemeManagedFillBrush ProgressButtonForeground { get; }
         public ThemeManagedVisualStateFillBrush ProgressBarCompletedBrush { get; }
@@ -466,6 +481,19 @@ namespace MGUI.Core.UI
                     new ThemeManagedFillBrush(BrightNeutralColor.Brighten(0.04f).AsFillBrush())
                 };
 
+                TreeViewSelectionBackground =
+                    new ThemeManagedVisualStateFillBrush(
+                        new VisualStateFillBrush(
+                            ListItemSelectedColor.AsFillBrush() * 0.65f,
+                            null, PressedModifierType.Darken, 0.04f)
+                    );
+                TreeViewSelectionForeground = Color.White;
+                TreeViewExpanderArrowColor = Color.White;
+                TreeViewBorderBrush = new MGUniformBorderBrush(BrightNeutralColor);
+                TreeViewBorderThickness = new MonoGame.Extended.Thickness(1);
+                TreeViewIndentSize = 20;
+                TreeViewExpanderButtonSize = 16;
+
                 GridSplitterForeground =
                     new ThemeManagedVisualStateFillBrush(
                         new VisualStateFillBrush(
@@ -691,6 +719,19 @@ namespace MGUI.Core.UI
                     new ThemeManagedFillBrush(BrightNeutralColor.Darken(0.04f).AsFillBrush()),
                     new ThemeManagedFillBrush(BrightNeutralColor.Brighten(0.04f).AsFillBrush())
                 };
+
+                TreeViewSelectionBackground =
+                    new ThemeManagedVisualStateFillBrush(
+                        new VisualStateFillBrush(
+                            Color.Yellow.AsFillBrush() * 0.65f,
+                            null, PressedModifierType.Darken, 0.04f)
+                    );
+                TreeViewSelectionForeground = Color.Black;
+                TreeViewExpanderArrowColor = Color.Black;
+                TreeViewBorderBrush = new MGUniformBorderBrush(Color.Gray);
+                TreeViewBorderThickness = new Thickness(1);
+                TreeViewIndentSize = 20;
+                TreeViewExpanderButtonSize = 16;
 
                 GridSplitterForeground =
                     new ThemeManagedVisualStateFillBrush(
