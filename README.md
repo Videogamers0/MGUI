@@ -457,7 +457,7 @@ MGUI can also parse and render your XAML markup at runtime using the MGXAMLDesig
 # Getting Started:
 
 1. Clone this repo
-2. Use Visual Studio 2022 or later (since this project targets .NET 6.0, and makes use of some new-ish C# language features such as record structs (which may be unavailable in c# language version 8.0 or earlier))
+2. Use Visual Studio 2022 or later (since this project targets .NET 8.0, and makes use of some new-ish C# language features such as record structs (which may be unavailable in c# language version 8.0 or earlier))
 3. In your MonoGame project:
    - In the Solution Explorer:
      - Right-click your Solution, *Add* -> *Existing Project*. Browse for `MGUI.Shared.csproj`, and `MGUI.Core.csproj`.
@@ -550,7 +550,7 @@ public class Game1 : Game, IObservableUpdate
   
 # Multi-Platform
 
-MGUI.Core targets `net6.0-windows` by default. If you wish to use MGUI on another OS, open `MGUI\MGUI.Core\MGUI.Core.csproj` and change `<TargetFramework>net6.0-windows</TargetFramework>` to `<TargetFramework>net6.0</TargetFramework>`. Some features have better implementations when targeting `net6.0-windows`, but everything probably™ works fine when targeting `net6.0`. In particular, targeting `net6.0` breaks some intellisense related to `MarkupExtensions` (such as `MGBinding`) when using the Visual Studio Xaml designer (but it still works at runtime, don't ask me why).
+MGUI.Core targets `net8.0-windows` by default. If you wish to use MGUI on another OS, open `MGUI\MGUI.Core\MGUI.Core.csproj` and change `<TargetFramework>net8.0-windows</TargetFramework>` to `<TargetFramework>net8.0</TargetFramework>`. Some features have better implementations when targeting `net8.0-windows`, but everything probably™ works fine when targeting `net8.0`. In particular, targeting `net8.0` breaks some intellisense related to `MarkupExtensions` (such as `MGBinding`) when using the Visual Studio Xaml designer (but it still works at runtime, don't ask me why).
 
 # Input Handling
 
@@ -741,4 +741,4 @@ MGUI's DataBinding engine supports several features such as:
 
 ![DataBindings_1](https://user-images.githubusercontent.com/9426230/225460788-5002d58a-86c8-44bc-9924-ff8207aa1532.png)
 
-Because MGUI uses its own DataBinding engine, DataBindings will work even on non-Windows platforms. (Though you will need to change `MGUI.Core` to target `net6.0` instead of `net6.0-windows`, and some intellisense won't work in the Visual Studio Xaml designer.)
+Because MGUI uses its own DataBinding engine, DataBindings will work even on non-Windows platforms. (Though you will need to change `MGUI.Core` to target `net8.0` instead of `net8.0-windows`, and some intellisense won't work in the Visual Studio Xaml designer.)
