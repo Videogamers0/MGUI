@@ -139,7 +139,7 @@ namespace MGUI.Core.UI
         /// <summary>The default value to use for <see cref="MGTreeView.BorderBrush"/>.</summary>
         public IBorderBrush TreeViewBorderBrush { get; set; }
         /// <summary>The default value to use for <see cref="MGTreeView.BorderThickness"/>.</summary>
-        public MonoGame.Extended.Thickness TreeViewBorderThickness { get; set; }
+        public Thickness TreeViewBorderThickness { get; set; }
         /// <summary>The default value to use for <see cref="MGTreeView.IndentSize"/>.</summary>
         public int TreeViewIndentSize { get; set; }
         /// <summary>The default size of the expander button in <see cref="MGTreeViewItem"/>.</summary>
@@ -490,7 +490,7 @@ namespace MGUI.Core.UI
                 TreeViewSelectionForeground = Color.White;
                 TreeViewExpanderArrowColor = Color.White;
                 TreeViewBorderBrush = new MGUniformBorderBrush(BrightNeutralColor);
-                TreeViewBorderThickness = new MonoGame.Extended.Thickness(1);
+                TreeViewBorderThickness = new Thickness(1);
                 TreeViewIndentSize = 20;
                 TreeViewExpanderButtonSize = 16;
 

@@ -2437,6 +2437,120 @@ namespace MGUI.Core.UI.XAML
         }
     }
 
+    [ContentProperty(nameof(Children))]
+    public class TreeView : MultiContentHost
+    {
+        public override MGElementType ElementType => MGElementType.TreeView;
+
+        [Category("Border")]
+        public Border Border { get; set; } = new();
+
+        [Category("Border")]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [Browsable(false)]
+        public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
+
+        [Category("Layout")]
+        public int? IndentSize { get; set; }
+
+        [Category("Appearance")]
+        public FillBrush SelectionBackgroundBrush { get; set; }
+        [Category("Appearance")]
+        public XAMLColor? SelectionForeground { get; set; }
+
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTreeView(Window);
+
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
+        {
+            MGTreeView TreeView = Element as MGTreeView;
+            Border.ApplySettings(TreeView, TreeView.BorderComponent.Element, false);
+
+            if (IndentSize.HasValue)
+                TreeView.IndentSize = IndentSize.Value;
+
+            if (SelectionBackgroundBrush != null)
+                TreeView.SelectionBackgroundBrush = new VisualStateFillBrush(SelectionBackgroundBrush.ToFillBrush(TreeView.GetDesktop(), TreeView));
+            if (SelectionForeground.HasValue)
+                TreeView.SelectionForeground = SelectionForeground.Value.ToXNAColor();
+
+            //  Add TreeViewItems
+            if (IncludeContent)
+            {
+                foreach (Element Child in Children)
+                {
+                    if (Child is TreeViewItem treeViewItem)
+                    {
+                        MGTreeViewItem item = treeViewItem.ToElement<MGTreeViewItem>(TreeView.SelfOrParentWindow, TreeView);
+                        TreeView.AddItem(item);
+                    }
+                }
+            }
+        }
+
+        protected internal override IEnumerable<Element> GetChildren()
+        {
+            foreach (Element Element in base.GetChildren())
+                yield return Element;
+            yield return Border;
+        }
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGTreeView TypedElement)
+            {
+                yield return (SelectionBackgroundBrush, TypedElement.SelectionBackgroundBrush, nameof(MGTreeView.SelectionBackgroundBrush));
+            }
+        }
+    }
+
+    [ContentProperty(nameof(Children))]
+    public class TreeViewItem : MultiContentHost
+    {
+        public override MGElementType ElementType => MGElementType.TreeViewItem;
+
+        [Category("Content")]
+        public string Header { get; set; }
+
+        [Category("Behavior")]
+        public bool? IsExpanded { get; set; }
+
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTreeViewItem(Window);
+
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
+        {
+            MGTreeViewItem TreeViewItem = Element as MGTreeViewItem;
+
+            if (!string.IsNullOrEmpty(Header))
+                TreeViewItem.Header = Header;
+
+            if (IsExpanded.HasValue)
+                TreeViewItem.IsExpanded = IsExpanded.Value;
+
+            //  Add child TreeViewItems
+            if (IncludeContent)
+            {
+                foreach (Element Child in Children)
+                {
+                    if (Child is TreeViewItem childTreeViewItem)
+                    {
+                        MGTreeViewItem childItem = childTreeViewItem.ToElement<MGTreeViewItem>(TreeViewItem.SelfOrParentWindow, TreeViewItem);
+                        TreeViewItem.AddItem(childItem);
+                    }
+                }
+            }
+        }
+
+        protected internal override IEnumerable<Element> GetChildren()
+        {
+            foreach (Element Element in base.GetChildren())
+                yield return Element;
+        }
+    }
+
     public class Window : SingleContentHost
     {
         public override MGElementType ElementType => MGElementType.Window;
@@ -2635,110 +2749,6 @@ namespace MGUI.Core.UI.XAML
         {
             MGXAMLDesigner Designer = Element as MGXAMLDesigner;
 
-        }
-    }
-
-    [ContentProperty(nameof(Children))]
-    public class TreeView : MultiContentHost
-    {
-        public override MGElementType ElementType => MGElementType.TreeView;
-
-        [Category("Border")]
-        public Border Border { get; set; } = new();
-
-        [Category("Border")]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public BorderBrush BorderBrush { get => Border.BorderBrush; set => Border.BorderBrush = value; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [Browsable(false)]
-        public BorderBrush BB { get => BorderBrush; set => BorderBrush = value; }
-
-        [Category("Layout")]
-        public int? IndentSize { get; set; }
-
-        [Category("Appearance")]
-        public FillBrush SelectionBackgroundBrush { get; set; }
-        [Category("Appearance")]
-        public XAMLColor? SelectionForeground { get; set; }
-
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTreeView(Window);
-
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
-        {
-            MGTreeView TreeView = Element as MGTreeView;
-            Border.ApplySettings(TreeView, TreeView.OuterBorder, false);
-
-            if (IndentSize.HasValue)
-                TreeView.IndentSize = IndentSize.Value;
-
-            if (SelectionBackgroundBrush != null)
-                TreeView.SelectionBackgroundBrush = new VisualStateFillBrush(SelectionBackgroundBrush.ToFillBrush(TreeView.GetDesktop(), TreeView));
-            if (SelectionForeground.HasValue)
-                TreeView.SelectionForeground = SelectionForeground.Value.ToXNAColor();
-
-            // Add TreeViewItems
-            if (IncludeContent)
-            {
-                foreach (Element Child in Children)
-                {
-                    if (Child is TreeViewItem treeViewItem)
-                    {
-                        MGTreeViewItem item = treeViewItem.ToElement<MGTreeViewItem>(TreeView.SelfOrParentWindow, TreeView);
-                        TreeView.AddItem(item);
-                    }
-                }
-            }
-        }
-
-        protected internal override IEnumerable<Element> GetChildren()
-        {
-            foreach (Element Element in base.GetChildren())
-                yield return Element;
-            yield return Border;
-        }
-    }
-
-    [ContentProperty(nameof(Children))]
-    public class TreeViewItem : MultiContentHost
-    {
-        public override MGElementType ElementType => MGElementType.TreeViewItem;
-
-        [Category("Content")]
-        public string Header { get; set; }
-
-        [Category("Behavior")]
-        public bool? IsExpanded { get; set; }
-
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTreeViewItem(Window);
-
-        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
-        {
-            MGTreeViewItem TreeViewItem = Element as MGTreeViewItem;
-
-            if (!string.IsNullOrEmpty(Header))
-                TreeViewItem.Header = Header;
-
-            if (IsExpanded.HasValue)
-                TreeViewItem.IsExpanded = IsExpanded.Value;
-
-            // Add child TreeViewItems
-            if (IncludeContent)
-            {
-                foreach (Element Child in Children)
-                {
-                    if (Child is TreeViewItem childTreeViewItem)
-                    {
-                        MGTreeViewItem childItem = childTreeViewItem.ToElement<MGTreeViewItem>(TreeViewItem.SelfOrParentWindow, TreeViewItem);
-                        TreeViewItem.AddItem(childItem);
-                    }
-                }
-            }
-        }
-
-        protected internal override IEnumerable<Element> GetChildren()
-        {
-            foreach (Element Element in base.GetChildren())
-                yield return Element;
         }
     }
 }
