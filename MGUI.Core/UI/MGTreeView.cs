@@ -1,6 +1,7 @@
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Core.UI.Containers;
+using MGUI.Core.UI.XAML;
 using MGUI.Shared.Helpers;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
@@ -10,13 +11,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using Thickness = MonoGame.Extended.Thickness;
 
 namespace MGUI.Core.UI
 {
-    /// <summary>
-    /// Represents a control that displays hierarchical data in a tree structure with expandable and collapsible nodes.
-    /// </summary>
-    public class MGTreeView : MGSingleContentHost
+    /// <summary>Represents a control that displays hierarchical data in a tree structure with expandable and collapsible nodes.</summary>
+    /// <typeparam name="TItemType">The type that the ItemsSource will be bound to.</typeparam>
+    public class MGTreeView<TItemType> : MGSingleContentHost
     {
         #region Border
         /// <summary>Provides direct access to this element's border.</summary>
@@ -40,7 +41,7 @@ namespace MGUI.Core.UI
         }
         #endregion Border
 
-        private readonly List<MGTreeViewItem> _VisibleItemsCache;
+        private readonly List<MGTreeViewItem<TItemType>> _VisibleItemsCache;
 
         /// <summary>Gets the scroll viewer that provides scrolling functionality for the tree view.</summary>
         public MGScrollViewer ScrollViewer { get; }
@@ -49,14 +50,14 @@ namespace MGUI.Core.UI
         public MGStackPanel ItemsPanel { get; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private readonly ObservableCollection<MGTreeViewItem> _Items;
+        private readonly ObservableCollection<MGTreeViewItem<TItemType>> _Items;
         /// <summary>Gets the collection of root-level items in the tree view.</summary>
-        public IReadOnlyList<MGTreeViewItem> Items => _Items;
+        public IReadOnlyList<MGTreeViewItem<TItemType>> Items => _Items;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private MGTreeViewItem _SelectedItem;
-        /// <summary>Gets or sets the currently selected item in the <see cref="MGTreeView"/>.</summary>
-        public MGTreeViewItem SelectedItem
+        private MGTreeViewItem<TItemType> _SelectedItem;
+        /// <summary>Gets or sets the currently selected item in the <see cref="MGTreeView{TItemType}"/>.</summary>
+        public MGTreeViewItem<TItemType> SelectedItem
         {
             get => _SelectedItem;
             set
@@ -185,29 +186,29 @@ namespace MGUI.Core.UI
         }
 
         /// <summary>Invoked when the <see cref="SelectedItem"/> changes.</summary>
-        public event EventHandler<MGTreeViewItem> SelectionChanged;
+        public event EventHandler<MGTreeViewItem<TItemType>> SelectionChanged;
 
         /// <summary>Invoked when an item is expanded to show its children.</summary>
-        public event EventHandler<MGTreeViewItem> ItemExpanded;
+        public event EventHandler<MGTreeViewItem<TItemType>> ItemExpanded;
 
         /// <summary>Invoked when an item is collapsed to hide its children.</summary>
-        public event EventHandler<MGTreeViewItem> ItemCollapsed;
+        public event EventHandler<MGTreeViewItem<TItemType>> ItemCollapsed;
 
         /// <summary>Invoked when an item is double-clicked.</summary>
-        public event EventHandler<MGTreeViewItem> ItemDoubleClicked;
+        public event EventHandler<MGTreeViewItem<TItemType>> ItemDoubleClicked;
 
         /// <summary>Invoked when an item is right-clicked.</summary>
-        public event EventHandler<MGTreeViewItem> ItemRightClicked;
+        public event EventHandler<MGTreeViewItem<TItemType>> ItemRightClicked;
 
         public MGTreeView(MGWindow Window)
             : base(Window, MGElementType.TreeView)
         {
             using (BeginInitializing())
             {
-                _Items = new ObservableCollection<MGTreeViewItem>();
+                _Items = new ObservableCollection<MGTreeViewItem<TItemType>>();
                 _Items.CollectionChanged += Items_CollectionChanged;
 
-                _VisibleItemsCache = new List<MGTreeViewItem>();
+                _VisibleItemsCache = new List<MGTreeViewItem<TItemType>>();
 
                 MGTheme Theme = GetTheme();
 
@@ -251,6 +252,33 @@ namespace MGUI.Core.UI
             }
         }
 
+        //  This method is invoked via reflection in MGUI.Core.UI.XAML.Controls.TreeView.ApplyDerivedSettings.
+        //  Do not modify the method signature.
+        internal void LoadSettings(TreeView Settings, bool IncludeContent)
+        {
+            MGDesktop Desktop = GetDesktop();
+
+            Settings.Border.ApplySettings(this, BorderComponent.Element, false);
+
+            if (Settings.IndentSize.HasValue)
+                IndentSize = Settings.IndentSize.Value;
+
+            if (Settings.SelectionBackgroundBrush != null)
+                SelectionBackgroundBrush = new VisualStateFillBrush(Settings.SelectionBackgroundBrush.ToFillBrush(Desktop, this));
+            if (Settings.SelectionForeground.HasValue)
+                SelectionForeground = Settings.SelectionForeground.Value.ToXNAColor();
+
+            //  Add TreeViewItems
+            if (IncludeContent)
+            {
+                foreach (Element Child in Settings.Children.OfType<TreeViewItem>())
+                {
+                    MGTreeViewItem<TItemType> item = Child.ToElement<MGTreeViewItem<TItemType>>(SelfOrParentWindow, this);
+                    AddItem(item);
+                }
+            }
+        }
+
         private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             using (ItemsPanel.AllowChangingContentTemporarily())
@@ -260,7 +288,7 @@ namespace MGUI.Core.UI
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                         if (e.NewItems != null)
                         {
-                            foreach (MGTreeViewItem item in e.NewItems)
+                            foreach (MGTreeViewItem<TItemType> item in e.NewItems)
                             {
                                 ItemsPanel.TryAddChild(item);
                             }
@@ -269,7 +297,7 @@ namespace MGUI.Core.UI
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                         if (e.OldItems != null)
                         {
-                            foreach (MGTreeViewItem item in e.OldItems)
+                            foreach (MGTreeViewItem<TItemType> item in e.OldItems)
                             {
                                 ItemsPanel.TryRemoveChild(item);
                             }
@@ -298,7 +326,7 @@ namespace MGUI.Core.UI
         /// <summary>Adds a root-level item to the tree view.</summary>
         /// <param name="item">The item to add as a root-level item.</param>
         /// <exception cref="ArgumentNullException">Thrown when item is null.</exception>
-        public void AddItem(MGTreeViewItem item)
+        public void AddItem(MGTreeViewItem<TItemType> item)
         {
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
@@ -310,7 +338,7 @@ namespace MGUI.Core.UI
         }
 
         /// <summary>Registers the given item and all of its descendants with this tree view (owner assignment, indentation, event hooks).</summary>
-        internal void RegisterItemRecursive(MGTreeViewItem item)
+        internal void RegisterItemRecursive(MGTreeViewItem<TItemType> item)
         {
             if (item == null)
                 return;
@@ -327,7 +355,7 @@ namespace MGUI.Core.UI
         /// <summary>Handles the Expanded event of a tree view item.</summary>
         private void OnItemExpanded(object sender, EventArgs e)
         {
-            if (sender is MGTreeViewItem item)
+            if (sender is MGTreeViewItem<TItemType> item)
             {
                 ItemExpanded?.Invoke(this, item);
                 RebuildVisibleItemsCache();
@@ -337,7 +365,7 @@ namespace MGUI.Core.UI
         /// <summary>Handles the Collapsed event of a tree view item.</summary>
         private void OnItemCollapsed(object sender, EventArgs e)
         {
-            if (sender is MGTreeViewItem item)
+            if (sender is MGTreeViewItem<TItemType> item)
             {
                 ItemCollapsed?.Invoke(this, item);
                 RebuildVisibleItemsCache();
@@ -346,7 +374,7 @@ namespace MGUI.Core.UI
 
         /// <summary>Removes a root-level item from the tree view.</summary>
         /// <param name="item">The item to remove.</param>
-        public void RemoveItem(MGTreeViewItem item)
+        public void RemoveItem(MGTreeViewItem<TItemType> item)
         {
             _Items.Remove(item);
             if (item != null)
@@ -363,7 +391,7 @@ namespace MGUI.Core.UI
         /// <summary>Gets the next visible item after the specified item in the tree view.</summary>
         /// <param name="current">The current item.</param>
         /// <returns>The next visible item, or null if there is no next item.</returns>
-        public MGTreeViewItem GetNextVisibleItem(MGTreeViewItem current)
+        public MGTreeViewItem<TItemType> GetNextVisibleItem(MGTreeViewItem<TItemType> current)
         {
             if (current == null)
                 return null;
@@ -378,7 +406,7 @@ namespace MGUI.Core.UI
         /// <summary>Gets the previous visible item before the specified item in the tree view.</summary>
         /// <param name="current">The current item.</param>
         /// <returns>The previous visible item, or null if there is no previous item.</returns>
-        public MGTreeViewItem GetPreviousVisibleItem(MGTreeViewItem current)
+        public MGTreeViewItem<TItemType> GetPreviousVisibleItem(MGTreeViewItem<TItemType> current)
         {
             if (current == null)
                 return null;
@@ -392,7 +420,7 @@ namespace MGUI.Core.UI
 
         /// <summary>Notifies the tree view that an item has been selected.</summary>
         /// <param name="item">The item that was selected, or null to clear selection.</param>
-        internal void NotifyItemSelected(MGTreeViewItem item)
+        internal void NotifyItemSelected(MGTreeViewItem<TItemType> item)
         {
             if (_SelectedItem == item)
                 return;
@@ -407,7 +435,7 @@ namespace MGUI.Core.UI
 
         /// <summary>Selects the specified item in the tree view.</summary>
         /// <param name="item">The item to select.</param>
-        public void SelectItem(MGTreeViewItem item)
+        public void SelectItem(MGTreeViewItem<TItemType> item)
         {
             NotifyItemSelected(item);
             if (item != null)
@@ -422,7 +450,7 @@ namespace MGUI.Core.UI
 
         /// <summary>Scrolls the tree view to make the specified item visible.</summary>
         /// <param name="item">The item to scroll into view.</param>
-        public void ScrollIntoView(MGTreeViewItem item)
+        public void ScrollIntoView(MGTreeViewItem<TItemType> item)
         {
             if (item == null)
                 return;
@@ -484,10 +512,10 @@ namespace MGUI.Core.UI
         /// <summary>Creates a tree view item from a data object, recursively creating child items.</summary>
         /// <param name="data">The data object to create an item from.</param>
         /// <param name="level">The depth level of this item in the tree hierarchy.</param>
-        /// <returns>A new <see cref="MGTreeViewItem"/> populated with the data.</returns>
-        private MGTreeViewItem CreateItemFromData(object data, int level)
+        /// <returns>A new <see cref="MGTreeViewItem{TDataType}"/> populated with the data.</returns>
+        private MGTreeViewItem<TItemType> CreateItemFromData(object data, int level)
         {
-            var item = new MGTreeViewItem(SelfOrParentWindow) { DataContext = data, Level = level, Header = data };
+            var item = new MGTreeViewItem<TItemType>(SelfOrParentWindow) { DataContext = data, Level = level, Header = data };
             var dataType = data.GetType();
             var childrenProperty = dataType.GetProperty(ChildrenPropertyName);
             if (childrenProperty != null)
@@ -510,13 +538,13 @@ namespace MGUI.Core.UI
         }
 
         /// <summary>Triggers the ItemDoubleClicked event.</summary>
-        internal void RaiseItemDoubleClicked(MGTreeViewItem item)
+        internal void RaiseItemDoubleClicked(MGTreeViewItem<TItemType> item)
         {
             ItemDoubleClicked?.Invoke(this, item);
         }
 
         /// <summary>Triggers the ItemRightClicked event.</summary>
-        internal void RaiseItemRightClicked(MGTreeViewItem item)
+        internal void RaiseItemRightClicked(MGTreeViewItem<TItemType> item)
         {
             ItemRightClicked?.Invoke(this, item);
         }

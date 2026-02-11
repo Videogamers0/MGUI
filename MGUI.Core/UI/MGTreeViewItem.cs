@@ -1,35 +1,27 @@
+using MGUI.Core.UI.Containers;
+using MGUI.Core.UI.XAML;
+using MGUI.Shared.Helpers;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using MGUI.Core.UI.Containers;
-using Microsoft.Xna.Framework;
-using MGUI.Shared.Helpers;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace MGUI.Core.UI;
 
 /// <summary>
-/// Represents an individual node in a <see cref="MGTreeView"/> that can contain child nodes.
+/// Represents an individual node in a <see cref="MGTreeView{TItemType}"/> that can contain child nodes.
 /// </summary>
-public class MGTreeViewItem : MGSingleContentHost
+public class MGTreeViewItem<TDataType> : MGSingleContentHost
 {
-    private object _Header;
-    private int _Level;
-    private MGTreeViewItem _ParentItem;
-    private bool _IsExpanded;
-    private readonly ObservableCollection<MGTreeViewItem> _Items;
-    internal MGTreeView _OwnerTreeView;
-    private object _HeaderTemplate;
     private VisualStateFillBrush _PreviousHeaderBackgroundBrush;
 
-    /// <summary>
-    /// Gets the visual element that displays the header content.
-    /// </summary>
+    /// <summary>Gets the visual element that displays the header content.</summary>
     public MGElement HeaderContent { get; private set; }
 
-    /// <summary>
-    /// Gets or sets the content to display in the header of this tree view item.
-    /// </summary>
+    private object _Header;
+    /// <summary>Gets or sets the content to display in the header of this tree view item.</summary>
     public object Header
     {
         get => _Header;
@@ -44,9 +36,7 @@ public class MGTreeViewItem : MGSingleContentHost
         }
     }
 
-    /// <summary>
-    /// Updates the HeaderContent based on the current Header value.
-    /// </summary>
+    /// <summary>Updates the HeaderContent based on the current Header value.</summary>
     private void UpdateHeaderContent()
     {
         if (_Header is string text)
@@ -62,9 +52,8 @@ public class MGTreeViewItem : MGSingleContentHost
             HeaderContainer.SetContent(HeaderContent);
     }
 
-    /// <summary>
-    /// Gets or sets the depth level of this item in the tree hierarchy (0 for root items).
-    /// </summary>
+    private int _Level;
+    /// <summary>Gets or sets the depth level of this item in the tree hierarchy (0 for root items).</summary>
     public int Level
     {
         get => _Level;
@@ -78,18 +67,16 @@ public class MGTreeViewItem : MGSingleContentHost
         }
     }
 
-    /// <summary>
-    /// Gets or sets the parent item of this tree view item. Null if this is a root item.
-    /// </summary>
-    public MGTreeViewItem ParentItem
+    private MGTreeViewItem<TDataType> _ParentItem;
+    /// <summary>Gets or sets the parent item of this tree view item. Null if this is a root item.</summary>
+    public MGTreeViewItem<TDataType> ParentItem
     {
         get => _ParentItem;
         internal set => _ParentItem = value;
     }
 
-    /// <summary>
-    /// Gets or sets whether this item is expanded to show its children.
-    /// </summary>
+    private bool _IsExpanded;
+    /// <summary>Gets or sets whether this item is expanded to show its children.</summary>
     public bool IsExpanded
     {
         get => _IsExpanded;
@@ -105,24 +92,19 @@ public class MGTreeViewItem : MGSingleContentHost
         }
     }
 
-    /// <summary>
-    /// Gets the collection of child items.
-    /// </summary>
-    public IReadOnlyList<MGTreeViewItem> Items => _Items;
+    private readonly ObservableCollection<MGTreeViewItem<TDataType>> _Items;
+    /// <summary>Gets the collection of child items.</summary>
+    public IReadOnlyList<MGTreeViewItem<TDataType>> Items => _Items;
 
-    /// <summary>
-    /// Gets whether this item has any child items.
-    /// </summary>
+    /// <summary>Gets whether this item has any child items.</summary>
     public bool HasItems => Items?.Count > 0;
 
-    /// <summary>
-    /// Gets the <see cref="MGTreeView"/> that owns this item.
-    /// </summary>
-    public MGTreeView OwnerTreeView => _OwnerTreeView;
+    internal MGTreeView<TDataType> _OwnerTreeView;
+    /// <summary>Gets the <see cref="MGTreeView{TItemType}"/> that owns this item.</summary>
+    public MGTreeView<TDataType> OwnerTreeView => _OwnerTreeView;
 
-    /// <summary>
-    /// Gets or sets the template used to display the header content (placeholder for future template support).
-    /// </summary>
+    private object _HeaderTemplate;
+    /// <summary>Gets or sets the template used to display the header content (placeholder for future template support).</summary>
     public object HeaderTemplate
     {
         get => _HeaderTemplate;
@@ -136,14 +118,10 @@ public class MGTreeViewItem : MGSingleContentHost
         }
     }
 
-    /// <summary>
-    /// Occurs when this item is expanded to show its children.
-    /// </summary>
+    /// <summary>Invoked when this item is expanded to show its children.</summary>
     public event EventHandler Expanded;
 
-    /// <summary>
-    /// Occurs when this item is collapsed to hide its children.
-    /// </summary>
+    /// <summary>Invoked when this item is collapsed to hide its children.</summary>
     public event EventHandler Collapsed;
 
     private MGBorder IndentationBorder { get; set; }
@@ -153,11 +131,12 @@ public class MGTreeViewItem : MGSingleContentHost
     private MGDockPanel HeaderPanel { get; set; }
     private DateTime _lastClickTime;
 
-    public MGTreeViewItem(MGWindow Window) : base(Window, MGElementType.TreeViewItem)
+    public MGTreeViewItem(MGWindow Window) 
+        : base(Window, MGElementType.TreeViewItem)
     {
         using (BeginInitializing())
         {
-            _Items = new ObservableCollection<MGTreeViewItem>();
+            _Items = new ObservableCollection<MGTreeViewItem<TDataType>>();
             _Items.CollectionChanged += Items_CollectionChanged;
 
             var mainPanel = new MGStackPanel(Window, Orientation.Vertical);
@@ -181,8 +160,30 @@ public class MGTreeViewItem : MGSingleContentHost
         }
     }
 
-    private void Items_CollectionChanged(object sender,
-        System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    //  This method is invoked via reflection in MGUI.Core.UI.XAML.Controls.TreeViewItem.ApplyDerivedSettings.
+    //  Do not modify the method signature.
+    internal void LoadSettings(TreeViewItem Settings, bool IncludeContent)
+    {
+        MGDesktop Desktop = GetDesktop();
+
+        if (!string.IsNullOrEmpty(Settings.Header))
+            Header = Settings.Header;
+
+        if (Settings.IsExpanded.HasValue)
+            IsExpanded = Settings.IsExpanded.Value;
+
+        //  Add child TreeViewItems
+        if (IncludeContent)
+        {
+            foreach (Element Child in Settings.Children.OfType<TreeViewItem>())
+            {
+                MGTreeViewItem<TDataType> childItem = Child.ToElement<MGTreeViewItem<TDataType>>(SelfOrParentWindow, this);
+                AddItem(childItem);
+            }
+        }
+    }
+
+    private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         using (ChildrenPanel.AllowChangingContentTemporarily())
         {
@@ -191,7 +192,7 @@ public class MGTreeViewItem : MGSingleContentHost
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     if (e.NewItems != null)
                     {
-                        foreach (MGTreeViewItem item in e.NewItems)
+                        foreach (MGTreeViewItem<TDataType> item in e.NewItems)
                         {
                             ChildrenPanel.TryAddChild(item);
                             if (OwnerTreeView != null)
@@ -203,7 +204,7 @@ public class MGTreeViewItem : MGSingleContentHost
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     if (e.OldItems != null)
                     {
-                        foreach (MGTreeViewItem item in e.OldItems)
+                        foreach (MGTreeViewItem<TDataType> item in e.OldItems)
                         {
                             ChildrenPanel.TryRemoveChild(item);
                         }
@@ -263,9 +264,7 @@ public class MGTreeViewItem : MGSingleContentHost
         else Collapse();
     }
 
-    /// <summary>
-    /// Expands this item to show its children.
-    /// </summary>
+    /// <summary>Expands this item to show its children.</summary>
     public void Expand()
     {
         IsExpanded = true;
@@ -273,9 +272,7 @@ public class MGTreeViewItem : MGSingleContentHost
         Expanded?.Invoke(this, EventArgs.Empty);
     }
 
-    /// <summary>
-    /// Collapses this item to hide its children.
-    /// </summary>
+    /// <summary>Collapses this item to hide its children.</summary>
     public void Collapse()
     {
         IsExpanded = false;
@@ -283,18 +280,14 @@ public class MGTreeViewItem : MGSingleContentHost
         Collapsed?.Invoke(this, EventArgs.Empty);
     }
 
-    /// <summary>
-    /// Toggles the expansion state of this item.
-    /// </summary>
+    /// <summary>Toggles the expansion state of this item.</summary>
     public void ToggleExpansion()
     {
         if (IsExpanded) Collapse();
         else Expand();
     }
 
-    /// <summary>
-    /// Expands this item and all of its descendant items recursively.
-    /// </summary>
+    /// <summary>Expands this item and all of its descendant items recursively.</summary>
     public void ExpandAll()
     {
         Expand();
@@ -302,9 +295,7 @@ public class MGTreeViewItem : MGSingleContentHost
             child.ExpandAll();
     }
 
-    /// <summary>
-    /// Collapses this item and all of its descendant items recursively.
-    /// </summary>
+    /// <summary>Collapses this item and all of its descendant items recursively.</summary>
     public void CollapseAll()
     {
         Collapse();
@@ -312,12 +303,10 @@ public class MGTreeViewItem : MGSingleContentHost
             child.CollapseAll();
     }
 
-    /// <summary>
-    /// Determines whether this item is an ancestor of the specified item.
-    /// </summary>
+    /// <summary>Determines whether this item is an ancestor of the specified item.</summary>
     /// <param name="item">The item to check.</param>
     /// <returns>True if this item is an ancestor of the specified item; otherwise, false.</returns>
-    public bool IsAncestorOf(MGTreeViewItem item)
+    public bool IsAncestorOf(MGTreeViewItem<TDataType> item)
     {
         if (item == null)
             return false;
@@ -332,13 +321,11 @@ public class MGTreeViewItem : MGSingleContentHost
         return false;
     }
 
-    /// <summary>
-    /// Adds a child item to this tree view item.
-    /// </summary>
+    /// <summary>Adds a child item to this tree view item.</summary>
     /// <param name="item">The item to add as a child.</param>
     /// <exception cref="ArgumentNullException">Thrown when item is null.</exception>
     /// <exception cref="InvalidOperationException">Thrown when attempting to add this item as its own child or when creating a circular reference.</exception>
-    public void AddItem(MGTreeViewItem item)
+    public void AddItem(MGTreeViewItem<TDataType> item)
     {
         if (item == null)
             throw new ArgumentNullException(nameof(item));
@@ -355,11 +342,9 @@ public class MGTreeViewItem : MGSingleContentHost
         item.UpdateIndentation();
     }
 
-    /// <summary>
-    /// Removes a child item from this tree view item.
-    /// </summary>
+    /// <summary>Removes a child item from this tree view item.</summary>
     /// <param name="item">The item to remove.</param>
-    public void RemoveItem(MGTreeViewItem item)
+    public void RemoveItem(MGTreeViewItem<TDataType> item)
     {
         _Items.Remove(item);
         if (item != null)
@@ -369,20 +354,16 @@ public class MGTreeViewItem : MGSingleContentHost
         }
     }
 
-    /// <summary>
-    /// Removes all child items from this tree view item.
-    /// </summary>
+    /// <summary>Removes all child items from this tree view item.</summary>
     public void ClearItems()
     {
         foreach (var item in _Items.ToList())
             RemoveItem(item);
     }
 
-    /// <summary>
-    /// Gets all visible descendant items (children and their visible descendants) of this item.
-    /// </summary>
+    /// <summary>Gets all visible descendant items (children and their visible descendants) of this item.</summary>
     /// <returns>An enumerable of visible descendant items.</returns>
-    public IEnumerable<MGTreeViewItem> GetVisibleDescendants()
+    public IEnumerable<MGTreeViewItem<TDataType>> GetVisibleDescendants()
     {
         if (!IsExpanded)
             yield break;
@@ -394,9 +375,7 @@ public class MGTreeViewItem : MGSingleContentHost
         }
     }
 
-    /// <summary>
-    /// Sets the selection state of this item.
-    /// </summary>
+    /// <summary>Sets the selection state of this item.</summary>
     /// <param name="selected">True to select this item; false to deselect it.</param>
     internal void SetSelected(bool selected)
     {
@@ -414,9 +393,7 @@ public class MGTreeViewItem : MGSingleContentHost
         }
     }
 
-    /// <summary>
-    /// Handles the click event on the header panel.
-    /// </summary>
+    /// <summary>Handles the click event on the header panel.</summary>
     private void OnHeaderPanelClick(object sender, Shared.Input.Mouse.BaseMouseReleasedEventArgs e)
     {
         var now = DateTime.Now;
@@ -434,17 +411,13 @@ public class MGTreeViewItem : MGSingleContentHost
         OwnerTreeView?.RebuildVisibleItemsCache();
     }
 
-    /// <summary>
-    /// Handles the right-click event on the header panel.
-    /// </summary>
+    /// <summary>Handles the right-click event on the header panel.</summary>
     private void OnHeaderPanelRightClick(object sender, Shared.Input.Mouse.BaseMouseReleasedEventArgs e)
     {
         OwnerTreeView?.RaiseItemRightClicked(this);
     }
 
-    /// <summary>
-    /// Draws the tree view item, including the expander arrow if the item has children.
-    /// </summary>
+    /// <summary>Draws the tree view item, including the expander arrow if the item has children.</summary>
     public override void Draw(ElementDrawArgs DA)
     {
         base.Draw(DA);

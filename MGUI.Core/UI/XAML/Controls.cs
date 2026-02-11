@@ -2442,6 +2442,15 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.TreeView;
 
+        /// <summary>The generic type that will be used when instantiating <see cref="MGTreeView{TItemType}"/>.<para/>
+        /// To set this value from a XAML string, you must define the namespace the type belongs to, then use the x:Type Markup Extension<br/>
+        /// (See: <see href="https://learn.microsoft.com/en-us/dotnet/desktop/xaml-services/xtype-markup-extension"/>)<para/>
+        /// Example:
+        /// <code>&lt;TreeView xmlns:local="clr-namespace:MyCoolGame.SomeNamespace" ItemType="{x:Type local:CustomTreeItem}" /&gt;</code><para/>
+        /// Default value: <code>typeof(object)</code></summary>
+        [Category("Data")]
+        public Type ItemType { get; set; } = typeof(object);
+
         [Category("Border")]
         public Border Border { get; set; } = new();
 
@@ -2460,33 +2469,18 @@ namespace MGUI.Core.UI.XAML
         [Category("Appearance")]
         public XAMLColor? SelectionForeground { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTreeView(Window);
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
+        {
+            Type GenericType = typeof(MGTreeView<>).MakeGenericType(new Type[] { ItemType });
+            object Element = Activator.CreateInstance(GenericType, new object[] { Window });
+            return Element as MGElement;
+        }
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
-            MGTreeView TreeView = Element as MGTreeView;
-            Border.ApplySettings(TreeView, TreeView.BorderComponent.Element, false);
-
-            if (IndentSize.HasValue)
-                TreeView.IndentSize = IndentSize.Value;
-
-            if (SelectionBackgroundBrush != null)
-                TreeView.SelectionBackgroundBrush = new VisualStateFillBrush(SelectionBackgroundBrush.ToFillBrush(TreeView.GetDesktop(), TreeView));
-            if (SelectionForeground.HasValue)
-                TreeView.SelectionForeground = SelectionForeground.Value.ToXNAColor();
-
-            //  Add TreeViewItems
-            if (IncludeContent)
-            {
-                foreach (Element Child in Children)
-                {
-                    if (Child is TreeViewItem treeViewItem)
-                    {
-                        MGTreeViewItem item = treeViewItem.ToElement<MGTreeViewItem>(TreeView.SelfOrParentWindow, TreeView);
-                        TreeView.AddItem(item);
-                    }
-                }
-            }
+            Type GenericType = typeof(MGTreeView<>).MakeGenericType(new Type[] { ItemType });
+            MethodInfo Method = GenericType.GetMethod(nameof(MGTreeView<object>.LoadSettings), BindingFlags.Instance | BindingFlags.NonPublic);
+            Method.Invoke(Element, new object[] { this, IncludeContent });
         }
 
         protected internal override IEnumerable<Element> GetChildren()
@@ -2500,9 +2494,19 @@ namespace MGUI.Core.UI.XAML
         {
             foreach (var Item in base.GetBindableObjects(Element))
                 yield return Item;
-            if (Element is MGTreeView TypedElement)
+
+            Type ElementType = Element.GetType();
+            if (ElementType.IsGenericType && ElementType.GetGenericTypeDefinition() == typeof(MGTreeView<>))
             {
-                yield return (SelectionBackgroundBrush, TypedElement.SelectionBackgroundBrush, nameof(MGTreeView.SelectionBackgroundBrush));
+                List<(XAMLBindableBase, string)> Paths = new List<(XAMLBindableBase, string)>()
+                {
+                    (SelectionBackgroundBrush, nameof(MGTreeView<object>.SelectionBackgroundBrush))
+                };
+
+                foreach ((XAMLBindableBase, string) Item in Paths)
+                {
+                    yield return (Item.Item1, ElementType.GetProperty(Item.Item2).GetValue(Element), Item.Item2);
+                }
             }
         }
     }
@@ -2518,30 +2522,46 @@ namespace MGUI.Core.UI.XAML
         [Category("Behavior")]
         public bool? IsExpanded { get; set; }
 
-        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent) => new MGTreeViewItem(Window);
+        /// <summary>Returns the type <see cref="MGTreeViewItem{TDataType}"/> where the generic TDataType matches the generic type param of the parent <see cref="MGTreeView{TItemType}"/> or <see cref="MGTreeViewItem{TDataType}"/>.<para/>
+        /// For example, if this TreeViewItem is a child of an MGTreeView&lt;SomeTreeDataObject&gt;, this function would return typeof(MGTreeViewItem&lt;SomeTreeDataObject&gt;)</summary>
+        /// <param name="Parent">The parent element of this tree view item. Must be of type <see cref="MGTreeView{TItemType}"/> or <see cref="MGTreeViewItem{TDataType}"/></param>
+        private static bool TryGetGenericType(MGElement Parent, out Type GenericType)
+        {
+            Type ParentType = Parent.GetType();
+            if (!ParentType.IsGenericType)
+            {
+                GenericType = null;
+                return false;
+            }
+
+            Type GenericTypeDef = ParentType.GetGenericTypeDefinition();
+            if (GenericTypeDef != typeof(MGTreeView<>) && GenericTypeDef != typeof(MGTreeViewItem<>))
+            {
+                GenericType = null;
+                return false;
+            }
+            else
+            {
+                Type GenericTypeParam = ParentType.GenericTypeArguments[0];
+                GenericType = typeof(MGTreeViewItem<>).MakeGenericType(new Type[] { ParentType.GenericTypeArguments[0] });
+                return true;
+            }
+        }
+
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
+        {
+            if (!TryGetGenericType(Parent, out Type GenericType))
+                throw new InvalidOperationException($"{nameof(TreeViewItem)}s can only be added as a direct child to {nameof(TreeView)} elements or {nameof(TreeViewItem)} elements.");
+            object Element = Activator.CreateInstance(GenericType, new object[] { Window });
+            return Element as MGElement;
+        }
 
         protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
         {
-            MGTreeViewItem TreeViewItem = Element as MGTreeViewItem;
-
-            if (!string.IsNullOrEmpty(Header))
-                TreeViewItem.Header = Header;
-
-            if (IsExpanded.HasValue)
-                TreeViewItem.IsExpanded = IsExpanded.Value;
-
-            //  Add child TreeViewItems
-            if (IncludeContent)
-            {
-                foreach (Element Child in Children)
-                {
-                    if (Child is TreeViewItem childTreeViewItem)
-                    {
-                        MGTreeViewItem childItem = childTreeViewItem.ToElement<MGTreeViewItem>(TreeViewItem.SelfOrParentWindow, TreeViewItem);
-                        TreeViewItem.AddItem(childItem);
-                    }
-                }
-            }
+            if (!TryGetGenericType(Parent, out Type GenericType))
+                throw new InvalidOperationException($"{nameof(TreeViewItem)}s can only be added as a direct child to {nameof(TreeView)} elements or {nameof(TreeViewItem)} elements.");
+            MethodInfo Method = GenericType.GetMethod(nameof(MGTreeViewItem<object>.LoadSettings), BindingFlags.Instance | BindingFlags.NonPublic);
+            Method.Invoke(Element, new object[] { this, IncludeContent });
         }
 
         protected internal override IEnumerable<Element> GetChildren()
