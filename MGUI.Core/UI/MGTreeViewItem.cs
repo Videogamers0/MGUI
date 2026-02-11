@@ -175,8 +175,14 @@ public class MGTreeViewItem<TDataType> : MGSingleContentHost
         //  Add child TreeViewItems
         if (IncludeContent)
         {
-            foreach (Element Child in Settings.Children.OfType<TreeViewItem>())
+            foreach (Element Child in Settings.Children)
             {
+                if (Child is not TreeViewItem)
+                {
+                    throw new InvalidOperationException($"{nameof(TreeViewItem)} elements in XAML must only contain child objects of type {nameof(TreeViewItem)}. " +
+                        $"Invalid child of type '{Child.GetType().Name}' ({Child.GetType().FullName}) detected.");
+                }
+
                 MGTreeViewItem<TDataType> childItem = Child.ToElement<MGTreeViewItem<TDataType>>(SelfOrParentWindow, this);
                 AddItem(childItem);
             }

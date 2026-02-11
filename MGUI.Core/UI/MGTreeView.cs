@@ -271,8 +271,14 @@ namespace MGUI.Core.UI
             //  Add TreeViewItems
             if (IncludeContent)
             {
-                foreach (Element Child in Settings.Children.OfType<TreeViewItem>())
+                foreach (Element Child in Settings.Children)
                 {
+                    if (Child is not TreeViewItem)
+                    {
+                        throw new InvalidOperationException($"{nameof(TreeView)} elements in XAML must only contain child objects of type {nameof(TreeViewItem)}. " +
+                            $"Invalid child of type '{Child.GetType().Name}' ({Child.GetType().FullName}) detected.");
+                    }
+
                     MGTreeViewItem<TItemType> item = Child.ToElement<MGTreeViewItem<TItemType>>(SelfOrParentWindow, this);
                     AddItem(item);
                 }
