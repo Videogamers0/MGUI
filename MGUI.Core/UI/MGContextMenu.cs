@@ -92,7 +92,14 @@ namespace MGUI.Core.UI
         /// False if it wasn't already open, or the action was cancelled.</returns>
         public bool TryCloseContextMenu() => IsContextMenuOpen && Host.TryCloseActiveContextMenu();
 
-        internal void InvokeContextMenuOpening() => ContextMenuOpening?.Invoke(this, EventArgs.Empty);
+        /// <returns>True if the opening should proceed; false if a subscriber cancelled it.</returns>
+        internal bool InvokeContextMenuOpening()
+        {
+            if (ContextMenuOpening == null) return true;
+            var args = new System.ComponentModel.CancelEventArgs();
+            ContextMenuOpening.Invoke(this, args);
+            return !args.Cancel;
+        }
         internal void InvokeContextMenuOpened()
         {
             NPC(nameof(IsContextMenuOpen));
@@ -105,7 +112,11 @@ namespace MGUI.Core.UI
             ContextMenuClosed?.Invoke(this, EventArgs.Empty);
         }
 
-        public event EventHandler<EventArgs> ContextMenuOpening;
+        /// <summary>Fired just before this <see cref="MGContextMenu"/> is shown.
+        /// Set <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to <see langword="true"/> to prevent the menu from opening.
+        /// <para/>Warning: subscribing multiple times will result in multiple invocations per open.
+        /// For dynamic items, prefer <see cref="ItemsFactory"/>.</summary>
+        public event EventHandler<System.ComponentModel.CancelEventArgs> ContextMenuOpening;
         public event EventHandler<EventArgs> ContextMenuOpened;
         public event EventHandler<EventArgs> ContextMenuClosing;
         public event EventHandler<EventArgs> ContextMenuClosed;
@@ -316,7 +327,8 @@ namespace MGUI.Core.UI
             }
             else
             {
-                Menu.InvokeContextMenuOpening();
+                if (!Menu.InvokeContextMenuOpening())
+                    return false;
                 _ActiveContextMenu = Menu;
 
                 Menu.Scale = Scale;
