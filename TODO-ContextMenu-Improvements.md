@@ -85,26 +85,159 @@ Optionnellement accepter un `Action<MGContextMenu>` en alternative (plus flexibl
 
 ---
 
-### 3. Corriger le bug workaround ScrollViewer (L564-575)
+### 3. Corriger le bug workaround ScrollViewer (L564-575) — ✅ état actuel + plan profond
 
-**Fichier :** `MGContextMenu.cs` (L564-575)
+**Fichier :** `MGContextMenu.cs`
 
-**Problème :** Un workaround marque `// Good luck to future me` : quand le ScrollViewer
-vertical est visible et le menu est réouvert, le layout ignore la largeur du scrollbar.
-Le fix actuel est `ContextMenuOpening += SV.InvalidateLayout()`.
+**Problème originel :** Quand le ScrollViewer vertical (Auto) est visible et le menu est
+réouvert, les items ignorent la largeur du scrollbar.
 
-**Action :**
-1. Investiguer si le commit référencé (`dd4c1d6`) a résolu le problème sous-jacent.
-2. Reproduire : créer un menu avec assez d'items pour afficher le scrollbar vertical,
-   ouvrir → fermer → réouvrir, vérifier le layout.
-3. Si le bug persiste, investiguer `MGScrollViewer` et `ScrollBarVisibility.Auto` :
-   - La mesure initiale est-elle invalidée correctement quand la visibilité du scrollbar change ?
-   - `TryGetRecentSelfMeasurement()` renvoie-t-il un stale measurement ?
-4. Fixer la root cause (probablement dans `MGScrollViewer.MeasureOverride` ou cache de mesure).
-5. Retirer le workaround une fois corrigé.
+**État actuel (commit `1fe8b8e`):** Le `SV.InvalidateLayout()` a été déplacé dans
+`InvokeContextMenuOpening()` avec explication du cache stale. Le workaround fonctionne
+mais ne résout pas la root cause dans le moteur de layout.
 
-**Risque :** Touche au cœur du layout. Tester avec des menus courts (pas de scrollbar),
-longs (scrollbar visible), et à la limite (scrollbar apparaît/disparaît).
+---
+
+#### Analyse de la root cause (résultat d'investigation)
+
+**Chaîne de mesure lors de l'ouverture :**
+```
+TryOpenContextMenu
+  → InvokeContextMenuOpening()          ← workaround ici
+  → ComputeContentSize(100,40,1000,800)
+      → UpdateMeasurement(MaxSize)       ← sur le MGContextMenu
+          → TryGetRecentSelfMeasurement  ← CanCacheSelfMeasurement=true → peut retourner du cache
+          → UpdateContentMeasurement     ← délègue au ScrollViewer
+              → SV.UpdateMeasurement     ← CanCacheSelfMeasurement=false → re-mesure toujours
+                  → MeasureSelfOverride  ← calcule scrollbar width
+                      → Content.UpdateMeasurement ← ItemsPanel (StackPanel)
+                          → TryGetRecentSelfMeasurement ← CanCacheSelfMeasurement=true → CACHE
+  → ApplySizeToContent(SizeToContent.WidthAndHeight, ...)
+      → LayoutChanged(this, true)        ← InvalidateLayout() sur ancêtres
+      → UpdateLayout(bounds)
+          → TryGetCachedMeasurement      ← check IsLayoutValid
+```
+
+**L'élément clé :** `TryGetCachedMeasurement` dans `UpdateLayout` (L1828) vérifie
+`IsLayoutValid`. Après la première ouverture, `IsLayoutValid = true`
+(L1936 : `UpdateLayout` le set à `true` en fin de méthode). Sur le cycle
+`Close → Re-open` :
+
+1. **Fermeture :** Rien n'invalide le layout. `IsLayoutValid` reste `true` sur le menu
+   ET ses enfants (ScrollViewer, ItemsPanel, items).
+2. **Réouverture :** `ComputeContentSize` → la mesure est recalculée via `UpdateMeasurement`
+   (pas `UpdateLayout`), donc `TryGetCachedMeasurement` n'est PAS impliqué ici. Mais
+   `ApplySizeToContent` appelle `UpdateLayout` enSUITE :
+   - `LayoutChanged(this, true)` invalide le ContextMenu (pas les enfants en profondeur)
+   - Le SV a `IsLayoutValid=true` → `TryGetCachedMeasurement` peut retourner un cache
+     de l'arrangement précédent, dont les bounds tenaient compte d'un scrollbar qui n'est
+     peut-être plus pertinent
+
+**La vraie root cause est double :**
+1. **Pas d'invalidation à la fermeture :** `InvokeContextMenuClosed` ne touche pas au layout.
+   Un menu fermé devrait être considéré « layout-invalide » pour le prochain open.
+2. **Pas de propagation descendante :** `InvalidateLayout()` ne recurse PAS dans l'arbre.
+   `LayoutChanged()` propage vers le **haut** (parents), pas vers le **bas** (enfants).
+   Quand le ContextMenu invalide son layout, le ScrollViewer et l'ItemsPanel gardent
+   `IsLayoutValid = true` avec des caches de mesure potentiellement stale.
+
+---
+
+#### Sous-tâches pour le fix correct
+
+##### 3a. Ajouter `InvalidateLayoutTree()` sur `MGElement`
+
+**Fichier :** `MGElement.cs`
+
+**Action :** Ajouter une méthode récursive descendante :
+```csharp
+/// <summary>Recursively invalidates the layout of this element and all its
+/// descendants. Use when the entire subtree's cached measurements may be stale,
+/// e.g. when a popup window closes and will be re-opened later.</summary>
+internal protected void InvalidateLayoutTree()
+{
+    InvalidateLayout();
+    foreach (MGElement child in GetVisualTreeChildren())
+        child.InvalidateLayoutTree();
+}
+```
+
+**Pré-requis :** Vérifier que `GetVisualTreeChildren()` (ou équivalent) est accessible.
+Sinon utiliser le pattern de traversal existant dans le framework.
+
+**Risque :** Performance si l'arbre est profond. Pour un ContextMenu avec ~5-20 items,
+c'est négligeable. Ne PAS appeler par frame.
+
+##### 3b. Invalider le layout tree à la fermeture du menu
+
+**Fichier :** `MGContextMenu.cs`
+
+**Action :** Dans `InvokeContextMenuClosed()` :
+```csharp
+internal void InvokeContextMenuClosed()
+{
+    // Invalidate the entire layout tree so the next open starts with clean
+    // caches. Without this, TryGetCachedMeasurement in UpdateLayout can
+    // return stale values from the previous open cycle, causing items to
+    // overlap the scrollbar.
+    InvalidateLayoutTree();
+
+    NPC(nameof(IsContextMenuOpen));
+    ContextMenuClosed?.Invoke(this, EventArgs.Empty);
+}
+```
+
+**Effet :** Après fermeture, TOUS les caches de mesure (self et full) sont vidés sur tout
+le sous-arbre. Le prochain open commence un layout pass entièrement frais.
+
+##### 3c. Retirer le workaround de `InvokeContextMenuOpening`
+
+**Fichier :** `MGContextMenu.cs`
+
+**Action :** Retirer l'appel à `ScrollViewerElement.InvalidateLayout()` dans
+`InvokeContextMenuOpening()`, puisque la tâche 3b a déjà invalidé tout le sous-arbre
+à la fermeture. Conserver un commentaire explicatif.
+
+**Validation :** Créer un test reproductible :
+1. Ouvrir un ContextMenu avec suffisamment d'items pour triggerr le scrollbar vertical
+2. Fermer le menu
+3. Réouvrir le menu
+4. Vérifier que les items ne chevauchent pas le scrollbar
+
+**Si le bug re-apparaît** malgré l'invalidation à la fermeture, le problème est plus profond
+(peut-être dans `UpdateContentLayout` du ScrollViewer qui re-mesure le content avec des
+caches stale). Dans ce cas, garder le workaround dans `InvokeContextMenuOpening` ET
+l'invalidation à la fermeture (ceinture et bretelles).
+
+##### 3d. (Optionnel) Fix structurel dans `MGScrollViewer.UpdateContentLayout`
+
+**Fichier :** `MGScrollViewer.cs` (L580-600)
+
+**Problème potentiel :** `UpdateContentLayout` appelle `Content.UpdateMeasurement` mais si
+le content (ItemsPanel) utilise des mesures cachées, le résultat peut être stale. La
+décision d'afficher le scrollbar dépend du contenu, mais le contenu est mesuré sans savoir
+si le scrollbar sera affiché → **problème circulaire**.
+
+**Action :** Dans `UpdateContentLayout`, avant l'appel à `Content.UpdateMeasurement`,
+forcer l'invalidation du content si la visibilité du scrollbar a changé depuis la dernière
+layout pass :
+```csharp
+protected override void UpdateContentLayout(Rectangle Bounds)
+{
+    if (Content != null)
+    {
+        // If scrollbar visibility might have changed, force fresh content measurement
+        if (VSBVisibility == ScrollBarVisibility.Auto || HSBVisibility == ScrollBarVisibility.Auto)
+            Content.InvalidateLayout();
+        // ... existing code
+    }
+}
+```
+
+**Risque :** Peut légèrement impacter les performances car le content est re-mesuré à chaque
+arrange quand le scrollbar est Auto. Ne faire QUE si 3a-3c ne suffisent pas.
+Si appliqué, le workaround et l'invalidation à la fermeture deviennent redondants pour ce
+cas spécifique (mais restent utiles pour d'autres cas de cache stale).
 
 ---
 
@@ -202,24 +335,31 @@ n'a pas de tests.
 ## Ordre d'exécution recommandé
 
 ```
-Tâche 6 (tests FitMenuToViewport)     — pas de dépendance, base de confiance
-  ↓
-Tâche 1 (ContextMenuOpening cancellable) — pre-requis pour le factory
-  ↓
-Tâche 2 (ItemsFactory)                 — résout le pattern d'usage fragile
-  ↓
-Tâche 4 (doc/guard double-souscription) — complémente le factory
-  ↓
-Tâche 5 (ContextMenuRequested sur MGElement) — amélioration API consommateur
-  ↓
-Tâche 3 (fix ScrollViewer workaround)  — investigation indépendante, peut être parallélisée
+PHASE 1 — Terminée (tâches 1-6)
+  Tâche 6  ✅  tests FitMenuToViewport
+  Tâche 1  ✅  ContextMenuOpening cancellable
+  Tâche 2  ✅  ItemsFactory
+  Tâche 4  ✅  doc double-souscription
+  Tâche 5  ✅  ContextMenuRequested sur MGElement
+  Tâche 3  ✅  workaround déplacé dans InvokeContextMenuOpening (partiel)
+
+PHASE 2 — Fix profond du cache de layout
+  Tâche 3a (InvalidateLayoutTree sur MGElement)
+    ↓
+  Tâche 3b (Invalider le layout tree à la fermeture du menu)
+    ↓
+  Tâche 3c (Retirer le workaround de InvokeContextMenuOpening + valider)
+    ↓
+  Tâche 3d (Optionnel: fix structurel dans MGScrollViewer.UpdateContentLayout)
 ```
 
 ## Critères de validation
 
-- [ ] Build OK, pas de warnings nouveaux
-- [ ] `FitMenuToViewport` couvert par tests unitaires
+- [x] Build OK, pas de warnings nouveaux
+- [x] `FitMenuToViewport` couvert par tests unitaires (16 tests)
 - [ ] Les menus existants (ComboBox dropdown, XAML samples) fonctionnent sans régression
-- [ ] Le docking context menu fonctionne avec le nouveau `ItemsFactory` OU `ContextMenuRequested`
-- [ ] Le workaround ScrollViewer est investigué (corrigé ou documenté)
-- [ ] Pas d'allocations par frame ajoutées (les menus sont créés on-demand, pas par tick)
+- [x] Le docking context menu fonctionne avec le nouveau `ItemsFactory` OU `ContextMenuRequested`
+- [ ] Le workaround ScrollViewer est remplacé par un fix propre (3a→3c) ou conservé avec justification
+- [x] Pas d'allocations par frame ajoutées (les menus sont créés on-demand, pas par tick)
+- [ ] Test reproductible : ouvrir menu avec scrollbar → fermer → réouvrir → layout correct
+- [ ] `InvalidateLayoutTree()` disponible comme utilitaire général sur `MGElement`
