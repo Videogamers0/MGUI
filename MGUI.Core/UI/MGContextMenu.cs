@@ -124,10 +124,21 @@ namespace MGUI.Core.UI
             ContextMenuClosed?.Invoke(this, EventArgs.Empty);
         }
 
-        /// <summary>Fired just before this <see cref="MGContextMenu"/> is shown.
-        /// Set <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to <see langword="true"/> to prevent the menu from opening.
-        /// <para/>Warning: subscribing multiple times will result in multiple invocations per open.
-        /// For dynamic items, prefer <see cref="ItemsFactory"/>.</summary>
+        /// <summary>Fired just before this <see cref="MGContextMenu"/> is shown.<br/>
+        /// Set <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to <see langword="true"/> to prevent the menu from opening.<para/>
+        /// <b>Dynamic items:</b> Use <see cref="ItemsFactory"/> instead of subscribing here to add/clear items.
+        /// <see cref="ItemsFactory"/> is called automatically on every open and avoids the risks below.<para/>
+        /// <b>Double-subscription warning:</b> This is a standard C# event — subscribing N times means the handler
+        /// runs N times per open. If the same object re-subscribes on every tab-rebuild or layout pass, items (or
+        /// other side-effects) will accumulate. Always pair a subscription with an unsubscription, or use
+        /// <see cref="ItemsFactory"/> which replaces the handler pattern entirely.<para/>
+        /// <b>Recommended patterns:</b>
+        /// <list type="bullet">
+        ///   <item>Static items: declare them once in XAML or in the constructor — no handler needed.</item>
+        ///   <item>Dynamic items: set <see cref="ItemsFactory"/> once.</item>
+        ///   <item>Conditional logic (not item-building): subscribe here, but ensure you unsubscribe when
+        ///         the hosting element is disposed / rebuilt.</item>
+        /// </list></summary>
         public event EventHandler<System.ComponentModel.CancelEventArgs> ContextMenuOpening;
         public event EventHandler<EventArgs> ContextMenuOpened;
         public event EventHandler<EventArgs> ContextMenuClosing;
