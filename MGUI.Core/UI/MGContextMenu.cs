@@ -95,6 +95,20 @@ namespace MGUI.Core.UI
         /// <returns>True if the opening should proceed; false if a subscriber cancelled it.</returns>
         internal bool InvokeContextMenuOpening()
         {
+            // Ensure the ScrollViewer re-measures from scratch on every open.
+            //
+            // Root cause: MGContextMenu's ancestor elements cache their measurements. Between
+            // open/close cycles the cached measurements can become stale because MGScrollViewer
+            // with ScrollBarVisibility.Auto changes the effective content width when the vertical
+            // scrollbar appears or disappears. Without this call the items panel on the second
+            // (and subsequent) opens can be measured at the wrong width, causing items to overlap
+            // the scrollbar.
+            //
+            // Calling InvalidateLayout() on the ScrollViewer clears its measurement caches and
+            // sets IsLayoutValid = false, which forces UpdateLayout() to clear the full-measurement
+            // cache and trigger a fresh layout pass before the menu is sized and positioned.
+            ScrollViewerElement.InvalidateLayout();
+
             if (ContextMenuOpening != null)
             {
                 var args = new System.ComponentModel.CancelEventArgs();
@@ -622,19 +636,11 @@ namespace MGUI.Core.UI
                     }
                 };
 
-                #region Bug Workaround
-                //  I have no clue why this is needed, but without it, the layout is incorrect if:
-                //      1. This ContextMenu's Vertical ScrollBar is visible (Set this.MaxHeight to a small value to test)
-                //      2. The menu is closed and then re-opened
-                //  The layout would be correct the first time the menu is opened. Afterwards, the menu items seem to ignore the Vertical ScrollBar's width
-                //  Good luck to future me trying to fix this issue for real instead of with a shitty workaround
-                //  Can also be 'fixed' by removing MGElement.TryGetRecentSelfMeasurement(...)
-                //  Seems to be related to how MGScrollViewer handles ScrollBarVisibility.Auto
-                ContextMenuOpening += (sender, e) => { SV.InvalidateLayout(); };
-                //  TODO: This may have been due to an issue that was fixed in this commit?
-                //  https://github.com/Videogamers0/MGUI/commit/dd4c1d6cefffe5d4474f8e6017687ff14b6c63c1
-                //  Should try re-testing the issue now and see if it's still reproducible
-                #endregion Bug Workaround
+                #region Former Bug Workaround (now handled in InvokeContextMenuOpening)
+                //  The SV.InvalidateLayout() call was previously done here via ContextMenuOpening event subscription.
+                //  It has been moved into InvokeContextMenuOpening() with a full explanation of the root cause.
+                //  Keeping this region comment so git history is traceable.
+                #endregion
 
                 ButtonWrapperTemplate = CreateDefaultDropdownButton;
 
