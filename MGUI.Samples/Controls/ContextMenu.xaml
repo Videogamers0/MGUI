@@ -195,6 +195,35 @@
                 </StackPanel>
             </DockPanel>
             <Separator/>
+
+            <DockPanel>
+                <TextBlock Dock="Top">
+                    ContextMenus use [c=Turquoise][i]ScrollBarVisibility.Auto[/i][/c] for the vertical scrollbar, so items are scrollable when
+                    the menu is taller than its [c=Turquoise][i]MaxHeight[/i][/c]. The example below has [c=LightBlue][s=Blue]MaxHeight="110"[/s][/c]
+                    to force the scrollbar to appear. [b]Right-click the button, close the menu, then right-click again[/b] to verify
+                    that items don't overlap the scrollbar on subsequent opens.
+                </TextBlock>
+                <StackPanel HorizontalAlignment="Left" Background="White * 0.1" Padding="4" Margin="0,4,0,0">
+                    <Button Name="ScrollbarReproButton" Padding="36,3">
+                        <Button.ContextMenu>
+                            <ContextMenu Name="ScrollbarReproMenu" MaxHeight="110" TitleText="Scrollbar Repro">
+                                <ContextMenuButton CommandId="SR1" Content="Scrollable Item #1" />
+                                <ContextMenuButton CommandId="SR2" Content="Scrollable Item #2" />
+                                <ContextMenuButton CommandId="SR3" Content="Scrollable Item #3" />
+                                <ContextMenuButton CommandId="SR4" Content="Scrollable Item #4" />
+                                <ContextMenuButton CommandId="SR5" Content="Scrollable Item #5" />
+                                <ContextMenuButton CommandId="SR6" Content="Scrollable Item #6" />
+                                <ContextMenuButton CommandId="SR7" Content="Scrollable Item #7" />
+                                <ContextMenuButton CommandId="SR8" Content="Scrollable Item #8" />
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                        <TextBlock TextAlignment="Center" Text="Right-click me (scrollbar repro)" />
+                    </Button>
+                    <TextBlock Name="ScrollbarReproStatus" HorizontalAlignment="Center" Margin="0,2"
+                               IsShadowed="True" ShadowColor="Black" />
+                </StackPanel>
+            </DockPanel>
+            <Separator/>
         </StackPanel>
     </ScrollViewer>
 </Window>

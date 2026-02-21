@@ -12,6 +12,8 @@ namespace MGUI.Samples.Controls
     {
         private MGContextMenu ContextMenu1 { get; }
         private MGTextBlock TextBlock1 { get; }
+        private MGContextMenu ScrollbarReproMenu { get; }
+        private MGTextBlock ScrollbarReproStatus { get; }
 
         public ContextMenuSamples(ContentManager Content, MGDesktop Desktop)
             : base(Content, Desktop, $"{nameof(Controls)}", "ContextMenu.xaml")
@@ -29,6 +31,13 @@ namespace MGUI.Samples.Controls
                     _ => throw new NotImplementedException($"Unrecognized {nameof(MGContextMenuButton.CommandId)}: {CommandId}")
                 };
                 TextBlock1.Text = Result;
+            };
+
+            ScrollbarReproMenu = Window.GetElementByName<MGContextMenu>("ScrollbarReproMenu");
+            ScrollbarReproStatus = Window.GetElementByName<MGTextBlock>("ScrollbarReproStatus");
+            ScrollbarReproMenu.ItemSelected += (sender, e) =>
+            {
+                ScrollbarReproStatus.Text = $"You selected [b]{e.CommandId}[/b]. Close and right-click again to re-test.";
             };
         }
     }
