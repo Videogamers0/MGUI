@@ -95,20 +95,6 @@ namespace MGUI.Core.UI
         /// <returns>True if the opening should proceed; false if a subscriber cancelled it.</returns>
         internal bool InvokeContextMenuOpening()
         {
-            // Ensure the ScrollViewer re-measures from scratch on every open.
-            //
-            // Root cause: MGContextMenu's ancestor elements cache their measurements. Between
-            // open/close cycles the cached measurements can become stale because MGScrollViewer
-            // with ScrollBarVisibility.Auto changes the effective content width when the vertical
-            // scrollbar appears or disappears. Without this call the items panel on the second
-            // (and subsequent) opens can be measured at the wrong width, causing items to overlap
-            // the scrollbar.
-            //
-            // Calling InvalidateLayout() on the ScrollViewer clears its measurement caches and
-            // sets IsLayoutValid = false, which forces UpdateLayout() to clear the full-measurement
-            // cache and trigger a fresh layout pass before the menu is sized and positioned.
-            ScrollViewerElement.InvalidateLayout();
-
             if (ContextMenuOpening != null)
             {
                 var args = new System.ComponentModel.CancelEventArgs();
@@ -644,11 +630,11 @@ namespace MGUI.Core.UI
                     }
                 };
 
-                #region Former Bug Workaround (now handled in InvokeContextMenuOpening)
-                //  The SV.InvalidateLayout() call was previously done here via ContextMenuOpening event subscription.
-                //  It has been moved into InvokeContextMenuOpening() with a full explanation of the root cause.
-                //  Keeping this region comment so git history is traceable.
-                #endregion
+                // Note: the original SV.InvalidateLayout() workaround that lived here (and then in
+                // InvokeContextMenuOpening) has been superseded by InvalidateLayoutTree() called in
+                // InvokeContextMenuClosed(). Invalidating the whole subtree on close is the proper fix:
+                // it ensures every descendant's measurement cache is cleared between open/close cycles,
+                // preventing stale values from the previous cycle causing items to overlap the scrollbar.
 
                 ButtonWrapperTemplate = CreateDefaultDropdownButton;
 

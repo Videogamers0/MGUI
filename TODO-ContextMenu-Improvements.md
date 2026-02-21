@@ -359,7 +359,7 @@ PHASE 2 — Fix profond du cache de layout
 - [x] `FitMenuToViewport` couvert par tests unitaires (16 tests)
 - [ ] Les menus existants (ComboBox dropdown, XAML samples) fonctionnent sans régression
 - [x] Le docking context menu fonctionne avec le nouveau `ItemsFactory` OU `ContextMenuRequested`
-- [ ] Le workaround ScrollViewer est remplacé par un fix propre (3a→3c) ou conservé avec justification
+- [x] Le workaround ScrollViewer est remplacé par un fix propre (3a→3c) — `InvalidateLayoutTree()` sur fermeture
 - [x] Pas d'allocations par frame ajoutées (les menus sont créés on-demand, pas par tick)
 - [ ] Test reproductible : ouvrir menu avec scrollbar → fermer → réouvrir → layout correct
-- [ ] `InvalidateLayoutTree()` disponible comme utilitaire général sur `MGElement`
+- [x] `InvalidateLayoutTree()` disponible comme utilitaire général sur `MGElement`
