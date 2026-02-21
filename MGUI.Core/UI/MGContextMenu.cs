@@ -95,10 +95,22 @@ namespace MGUI.Core.UI
         /// <returns>True if the opening should proceed; false if a subscriber cancelled it.</returns>
         internal bool InvokeContextMenuOpening()
         {
-            if (ContextMenuOpening == null) return true;
-            var args = new System.ComponentModel.CancelEventArgs();
-            ContextMenuOpening.Invoke(this, args);
-            return !args.Cancel;
+            if (ContextMenuOpening != null)
+            {
+                var args = new System.ComponentModel.CancelEventArgs();
+                ContextMenuOpening.Invoke(this, args);
+                if (args.Cancel) return false;
+            }
+
+            // Rebuild items via factory (if set) after the cancel-check so we
+            // don't mutate items for a menu that ends up not opening.
+            if (ItemsFactory != null)
+            {
+                ClearItems();
+                ItemsFactory(this);
+            }
+
+            return true;
         }
         internal void InvokeContextMenuOpened()
         {
@@ -251,6 +263,33 @@ namespace MGUI.Core.UI
             _Items.Add(Separator);
             return Separator;
         }
+
+        /// <summary>Removes all items from this menu, correctly unregistering internal event handlers
+        /// and removing elements from the visual tree.
+        /// <para/>Prefer this over calling <c>Items.Clear()</c> directly, which does not clean up properly
+        /// due to <see cref="ObservableCollection{T}"/>'s Reset action not carrying <c>OldItems</c>.</summary>
+        public void ClearItems()
+        {
+            for (int i = _Items.Count - 1; i >= 0; i--)
+                _Items.RemoveAt(i);
+        }
+
+        /// <summary>Optional factory called every time this menu is about to open (just after
+        /// <see cref="ContextMenuOpening"/> fires and has not been cancelled).
+        /// When set, <see cref="ClearItems"/> is called automatically before the factory runs,
+        /// so the item list is always freshly built.
+        /// <para/>This is the recommended approach for <em>dynamic</em> menus whose items change
+        /// between invocations — it replaces the fragile pattern of subscribing to
+        /// <see cref="ContextMenuOpening"/> and calling <c>Clear()+AddButton()</c> inside the handler.
+        /// <para/>Example:
+        /// <code>
+        /// menu.ItemsFactory = m =>
+        /// {
+        ///     m.AddButton("Close",  _ => Close());
+        ///     m.AddButton("Reload", _ => Reload());
+        /// };
+        /// </code></summary>
+        public Action<MGContextMenu> ItemsFactory { get; set; }
         #endregion
 
         public MGScrollViewer ScrollViewerElement { get; }
