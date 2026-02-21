@@ -79,6 +79,31 @@ namespace MGUI.Core.UI
         }
     }
 
+    /// <summary>Event args for <see cref="MGElement.ContextMenuRequested"/>.
+    /// Allows subscribers to provide or replace the <see cref="MGContextMenu"/> that will be opened
+    /// when the user right-clicks the element, without needing to assign <see cref="MGElement.ContextMenu"/>.</summary>
+    public class ContextMenuRequestedEventArgs : EventArgs
+    {
+        /// <summary>The context menu that will be opened, initially equal to the element's
+        /// <see cref="MGElement.ContextMenu"/> property. Set this to a different instance to
+        /// replace the menu, or to <see langword="null"/> to suppress opening entirely.</summary>
+        public MGContextMenu Menu { get; set; }
+
+        /// <summary>Mouse position in screen space at the moment of the right-click.</summary>
+        public Point Position { get; }
+
+        /// <summary>Set to <see langword="true"/> to suppress opening the menu entirely.
+        /// If <see langword="false"/> (default), the menu referenced by <see cref="Menu"/> will be opened.</summary>
+        public bool Handled { get; set; }
+
+        public ContextMenuRequestedEventArgs(MGContextMenu InitialMenu, Point Position)
+        {
+            Menu = InitialMenu;
+            this.Position = Position;
+            Handled = false;
+        }
+    }
+
     //TODO:
     //Fix bug with measurement logic of components
     //      MGElement.MeasureSelf and MGElement.UpdateLayout both have 2 bugs when dealing with components
@@ -151,32 +176,6 @@ namespace MGUI.Core.UI
     //maybe MGElement should have a: List<MGElement> AttachedElements { get; }
     //		This would specifically be for elements where the parent doesn't normally have a reference to the child, such as MGResizeGrip when using MGResizeGrip.Host to attach to
     //		The Visual Tree traversal logic should have an additional parameter, IncludeAttached
-
-    /// <summary>Event args for <see cref="MGElement.ContextMenuRequested"/>.
-    /// Allows subscribers to provide or replace the <see cref="MGContextMenu"/> that will be opened
-    /// when the user right-clicks the element, without needing to assign <see cref="MGElement.ContextMenu"/>.</summary>
-    public class ContextMenuRequestedEventArgs : EventArgs
-    {
-        /// <summary>The context menu that will be opened, initially equal to the element's
-        /// <see cref="MGElement.ContextMenu"/> property. Set this to a different instance to
-        /// replace the menu, or to <see langword="null"/> to suppress opening entirely.</summary>
-        public MGContextMenu Menu { get; set; }
-
-        /// <summary>Mouse position in screen space at the moment of the right-click.</summary>
-        public Point Position { get; }
-
-        /// <summary>Set to <see langword="true"/> to suppress opening the menu entirely.
-        /// If <see langword="false"/> (default), the menu referenced by <see cref="Menu"/> will be opened.</summary>
-        public bool Handled { get; set; }
-
-        public ContextMenuRequestedEventArgs(MGContextMenu InitialMenu, Point Position)
-        {
-            this.Menu = InitialMenu;
-            this.Position = Position;
-            this.Handled = false;
-        }
-    }
-
     /// <summary>Base class for all UI elements.</summary>
     public abstract class MGElement : XAMLBindableBase, IMouseHandlerHost, IKeyboardHandlerHost, 
         IElementNameResolver, IResourcesResolver, IDesktopResolver
