@@ -120,22 +120,27 @@ namespace MGUI.Samples
                             //  Now that the Century Gothic font set has been added to the FontManager, we can use MGTextBlocks with FontFamily="Century Gothic"
 
                             // ── FontStashSharp engine (F1 to toggle) ──────────────────────────────────
-                            //  Reopen the streams; the previous reads consumed them.
+                            //  Uses JetBrainsMono (bundled in MGUI.Core) so the size comparison
+                            //  is purely engine-driven, independent of the Gothic font.
                             try
                             {
+                                // AppContext.BaseDirectory = …/MGUI.Samples/bin/Debug/net6.0-windows/
+                                string jbmDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,
+                                    @"..\..\..\..\MGUI.Core\Content\Fonts\JetBrainsMono\ttf"));
+
                                 _fssEngine = new FontStashSharpTextEngine();
-                                foreach (CustomFontStyles style in DesiredStyles)
-                                {
-                                    string ttfPath = style switch
-                                    {
-                                        CustomFontStyles.Bold   => Path.Combine(FontsDirectory, "gothicb.ttf"),
-                                        CustomFontStyles.Italic => Path.Combine(FontsDirectory, "gothici.ttf"),
-                                        _                       => Path.Combine(FontsDirectory, "gothic.ttf")
-                                    };
-                                    var fontSystem = new FontSystem();
-                                    fontSystem.AddFont(File.ReadAllBytes(ttfPath));
-                                    _fssEngine.AddFontSystem("Century Gothic", style, fontSystem);
-                                }
+
+                                var jbmNormal = new FontSystem();
+                                jbmNormal.AddFont(File.ReadAllBytes(Path.Combine(jbmDir, "JetBrainsMono-Regular.ttf")));
+                                _fssEngine.AddFontSystem("JetBrainsMono", CustomFontStyles.Normal, jbmNormal);
+
+                                var jbmBold = new FontSystem();
+                                jbmBold.AddFont(File.ReadAllBytes(Path.Combine(jbmDir, "JetBrainsMono-Bold.ttf")));
+                                _fssEngine.AddFontSystem("JetBrainsMono", CustomFontStyles.Bold, jbmBold);
+
+                                var jbmItalic = new FontSystem();
+                                jbmItalic.AddFont(File.ReadAllBytes(Path.Combine(jbmDir, "JetBrainsMono-Italic.ttf")));
+                                _fssEngine.AddFontSystem("JetBrainsMono", CustomFontStyles.Italic, jbmItalic);
                             }
                             catch (Exception fssEx) { Debug.WriteLine($"FSS engine init failed: {fssEx.Message}"); _fssEngine = null; }
                             // ─────────────────────────────────────────────────────────────────────────
