@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using MGUI.Shared.Helpers;
+using MGUI.Shared.Text;
+using MGUI.Shared.Text.Engines;
 using MonoGame.Extended;
 
 namespace MGUI.Core.UI.Text
@@ -55,8 +57,9 @@ namespace MGUI.Core.UI.Text
             Thickness Padding = TextBlockElement.Padding;
             float LinePadding = TextBlockElement.LinePadding;
 
-            SpriteFont SF = TextBlockElement.GetFont(TextBlockElement.IsBold, TextBlockElement.IsItalic, out Dictionary<char, SpriteFont.Glyph> Glyphs);
-            Vector2 MeasurementScale = new Vector2(1.0f, TextBlockElement.FontHeight) * TextBlockElement.FontScale;
+            // Resolve font via ITextEngine (no direct SpriteFont dependency)
+            ITextEngine engine   = TextBlockElement.GetDesktop().TextEngine;
+            ResolvedFont resolved = TextBlockElement.GetResolvedFont(TextBlockElement.IsBold, TextBlockElement.IsItalic);
 
             float CurrentY = LayoutBounds.Top + Padding.Top;
             if (TextBlockElement.Lines?.Any() != true)
@@ -96,25 +99,17 @@ namespace MGUI.Core.UI.Text
 
                             foreach (char c in Run.Text)
                             {
-                                //SpriteFont.MeasureString source code is here:
-                                //https://github.com/MonoGame/MonoGame/blob/develop/MonoGame.Framework/Graphics/SpriteFont.cs
+                                GlyphMetrics glyph = engine.MeasureGlyph(resolved, c);
 
-                                SpriteFont.Glyph Glyph = Glyphs[c];
+                                float charWidth = IsStartOfLine
+                                    ? glyph.TotalWidthFirstGlyph
+                                    : glyph.TotalWidth;
+                                IsStartOfLine = false;
 
-                                float ActualLeftSideBearing;
-                                if (IsStartOfLine)
-                                {
-                                    IsStartOfLine = false;
-                                    ActualLeftSideBearing = Math.Max(Glyph.LeftSideBearing, 0);
-                                }
-                                else
-                                    ActualLeftSideBearing = SF.Spacing + Glyph.LeftSideBearing;
-
-                                float Width = (ActualLeftSideBearing + Glyph.Width + Glyph.RightSideBearing) * MeasurementScale.X;
-                                LineInfo.AddCharacter(Line.OriginalCharacterIndices[CharacterIndexInWrappedLines], CharCounter, CurrentX, Width);
+                                LineInfo.AddCharacter(Line.OriginalCharacterIndices[CharacterIndexInWrappedLines], CharCounter, CurrentX, charWidth);
                                 CharacterIndexInWrappedLines++;
                                 CharCounter++;
-                                CurrentX += Width;
+                                CurrentX += charWidth;
                             }
                         }
                     }
