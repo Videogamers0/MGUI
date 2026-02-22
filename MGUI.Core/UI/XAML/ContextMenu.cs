@@ -224,4 +224,43 @@ namespace MGUI.Core.UI.XAML
             yield return Separator;
         }
     }
+
+    /// <summary>XAML class for <see cref="MGContextMenuRadio"/>.<para/>
+    /// Items sharing the same <see cref="GroupName"/> are mutually exclusive within the same <see cref="ContextMenu"/>.</summary>
+    public class ContextMenuRadio : WrappedContextMenuItem
+    {
+        public override MGElementType ElementType => MGElementType.ContextMenuItem;
+
+        [Category("Data")]
+        public string GroupName { get; set; }
+        [Category("Data")]
+        public bool? IsChecked { get; set; }
+        [Category("Data")]
+        public string CommandId { get; set; }
+
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
+        {
+            if (Parent is MGContextMenu ContextMenu)
+            {
+                MGElement ContentElement = Content?.ToElement<MGElement>(Window, null) ?? new MGTextBlock(Window, "");
+                return ContextMenu.AddRadioButton(ContentElement, GroupName ?? "default", IsChecked ?? false);
+            }
+            else
+                throw new InvalidOperationException($"The parent of a {nameof(ContextMenuRadio)} must be a {nameof(MGContextMenu)}.");
+        }
+
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
+        {
+            MGContextMenuRadio Radio = Element as MGContextMenuRadio;
+
+            if (CommandId != null)
+                Radio.CommandId = CommandId;
+            if (GroupName != null)
+                Radio.GroupName = GroupName;
+            if (IsChecked.HasValue)
+                Radio.IsChecked = IsChecked.Value;
+
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
+        }
+    }
 }
