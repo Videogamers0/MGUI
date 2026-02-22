@@ -847,15 +847,12 @@ namespace MGUI.Core.UI
         {
             float WindowScale = ParentWindow.Scale;
             MGDesktop Desktop = GetDesktop();
-            FontManager FontManager = Desktop.FontManager;
             DrawTransaction DT = DA.DT;
             float Opacity = DA.Opacity;
             Color DefaultForeground = ActualForeground;
-            Vector2 FontOrigin = this.FontOrigin;
 
             Matrix Transform = Matrix.CreateTranslation(new Vector3(DA.Offset.ToVector2(), 0));
             IDisposable TemporaryDrawTransform = null;
-            bool UseScaledSpriteFont = false;
             float ImageSizeScalar = 1.0f;
 #if NEVER
             //  This logic *almost* works but not quite :( Seems like there's minor issues with the measured text width, so the X-positioning is slightly inaccurate
@@ -914,21 +911,12 @@ namespace MGUI.Core.UI
                     }
                     else if (Run.RunType == TextRunType.Text && Run is MGTextRunText TextRun)
                     {
-                        bool IsBold = TextRun.Settings.IsBold;
+                        bool IsBold   = TextRun.Settings.IsBold;
                         bool IsItalic = TextRun.Settings.IsItalic;
-                        SpriteFont SF = GetFont(IsBold, IsItalic, out _);
-
-                        float FontScale = this.FontScale;
-                        if (UseScaledSpriteFont)
-                        {
-                            CustomFontStyles FontStyle = 
-                                IsBold && IsItalic ? CustomFontStyles.Bold | CustomFontStyles.Italic : 
-                                IsBold ? CustomFontStyles.Bold : 
-                                IsItalic ? CustomFontStyles.Italic : 
-                                CustomFontStyles.Normal;
-                            SF = Desktop.FontManager.GetFont(FontFamily, FontStyle,(int)(FontSize * FontScale * WindowScale), true, out _, out float ExactScale, out float SuggestedScale, out _);
-                            FontScale = ExactScale;
-                        }
+                        ResolvedFont resolved   = GetResolvedFont(IsBold, IsItalic);
+                        float drawScale = GetTheme().FontSettings.UseExactScale
+                            ? resolved.ExactScale
+                            : resolved.SuggestedScale;
 
                         float ActualOpacity = Opacity * TextRun.Settings.Opacity;
                         Color Foreground = (TextRun.Settings.Foreground ?? DefaultForeground) * ActualOpacity;
@@ -945,19 +933,9 @@ namespace MGUI.Core.UI
                             IFillBrush BackgroundBrush = TextRun.Settings.Background.Brush;
                             Thickness BackgroundPadding = TextRun.Settings.Background.Padding;
 
-                            if (UseScaledSpriteFont)
-                            {
-                                Rectangle BackgroundDestination = new Rectangle((int)CurrentX, (int)TextYPosition, (int)TextSize.X, (int)Line.LineTextHeight)
-                                    .GetExpanded(BackgroundPadding)
-                                    .CreateTransformed(Transform);
-                                BackgroundBrush.Draw(DA.SetOpacity(ActualOpacity).AsZeroOffset(), this, BackgroundDestination);
-                            }
-                            else
-                            {
-                                Rectangle BackgroundDestination = new Rectangle((int)CurrentX, (int)TextYPosition, (int)TextSize.X, (int)Line.LineTextHeight)
-                                    .GetExpanded(BackgroundPadding);
-                                BackgroundBrush.Draw(DA.SetOpacity(ActualOpacity), this, BackgroundDestination);
-                            }
+                            Rectangle BackgroundDestination = new Rectangle((int)CurrentX, (int)TextYPosition, (int)TextSize.X, (int)Line.LineTextHeight)
+                                .GetExpanded(BackgroundPadding);
+                            BackgroundBrush.Draw(DA.SetOpacity(ActualOpacity), this, BackgroundDestination);
                         }
 
                         //  Draw underline
@@ -981,12 +959,12 @@ namespace MGUI.Core.UI
                             Color ShadowColor = (TextRun.Settings.Shadow.ShadowColor ?? DefaultForeground) * ActualOpacity;
                             Vector2 ShadowOffset = TextRun.Settings.Shadow.ShadowOffset ?? new(1, 1);
 
-                            DT.DrawSpriteFontText(SF, ActualText, Position + ShadowOffset, ShadowColor, FontOrigin, FontScale, FontScale);
-                            DT.DrawSpriteFontText(SF, ActualText, Position, Foreground, FontOrigin, FontScale, FontScale);
+                            DT.DrawTextViaEngine(resolved, ActualText, Position + ShadowOffset, ShadowColor, resolved.DrawOrigin, drawScale);
+                            DT.DrawTextViaEngine(resolved, ActualText, Position,               Foreground,  resolved.DrawOrigin, drawScale);
                         }
                         else
                         {
-                            DT.DrawSpriteFontText(SF, ActualText, Position, Foreground, FontOrigin, FontScale, FontScale);
+                            DT.DrawTextViaEngine(resolved, ActualText, Position, Foreground, resolved.DrawOrigin, drawScale);
                         }
 
                         RunBounds = new(CurrentX, TextYPosition, TextSize.X, TextSize.Y);

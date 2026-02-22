@@ -174,6 +174,27 @@ namespace MGUI.Shared.Rendering
                 SB.DrawString(Font, Text, Position, Color, Rotation, Origin, new Vector2(ScaleX, ScaleY), Effects, Depth);
         }
 
+        /// <summary>
+        /// Draws <paramref name="Text"/> using the active <see cref="ITextEngine"/>, while
+        /// ensuring the correct <see cref="DrawContext"/> has been started on this transaction.
+        /// </summary>
+        public void DrawTextViaEngine(
+            MGUI.Shared.Text.ResolvedFont Font,
+            string Text,
+            Vector2 Position,
+            Color Color,
+            Vector2 Origin,
+            float Scale,
+            float Rotation = 0f,
+            float Depth    = 0f,
+            SpriteEffects Effects = SpriteEffects.None)
+        {
+            if (string.IsNullOrEmpty(Text) || Font?.NativeFont == null)
+                return;
+            BeginDraw(DrawContext.Sprites);
+            TextEngine.DrawText(SB, Font, Text, Position, Color, Origin, Scale, Rotation, Depth, Effects);
+        }
+
         /// <param name="Family">The font to use</param>
         /// <param name="DesiredFontSize">The desired size of the <see cref="SpriteFont"/>, in points.</param>
         /// <param name="Exact">If true, will attempt to render the text at exactly the given <paramref name="DesiredFontSize"/>.<br/>
