@@ -14,9 +14,9 @@
 
             <!-- File menu -->
             <MenuBarItem Text="File">
-                <ContextMenuButton Icon="GoldBullion"   CommandId="File.New"  Content="New"     />
-                <ContextMenuButton Icon="SilverBullion" CommandId="File.Open" Content="Open..." />
-                <ContextMenuButton Icon="BronzeBullion" CommandId="File.Save" Content="Save"    />
+                <ContextMenuButton Icon="GoldBullion"   CommandId="File.New"  Content="New"     ShortcutText="Ctrl+N" />
+                <ContextMenuButton Icon="SilverBullion" CommandId="File.Open" Content="Open..." ShortcutText="Ctrl+O" />
+                <ContextMenuButton Icon="BronzeBullion" CommandId="File.Save" Content="Save"    ShortcutText="Ctrl+S" />
                 <ContextMenuSeparator />
                 <ContextMenuButton CommandId="File.Recent" Content="Recent">
                     <ContextMenuButton.Submenu>
@@ -33,9 +33,9 @@
 
             <!-- Edit menu -->
             <MenuBarItem Text="Edit">
-                <ContextMenuButton Icon="GoldBullion"   CommandId="Edit.Cut"       Content="Cut"    />
-                <ContextMenuButton Icon="SilverBullion" CommandId="Edit.Copy"      Content="Copy"   />
-                <ContextMenuButton Icon="BronzeBullion" CommandId="Edit.Paste"     Content="Paste"  />
+                <ContextMenuButton Icon="GoldBullion"   CommandId="Edit.Cut"       Content="Cut"    ShortcutText="Ctrl+X" />
+                <ContextMenuButton Icon="SilverBullion" CommandId="Edit.Copy"      Content="Copy"   ShortcutText="Ctrl+C" />
+                <ContextMenuButton Icon="BronzeBullion" CommandId="Edit.Paste"     Content="Paste"  ShortcutText="Ctrl+V" />
                 <ContextMenuSeparator />
                 <ContextMenuButton             CommandId="Edit.SelectAll"  Content="Select All"         />
                 <ContextMenuSeparator />
@@ -101,7 +101,9 @@
                     [c=Gold]• Toggle items[/c] — "View → Show Grid / Show Rulers" are checkable.[br]
                     [c=Gold]• Radio groups[/c] — "View → Zoom" items are mutually exclusive.[br]
                     [c=Gold]• Disabled items[/c] — "Edit → Undo (disabled)" is grayed out.[br]
-                    [c=Gold]• Icons[/c] — File and Edit menus show icons next to items.
+                    [c=Gold]• Icons[/c] — File and Edit menus show icons next to items.[br]
+                    [c=Gold]• ShortcutText[/c] — File and Edit items show keyboard shortcut hints.[br]
+                    [c=Gold]• Keyboard navigation[/c] — open a menu, then use ← / → to navigate items, Escape to close.
                 </TextBlock>
             </StackPanel>
         </ScrollViewer>

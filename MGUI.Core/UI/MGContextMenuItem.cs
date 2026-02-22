@@ -258,6 +258,35 @@ namespace MGUI.Core.UI
         private void Submenu_Opened(object sender, EventArgs e) => ContentWrapper.SpoofIsHoveredWhileDrawingBackground = true;
         private void Submenu_Closed(object sender, EventArgs e) => ContentWrapper.SpoofIsHoveredWhileDrawingBackground = false;
 
+        #region ShortcutText
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private MGTextBlock _ShortcutTextBlock;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string _ShortcutText;
+        /// <summary>Optional shortcut key hint displayed to the right of the item label (e.g. "Ctrl+S").<para/>
+        /// Set to null or empty to hide.</summary>
+        public string ShortcutText
+        {
+            get => _ShortcutText;
+            set
+            {
+                if (_ShortcutText != value)
+                {
+                    _ShortcutText = value;
+                    if (_ShortcutTextBlock != null)
+                    {
+                        _ShortcutTextBlock.Text = _ShortcutText ?? "";
+                        _ShortcutTextBlock.Visibility = string.IsNullOrEmpty(_ShortcutText)
+                            ? Visibility.Collapsed
+                            : Visibility.Visible;
+                    }
+                    NPC(nameof(ShortcutText));
+                }
+            }
+        }
+        #endregion ShortcutText
+
         protected MGWrappedContextMenuItem(MGContextMenu Menu, ContextMenuItemType ItemType, MGButton ContentWrapper, MGElement MenuItemContent)
             : base(Menu, ItemType)
         {
@@ -289,6 +318,17 @@ namespace MGUI.Core.UI
 
             this.MenuItemContent = MenuItemContent;
             this.ContentWrapper = ContentWrapper;
+
+            // Shortcut text label — starts collapsed; visible once ShortcutText is assigned
+            _ShortcutTextBlock = new MGTextBlock(Menu, "", Color.LightGray, Menu.GetTheme().FontSettings.ContextMenuFontSize);
+            _ShortcutTextBlock.Margin = new Thickness(18, 0, 0, 0);
+            _ShortcutTextBlock.VerticalAlignment = VerticalAlignment.Center;
+            _ShortcutTextBlock.Visibility = Visibility.Collapsed;
+            _ShortcutTextBlock.ManagedParent = this;
+            using (Container.AllowChangingContentTemporarily())
+            {
+                Container.TryAddChild(_ShortcutTextBlock);
+            }
 
             SubmenuArrowElement = new(Menu, SubmenuArrowWidth, SubmenuArrowHeight, Color.Transparent, 0, Color.Transparent);
             SubmenuArrowElement.Margin = new(0, 5, DefaultSubmenuArrowRightMargin, 5);

@@ -131,6 +131,7 @@ namespace MGUI.Core.UI.XAML
 
         public string CommandId { get; set; }
         public Image Icon { get; set; }
+        public string ShortcutText { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
@@ -151,6 +152,8 @@ namespace MGUI.Core.UI.XAML
                 ContextMenuButton.CommandId = CommandId;
             if (Icon != null)
                 ContextMenuButton.Icon = Icon.ToElement<MGImage>(ContextMenuButton.SelfOrParentWindow, ContextMenuButton);
+            if (ShortcutText != null)
+                ContextMenuButton.ShortcutText = ShortcutText;
 
             base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
@@ -170,6 +173,7 @@ namespace MGUI.Core.UI.XAML
         public override MGElementType ElementType => MGElementType.ContextMenuItem;
 
         public bool? IsChecked { get; set; }
+        public string ShortcutText { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
@@ -188,6 +192,8 @@ namespace MGUI.Core.UI.XAML
 
             if (IsChecked.HasValue)
                 ContextMenuToggle.IsChecked = IsChecked.Value;
+            if (ShortcutText != null)
+                ContextMenuToggle.ShortcutText = ShortcutText;
 
             base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
@@ -237,6 +243,8 @@ namespace MGUI.Core.UI.XAML
         public bool? IsChecked { get; set; }
         [Category("Data")]
         public string CommandId { get; set; }
+        [Category("Data")]
+        public string ShortcutText { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
@@ -259,6 +267,8 @@ namespace MGUI.Core.UI.XAML
                 Radio.GroupName = GroupName;
             if (IsChecked.HasValue)
                 Radio.IsChecked = IsChecked.Value;
+            if (ShortcutText != null)
+                Radio.ShortcutText = ShortcutText;
 
             base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
