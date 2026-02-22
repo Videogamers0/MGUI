@@ -45,10 +45,12 @@ namespace MGUI.Shared.Text
         public bool IsFallback { get; }
 
         /// <summary>
-        /// Opaque native font handle owned by the backend.
-        /// Outside of <c>MGUI.Shared</c> this is treated as an opaque token.
+        /// Opaque native font handle owned by the backend (e.g. a <c>SpriteFontHandle</c>
+        /// for <c>SpriteFontTextEngine</c>, or an FSS wrapper for <c>FontStashSharpTextEngine</c>).
+        /// This property is intended for backend implementations only — do not inspect or cast
+        /// it outside of the engine that created this <see cref="ResolvedFont"/>.
         /// </summary>
-        internal object NativeFont { get; }
+        public object NativeFont { get; }
 
         /// <param name="nativeFont">Backend-specific object (e.g. <c>SpriteFont</c> or <c>SpriteFontBase</c>).
         /// Pass <c>null</c> when no native font is applicable (e.g. in headless test engines).</param>
