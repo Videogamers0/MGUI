@@ -95,19 +95,20 @@ namespace MGUI.Core.UI
         /// <returns>True if the opening should proceed; false if a subscriber cancelled it.</returns>
         internal bool InvokeContextMenuOpening()
         {
+            // Run the factory first so that newly created items can subscribe to ContextMenuOpening
+            // and receive it during this same open cycle (e.g. to evaluate ComputeIsVisible).
+            // If the open is subsequently cancelled the items will simply be rebuilt on the next open.
+            if (ItemsFactory != null)
+            {
+                ClearItems();
+                ItemsFactory(this);
+            }
+
             if (ContextMenuOpening != null)
             {
                 var args = new System.ComponentModel.CancelEventArgs();
                 ContextMenuOpening.Invoke(this, args);
                 if (args.Cancel) return false;
-            }
-
-            // Rebuild items via factory (if set) after the cancel-check so we
-            // don't mutate items for a menu that ends up not opening.
-            if (ItemsFactory != null)
-            {
-                ClearItems();
-                ItemsFactory(this);
             }
 
             return true;
@@ -132,10 +133,10 @@ namespace MGUI.Core.UI
             ContextMenuClosed?.Invoke(this, EventArgs.Empty);
         }
 
-        /// <summary>Fired just before this <see cref="MGContextMenu"/> is shown.<br/>
+        /// <summary>Fired just before this <see cref="MGContextMenu"/> is shown, <em>after</em> <see cref="ItemsFactory"/> has run.<br/>
         /// Set <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to <see langword="true"/> to prevent the menu from opening.<para/>
         /// <b>Dynamic items:</b> Use <see cref="ItemsFactory"/> instead of subscribing here to add/clear items.
-        /// <see cref="ItemsFactory"/> is called automatically on every open and avoids the risks below.<para/>
+        /// <see cref="ItemsFactory"/> is called automatically on every open (before this event fires) and avoids the risks below.<para/>
         /// <b>Double-subscription warning:</b> This is a standard C# event — subscribing N times means the handler
         /// runs N times per open. If the same object re-subscribes on every tab-rebuild or layout pass, items (or
         /// other side-effects) will accumulate. Always pair a subscription with an unsubscription, or use
@@ -293,10 +294,13 @@ namespace MGUI.Core.UI
                 _Items.RemoveAt(i);
         }
 
-        /// <summary>Optional factory called every time this menu is about to open (just after
-        /// <see cref="ContextMenuOpening"/> fires and has not been cancelled).
+        /// <summary>Optional factory called every time this menu is about to open (just <em>before</em>
+        /// <see cref="ContextMenuOpening"/> fires).
         /// When set, <see cref="ClearItems"/> is called automatically before the factory runs,
         /// so the item list is always freshly built.
+        /// Items created by the factory subscribe to <see cref="ContextMenuOpening"/> during construction
+        /// and therefore receive it for the same open cycle — so <see cref="MGContextMenuItem.ComputeIsVisible"/>
+        /// is evaluated correctly on first open.
         /// <para/>This is the recommended approach for <em>dynamic</em> menus whose items change
         /// between invocations — it replaces the fragile pattern of subscribing to
         /// <see cref="ContextMenuOpening"/> and calling <c>Clear()+AddButton()</c> inside the handler.
