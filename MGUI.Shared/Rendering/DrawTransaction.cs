@@ -29,6 +29,7 @@ namespace MGUI.Shared.Rendering
     public class DrawTransaction : IDisposable
     {
         public MainRenderer Renderer { get; }
+        [Obsolete("Access fonts through MainRenderer.TextEngine / ITextEngine instead.")]
         public FontManager FontManager => Renderer.FontManager;
         /// <summary>Delegates to <see cref="MainRenderer.TextEngine"/>.</summary>
         public ITextEngine TextEngine => Renderer.TextEngine;
@@ -164,6 +165,7 @@ namespace MGUI.Shared.Rendering
         #endregion Draw Texture
 
         #region Draw Text
+        [Obsolete("Use DrawTextViaEngine(ResolvedFont, ...) with the active ITextEngine instead.")]
         public void DrawSpriteFontText(SpriteFont Font, string Text, Vector2 Position, Color Color, 
             Vector2 Origin, float ScaleX = 1f, float ScaleY = 1f, float Rotation = 0f, float Depth = 0f, SpriteEffects Effects = SpriteEffects.None)
         {
