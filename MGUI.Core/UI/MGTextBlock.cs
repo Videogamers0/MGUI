@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MonoGame.Extended;
 using MGUI.Shared.Text;
+using MGUI.Shared.Text.Engines;
 using MGUI.Shared.Rendering;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Shared.Input.Mouse;
@@ -47,6 +48,24 @@ namespace MGUI.Core.UI
         private Dictionary<char, SpriteFont.Glyph> SF_Italic_Glyphs { get; set; }
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Dictionary<char, SpriteFont.Glyph> SF_BoldItalic_Glyphs { get; set; }
+
+        // ── ITextEngine-backed resolved fonts (one per style variant) ─────────────
+        /// <summary>Shortcut to the active <see cref="ITextEngine"/> from the parent Desktop.</summary>
+        private ITextEngine TextEngine => GetDesktop().TextEngine;
+
+        internal ResolvedFont RF_Regular    { get; private set; }
+        internal ResolvedFont RF_Bold       { get; private set; }
+        internal ResolvedFont RF_Italic     { get; private set; }
+        internal ResolvedFont RF_BoldItalic { get; private set; }
+
+        /// <summary>Returns the <see cref="ResolvedFont"/> corresponding to the given style flags.</summary>
+        internal ResolvedFont GetResolvedFont(bool IsBold, bool IsItalic)
+        {
+            if (!IsBold && !IsItalic) return RF_Regular;
+            if (IsBold && IsItalic)   return RF_BoldItalic;
+            if (IsBold)               return RF_Bold;
+            return RF_Italic;
+        }
 
         internal SpriteFont GetFont(bool IsBold, bool IsItalic, out Dictionary<char, SpriteFont.Glyph> Glyphs)
         {
@@ -96,10 +115,18 @@ namespace MGUI.Core.UI
                 SF_Italic = GetFontStyleOrDefault(FS, CustomFontStyles.Italic, Size, SF_Regular);
                 SF_BoldItalic = GetFontStyleOrDefault(FS, CustomFontStyles.Bold | CustomFontStyles.Italic, Size, SF_Bold ?? SF_Italic ?? SF_Regular);
 
-                SF_Regular_Glyphs = SF_Regular?.GetGlyphs();
-                SF_Bold_Glyphs = SF_Bold?.GetGlyphs();
-                SF_Italic_Glyphs = SF_Italic?.GetGlyphs();
+                SF_Regular_Glyphs    = SF_Regular?.GetGlyphs();
+                SF_Bold_Glyphs       = SF_Bold?.GetGlyphs();
+                SF_Italic_Glyphs     = SF_Italic?.GetGlyphs();
                 SF_BoldItalic_Glyphs = SF_BoldItalic?.GetGlyphs();
+
+                // Resolve ITextEngine handles for the 4 style variants
+                ITextEngine engine = TextEngine;
+                bool useExact = GetTheme().FontSettings.UseExactScale;
+                RF_Regular    = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Normal));
+                RF_Bold       = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Bold));
+                RF_Italic     = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Italic));
+                RF_BoldItalic = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Bold | CustomFontStyles.Italic));
 
                 InvokeLayoutChanged();
 
@@ -595,61 +622,26 @@ namespace MGUI.Core.UI
             if (string.IsNullOrEmpty(Text))
                 return Vector2.Zero;
 
-            SpriteFont SF = GetFont(IsBold, IsItalic, out Dictionary<char, SpriteFont.Glyph> Glyphs);
+            ResolvedFont resolved = GetResolvedFont(IsBold, IsItalic);
+            ITextEngine engine    = TextEngine;
 
-#if true
-            //  Referenced SpriteFont.MeasureString source code from:
-            //  https://github.com/MonoGame/MonoGame/blob/develop/MonoGame.Framework/Graphics/SpriteFont.cs
-
-            float Width = 0;
-            float Height = SF.LineSpacing;
-
-            float CurrentXOffset = 0;
-#pragma warning disable CS0219 // Variable is assigned but its value is never used
-            bool IsFirstCharacter = true;
-#pragma warning restore CS0219 // Variable is assigned but its value is never used
-
-            if (SF.Spacing != 0)
-                throw new NotImplementedException($"{nameof(MGTextBlock)}.{nameof(MeasureText)} currently does not handle {nameof(SpriteFont)}s with a non-zero Spacing.");
-
+            float width = 0f;
+            bool first  = true;
             foreach (char c in Text)
             {
-                if (!Glyphs.TryGetValue(c, out SpriteFont.Glyph Glyph))
-                    Glyph = Glyphs[SF.DefaultCharacter.Value];
-
-#if NEVER
-                if (IsFirstCharacter)
-                    IsFirstCharacter = false;
-                else
-                    CurrentXOffset += SF.Spacing;
-
-                if (IgnoreFirstGlyphNegativeLeftSideBearing)
+                GlyphMetrics g = engine.MeasureGlyph(resolved, c);
+                if (first && IgnoreFirstGlyphNegativeLeftSideBearing)
                 {
-                    CurrentXOffset += Math.Max(Glyph.LeftSideBearing, 0);
-                    IgnoreFirstGlyphNegativeLeftSideBearing = false;
+                    width += g.TotalWidthFirstGlyph;
+                    first  = false;
                 }
                 else
-                    CurrentXOffset += Glyph.LeftSideBearing;
-
-                CurrentXOffset += Glyph.Width;
-                Width = Math.Max(Width, CurrentXOffset + Math.Max(Glyph.RightSideBearing, 0));
-                CurrentXOffset += Glyph.RightSideBearing;
-                Height = Math.Max(Height, Glyph.Cropping.Height);
-#else
-                //TODO figure out why MonoGame's SpriteFont.cs uses Math.Max when adding the left/right bearings, then fix this logic accordingly
-                CurrentXOffset += Glyph.WidthIncludingBearings;
-                Width += Glyph.WidthIncludingBearings;
-                Height = Math.Max(Height, Glyph.Cropping.Height);
-#endif
+                {
+                    width += g.TotalWidth;
+                }
             }
 
-            return new Vector2(Width, FontHeight) * FontScale;
-#else
-            //  The problem with this logic is that it doesn't always result in the same total width when measuring a string versus measuring the sum of its substrings
-            //  EX: [Measure("HelloWorld").Width] isn't always equivalent to [Measure("Hello").Width + Measure("World").Width]
-            //  Which can cause a ton of issues in MGTextLine.ParseRuns(...)
-            return new Vector2(SF.MeasureString(Text).X, FontHeight) * FontScale;
-#endif
+            return new Vector2(width, resolved.LineHeight);
         }
 
         private readonly List<ElementMeasurement> RecentSelfMeasurements = new();
