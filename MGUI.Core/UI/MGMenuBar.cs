@@ -1,6 +1,8 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MGUI.Shared.Helpers;
+using MGUI.Shared.Input.Keyboard;
 using MGUI.Core.UI.Brushes.Border_Brushes;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Core.UI.Containers;
@@ -209,6 +211,8 @@ namespace MGUI.Core.UI
     /// Supports hierarchical menus (unlimited levels), separators, toggle items, radio groups, disabled items, and icon + text.</summary>
     public class MGMenuBar : MGSingleContentHost
     {
+        /// <inheritdoc/>
+        public override bool CanHandleKeyboardInput => IsMenuActive;
         #region Border
         /// <summary>Provides direct access to this element's border.</summary>
         public MGComponent<MGBorder> BorderComponent { get; }
@@ -331,6 +335,9 @@ namespace MGUI.Core.UI
             ActiveItem = Item;
             IsMenuActive = true;
             Item.OpenSubmenu();
+
+            // Claim keyboard focus so arrow/escape keys reach this handler
+            GetDesktop().QueuedFocusedKeyboardHandler = this;
         }
 
         /// <summary>Closes the dropdown of the current active item.</summary>
@@ -342,6 +349,10 @@ namespace MGUI.Core.UI
                 ActiveItem = null;
                 IsMenuActive = false;
                 Prev.CloseSubmenu();
+
+                // Release keyboard focus
+                if (GetDesktop().FocusedKeyboardHandler == this)
+                    GetDesktop().QueuedFocusedKeyboardHandler = null;
             }
         }
 
@@ -396,6 +407,33 @@ namespace MGUI.Core.UI
                 VerticalAlignment = VerticalAlignment.Top;
                 MinHeight = 22;
                 Padding = new Thickness(2, 1, 2, 1);
+
+                // Keyboard navigation: ← / → moves between top-level items, Escape closes the menu
+                KeyboardHandler.Pressed += (sender, e) =>
+                {
+                    if (!IsMenuActive)
+                        return;
+
+                    if (e.Key == Keys.Left)
+                    {
+                        int Idx = _Items.IndexOf(ActiveItem);
+                        if (Idx > 0)
+                            OpenItem(_Items[Idx - 1]);
+                        e.SetHandledBy(this, false);
+                    }
+                    else if (e.Key == Keys.Right)
+                    {
+                        int Idx = _Items.IndexOf(ActiveItem);
+                        if (Idx >= 0 && Idx < _Items.Count - 1)
+                            OpenItem(_Items[Idx + 1]);
+                        e.SetHandledBy(this, false);
+                    }
+                    else if (e.Key == Keys.Escape)
+                    {
+                        CloseActiveItem();
+                        e.SetHandledBy(this, false);
+                    }
+                };
 
                 _Items = new();
                 _Items.CollectionChanged += (sender, e) =>
