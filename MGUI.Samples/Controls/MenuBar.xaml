@@ -94,17 +94,7 @@
                 <TextBlock TextAlignment="Center">
                     This window demonstrates the [c=Turquoise][b]MGMenuBar[/b][/c] control.
                 </TextBlock>
-                <TextBlock>
-                    Features shown:[br]
-                    [c=Gold]• Hierarchical menus[/c] — "Format → Font → Font Size" has 3 levels.[br]
-                    [c=Gold]• Separators[/c] — horizontal lines between groups of items.[br]
-                    [c=Gold]• Toggle items[/c] — "View → Show Grid / Show Rulers" are checkable.[br]
-                    [c=Gold]• Radio groups[/c] — "View → Zoom" items are mutually exclusive.[br]
-                    [c=Gold]• Disabled items[/c] — "Edit → Undo (disabled)" is grayed out.[br]
-                    [c=Gold]• Icons[/c] — File and Edit menus show icons next to items.[br]
-                    [c=Gold]• ShortcutText[/c] — File and Edit items show keyboard shortcut hints.[br]
-                    [c=Gold]• Keyboard navigation[/c] — open a menu, then use ← / → to navigate items, Escape to close.
-                </TextBlock>
+                <TextBlock Text="Features shown:\n[c=Gold]• Hierarchical menus[/c] — &quot;Format → Font → Font Size&quot; has 3 levels.\n[c=Gold]• Separators[/c] — horizontal lines between groups of items.\n[c=Gold]• Toggle items[/c] — &quot;View → Show Grid / Show Rulers&quot; are checkable.\n[c=Gold]• Radio groups[/c] — &quot;View → Zoom&quot; items are mutually exclusive.\n[c=Gold]• Disabled items[/c] — &quot;Edit → Undo (disabled)&quot; is grayed out.\n[c=Gold]• Icons[/c] — File and Edit menus show icons next to items.\n[c=Gold]• ShortcutText[/c] — File and Edit items show keyboard shortcut hints.\n[c=Gold]• Keyboard navigation[/c] — open a menu, then use ← / → to navigate items, Escape to close." />
             </StackPanel>
         </ScrollViewer>
 
