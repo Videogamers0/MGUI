@@ -94,12 +94,6 @@ namespace MGUI.Core.UI
                 if (MenuBar.IsMenuActive && MenuBar.ActiveItem != this)
                     MenuBar.OpenItem(this);
             };
-
-            if (Submenu != null)
-            {
-                Submenu.ContextMenuOpened += (s, e) => ContentWrapper.SpoofIsHoveredWhileDrawingBackground = true;
-                Submenu.ContextMenuClosed += (s, e) => ContentWrapper.SpoofIsHoveredWhileDrawingBackground = false;
-            }
         }
 
         private MGElement _ItemContent;
@@ -135,14 +129,6 @@ namespace MGUI.Core.UI
                         _Submenu.ItemRadioSelected += Submenu_ItemRadioSelected;
                         _Submenu.ContextMenuOpened += Submenu_Opened;
                         _Submenu.ContextMenuClosed += Submenu_Closed;
-
-                        if (ContentWrapper != null)
-                        {
-                            _Submenu.ContextMenuOpened -= (s, e) => ContentWrapper.SpoofIsHoveredWhileDrawingBackground = true;
-                            _Submenu.ContextMenuClosed -= (s, e) => ContentWrapper.SpoofIsHoveredWhileDrawingBackground = false;
-                            _Submenu.ContextMenuOpened += (s, e) => ContentWrapper.SpoofIsHoveredWhileDrawingBackground = true;
-                            _Submenu.ContextMenuClosed += (s, e) => ContentWrapper.SpoofIsHoveredWhileDrawingBackground = false;
-                        }
                     }
 
                     NPC(nameof(Submenu));
