@@ -122,13 +122,31 @@ namespace MGUI.FontStashSharp
             return resolved;
         }
 
+        // ── Private helper ────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Returns the <see cref="FSSFontHandle"/> for <paramref name="font"/>.
+        /// If the <see cref="ResolvedFont"/> was created by a different engine (e.g. after
+        /// pressing F1 to toggle backends), the font is transparently re-resolved using its
+        /// <see cref="ResolvedFont.Spec"/> so the caller always gets a valid FSS handle.
+        /// </summary>
+        private FSSFontHandle? GetHandle(ResolvedFont font)
+        {
+            if (font.NativeFont is FSSFontHandle h)
+                return h;
+            // Stale handle from another engine — re-resolve via spec.
+            return ResolveFont(font.Spec).NativeFont as FSSFontHandle;
+        }
+
         /// <inheritdoc/>
         public Vector2 MeasureText(ResolvedFont font, string text)
         {
-            if (string.IsNullOrEmpty(text) || font.NativeFont is null)
+            if (string.IsNullOrEmpty(text))
                 return Vector2.Zero;
 
-            var h    = (FSSFontHandle)font.NativeFont;
+            var h = GetHandle(font);
+            if (h is null) return Vector2.Zero;
+
             var size = h.Font.MeasureString(text);
             // Use the consistent line height rather than the string's own Y
             return new Vector2(size.X, h.LineHeight);
@@ -137,10 +155,10 @@ namespace MGUI.FontStashSharp
         /// <inheritdoc/>
         public GlyphMetrics MeasureGlyph(ResolvedFont font, char c)
         {
-            if (font.NativeFont is null)
+            var h = GetHandle(font);
+            if (h is null)
                 return new GlyphMetrics(0, 0, 0, font.LineHeight);
 
-            var h    = (FSSFontHandle)font.NativeFont;
             // FSS doesn't expose per-glyph bearings via public API;
             // measure the single-char string and report the full width as GlyphWidth
             // (LeftSideBearing = RightSideBearing = 0, so TotalWidth == TotalWidthFirstGlyph).
@@ -167,10 +185,12 @@ namespace MGUI.FontStashSharp
             float depth       = 0f,
             SpriteEffects effects = SpriteEffects.None)
         {
-            if (string.IsNullOrEmpty(text) || font.NativeFont is null)
+            if (string.IsNullOrEmpty(text))
                 return;
 
-            var h = (FSSFontHandle)font.NativeFont;
+            var h = GetHandle(font);
+            if (h is null) return;
+
             h.Font.DrawText(spriteBatch, text, position, color,
                 rotation:   rotation,
                 origin:     origin,

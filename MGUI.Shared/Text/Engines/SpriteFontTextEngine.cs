@@ -120,13 +120,31 @@ namespace MGUI.Shared.Text.Engines
             return resolved;
         }
 
+        // ── Private helper ────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Returns the <see cref="SpriteFontHandle"/> for <paramref name="font"/>.
+        /// If the <see cref="ResolvedFont"/> was created by a different engine (e.g. after
+        /// toggling backends at runtime), the font is transparently re-resolved using its
+        /// <see cref="ResolvedFont.Spec"/> so the caller always gets a valid SpriteFont handle.
+        /// </summary>
+        private SpriteFontHandle GetHandle(ResolvedFont font)
+        {
+            if (font.NativeFont is SpriteFontHandle h)
+                return h;
+            // Stale handle from another engine — re-resolve via spec.
+            return ResolveFont(font.Spec).NativeFont as SpriteFontHandle;
+        }
+
         /// <inheritdoc/>
         public Vector2 MeasureText(ResolvedFont font, string text)
         {
             if (string.IsNullOrEmpty(text))
                 return Vector2.Zero;
 
-            var h = (SpriteFontHandle)font.NativeFont;
+            var h = GetHandle(font);
+            if (h is null) return Vector2.Zero;
+
             // Width: use SF.MeasureString for consistency with DrawTransaction.MeasureText
             float width = h.SF.MeasureString(text).X * h.Scale;
             return new Vector2(width, h.FontHeight * h.Scale);
@@ -135,7 +153,9 @@ namespace MGUI.Shared.Text.Engines
         /// <inheritdoc/>
         public GlyphMetrics MeasureGlyph(ResolvedFont font, char c)
         {
-            var h = (SpriteFontHandle)font.NativeFont;
+            var h = GetHandle(font);
+            if (h is null)
+                return new GlyphMetrics(0, 0, 0, font.LineHeight);
 
             if (!h.Glyphs.TryGetValue(c, out SpriteFont.Glyph glyph))
             {
@@ -174,10 +194,12 @@ namespace MGUI.Shared.Text.Engines
             float depth       = 0f,
             SpriteEffects effects = SpriteEffects.None)
         {
-            if (string.IsNullOrEmpty(text) || font.NativeFont == null)
+            if (string.IsNullOrEmpty(text))
                 return;
 
-            var h = (SpriteFontHandle)font.NativeFont;
+            var h = GetHandle(font);
+            if (h is null) return;
+
             spriteBatch.DrawString(h.SF, text, position, color, rotation, origin, scale, effects, depth);
         }
 
