@@ -16,6 +16,7 @@ namespace MGUI.Core.UI
     {
         Button,
         Toggle,
+        Radio,
         Separator
     }
 
@@ -82,6 +83,8 @@ namespace MGUI.Core.UI
         public bool IsButton => MenuItemType == ContextMenuItemType.Button;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsToggle => MenuItemType == ContextMenuItemType.Toggle;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public bool IsRadio => MenuItemType == ContextMenuItemType.Radio;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsSeparator => MenuItemType == ContextMenuItemType.Separator;
 
@@ -451,7 +454,6 @@ namespace MGUI.Core.UI
     {
         private MGComponent<MGSeparator> SeparatorComponent { get; }
         public MGSeparator SeparatorElement { get; }
-
         public int Height
         {
             get => SeparatorElement.Size;
@@ -477,6 +479,90 @@ namespace MGUI.Core.UI
 
             HorizontalContentAlignment = HorizontalAlignment.Stretch;
             VerticalContentAlignment = VerticalAlignment.Stretch;
+        }
+    }
+
+    /// <summary>Instantiated via <see cref="MGContextMenu.AddRadioButton(string, string, bool)"/></summary>
+    public class MGContextMenuRadio : MGWrappedContextMenuItem
+    {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _IsChecked;
+        public bool IsChecked
+        {
+            get => _IsChecked;
+            set
+            {
+                if (_IsChecked != value)
+                {
+                    _IsChecked = value;
+                    NPC(nameof(IsChecked));
+                    OnToggled?.Invoke(this, IsChecked);
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string _GroupName;
+        /// <summary>Identifies the radio group this item belongs to within the parent <see cref="MGContextMenu"/>.<para/>
+        /// Only one item per group can have <see cref="IsChecked"/> == true at a time.</summary>
+        public string GroupName
+        {
+            get => _GroupName;
+            set
+            {
+                if (_GroupName != value)
+                {
+                    string Previous = _GroupName;
+                    _GroupName = value;
+                    NPC(nameof(GroupName));
+                    Menu.OnRadioGroupNameChanged(this, Previous, _GroupName);
+                }
+            }
+        }
+
+        /// <summary>Invoked when <see cref="IsChecked"/> changes.</summary>
+        public event EventHandler<bool> OnToggled;
+
+        protected override void OnContentWrapperChanged()
+        {
+            ContentWrapper?.AddCommandHandler((Button, e) =>
+            {
+                if (!IsChecked)
+                    Menu.SetCheckedRadioItem(GroupName, this);
+            });
+        }
+
+        internal MGContextMenuRadio(MGContextMenu Menu, MGElement Header, string GroupName, bool IsChecked)
+            : base(Menu, ContextMenuItemType.Radio, Menu.ButtonWrapperTemplate(Menu), Header)
+        {
+            Menu.ButtonWrapperTemplateChanged += (sender, e) =>
+            {
+                ContentWrapper = Menu.ButtonWrapperTemplate(Menu);
+            };
+
+            HeaderPresenter.OnEndingDraw += (sender, e) =>
+            {
+                // Draw a radio bullet circle in the header area
+                Rectangle Bounds = HeaderPresenter.LayoutBounds;
+                int Diameter = Math.Min(Bounds.Width, Bounds.Height) - 4;
+                if (Diameter > 0)
+                {
+                    Point Center = Bounds.Center + e.DA.Offset;
+                    float R = Diameter / 2f;
+                    // Outer ring
+                    e.DA.DT.StrokeCircle(Center.ToVector2(), Color.White * 0.7f * e.DA.Opacity, R, 1f, 16);
+                    // Filled inner dot when checked
+                    if (this.IsChecked)
+                    {
+                        float InnerR = Math.Max(1f, R - 3f);
+                        e.DA.DT.FillCircle(Center.ToVector2(), Color.White * e.DA.Opacity, InnerR, 16);
+                    }
+                }
+            };
+
+            _GroupName = GroupName;
+            Menu.RegisterRadioItem(this);
+            this.IsChecked = IsChecked;
         }
     }
 }
