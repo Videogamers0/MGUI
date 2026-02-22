@@ -50,8 +50,9 @@ namespace MGUI.Shared.Text
         /// </summary>
         internal object NativeFont { get; }
 
-        /// <param name="nativeFont">Backend-specific object (e.g. <c>SpriteFont</c> or <c>SpriteFontBase</c>).</param>
-        internal ResolvedFont(
+        /// <param name="nativeFont">Backend-specific object (e.g. <c>SpriteFont</c> or <c>SpriteFontBase</c>).
+        /// Pass <c>null</c> when no native font is applicable (e.g. in headless test engines).</param>
+        public ResolvedFont(
             FontSpec spec,
             int actualSize,
             float exactScale,
