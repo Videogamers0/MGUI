@@ -93,9 +93,13 @@ namespace MGUI.Samples
 
                             //  Note: large font sizes may require a lot of memory for the spritefont file.
                             //      Even just this example of 5 sizes and 3 variants per size (15 SpriteFonts) uses over 50MB of memory!
-                            //  Also note that SpriteFontPlus uses px heights when generating the sprite font which isn't the same as font pts.
-                            //  So for example, using an MGTextBlock with FontSize=12 will be smaller text than 12pt font that you're probably used to
+                            //  SpriteFontPlus uses px heights. At 96 DPI, 1pt ≈ 1.333px.
+                            //  We bake at ~pt×4/3 but register with the logical pt size so that
+                            //  MGTextBlocks requesting FontSize=12 (pt) get a visually matching font.
+                            //  Logical pt size → actual bake px size:
+                            //    12 → 16,  14 → 19,  16 → 21,  20 → 27,  24 → 32
                             ReadOnlyCollection<int> DesiredSizes = new List<int>() { 12, 14, 16, 20, 24 }.AsReadOnly();
+                            Dictionary<int, int> PtToPx = new() { { 12, 16 }, { 14, 19 }, { 16, 21 }, { 20, 27 }, { 24, 32 } };
                             ReadOnlyCollection<CustomFontStyles> DesiredStyles = new List<CustomFontStyles>() {
                                 CustomFontStyles.Normal, CustomFontStyles.Bold, CustomFontStyles.Italic
                             }.AsReadOnly();
@@ -104,8 +108,9 @@ namespace MGUI.Samples
                             {
                                 foreach (CustomFontStyles FontStyle in DesiredStyles)
                                 {
+                                    int bakeSize = PtToPx.TryGetValue(FontSize, out int px) ? px : FontSize;
                                     FontMetadata Metadata = new FontMetadata(FontSize, FontStyle.HasFlag(CustomFontStyles.Bold), FontStyle.HasFlag(CustomFontStyles.Italic));
-                                    SpriteFont SF = TtfFontBaker.Bake(FileStreamsLookup[FontStyle], FontSize, FontBitmapWidth, FontBitmapHeight, FontCharacterRanges).CreateSpriteFont(GraphicsDevice);
+                                    SpriteFont SF = TtfFontBaker.Bake(FileStreamsLookup[FontStyle], bakeSize, FontBitmapWidth, FontBitmapHeight, FontCharacterRanges).CreateSpriteFont(GraphicsDevice);
                                     SpriteFonts.Add(SF, Metadata);
                                 }
                             }
