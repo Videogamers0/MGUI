@@ -56,12 +56,19 @@ namespace MGUI.FontStashSharp
         private readonly Dictionary<FontSpec, ResolvedFont> _cache = new();
 
         /// <summary>
-        /// Conversion factor from MGUI logical font size (pt, as used by the Content Pipeline)
-        /// to FSS pixel size.  At 96 DPI, 1pt = 4/3 px.
-        /// Override to 1f if your FSS FontSystems were built with px sizes already.
-        /// Default: <c>4f / 3f</c> (~1.333).
+        /// Scale factor applied to MGUI's logical <c>FontSize</c> before passing it to
+        /// <see cref="FontSystem.GetFont"/>.
+        /// <para/>
+        /// MonoGame's built-in SpriteFont renderer reports a <c>LineSpacing</c> that is
+        /// typically ~1.5× the nominal font size, whereas FontStashSharp's
+        /// <c>SpriteFontBase.LineHeight</c> is ~1.0× the pixel size passed to
+        /// <c>GetFont()</c>.  Multiplying by <c>1.5f</c> makes both engines produce
+        /// visually equivalent text metrics under MGUI's default layout.
+        /// <para/>
+        /// Set to <c>1f</c> if your <see cref="FontSystem"/> instances were built with sizes
+        /// already expressed in the same unit as <c>FontSize</c>.
         /// </summary>
-        public float PointsToPixels { get; set; } = 4f / 3f;
+        public float FontSizeScale { get; set; } = 1.5f;
 
         // ── Registration ─────────────────────────────────────────────────────────
 
@@ -112,7 +119,7 @@ namespace MGUI.FontStashSharp
                 return placeholder;
             }
 
-            SpriteFontBase spriteFontBase = fs.GetFont((int)Math.Round(spec.Size * PointsToPixels));
+            SpriteFontBase spriteFontBase = fs.GetFont((int)Math.Round(spec.Size * FontSizeScale));
             var handle = new FSSFontHandle(spriteFontBase);
 
             var resolved = new ResolvedFont(
