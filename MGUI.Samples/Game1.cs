@@ -1,9 +1,12 @@
-﻿using MGUI.Core.UI;
+﻿using FontStashSharp;
+using MGUI.Core.UI;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
+using MGUI.FontStashSharp;
 using MGUI.Shared.Helpers;
 using MGUI.Shared.Input.Keyboard;
 using MGUI.Shared.Rendering;
 using MGUI.Shared.Text;
+using MGUI.Shared.Text.Engines;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -25,6 +28,10 @@ namespace MGUI.Samples
 
         private MainRenderer MGUIRenderer { get; set; }
         private MGDesktop Desktop { get; set; }
+
+        /// <summary>Optional FontStashSharp backend. Press F1 to toggle between engines.</summary>
+        private FontStashSharpTextEngine _fssEngine;
+        private KeyboardState _prevKeyboardState;
 
         //  IObservableUpdate implementation
         public event EventHandler<TimeSpan> PreviewUpdate;
@@ -106,6 +113,27 @@ namespace MGUI.Samples
                             Desktop.FontManager.AddFontSet(new FontSet("Century Gothic", SpriteFonts));
 
                             //  Now that the Century Gothic font set has been added to the FontManager, we can use MGTextBlocks with FontFamily="Century Gothic"
+
+                            // ── FontStashSharp engine (F1 to toggle) ──────────────────────────────────
+                            //  Reopen the streams; the previous reads consumed them.
+                            try
+                            {
+                                _fssEngine = new FontStashSharpTextEngine();
+                                foreach (CustomFontStyles style in DesiredStyles)
+                                {
+                                    string ttfPath = style switch
+                                    {
+                                        CustomFontStyles.Bold   => Path.Combine(FontsDirectory, "gothicb.ttf"),
+                                        CustomFontStyles.Italic => Path.Combine(FontsDirectory, "gothici.ttf"),
+                                        _                       => Path.Combine(FontsDirectory, "gothic.ttf")
+                                    };
+                                    var fontSystem = new FontSystem();
+                                    fontSystem.AddFont(File.ReadAllBytes(ttfPath));
+                                    _fssEngine.AddFontSystem("Century Gothic", style, fontSystem);
+                                }
+                            }
+                            catch (Exception fssEx) { Debug.WriteLine($"FSS engine init failed: {fssEx.Message}"); _fssEngine = null; }
+                            // ─────────────────────────────────────────────────────────────────────────
                         }
                     }
                 }
@@ -127,6 +155,18 @@ namespace MGUI.Samples
         protected override void Update(GameTime gameTime)
         {
             PreviewUpdate?.Invoke(this, gameTime.TotalGameTime);
+
+            // F1 toggles between SpriteFontTextEngine and FontStashSharpTextEngine
+            KeyboardState ks = Keyboard.GetState();
+            if (_fssEngine != null &&
+                ks.IsKeyDown(Keys.F1) && !_prevKeyboardState.IsKeyDown(Keys.F1))
+            {
+                Desktop.TextEngine = Desktop.TextEngine is SpriteFontTextEngine
+                    ? (ITextEngine)_fssEngine
+                    : new SpriteFontTextEngine(Desktop.FontManager);
+                Debug.WriteLine($"[TextEngine] switched to {Desktop.TextEngine.GetType().Name}");
+            }
+            _prevKeyboardState = ks;
 
             Desktop.Update();
             // TODO: Add your update logic here
