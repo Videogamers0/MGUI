@@ -172,6 +172,7 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.ContextMenuItem;
 
+        public string CommandId { get; set; }
         public bool? IsChecked { get; set; }
         public string ShortcutText { get; set; }
 
@@ -190,6 +191,8 @@ namespace MGUI.Core.UI.XAML
         {
             MGContextMenuToggle ContextMenuToggle = Element as MGContextMenuToggle;
 
+            if (CommandId != null)
+                ContextMenuToggle.CommandId = CommandId;
             if (IsChecked.HasValue)
                 ContextMenuToggle.IsChecked = IsChecked.Value;
             if (ShortcutText != null)
