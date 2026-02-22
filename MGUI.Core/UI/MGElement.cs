@@ -1758,21 +1758,6 @@ namespace MGUI.Core.UI
             RecentMeasurementsFull.Clear();
         }
 
-        /// <summary>Recursively invalidates the layout of this element and all its visual-tree descendants,
-        /// including <see cref="Components"/>.<para/>
-        /// Use this instead of <see cref="InvalidateLayout"/> when the entire subtree's cached measurements
-        /// may be stale — for example when a popup window closes and will be re-opened later.<para/>
-        /// Note: <see cref="InvalidateLayout"/> and <see cref="LayoutChanged"/> only propagate <b>upward</b>
-        /// toward parents. This method fills the gap for downward propagation.</summary>
-        internal protected void InvalidateLayoutTree()
-        {
-            InvalidateLayout();
-            foreach (MGElement Child in GetVisualTreeChildren(true, true))
-                Child.InvalidateLayoutTree();
-            foreach (MGComponentBase Component in Components)
-                Component.BaseElement.InvalidateLayoutTree();
-        }
-
         /// <summary>Invoked when a property that affects this <see cref="MGElement"/>'s layout has changed, such as <see cref="Padding"/>, <see cref="Margin"/>, or its content.</summary>
         protected virtual void LayoutChanged(MGElement Source, bool NotifyParent)
         {

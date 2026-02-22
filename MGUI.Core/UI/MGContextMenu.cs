@@ -121,14 +121,6 @@ namespace MGUI.Core.UI
         internal void InvokeContextMenuClosing() => ContextMenuClosing?.Invoke(this, EventArgs.Empty);
         internal void InvokeContextMenuClosed()
         {
-            // Invalidate the entire layout subtree so the next open starts with fresh
-            // measurement caches. Two conditions make this necessary:
-            //   1. Closing the menu does not set IsLayoutValid = false by default.
-            //   2. InvalidateLayout() / LayoutChanged() do not propagate downward into children.
-            // Without this, TryGetCachedMeasurement() in UpdateLayout can return stale values
-            // from the previous open cycle — e.g. items overlapping the vertical scrollbar when
-            // ScrollBarVisibility.Auto is used (see root-cause analysis in TODO-ContextMenu-Improvements.md).
-            InvalidateLayoutTree();
             NPC(nameof(IsContextMenuOpen));
             ContextMenuClosed?.Invoke(this, EventArgs.Empty);
         }
@@ -633,12 +625,6 @@ namespace MGUI.Core.UI
                         }
                     }
                 };
-
-                // Note: the original SV.InvalidateLayout() workaround that lived here (and then in
-                // InvokeContextMenuOpening) has been superseded by InvalidateLayoutTree() called in
-                // InvokeContextMenuClosed(). Invalidating the whole subtree on close is the proper fix:
-                // it ensures every descendant's measurement cache is cleared between open/close cycles,
-                // preventing stale values from the previous cycle causing items to overlap the scrollbar.
 
                 ButtonWrapperTemplate = CreateDefaultDropdownButton;
 
