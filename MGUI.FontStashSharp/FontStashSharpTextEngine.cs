@@ -55,6 +55,14 @@ namespace MGUI.FontStashSharp
         /// <summary>Cache: FontSpec → ResolvedFont (+ embedded FSSFontHandle as NativeFont).</summary>
         private readonly Dictionary<FontSpec, ResolvedFont> _cache = new();
 
+        /// <summary>
+        /// Conversion factor from MGUI logical font size (pt, as used by the Content Pipeline)
+        /// to FSS pixel size.  At 96 DPI, 1pt = 4/3 px.
+        /// Override to 1f if your FSS FontSystems were built with px sizes already.
+        /// Default: <c>4f / 3f</c> (~1.333).
+        /// </summary>
+        public float PointsToPixels { get; set; } = 4f / 3f;
+
         // ── Registration ─────────────────────────────────────────────────────────
 
         /// <summary>
@@ -104,7 +112,7 @@ namespace MGUI.FontStashSharp
                 return placeholder;
             }
 
-            SpriteFontBase spriteFontBase = fs.GetFont(spec.Size);
+            SpriteFontBase spriteFontBase = fs.GetFont((int)Math.Round(spec.Size * PointsToPixels));
             var handle = new FSSFontHandle(spriteFontBase);
 
             var resolved = new ResolvedFont(
