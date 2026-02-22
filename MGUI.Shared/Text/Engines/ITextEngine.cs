@@ -55,7 +55,10 @@ namespace MGUI.Shared.Text.Engines
         /// <para/>
         /// <paramref name="origin"/> is the glyph origin offset (e.g. from
         /// <see cref="ResolvedFont.DrawOrigin"/>); pass <see cref="Vector2.Zero"/> to draw from
-        /// the top-left corner.
+        /// the top-left corner.<para/>
+        /// <paramref name="scale"/> controls the rendering scale — use
+        /// <see cref="ResolvedFont.SuggestedScale"/> for sharp rendering or
+        /// <see cref="ResolvedFont.ExactScale"/> for pixel-exact sizing.
         /// </summary>
         void DrawText(
             SpriteBatch spriteBatch,
@@ -64,6 +67,7 @@ namespace MGUI.Shared.Text.Engines
             Vector2 position,
             Color color,
             Vector2 origin,
+            float scale,
             float rotation  = 0f,
             float depth     = 0f,
             SpriteEffects effects = SpriteEffects.None);

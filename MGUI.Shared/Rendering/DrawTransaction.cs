@@ -1,5 +1,6 @@
 ﻿using MGUI.Shared.Helpers;
 using MGUI.Shared.Text;
+using MGUI.Shared.Text.Engines;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -29,6 +30,8 @@ namespace MGUI.Shared.Rendering
     {
         public MainRenderer Renderer { get; }
         public FontManager FontManager => Renderer.FontManager;
+        /// <summary>Delegates to <see cref="MainRenderer.TextEngine"/>.</summary>
+        public ITextEngine TextEngine => Renderer.TextEngine;
         public GraphicsDevice GD => Renderer.GD;
         public SpriteBatch SB => Renderer.SB;
         private PrimitiveBatch PB => Renderer.PB;
@@ -192,16 +195,20 @@ namespace MGUI.Shared.Rendering
 
         public Vector2 MeasureText(string Family, CustomFontStyles Style, string Text, int DesiredFontSize, bool Exact = false)
         {
-            if (FontManager.TryGetFont(Family, Style, DesiredFontSize, true, out FontSet FS, out SpriteFont SF, out int Size, out float ExactScale, out float SuggestedScale))
-            {
-                float Scale = Exact ? ExactScale : SuggestedScale;
-                Vector2 TextSize = new Vector2(SF.MeasureString(Text).X, FS.Heights[Size]) * Scale;
-                return TextSize;
-            }
-            else
-            {
+            if (string.IsNullOrEmpty(Text))
                 return Vector2.Zero;
-            }
+
+            var resolved = TextEngine.ResolveFont(new FontSpec(Family, DesiredFontSize, Style));
+            if (resolved.NativeFont == null && resolved.IsFallback)
+                return Vector2.Zero;
+
+            Vector2 suggested = TextEngine.MeasureText(resolved, Text);
+            if (!Exact || resolved.SuggestedScale == resolved.ExactScale)
+                return suggested;
+
+            // Adjust from SuggestedScale to ExactScale proportionally
+            float ratio = resolved.ExactScale / resolved.SuggestedScale;
+            return suggested * ratio;
         }
 
         /// <summary>Renders the given <paramref name="Text"/> using <see cref="CustomFontStyles.Normal"/> style.</summary>
@@ -218,25 +225,25 @@ namespace MGUI.Shared.Rendering
         /// If false, treats <paramref name="DesiredFontSize"/> as an approximation, and may render the text slightly larger or smaller to avoid blurriness</param>
         public Vector2 DrawText(string Family, CustomFontStyles Style, string Text, Vector2 Position, Color Color, int DesiredFontSize, bool Exact = false)
         {
-            if (FontManager.TryGetFont(Family, Style, DesiredFontSize, true, out FontSet FS, out SpriteFont SF, out int Size, out float ExactScale, out float SuggestedScale))
-            {
-                BeginDraw(DrawContext.Sprites);
-                float Scale = Exact ? ExactScale : SuggestedScale;
-
-                Vector2 Origin = FS.Origins[Size];
-                int TextHeight = FS.Heights[Size];
-                Vector2 TextSize = new Vector2(SF.MeasureString(Text).X, FS.Heights[Size]) * Scale;
-                SB.DrawString(SF, Text, Position, Color, 0f, Origin, Scale, SpriteEffects.None, 0);
-                return TextSize;
-            }
-            else
+            var resolved = TextEngine.ResolveFont(new FontSpec(Family, DesiredFontSize, Style));
+            if (resolved.NativeFont == null)
             {
 #if DEBUG
-                throw new KeyNotFoundException($"No font found for {nameof(Family)}={Family} and {nameof(Style)}={Style}");
+                throw new KeyNotFoundException($"No font found for Family={Family} and Style={Style}");
 #else
                 return Vector2.Zero;
 #endif
             }
+
+            BeginDraw(DrawContext.Sprites);
+            float scale = Exact ? resolved.ExactScale : resolved.SuggestedScale;
+            TextEngine.DrawText(SB, resolved, Text, Position, Color, resolved.DrawOrigin, scale);
+
+            // Return the visual size
+            Vector2 suggested = TextEngine.MeasureText(resolved, Text);
+            if (!Exact || resolved.SuggestedScale == resolved.ExactScale)
+                return suggested;
+            return suggested * (resolved.ExactScale / resolved.SuggestedScale);
         }
         #endregion Draw Text
 

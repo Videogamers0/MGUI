@@ -169,6 +169,7 @@ namespace MGUI.Shared.Text.Engines
             Vector2 position,
             Color color,
             Vector2 origin,
+            float scale,
             float rotation    = 0f,
             float depth       = 0f,
             SpriteEffects effects = SpriteEffects.None)
@@ -177,7 +178,6 @@ namespace MGUI.Shared.Text.Engines
                 return;
 
             var h = (SpriteFontHandle)font.NativeFont;
-            float scale = h.Scale;
             spriteBatch.DrawString(h.SF, text, position, color, rotation, origin, scale, effects, depth);
         }
 

@@ -66,7 +66,7 @@ namespace MGUI.Tests.Text.Engines
 
         public void DrawText(SpriteBatch spriteBatch, ResolvedFont font, string text,
             Vector2 position, Color color, Vector2 origin,
-            float rotation = 0f, float depth = 0f, SpriteEffects effects = SpriteEffects.None)
+            float scale, float rotation = 0f, float depth = 0f, SpriteEffects effects = SpriteEffects.None)
         {
             // No-op in tests — no GPU available.
         }
