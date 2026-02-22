@@ -51,8 +51,8 @@ namespace MGUI.Core.UI
         ToolTip,
         ContextMenu,
         ContextMenuItem,
-        //MenuBar?
-        //MenuItem?
+        MenuBar,
+        MenuBarItem,
 
         //  Data Display
         ListView,
