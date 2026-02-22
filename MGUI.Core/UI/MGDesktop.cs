@@ -183,7 +183,8 @@ namespace MGUI.Core.UI
                         return false;
                 }
 
-                Menu.InvokeContextMenuOpening();
+                if (!Menu.InvokeContextMenuOpening())
+                    return false;
 
                 _ActiveContextMenu = Menu;
 
