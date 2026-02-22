@@ -116,8 +116,6 @@ namespace MGUI.Samples
             Compendium Compendium = new(Content, Desktop);
             Compendium.Show();
 
-            MGUI.Samples.Dialogs.Debugging.ContextMenuScrollbarRepro.AddToDesktop(Desktop);
-
             base.Initialize();
         }
 
