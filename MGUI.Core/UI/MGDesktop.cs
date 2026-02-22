@@ -27,6 +27,13 @@ namespace MGUI.Core.UI
         public MainRenderer Renderer { get; }
         public InputTracker InputTracker => Renderer.Input;
         public FontManager FontManager => Renderer.FontManager;
+        /// <summary>The active <see cref="MGUI.Shared.Text.Engines.ITextEngine"/> used for all
+        /// text measurement and rendering.  Assign a different engine to switch backends globally.</summary>
+        public MGUI.Shared.Text.Engines.ITextEngine TextEngine
+        {
+            get => Renderer.TextEngine;
+            set => Renderer.TextEngine = value;
+        }
 
         /// <summary>A <see cref="MouseHandler"/> that is updated at the start of <see cref="Update()"/>, before any <see cref="MGWindow"/>s in <see cref="Windows"/> are updated.<br/>
         /// Objects that subscribe to this handler's mouse events will be the very first to receive and handle the event.<para/>
