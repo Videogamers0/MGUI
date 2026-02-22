@@ -51,7 +51,7 @@ namespace MGUI.Core.UI
 
         // ── ITextEngine-backed resolved fonts (one per style variant) ─────────────
         /// <summary>Shortcut to the active <see cref="ITextEngine"/> from the parent Desktop.</summary>
-        private ITextEngine TextEngine => GetDesktop().TextEngine;
+        private ITextEngine TextEngine => GetTextEngine();
 
         internal ResolvedFont RF_Regular    { get; private set; }
         internal ResolvedFont RF_Bold       { get; private set; }

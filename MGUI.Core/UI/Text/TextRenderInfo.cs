@@ -58,7 +58,7 @@ namespace MGUI.Core.UI.Text
             float LinePadding = TextBlockElement.LinePadding;
 
             // Resolve font via ITextEngine (no direct SpriteFont dependency)
-            ITextEngine engine   = TextBlockElement.GetDesktop().TextEngine;
+            ITextEngine engine   = TextBlockElement.GetTextEngine();
             ResolvedFont resolved = TextBlockElement.GetResolvedFont(TextBlockElement.IsBold, TextBlockElement.IsItalic);
 
             float CurrentY = LayoutBounds.Top + Padding.Top;

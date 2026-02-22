@@ -1,4 +1,5 @@
 ﻿using MGUI.Shared.Helpers;
+using MGUI.Shared.Text.Engines;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -163,6 +164,30 @@ namespace MGUI.Core.UI
         public MGTheme GetTheme() => SelfOrParentWindow.Theme ?? GetDesktop().Theme;
         public MGResources GetResources() => GetDesktop().Resources;
         public bool TryGetElementByName(string Name, out MGElement NamedElement) => SelfOrParentWindow.TryGetElementByName(Name, out NamedElement);
+
+        /// <summary>
+        /// Optional per-element <see cref="ITextEngine"/> override.
+        /// When set, this element (and any children that call <see cref="GetTextEngine"/>) will use this engine
+        /// instead of the desktop-level one.
+        /// </summary>
+        public ITextEngine TextEngineOverride { get; set; }
+
+        /// <summary>
+        /// Returns the <see cref="ITextEngine"/> to use for this element.
+        /// Walks up the visual tree: first non-null <see cref="TextEngineOverride"/> wins;
+        /// if none found, falls back to <see cref="MGDesktop.TextEngine"/>.
+        /// </summary>
+        public ITextEngine GetTextEngine()
+        {
+            MGElement current = this;
+            while (current != null)
+            {
+                if (current.TextEngineOverride != null)
+                    return current.TextEngineOverride;
+                current = current.Parent;
+            }
+            return GetDesktop().TextEngine;
+        }
 
 		/// <summary>The <see cref="MGWindow"/> that this <see cref="MGElement"/> belongs to. This value is only null if this <see cref="MGElement"/> is an <see cref="MGWindow"/> with no parent.</summary>
 		public MGWindow ParentWindow { get; }
