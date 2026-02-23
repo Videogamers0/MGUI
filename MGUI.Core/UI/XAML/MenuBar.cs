@@ -139,7 +139,10 @@ namespace MGUI.Core.UI.XAML
                 }
             }
 
-            //base.ApplyDerivedSettings(Parent, Element, IncludeContent);
+            // base.ApplyDerivedSettings is intentionally NOT called here.
+            // SingleContentHost.ApplyDerivedSettings would call SetContent() on the runtime element,
+            // but Content is already consumed in CreateElementInstance (passed to MenuBar.AddItem).
+            // The runtime element has CanChangeContent = false, so a second SetContent call would throw.
         }
 
         protected internal override IEnumerable<Element> GetChildren()

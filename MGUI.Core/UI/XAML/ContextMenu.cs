@@ -121,7 +121,10 @@ namespace MGUI.Core.UI.XAML
             if (Submenu != null)
                 ContextMenuItem.Submenu = Submenu.ToElement<MGContextMenu>(ContextMenuItem.SelfOrParentWindow, ContextMenuItem);
 
-            //base.ApplyDerivedSettings(Parent, Element, IncludeContent);
+            // base.ApplyDerivedSettings is intentionally NOT called here.
+            // SingleContentHost.ApplyDerivedSettings would call SetContent() on the runtime element,
+            // but Content is already consumed in CreateElementInstance (e.g. passed to ContextMenu.AddButton).
+            // The runtime element has CanChangeContent = false, so a second SetContent call would throw.
         }
     }
 
