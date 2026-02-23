@@ -197,7 +197,7 @@ namespace MGUI.Core.UI
                         if (Previous != null)
                             Container.TryRemoveChild(Previous);
                         if (MenuItemContent != null)
-                            Container.TryAddChild(MenuItemContent);
+                            Container.TryAddChild(MenuItemContent, Dock.Left);
                     }
 
                     NPC(nameof(MenuItemContent));
@@ -205,7 +205,7 @@ namespace MGUI.Core.UI
             }
         }
 
-        protected MGStackPanel Container { get; }
+        protected MGDockPanel Container { get; }
 
         /// <summary>The width of the dropdown arrow that appears on the right-edge of a <see cref="MGContextMenuItem"/> that has a nested <see cref="Submenu"/></summary>
         public const int SubmenuArrowWidth = 5;
@@ -290,8 +290,7 @@ namespace MGUI.Core.UI
         protected MGWrappedContextMenuItem(MGContextMenu Menu, ContextMenuItemType ItemType, MGButton ContentWrapper, MGElement MenuItemContent)
             : base(Menu, ItemType)
         {
-            Container = new(Menu, Orientation.Horizontal);
-            Container.Spacing = 5;
+            Container = new(Menu);
             Container.ManagedParent = this;
             Container.CanChangeContent = false;
 
@@ -300,7 +299,7 @@ namespace MGUI.Core.UI
             HeaderPresenter.CanChangeContent = false;
             HeaderPresenter.PreferredWidth = Menu.HeaderSize.Width;
             HeaderPresenter.PreferredHeight = Menu.HeaderSize.Height;
-            HeaderPresenter.Margin = new(0);
+            HeaderPresenter.Margin = new(0, 0, 5, 0);
             HeaderPresenter.BackgroundBrush = new(null);
             HeaderPresenter.ManagedParent = this;
             InvokeContentAdded(HeaderPresenter);
@@ -313,22 +312,23 @@ namespace MGUI.Core.UI
 
             using (Container.AllowChangingContentTemporarily())
             {
-                Container.TryAddChild(HeaderPresenter);
+                Container.TryAddChild(HeaderPresenter, Dock.Left);
             }
-
-            this.MenuItemContent = MenuItemContent;
-            this.ContentWrapper = ContentWrapper;
 
             // Shortcut text label — starts collapsed; visible once ShortcutText is assigned
             _ShortcutTextBlock = new MGTextBlock(Menu, "", Color.LightGray, Menu.GetTheme().FontSettings.ContextMenuFontSize);
             _ShortcutTextBlock.Margin = new Thickness(18, 0, 0, 0);
             _ShortcutTextBlock.VerticalAlignment = VerticalAlignment.Center;
+            _ShortcutTextBlock.HorizontalAlignment = HorizontalAlignment.Right;
             _ShortcutTextBlock.Visibility = Visibility.Collapsed;
             _ShortcutTextBlock.ManagedParent = this;
             using (Container.AllowChangingContentTemporarily())
             {
-                Container.TryAddChild(_ShortcutTextBlock);
+                Container.TryAddChild(_ShortcutTextBlock, Dock.Right);
             }
+
+            this.MenuItemContent = MenuItemContent;
+            this.ContentWrapper = ContentWrapper;
 
             SubmenuArrowElement = new(Menu, SubmenuArrowWidth, SubmenuArrowHeight, Color.Transparent, 0, Color.Transparent);
             SubmenuArrowElement.Margin = new(0, 5, DefaultSubmenuArrowRightMargin, 5);

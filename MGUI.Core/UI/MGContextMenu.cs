@@ -212,7 +212,7 @@ namespace MGUI.Core.UI
             Button.Padding = new(5, 3, 20, 3);
             Button.Margin = new(0);
 
-            Button.HorizontalContentAlignment = HorizontalAlignment.Left;
+            Button.HorizontalContentAlignment = HorizontalAlignment.Stretch;
             Button.VerticalContentAlignment = VerticalAlignment.Center;
             Button.HorizontalAlignment = HorizontalAlignment.Stretch;
             Button.VerticalAlignment = VerticalAlignment.Stretch;
