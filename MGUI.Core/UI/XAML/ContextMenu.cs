@@ -121,7 +121,10 @@ namespace MGUI.Core.UI.XAML
             if (Submenu != null)
                 ContextMenuItem.Submenu = Submenu.ToElement<MGContextMenu>(ContextMenuItem.SelfOrParentWindow, ContextMenuItem);
 
-            //base.ApplyDerivedSettings(Parent, Element, IncludeContent);
+            // base.ApplyDerivedSettings is intentionally NOT called here.
+            // SingleContentHost.ApplyDerivedSettings would call SetContent() on the runtime element,
+            // but Content is already consumed in CreateElementInstance (e.g. passed to ContextMenu.AddButton).
+            // The runtime element has CanChangeContent = false, so a second SetContent call would throw.
         }
     }
 
@@ -131,6 +134,7 @@ namespace MGUI.Core.UI.XAML
 
         public string CommandId { get; set; }
         public Image Icon { get; set; }
+        public string ShortcutText { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
@@ -151,6 +155,8 @@ namespace MGUI.Core.UI.XAML
                 ContextMenuButton.CommandId = CommandId;
             if (Icon != null)
                 ContextMenuButton.Icon = Icon.ToElement<MGImage>(ContextMenuButton.SelfOrParentWindow, ContextMenuButton);
+            if (ShortcutText != null)
+                ContextMenuButton.ShortcutText = ShortcutText;
 
             base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
@@ -169,7 +175,9 @@ namespace MGUI.Core.UI.XAML
     {
         public override MGElementType ElementType => MGElementType.ContextMenuItem;
 
+        public string CommandId { get; set; }
         public bool? IsChecked { get; set; }
+        public string ShortcutText { get; set; }
 
         protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
         {
@@ -186,8 +194,12 @@ namespace MGUI.Core.UI.XAML
         {
             MGContextMenuToggle ContextMenuToggle = Element as MGContextMenuToggle;
 
+            if (CommandId != null)
+                ContextMenuToggle.CommandId = CommandId;
             if (IsChecked.HasValue)
                 ContextMenuToggle.IsChecked = IsChecked.Value;
+            if (ShortcutText != null)
+                ContextMenuToggle.ShortcutText = ShortcutText;
 
             base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
@@ -222,6 +234,49 @@ namespace MGUI.Core.UI.XAML
                 yield return Element;
 
             yield return Separator;
+        }
+    }
+
+    /// <summary>XAML class for <see cref="MGContextMenuRadio"/>.<para/>
+    /// Items sharing the same <see cref="GroupName"/> are mutually exclusive within the same <see cref="ContextMenu"/>.</summary>
+    public class ContextMenuRadio : WrappedContextMenuItem
+    {
+        public override MGElementType ElementType => MGElementType.ContextMenuItem;
+
+        [Category("Data")]
+        public string GroupName { get; set; }
+        [Category("Data")]
+        public bool? IsChecked { get; set; }
+        [Category("Data")]
+        public string CommandId { get; set; }
+        [Category("Data")]
+        public string ShortcutText { get; set; }
+
+        protected override MGElement CreateElementInstance(MGWindow Window, MGElement Parent)
+        {
+            if (Parent is MGContextMenu ContextMenu)
+            {
+                MGElement ContentElement = Content?.ToElement<MGElement>(Window, null) ?? new MGTextBlock(Window, "");
+                return ContextMenu.AddRadioButton(ContentElement, GroupName ?? "default", IsChecked ?? false);
+            }
+            else
+                throw new InvalidOperationException($"The parent of a {nameof(ContextMenuRadio)} must be a {nameof(MGContextMenu)}.");
+        }
+
+        protected internal override void ApplyDerivedSettings(MGElement Parent, MGElement Element, bool IncludeContent)
+        {
+            MGContextMenuRadio Radio = Element as MGContextMenuRadio;
+
+            if (CommandId != null)
+                Radio.CommandId = CommandId;
+            if (GroupName != null)
+                Radio.GroupName = GroupName;
+            if (IsChecked.HasValue)
+                Radio.IsChecked = IsChecked.Value;
+            if (ShortcutText != null)
+                Radio.ShortcutText = ShortcutText;
+
+            base.ApplyDerivedSettings(Parent, Element, IncludeContent);
         }
     }
 }

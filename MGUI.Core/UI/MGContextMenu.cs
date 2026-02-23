@@ -305,7 +305,69 @@ namespace MGUI.Core.UI
         /// };
         /// </code></summary>
         public Action<MGContextMenu> ItemsFactory { get; set; }
-        #endregion
+
+        /// <summary>Adds a radio button item to this <see cref="MGContextMenu"/>.<para/>
+        /// Items sharing the same <paramref name="GroupName"/> are mutually exclusive.</summary>
+        public MGContextMenuRadio AddRadioButton(string Text, string GroupName, bool IsChecked = false)
+            => AddRadioButton(new MGTextBlock(this, Text, null, GetTheme().FontSettings.ContextMenuFontSize), GroupName, IsChecked);
+
+        /// <summary>Adds a radio button item to this <see cref="MGContextMenu"/>.<para/>
+        /// Items sharing the same <paramref name="GroupName"/> are mutually exclusive.</summary>
+        public MGContextMenuRadio AddRadioButton(MGElement Content, string GroupName, bool IsChecked = false)
+        {
+            MGContextMenuRadio Radio = new(this, Content, GroupName, IsChecked);
+            _Items.Add(Radio);
+            return Radio;
+        }
+
+        #region Radio Groups
+        private Dictionary<string, List<MGContextMenuRadio>> _RadioGroups { get; } = new();
+
+        internal void RegisterRadioItem(MGContextMenuRadio Item)
+        {
+            if (Item.GroupName == null)
+                return;
+            if (!_RadioGroups.TryGetValue(Item.GroupName, out List<MGContextMenuRadio> Group))
+            {
+                Group = new();
+                _RadioGroups[Item.GroupName] = Group;
+            }
+            Group.Add(Item);
+        }
+
+        internal void UnregisterRadioItem(MGContextMenuRadio Item)
+        {
+            if (Item.GroupName != null && _RadioGroups.TryGetValue(Item.GroupName, out List<MGContextMenuRadio> Group))
+                Group.Remove(Item);
+        }
+
+        internal void OnRadioGroupNameChanged(MGContextMenuRadio Item, string OldGroup, string NewGroup)
+        {
+            if (OldGroup != null && _RadioGroups.TryGetValue(OldGroup, out List<MGContextMenuRadio> OldList))
+                OldList.Remove(Item);
+            if (NewGroup != null)
+            {
+                if (!_RadioGroups.TryGetValue(NewGroup, out List<MGContextMenuRadio> NewList))
+                {
+                    NewList = new();
+                    _RadioGroups[NewGroup] = NewList;
+                }
+                NewList.Add(Item);
+            }
+        }
+
+        /// <summary>Sets the given <paramref name="CheckedItem"/> as the only checked item in the group <paramref name="GroupName"/>,
+        /// unchecking all others in that group.</summary>
+        public void SetCheckedRadioItem(string GroupName, MGContextMenuRadio CheckedItem)
+        {
+            if (GroupName == null || !_RadioGroups.TryGetValue(GroupName, out List<MGContextMenuRadio> Group))
+                return;
+            foreach (MGContextMenuRadio Item in Group)
+                Item.IsChecked = Item == CheckedItem;
+            ItemRadioSelected?.Invoke(this, CheckedItem);
+        }
+        #endregion Radio Groups
+        #endregion Items
 
         public MGScrollViewer ScrollViewerElement { get; }
         public MGStackPanel ItemsPanel { get; }
@@ -447,6 +509,9 @@ namespace MGUI.Core.UI
         /// <summary>Invoked when a <see cref="MGContextMenuToggle"/> item is clicked, after the <see cref="MGContextMenuToggle.IsChecked"/> value changes. <br/>
         /// The <see cref="MGContextMenuButton"/> may exist within a nested submenu (See also: <see cref="Submenus"/>)</summary>
         public event EventHandler<MGContextMenuToggle> ItemToggled;
+        /// <summary>Invoked when a <see cref="MGContextMenuRadio"/> item is clicked and becomes checked.<br/>
+        /// The <see cref="MGContextMenuRadio"/> may exist within a nested submenu (See also: <see cref="Submenus"/>)</summary>
+        public event EventHandler<MGContextMenuRadio> ItemRadioSelected;
 
         public IContextMenuHost Host { get; }
         public bool IsSubmenu => Host is MGContextMenu;
@@ -597,6 +662,8 @@ namespace MGUI.Core.UI
                                         Button.OnSelected += MenuItem_ItemSelected;
                                     else if (Item is MGContextMenuToggle Toggle)
                                         Toggle.OnToggled += MenuItem_ItemToggled;
+                                    else if (Item is MGContextMenuRadio Radio)
+                                        Radio.OnToggled += MenuItem_ItemRadioSelected;
                                     ItemsPanel.TryInsertChild(Index, Item);
                                     Index++;
                                 }
@@ -613,6 +680,11 @@ namespace MGUI.Core.UI
                                         Button.OnSelected -= MenuItem_ItemSelected;
                                     else if (Item is MGContextMenuToggle Toggle)
                                         Toggle.OnToggled -= MenuItem_ItemToggled;
+                                    else if (Item is MGContextMenuRadio Radio)
+                                    {
+                                        Radio.OnToggled -= MenuItem_ItemRadioSelected;
+                                        UnregisterRadioItem(Radio);
+                                    }
                                     ItemsPanel.TryRemoveChild(Item);
                                 }
                             }
@@ -693,12 +765,14 @@ namespace MGUI.Core.UI
                 {
                     e.ItemSelected += Submenu_ItemSelected;
                     e.ItemToggled += Submenu_ItemToggled;
+                    e.ItemRadioSelected += Submenu_ItemRadioSelected;
                 };
 
                 SubmenuClosed += (sender, e) =>
                 {
                     e.ItemSelected -= Submenu_ItemSelected;
                     e.ItemToggled -= Submenu_ItemToggled;
+                    e.ItemRadioSelected -= Submenu_ItemRadioSelected;
                 };
 
                 ItemSelected += (sender, e) =>
@@ -712,11 +786,18 @@ namespace MGUI.Core.UI
                     if (!StaysOpenOnItemToggled)
                         TryCloseContextMenu();
                 };
+
+                ItemRadioSelected += (sender, e) =>
+                {
+                    if (!StaysOpenOnItemToggled)
+                        TryCloseContextMenu();
+                };
             }
         }
 
         private void Submenu_ItemSelected(object sender, MGContextMenuButton e) => ItemSelected?.Invoke(this, e);
         private void Submenu_ItemToggled(object sender, MGContextMenuToggle e) => ItemToggled?.Invoke(this, e);
+        private void Submenu_ItemRadioSelected(object sender, MGContextMenuRadio e) => ItemRadioSelected?.Invoke(this, e);
 
         private void MenuItem_ItemSelected(object sender, EventArgs e)
         {
@@ -728,6 +809,12 @@ namespace MGUI.Core.UI
         {
             if (sender is MGContextMenuToggle Toggle)
                 ItemToggled?.Invoke(this, Toggle);
+        }
+
+        private void MenuItem_ItemRadioSelected(object sender, bool e)
+        {
+            if (sender is MGContextMenuRadio Radio && Radio.IsChecked)
+                ItemRadioSelected?.Invoke(this, Radio);
         }
 
         public IEnumerable<TMenuItemType> GetItemsOfType<TMenuItemType>(bool IncludeSubmenus)

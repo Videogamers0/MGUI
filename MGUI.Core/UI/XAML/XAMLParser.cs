@@ -49,6 +49,10 @@ namespace MGUI.Core.UI.XAML
             { "ContextMenuButton", nameof(ContextMenuButton) },
             { "ContextMenuToggle", nameof(ContextMenuToggle) },
             { "ContextMenuSeparator", nameof(ContextMenuSeparator) },
+            { "ContextMenuRadio", nameof(ContextMenuRadio) },
+
+            { "MenuBar", nameof(MenuBar) },
+            { "MenuBarItem", nameof(MenuBarItem) },
 
             { "Expander", nameof(Expander) },
             { "GroupBox", nameof(GroupBox) },
@@ -100,6 +104,9 @@ namespace MGUI.Core.UI.XAML
             { "CMB", nameof(ContextMenuButton) },
             { "CMT", nameof(ContextMenuToggle) },
             { "CMS", nameof(ContextMenuSeparator) },
+            { "CMR", nameof(ContextMenuRadio) },
+            { "MB", nameof(MenuBar) },
+            { "MBI", nameof(MenuBarItem) },
             { "GB", nameof(GroupBox) },
             { "LB", nameof(ListBox) },
             { "LV", nameof(ListView) },
