@@ -16,7 +16,7 @@ namespace MGUI.Core.UI
     {
         Button,
         Toggle,
-        Radio,
+        RadioButton,
         Separator
     }
 
@@ -84,7 +84,7 @@ namespace MGUI.Core.UI
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsToggle => MenuItemType == ContextMenuItemType.Toggle;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public bool IsRadio => MenuItemType == ContextMenuItemType.Radio;
+        public bool IsRadioButton => MenuItemType == ContextMenuItemType.RadioButton;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsSeparator => MenuItemType == ContextMenuItemType.Separator;
 
@@ -523,7 +523,7 @@ namespace MGUI.Core.UI
     }
 
     /// <summary>Instantiated via <see cref="MGContextMenu.AddRadioButton(string, string, bool)"/></summary>
-    public class MGContextMenuRadio : MGWrappedContextMenuItem
+    public class MGContextMenuRadioButton : MGWrappedContextMenuItem
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _IsChecked;
@@ -555,7 +555,7 @@ namespace MGUI.Core.UI
                     string Previous = _GroupName;
                     _GroupName = value;
                     NPC(nameof(GroupName));
-                    Menu.OnRadioGroupNameChanged(this, Previous, _GroupName);
+                    Menu.OnRadioButtonGroupNameChanged(this, Previous, _GroupName);
                 }
             }
         }
@@ -572,8 +572,8 @@ namespace MGUI.Core.UI
             });
         }
 
-        internal MGContextMenuRadio(MGContextMenu Menu, MGElement Header, string GroupName, bool IsChecked)
-            : base(Menu, ContextMenuItemType.Radio, Menu.ButtonWrapperTemplate(Menu), Header)
+        internal MGContextMenuRadioButton(MGContextMenu Menu, MGElement Header, string GroupName, bool IsChecked)
+            : base(Menu, ContextMenuItemType.RadioButton, Menu.ButtonWrapperTemplate(Menu), Header)
         {
             Menu.ButtonWrapperTemplateChanged += (sender, e) =>
             {

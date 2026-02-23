@@ -151,7 +151,7 @@ namespace MGUI.Core.UI
 
         private void Submenu_ItemSelected(object sender, MGContextMenuButton e) => MenuBar.InvokeItemSelected(e);
         private void Submenu_ItemToggled(object sender, MGContextMenuToggle e) => MenuBar.InvokeItemToggled(e);
-        private void Submenu_ItemRadioSelected(object sender, MGContextMenuRadio e) => MenuBar.InvokeItemRadioSelected(e);
+        private void Submenu_ItemRadioSelected(object sender, MGContextMenuRadioButton e) => MenuBar.InvokeItemRadioSelected(e);
         #endregion Submenu
 
         /// <summary>Opens the <see cref="Submenu"/> positioned directly below this item in screen space.</summary>
@@ -358,12 +358,12 @@ namespace MGUI.Core.UI
         public event EventHandler<MGContextMenuButton> ItemSelected;
         /// <summary>Invoked when a <see cref="MGContextMenuToggle"/> in any dropdown is toggled.</summary>
         public event EventHandler<MGContextMenuToggle> ItemToggled;
-        /// <summary>Invoked when a <see cref="MGContextMenuRadio"/> in any dropdown is selected.</summary>
-        public event EventHandler<MGContextMenuRadio> ItemRadioSelected;
+        /// <summary>Invoked when a <see cref="MGContextMenuRadioButton"/> in any dropdown is selected.</summary>
+        public event EventHandler<MGContextMenuRadioButton> ItemRadioSelected;
 
         internal void InvokeItemSelected(MGContextMenuButton e) => ItemSelected?.Invoke(this, e);
         internal void InvokeItemToggled(MGContextMenuToggle e) => ItemToggled?.Invoke(this, e);
-        internal void InvokeItemRadioSelected(MGContextMenuRadio e) => ItemRadioSelected?.Invoke(this, e);
+        internal void InvokeItemRadioSelected(MGContextMenuRadioButton e) => ItemRadioSelected?.Invoke(this, e);
         #endregion Events
 
         /// <param name="Window">The parent <see cref="MGWindow"/>.</param>

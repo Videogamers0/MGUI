@@ -48,9 +48,9 @@
                 <ContextMenuToggle CommandId="View.ShowRulers" IsChecked="True" Content="Show Rulers" />
                 <ContextMenuSeparator />
                 <!-- Radio group: zoom level -->
-                <ContextMenuRadio GroupName="Zoom" CommandId="View.Zoom.Small"                Content="Zoom 50%"  />
-                <ContextMenuRadio GroupName="Zoom" CommandId="View.Zoom.Normal" IsChecked="True" Content="Zoom 100%" />
-                <ContextMenuRadio GroupName="Zoom" CommandId="View.Zoom.Large"                Content="Zoom 200%" />
+                <ContextMenuRadioButton GroupName="Zoom" CommandId="View.Zoom.Small"                Content="Zoom 50%"  />
+                <ContextMenuRadioButton GroupName="Zoom" CommandId="View.Zoom.Normal" IsChecked="True" Content="Zoom 100%" />
+                <ContextMenuRadioButton GroupName="Zoom" CommandId="View.Zoom.Large"                Content="Zoom 200%" />
             </MenuBarItem>
 
             <!-- Format menu with deeply nested submenu -->
@@ -65,9 +65,9 @@
                             <ContextMenuButton CommandId="Format.Font.Size" Content="Font Size">
                                 <ContextMenuButton.Submenu>
                                     <ContextMenu>
-                                        <ContextMenuRadio GroupName="FontSize" CommandId="Format.Font.Size.Small"                  Content="Small"  />
-                                        <ContextMenuRadio GroupName="FontSize" CommandId="Format.Font.Size.Medium" IsChecked="True" Content="Medium" />
-                                        <ContextMenuRadio GroupName="FontSize" CommandId="Format.Font.Size.Large"                  Content="Large"  />
+                                        <ContextMenuRadioButton GroupName="FontSize" CommandId="Format.Font.Size.Small"                  Content="Small"  />
+                                        <ContextMenuRadioButton GroupName="FontSize" CommandId="Format.Font.Size.Medium" IsChecked="True" Content="Medium" />
+                                        <ContextMenuRadioButton GroupName="FontSize" CommandId="Format.Font.Size.Large"                  Content="Large"  />
                                     </ContextMenu>
                                 </ContextMenuButton.Submenu>
                             </ContextMenuButton>
