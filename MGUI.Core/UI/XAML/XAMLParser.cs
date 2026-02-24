@@ -49,6 +49,13 @@ namespace MGUI.Core.UI.XAML
             { "ContextMenuButton", nameof(ContextMenuButton) },
             { "ContextMenuToggle", nameof(ContextMenuToggle) },
             { "ContextMenuSeparator", nameof(ContextMenuSeparator) },
+            { "ContextMenuRadioButton", nameof(ContextMenuRadioButton) },
+
+            { "MenuBar", nameof(MenuBar) },
+            { "MenuBarItem", nameof(MenuBarItem) },
+
+            { "TreeView", nameof(TreeView) },
+            { "TreeViewItem", nameof(TreeViewItem) },
 
             { "Expander", nameof(Expander) },
             { "GroupBox", nameof(GroupBox) },
@@ -100,6 +107,9 @@ namespace MGUI.Core.UI.XAML
             { "CMB", nameof(ContextMenuButton) },
             { "CMT", nameof(ContextMenuToggle) },
             { "CMS", nameof(ContextMenuSeparator) },
+            { "CMR", nameof(ContextMenuRadioButton) },
+            { "MB", nameof(MenuBar) },
+            { "MBI", nameof(MenuBarItem) },
             { "GB", nameof(GroupBox) },
             { "LB", nameof(ListBox) },
             { "LV", nameof(ListView) },
@@ -112,6 +122,8 @@ namespace MGUI.Core.UI.XAML
             { "TI", nameof(TabItem) },
             { "TB", nameof(TextBlock) },
             { "TT", nameof(ToolTip) },
+            { "TV", nameof(TreeView) },
+            { "TVI", nameof(TreeViewItem) },
             { "RD", nameof(RowDefinition) },
             { "CD", nameof(ColumnDefinition) },
             { "GS", nameof(GridSplitter) },

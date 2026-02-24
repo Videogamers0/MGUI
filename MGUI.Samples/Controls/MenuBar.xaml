@@ -1,0 +1,103 @@
+<Window xmlns="clr-namespace:MGUI.Core.UI.XAML;assembly=MGUI.Core"
+        Left="440" Top="20" Width="700" Height="500" TitleText="MenuBar" Padding="0">
+    <Window.Styles>
+        <Style Name="Header1" TargetType="TextBlock">
+            <Setter Property="IsBold" Value="True" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+    </Window.Styles>
+
+    <DockPanel>
+
+        <!-- MenuBar docked at the top of the window -->
+        <MenuBar Name="MainMenuBar" Dock="Top">
+
+            <!-- File menu -->
+            <MenuBarItem Text="File">
+                <ContextMenuButton Icon="GoldBullion"   CommandId="File.New"  Content="New"     ShortcutText="Ctrl+N" />
+                <ContextMenuButton Icon="SilverBullion" CommandId="File.Open" Content="Open..." ShortcutText="Ctrl+O" />
+                <ContextMenuButton Icon="BronzeBullion" CommandId="File.Save" Content="Save"    ShortcutText="Ctrl+S" />
+                <ContextMenuSeparator />
+                <ContextMenuButton CommandId="File.Recent" Content="Recent">
+                    <ContextMenuButton.Submenu>
+                        <ContextMenu>
+                            <ContextMenuButton CommandId="File.Recent.Doc1" Content="Document1.txt" />
+                            <ContextMenuButton CommandId="File.Recent.Doc2" Content="Document2.txt" />
+                            <ContextMenuButton CommandId="File.Recent.Doc3" Content="Project.mgui"  />
+                        </ContextMenu>
+                    </ContextMenuButton.Submenu>
+                </ContextMenuButton>
+                <ContextMenuSeparator />
+                <ContextMenuButton CommandId="File.Exit" Content="Exit" />
+            </MenuBarItem>
+
+            <!-- Edit menu -->
+            <MenuBarItem Text="Edit">
+                <ContextMenuButton Icon="GoldBullion"   CommandId="Edit.Cut"       Content="Cut"    ShortcutText="Ctrl+X" />
+                <ContextMenuButton Icon="SilverBullion" CommandId="Edit.Copy"      Content="Copy"   ShortcutText="Ctrl+C" />
+                <ContextMenuButton Icon="BronzeBullion" CommandId="Edit.Paste"     Content="Paste"  ShortcutText="Ctrl+V" />
+                <ContextMenuSeparator />
+                <ContextMenuButton             CommandId="Edit.SelectAll"  Content="Select All"         />
+                <ContextMenuSeparator />
+                <ContextMenuButton             CommandId="Edit.Undo" IsEnabled="False" Content="Undo (disabled)" />
+            </MenuBarItem>
+
+            <!-- View menu with toggles and radio groups -->
+            <MenuBarItem Text="View">
+                <ContextMenuToggle CommandId="View.ShowGrid"             Content="Show Grid"   />
+                <ContextMenuToggle CommandId="View.ShowRulers" IsChecked="True" Content="Show Rulers" />
+                <ContextMenuSeparator />
+                <!-- Radio group: zoom level -->
+                <ContextMenuRadioButton GroupName="Zoom" CommandId="View.Zoom.Small"                Content="Zoom 50%"  />
+                <ContextMenuRadioButton GroupName="Zoom" CommandId="View.Zoom.Normal" IsChecked="True" Content="Zoom 100%" />
+                <ContextMenuRadioButton GroupName="Zoom" CommandId="View.Zoom.Large"                Content="Zoom 200%" />
+            </MenuBarItem>
+
+            <!-- Format menu with deeply nested submenu -->
+            <MenuBarItem Text="Format">
+                <ContextMenuButton CommandId="Format.Font" Content="Font">
+                    <ContextMenuButton.Submenu>
+                        <ContextMenu>
+                            <ContextMenuButton CommandId="Format.Font.Bold"      Content="Bold"      />
+                            <ContextMenuButton CommandId="Format.Font.Italic"    Content="Italic"    />
+                            <ContextMenuButton CommandId="Format.Font.Underline" Content="Underline" />
+                            <ContextMenuSeparator />
+                            <ContextMenuButton CommandId="Format.Font.Size" Content="Font Size">
+                                <ContextMenuButton.Submenu>
+                                    <ContextMenu>
+                                        <ContextMenuRadioButton GroupName="FontSize" CommandId="Format.Font.Size.Small"                  Content="Small"  />
+                                        <ContextMenuRadioButton GroupName="FontSize" CommandId="Format.Font.Size.Medium" IsChecked="True" Content="Medium" />
+                                        <ContextMenuRadioButton GroupName="FontSize" CommandId="Format.Font.Size.Large"                  Content="Large"  />
+                                    </ContextMenu>
+                                </ContextMenuButton.Submenu>
+                            </ContextMenuButton>
+                        </ContextMenu>
+                    </ContextMenuButton.Submenu>
+                </ContextMenuButton>
+                <ContextMenuSeparator />
+                <ContextMenuButton CommandId="Format.Bold"   Content="Bold"   />
+                <ContextMenuButton CommandId="Format.Italic" Content="Italic" />
+            </MenuBarItem>
+
+        </MenuBar>
+
+        <!-- Status bar at the bottom -->
+        <DockPanel Dock="Bottom" MinHeight="24">
+            <TextBlock Name="StatusText" Margin="6,2" VerticalAlignment="Center"
+                       Text="Click a menu item to see the result here." />
+        </DockPanel>
+
+        <!-- Main content area -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
+            <StackPanel Orientation="Vertical" Spacing="8">
+                <TextBlock StyleNames="Header1" TextAlignment="Center" Text="MenuBar Demo" />
+                <TextBlock TextAlignment="Center">
+                    This window demonstrates the [c=Turquoise][b]MGMenuBar[/b][/c] control.
+                </TextBlock>
+                <TextBlock Text="Features shown:\n[c=Gold]• Hierarchical menus[/c] — &quot;Format → Font → Font Size&quot; has 3 levels.\n[c=Gold]• Separators[/c] — horizontal lines between groups of items.\n[c=Gold]• Toggle items[/c] — &quot;View → Show Grid / Show Rulers&quot; are checkable.\n[c=Gold]• Radio groups[/c] — &quot;View → Zoom&quot; items are mutually exclusive.\n[c=Gold]• Disabled items[/c] — &quot;Edit → Undo (disabled)&quot; is grayed out.\n[c=Gold]• Icons[/c] — File and Edit menus show icons next to items.\n[c=Gold]• ShortcutText[/c] — File and Edit items show keyboard shortcut hints.\n[c=Gold]• Keyboard navigation[/c] — open a menu, then use ← / → to navigate items, Escape to close." />
+            </StackPanel>
+        </ScrollViewer>
+
+    </DockPanel>
+
+</Window>

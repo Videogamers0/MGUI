@@ -1,12 +1,13 @@
-﻿using System.Reflection.Metadata;
+﻿using MGUI.Shared.Helpers;
+using Microsoft.Xna.Framework;
+using MonoGame.Extended;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
-using MGUI.Shared.Helpers;
-using Microsoft.Xna.Framework;
-using System.Collections.Specialized;
-using System.Collections.Generic;
-using System;
-using MonoGame.Extended;
 
 namespace MGUI.Core.UI.Containers
 {
@@ -66,6 +67,25 @@ namespace MGUI.Core.UI.Containers
             DockedChildren.Add(new(Item, Dock));
             _Children.Add(Item);
             return true;
+        }
+
+        public bool TryRemoveChild(MGElement Item)
+        {
+            if (!CanChangeContent)
+                return false;
+
+            for (int i = 0; i < DockedChildren.Count; i++)
+            {
+                DockedChild ActualItem = DockedChildren[i];
+                if (ActualItem.Item == Item)
+                {
+                    DockedChildren.RemoveAt(i);
+                    _Children.Remove(Item);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public MGDockPanel(MGWindow Window, bool LastChildFill = true)

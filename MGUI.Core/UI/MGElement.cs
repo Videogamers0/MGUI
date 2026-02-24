@@ -80,6 +80,31 @@ namespace MGUI.Core.UI
         }
     }
 
+    /// <summary>Event args for <see cref="MGElement.ContextMenuRequested"/>.
+    /// Allows subscribers to provide or replace the <see cref="MGContextMenu"/> that will be opened
+    /// when the user right-clicks the element, without needing to assign <see cref="MGElement.ContextMenu"/>.</summary>
+    public class ContextMenuRequestedEventArgs : EventArgs
+    {
+        /// <summary>The context menu that will be opened, initially equal to the element's
+        /// <see cref="MGElement.ContextMenu"/> property. Set this to a different instance to
+        /// replace the menu, or to <see langword="null"/> to suppress opening entirely.</summary>
+        public MGContextMenu Menu { get; set; }
+
+        /// <summary>Mouse position in screen space at the moment of the right-click.</summary>
+        public Point Position { get; }
+
+        /// <summary>Set to <see langword="true"/> to suppress opening the menu entirely.
+        /// If <see langword="false"/> (default), the menu referenced by <see cref="Menu"/> will be opened.</summary>
+        public bool Handled { get; set; }
+
+        public ContextMenuRequestedEventArgs(MGContextMenu InitialMenu, Point Position)
+        {
+            Menu = InitialMenu;
+            this.Position = Position;
+            Handled = false;
+        }
+    }
+
     //TODO:
     //Fix bug with measurement logic of components
     //      MGElement.MeasureSelf and MGElement.UpdateLayout both have 2 bugs when dealing with components
@@ -152,7 +177,6 @@ namespace MGUI.Core.UI
     //maybe MGElement should have a: List<MGElement> AttachedElements { get; }
     //		This would specifically be for elements where the parent doesn't normally have a reference to the child, such as MGResizeGrip when using MGResizeGrip.Host to attach to
     //		The Visual Tree traversal logic should have an additional parameter, IncludeAttached
-
     /// <summary>Base class for all UI elements.</summary>
     public abstract class MGElement : XAMLBindableBase, IMouseHandlerHost, IKeyboardHandlerHost, 
         IElementNameResolver, IResourcesResolver, IDesktopResolver
@@ -689,29 +713,86 @@ namespace MGUI.Core.UI
 				{
 					MGContextMenu Previous = ContextMenu;
 					_ContextMenu = value;
-
-                    if (Previous != null && ContextMenu == null)
-                        MouseHandler.RMBReleasedInside -= TryOpenContextMenuOnRightClick;
-                    else if (Previous == null && ContextMenu != null)
-                        MouseHandler.RMBReleasedInside += TryOpenContextMenuOnRightClick;
-
+                    SyncContextMenuRmbHandler();
                     NPC(nameof(ContextMenu));
 					ContextMenuChanged?.Invoke(this, new(Previous, ContextMenu));
 				}
 			}
 		}
 
+        /// <summary>Tracks whether <see cref="TryOpenContextMenuOnRightClick"/> is currently
+        /// subscribed to <see cref="MouseHandler"/>.<see cref="MGUI.Shared.Input.Mouse.MouseHandler.RMBReleasedInside"/>.</summary>
+        private bool _rmbHandlerSubscribed;
+
+        /// <summary>Subscribes or unsubscribes <see cref="TryOpenContextMenuOnRightClick"/> from
+        /// <see cref="MouseHandler"/>.<see cref="MGUI.Shared.Input.Mouse.MouseHandler.RMBReleasedInside"/>
+        /// based on whether a <see cref="ContextMenu"/> is assigned or <see cref="ContextMenuRequested"/> has subscribers.</summary>
+        private void SyncContextMenuRmbHandler()
+        {
+            bool needsHandler = _ContextMenu != null || _contextMenuRequested != null;
+            if (needsHandler && !_rmbHandlerSubscribed)
+            {
+                MouseHandler.RMBReleasedInside += TryOpenContextMenuOnRightClick;
+                _rmbHandlerSubscribed = true;
+            }
+            else if (!needsHandler && _rmbHandlerSubscribed)
+            {
+                MouseHandler.RMBReleasedInside -= TryOpenContextMenuOnRightClick;
+                _rmbHandlerSubscribed = false;
+            }
+        }
+
         private void TryOpenContextMenuOnRightClick(object sender, BaseMouseReleasedEventArgs e)
         {
-            if (ContextMenu.TryOpenContextMenu(e.Position) == true)
-            {
-                e.SetHandledBy(ContextMenu, false);
-            }
+            // Build args with the element's static ContextMenu as default.
+            var args = new ContextMenuRequestedEventArgs(_ContextMenu, e.Position);
+
+            // Let subscribers override or cancel.
+            _contextMenuRequested?.Invoke(this, args);
+
+            if (args.Handled)
+                return;
+
+            MGContextMenu menu = args.Menu;
+            if (menu != null && menu.TryOpenContextMenu(e.Position))
+                e.SetHandledBy(menu, false);
         }
 
 		/// <summary>Invoked when <see cref="ContextMenu"/> is set to a new value. (Not invoked when the content within <see cref="ContextMenu"/> is modified)<para/>
 		/// See also: <see cref="MGDesktop.ActiveContextMenu"/>, <see cref="MGDesktop.ContextMenuClosing"/>, <see cref="MGDesktop.ContextMenuClosed"/>, <see cref="MGDesktop.ContextMenuOpening"/>, <see cref="MGDesktop.ContextMenuOpened"/></summary>
         public event EventHandler<EventArgs<MGContextMenu>> ContextMenuChanged;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private EventHandler<ContextMenuRequestedEventArgs> _contextMenuRequested;
+        /// <summary>Fired when the user right-clicks this element, just before the context menu is opened.
+        /// Allows building or replacing the menu dynamically without assigning <see cref="ContextMenu"/>.
+        /// <para/><b>Usage:</b> set <see cref="ContextMenuRequestedEventArgs.Menu"/> to a fresh
+        /// <see cref="MGContextMenu"/> instance, or set <see cref="ContextMenuRequestedEventArgs.Handled"/>
+        /// to <see langword="true"/> to suppress the menu entirely.
+        /// <para/>Subscribing to this event automatically wires up the right-click handler, so you do
+        /// <em>not</em> need to also set <see cref="ContextMenu"/> if you only use this event.
+        /// <para/>Example:
+        /// <code>
+        /// element.ContextMenuRequested += (s, e) =>
+        /// {
+        ///     var m = new MGContextMenu(window, "");
+        ///     m.AddButton("Option A", _ => DoA());
+        ///     e.Menu = m;
+        /// };
+        /// </code></summary>
+        public event EventHandler<ContextMenuRequestedEventArgs> ContextMenuRequested
+        {
+            add
+            {
+                _contextMenuRequested += value;
+                SyncContextMenuRmbHandler();
+            }
+            remove
+            {
+                _contextMenuRequested -= value;
+                SyncContextMenuRmbHandler();
+            }
+        }
         #endregion ContextMenu
 
         #region Input

@@ -23,6 +23,7 @@
     <None Remove="Controls\ComboBox.xaml" />
     <None Remove="Controls\Compendium.xaml" />
     <None Remove="Controls\ContextMenu.xaml" />
+    <None Remove="Controls\MenuBar.xaml" />
     <None Remove="Controls\ContextualContentPresenter.xaml" />
     <None Remove="Controls\DockPanel.xaml" />
     <None Remove="Controls\Expander.xaml" />
@@ -69,6 +70,9 @@
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ContextMenu.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\MenuBar.xaml">
       <Generator>MSBuild:Compile</Generator>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ContextualContentPresenter.xaml">

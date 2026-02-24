@@ -16,6 +16,7 @@ namespace MGUI.Core.UI
     {
         Button,
         Toggle,
+        RadioButton,
         Separator
     }
 
@@ -82,6 +83,8 @@ namespace MGUI.Core.UI
         public bool IsButton => MenuItemType == ContextMenuItemType.Button;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsToggle => MenuItemType == ContextMenuItemType.Toggle;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public bool IsRadioButton => MenuItemType == ContextMenuItemType.RadioButton;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public bool IsSeparator => MenuItemType == ContextMenuItemType.Separator;
 
@@ -194,7 +197,7 @@ namespace MGUI.Core.UI
                         if (Previous != null)
                             Container.TryRemoveChild(Previous);
                         if (MenuItemContent != null)
-                            Container.TryAddChild(MenuItemContent);
+                            Container.TryAddChild(MenuItemContent, Dock.Left);
                     }
 
                     NPC(nameof(MenuItemContent));
@@ -202,7 +205,7 @@ namespace MGUI.Core.UI
             }
         }
 
-        protected MGStackPanel Container { get; }
+        protected MGDockPanel Container { get; }
 
         /// <summary>The width of the dropdown arrow that appears on the right-edge of a <see cref="MGContextMenuItem"/> that has a nested <see cref="Submenu"/></summary>
         public const int SubmenuArrowWidth = 5;
@@ -255,11 +258,39 @@ namespace MGUI.Core.UI
         private void Submenu_Opened(object sender, EventArgs e) => ContentWrapper.SpoofIsHoveredWhileDrawingBackground = true;
         private void Submenu_Closed(object sender, EventArgs e) => ContentWrapper.SpoofIsHoveredWhileDrawingBackground = false;
 
+        #region ShortcutText
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private MGTextBlock _ShortcutTextBlock;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string _ShortcutText;
+        /// <summary>Optional shortcut key hint displayed to the right of the item label (e.g. "Ctrl+S").<para/>
+        /// Set to null or empty to hide.</summary>
+        public string ShortcutText
+        {
+            get => _ShortcutText;
+            set
+            {
+                if (_ShortcutText != value)
+                {
+                    _ShortcutText = value;
+                    if (_ShortcutTextBlock != null)
+                    {
+                        _ShortcutTextBlock.Text = _ShortcutText ?? "";
+                        _ShortcutTextBlock.Visibility = string.IsNullOrEmpty(_ShortcutText)
+                            ? Visibility.Collapsed
+                            : Visibility.Visible;
+                    }
+                    NPC(nameof(ShortcutText));
+                }
+            }
+        }
+        #endregion ShortcutText
+
         protected MGWrappedContextMenuItem(MGContextMenu Menu, ContextMenuItemType ItemType, MGButton ContentWrapper, MGElement MenuItemContent)
             : base(Menu, ItemType)
         {
-            Container = new(Menu, Orientation.Horizontal);
-            Container.Spacing = 5;
+            Container = new(Menu);
             Container.ManagedParent = this;
             Container.CanChangeContent = false;
 
@@ -268,7 +299,7 @@ namespace MGUI.Core.UI
             HeaderPresenter.CanChangeContent = false;
             HeaderPresenter.PreferredWidth = Menu.HeaderSize.Width;
             HeaderPresenter.PreferredHeight = Menu.HeaderSize.Height;
-            HeaderPresenter.Margin = new(0);
+            HeaderPresenter.Margin = new(0, 0, 5, 0);
             HeaderPresenter.BackgroundBrush = new(null);
             HeaderPresenter.ManagedParent = this;
             InvokeContentAdded(HeaderPresenter);
@@ -281,7 +312,19 @@ namespace MGUI.Core.UI
 
             using (Container.AllowChangingContentTemporarily())
             {
-                Container.TryAddChild(HeaderPresenter);
+                Container.TryAddChild(HeaderPresenter, Dock.Left);
+            }
+
+            // Shortcut text label — starts collapsed; visible once ShortcutText is assigned
+            _ShortcutTextBlock = new MGTextBlock(Menu, "", Color.LightGray, Menu.GetTheme().FontSettings.ContextMenuFontSize);
+            _ShortcutTextBlock.Margin = new Thickness(18, 0, 0, 0);
+            _ShortcutTextBlock.VerticalAlignment = VerticalAlignment.Center;
+            _ShortcutTextBlock.HorizontalAlignment = HorizontalAlignment.Right;
+            _ShortcutTextBlock.Visibility = Visibility.Collapsed;
+            _ShortcutTextBlock.ManagedParent = this;
+            using (Container.AllowChangingContentTemporarily())
+            {
+                Container.TryAddChild(_ShortcutTextBlock, Dock.Right);
             }
 
             this.MenuItemContent = MenuItemContent;
@@ -451,7 +494,6 @@ namespace MGUI.Core.UI
     {
         private MGComponent<MGSeparator> SeparatorComponent { get; }
         public MGSeparator SeparatorElement { get; }
-
         public int Height
         {
             get => SeparatorElement.Size;
@@ -477,6 +519,90 @@ namespace MGUI.Core.UI
 
             HorizontalContentAlignment = HorizontalAlignment.Stretch;
             VerticalContentAlignment = VerticalAlignment.Stretch;
+        }
+    }
+
+    /// <summary>Instantiated via <see cref="MGContextMenu.AddRadioButton(string, string, bool)"/></summary>
+    public class MGContextMenuRadioButton : MGWrappedContextMenuItem
+    {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _IsChecked;
+        public bool IsChecked
+        {
+            get => _IsChecked;
+            set
+            {
+                if (_IsChecked != value)
+                {
+                    _IsChecked = value;
+                    NPC(nameof(IsChecked));
+                    OnToggled?.Invoke(this, IsChecked);
+                }
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string _GroupName;
+        /// <summary>Identifies the radio group this item belongs to within the parent <see cref="MGContextMenu"/>.<para/>
+        /// Only one item per group can have <see cref="IsChecked"/> == true at a time.</summary>
+        public string GroupName
+        {
+            get => _GroupName;
+            set
+            {
+                if (_GroupName != value)
+                {
+                    string Previous = _GroupName;
+                    _GroupName = value;
+                    NPC(nameof(GroupName));
+                    Menu.OnRadioButtonGroupNameChanged(this, Previous, _GroupName);
+                }
+            }
+        }
+
+        /// <summary>Invoked when <see cref="IsChecked"/> changes.</summary>
+        public event EventHandler<bool> OnToggled;
+
+        protected override void OnContentWrapperChanged()
+        {
+            ContentWrapper?.AddCommandHandler((Button, e) =>
+            {
+                if (!IsChecked)
+                    Menu.SetCheckedRadioItem(GroupName, this);
+            });
+        }
+
+        internal MGContextMenuRadioButton(MGContextMenu Menu, MGElement Header, string GroupName, bool IsChecked)
+            : base(Menu, ContextMenuItemType.RadioButton, Menu.ButtonWrapperTemplate(Menu), Header)
+        {
+            Menu.ButtonWrapperTemplateChanged += (sender, e) =>
+            {
+                ContentWrapper = Menu.ButtonWrapperTemplate(Menu);
+            };
+
+            HeaderPresenter.OnEndingDraw += (sender, e) =>
+            {
+                // Draw a radio bullet circle in the header area
+                Rectangle Bounds = HeaderPresenter.LayoutBounds;
+                int Diameter = Math.Min(Bounds.Width, Bounds.Height) - 4;
+                if (Diameter > 0)
+                {
+                    Point Center = Bounds.Center + e.DA.Offset;
+                    float R = Diameter / 2f;
+                    // Outer ring
+                    e.DA.DT.StrokeCircle(Center.ToVector2(), Color.White * 0.7f * e.DA.Opacity, R, 1f, 16);
+                    // Filled inner dot when checked
+                    if (this.IsChecked)
+                    {
+                        float InnerR = Math.Max(1f, R - 3f);
+                        e.DA.DT.FillCircle(Center.ToVector2(), Color.White * e.DA.Opacity, InnerR, 16);
+                    }
+                }
+            };
+
+            _GroupName = GroupName;
+            Menu.RegisterRadioItem(this);
+            this.IsChecked = IsChecked;
         }
     }
 }

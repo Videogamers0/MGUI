@@ -425,6 +425,22 @@ namespace MGUI.Core.UI
                 _Backgrounds[MGElementType.Stopwatch] = new ThemeManagedVisualStateFillBrush(AccentBG.GetValue(true));
                 _Backgrounds[MGElementType.Timer] = new ThemeManagedVisualStateFillBrush(AccentBG.GetValue(true));
 
+                //  MenuBar
+                _Backgrounds[MGElementType.MenuBar] =
+                    new ThemeManagedVisualStateFillBrush(
+                        new VisualStateFillBrush(
+                            AccentBrush,
+                            null, PressedModifierType.Darken, 0.06f)
+                    );
+
+                //  MenuBarItem (transparent by default, highlight on hover / press)
+                _Backgrounds[MGElementType.MenuBarItem] =
+                    new ThemeManagedVisualStateFillBrush(
+                        new VisualStateFillBrush(
+                            null,
+                            Color.White * 0.12f, PressedModifierType.Darken, 0.06f)
+                    );
+
                 //  ToggleButton
                 ThemeManagedVisualStateFillBrush ToggleButtonBG =
                     new ThemeManagedVisualStateFillBrush(
@@ -662,6 +678,22 @@ namespace MGUI.Core.UI
                 _Backgrounds[MGElementType.Separator] = new ThemeManagedVisualStateFillBrush(AccentBG.GetValue(true));
                 _Backgrounds[MGElementType.Stopwatch] = new ThemeManagedVisualStateFillBrush(AccentBG.GetValue(true));
                 _Backgrounds[MGElementType.Timer] = new ThemeManagedVisualStateFillBrush(AccentBG.GetValue(true));
+
+                //  MenuBar
+                _Backgrounds[MGElementType.MenuBar] =
+                    new ThemeManagedVisualStateFillBrush(
+                        new VisualStateFillBrush(
+                            PrimaryBG,
+                            null, PressedModifierType.Darken, 0.06f)
+                    );
+
+                //  MenuBarItem (transparent by default, LightBlue overlay on hover / press)
+                _Backgrounds[MGElementType.MenuBarItem] =
+                    new ThemeManagedVisualStateFillBrush(
+                        new VisualStateFillBrush(
+                            null,
+                            Color.LightBlue * 0.5f, PressedModifierType.Darken, 0.06f)
+                    );
 
                 //  ToggleButton
                 ThemeManagedVisualStateFillBrush ToggleButtonBG =

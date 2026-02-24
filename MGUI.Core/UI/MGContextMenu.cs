@@ -92,7 +92,27 @@ namespace MGUI.Core.UI
         /// False if it wasn't already open, or the action was cancelled.</returns>
         public bool TryCloseContextMenu() => IsContextMenuOpen && Host.TryCloseActiveContextMenu();
 
-        internal void InvokeContextMenuOpening() => ContextMenuOpening?.Invoke(this, EventArgs.Empty);
+        /// <returns>True if the opening should proceed; false if a subscriber cancelled it.</returns>
+        internal bool InvokeContextMenuOpening()
+        {
+            // Run the factory first so that newly created items can subscribe to ContextMenuOpening
+            // and receive it during this same open cycle (e.g. to evaluate ComputeIsVisible).
+            // If the open is subsequently cancelled the items will simply be rebuilt on the next open.
+            if (ItemsFactory != null)
+            {
+                ClearItems();
+                ItemsFactory(this);
+            }
+
+            if (ContextMenuOpening != null)
+            {
+                var args = new System.ComponentModel.CancelEventArgs();
+                ContextMenuOpening.Invoke(this, args);
+                if (args.Cancel) return false;
+            }
+
+            return true;
+        }
         internal void InvokeContextMenuOpened()
         {
             NPC(nameof(IsContextMenuOpen));
@@ -105,7 +125,22 @@ namespace MGUI.Core.UI
             ContextMenuClosed?.Invoke(this, EventArgs.Empty);
         }
 
-        public event EventHandler<EventArgs> ContextMenuOpening;
+        /// <summary>Fired just before this <see cref="MGContextMenu"/> is shown, <em>after</em> <see cref="ItemsFactory"/> has run.<br/>
+        /// Set <see cref="System.ComponentModel.CancelEventArgs.Cancel"/> to <see langword="true"/> to prevent the menu from opening.<para/>
+        /// <b>Dynamic items:</b> Use <see cref="ItemsFactory"/> instead of subscribing here to add/clear items.
+        /// <see cref="ItemsFactory"/> is called automatically on every open (before this event fires) and avoids the risks below.<para/>
+        /// <b>Double-subscription warning:</b> This is a standard C# event — subscribing N times means the handler
+        /// runs N times per open. If the same object re-subscribes on every tab-rebuild or layout pass, items (or
+        /// other side-effects) will accumulate. Always pair a subscription with an unsubscription, or use
+        /// <see cref="ItemsFactory"/> which replaces the handler pattern entirely.<para/>
+        /// <b>Recommended patterns:</b>
+        /// <list type="bullet">
+        ///   <item>Static items: declare them once in XAML or in the constructor — no handler needed.</item>
+        ///   <item>Dynamic items: set <see cref="ItemsFactory"/> once.</item>
+        ///   <item>Conditional logic (not item-building): subscribe here, but ensure you unsubscribe when
+        ///         the hosting element is disposed / rebuilt.</item>
+        /// </list></summary>
+        public event EventHandler<System.ComponentModel.CancelEventArgs> ContextMenuOpening;
         public event EventHandler<EventArgs> ContextMenuOpened;
         public event EventHandler<EventArgs> ContextMenuClosing;
         public event EventHandler<EventArgs> ContextMenuClosed;
@@ -177,7 +212,7 @@ namespace MGUI.Core.UI
             Button.Padding = new(5, 3, 20, 3);
             Button.Margin = new(0);
 
-            Button.HorizontalContentAlignment = HorizontalAlignment.Left;
+            Button.HorizontalContentAlignment = HorizontalAlignment.Stretch;
             Button.VerticalContentAlignment = VerticalAlignment.Center;
             Button.HorizontalAlignment = HorizontalAlignment.Stretch;
             Button.VerticalAlignment = VerticalAlignment.Stretch;
@@ -240,7 +275,99 @@ namespace MGUI.Core.UI
             _Items.Add(Separator);
             return Separator;
         }
-        #endregion
+
+        /// <summary>Removes all items from this menu, correctly unregistering internal event handlers
+        /// and removing elements from the visual tree.
+        /// <para/>Prefer this over calling <c>Items.Clear()</c> directly, which does not clean up properly
+        /// due to <see cref="ObservableCollection{T}"/>'s Reset action not carrying <c>OldItems</c>.</summary>
+        public void ClearItems()
+        {
+            for (int i = _Items.Count - 1; i >= 0; i--)
+                _Items.RemoveAt(i);
+        }
+
+        /// <summary>Optional factory called every time this menu is about to open (just <em>before</em>
+        /// <see cref="ContextMenuOpening"/> fires).
+        /// When set, <see cref="ClearItems"/> is called automatically before the factory runs,
+        /// so the item list is always freshly built.
+        /// Items created by the factory subscribe to <see cref="ContextMenuOpening"/> during construction
+        /// and therefore receive it for the same open cycle — so <see cref="MGContextMenuItem.ComputeIsVisible"/>
+        /// is evaluated correctly on first open.
+        /// <para/>This is the recommended approach for <em>dynamic</em> menus whose items change
+        /// between invocations — it replaces the fragile pattern of subscribing to
+        /// <see cref="ContextMenuOpening"/> and calling <c>Clear()+AddButton()</c> inside the handler.
+        /// <para/>Example:
+        /// <code>
+        /// menu.ItemsFactory = m =>
+        /// {
+        ///     m.AddButton("Close",  _ => Close());
+        ///     m.AddButton("Reload", _ => Reload());
+        /// };
+        /// </code></summary>
+        public Action<MGContextMenu> ItemsFactory { get; set; }
+
+        /// <summary>Adds a radio button item to this <see cref="MGContextMenu"/>.<para/>
+        /// Items sharing the same <paramref name="GroupName"/> are mutually exclusive.</summary>
+        public MGContextMenuRadioButton AddRadioButton(string Text, string GroupName, bool IsChecked = false)
+            => AddRadioButton(new MGTextBlock(this, Text, null, GetTheme().FontSettings.ContextMenuFontSize), GroupName, IsChecked);
+
+        /// <summary>Adds a radio button item to this <see cref="MGContextMenu"/>.<para/>
+        /// Items sharing the same <paramref name="GroupName"/> are mutually exclusive.</summary>
+        public MGContextMenuRadioButton AddRadioButton(MGElement Content, string GroupName, bool IsChecked = false)
+        {
+            MGContextMenuRadioButton RadioButton = new(this, Content, GroupName, IsChecked);
+            _Items.Add(RadioButton);
+            return RadioButton;
+        }
+
+        #region Radio Groups
+        private Dictionary<string, List<MGContextMenuRadioButton>> _RadioGroups { get; } = new();
+
+        internal void RegisterRadioItem(MGContextMenuRadioButton Item)
+        {
+            if (Item.GroupName == null)
+                return;
+            if (!_RadioGroups.TryGetValue(Item.GroupName, out List<MGContextMenuRadioButton> Group))
+            {
+                Group = new();
+                _RadioGroups[Item.GroupName] = Group;
+            }
+            Group.Add(Item);
+        }
+
+        internal void UnregisterRadioItem(MGContextMenuRadioButton Item)
+        {
+            if (Item.GroupName != null && _RadioGroups.TryGetValue(Item.GroupName, out List<MGContextMenuRadioButton> Group))
+                Group.Remove(Item);
+        }
+
+        internal void OnRadioButtonGroupNameChanged(MGContextMenuRadioButton Item, string OldGroup, string NewGroup)
+        {
+            if (OldGroup != null && _RadioGroups.TryGetValue(OldGroup, out List<MGContextMenuRadioButton> OldList))
+                OldList.Remove(Item);
+            if (NewGroup != null)
+            {
+                if (!_RadioGroups.TryGetValue(NewGroup, out List<MGContextMenuRadioButton> NewList))
+                {
+                    NewList = new();
+                    _RadioGroups[NewGroup] = NewList;
+                }
+                NewList.Add(Item);
+            }
+        }
+
+        /// <summary>Sets the given <paramref name="CheckedItem"/> as the only checked item in the group <paramref name="GroupName"/>,
+        /// unchecking all others in that group.</summary>
+        public void SetCheckedRadioItem(string GroupName, MGContextMenuRadioButton CheckedItem)
+        {
+            if (GroupName == null || !_RadioGroups.TryGetValue(GroupName, out List<MGContextMenuRadioButton> Group))
+                return;
+            foreach (MGContextMenuRadioButton Item in Group)
+                Item.IsChecked = Item == CheckedItem;
+            ItemRadioSelected?.Invoke(this, CheckedItem);
+        }
+        #endregion Radio Groups
+        #endregion Items
 
         public MGScrollViewer ScrollViewerElement { get; }
         public MGStackPanel ItemsPanel { get; }
@@ -316,7 +443,8 @@ namespace MGUI.Core.UI
             }
             else
             {
-                Menu.InvokeContextMenuOpening();
+                if (!Menu.InvokeContextMenuOpening())
+                    return false;
                 _ActiveContextMenu = Menu;
 
                 Menu.Scale = Scale;
@@ -381,6 +509,9 @@ namespace MGUI.Core.UI
         /// <summary>Invoked when a <see cref="MGContextMenuToggle"/> item is clicked, after the <see cref="MGContextMenuToggle.IsChecked"/> value changes. <br/>
         /// The <see cref="MGContextMenuButton"/> may exist within a nested submenu (See also: <see cref="Submenus"/>)</summary>
         public event EventHandler<MGContextMenuToggle> ItemToggled;
+        /// <summary>Invoked when a <see cref="MGContextMenuRadioButton"/> item is clicked and becomes checked.<br/>
+        /// The <see cref="MGContextMenuRadioButton"/> may exist within a nested submenu (See also: <see cref="Submenus"/>)</summary>
+        public event EventHandler<MGContextMenuRadioButton> ItemRadioSelected;
 
         public IContextMenuHost Host { get; }
         public bool IsSubmenu => Host is MGContextMenu;
@@ -531,6 +662,8 @@ namespace MGUI.Core.UI
                                         Button.OnSelected += MenuItem_ItemSelected;
                                     else if (Item is MGContextMenuToggle Toggle)
                                         Toggle.OnToggled += MenuItem_ItemToggled;
+                                    else if (Item is MGContextMenuRadioButton RadioButton)
+                                        RadioButton.OnToggled += MenuItem_ItemRadioSelected;
                                     ItemsPanel.TryInsertChild(Index, Item);
                                     Index++;
                                 }
@@ -547,6 +680,11 @@ namespace MGUI.Core.UI
                                         Button.OnSelected -= MenuItem_ItemSelected;
                                     else if (Item is MGContextMenuToggle Toggle)
                                         Toggle.OnToggled -= MenuItem_ItemToggled;
+                                    else if (Item is MGContextMenuRadioButton RadioButton)
+                                    {
+                                        RadioButton.OnToggled -= MenuItem_ItemRadioSelected;
+                                        UnregisterRadioItem(RadioButton);
+                                    }
                                     ItemsPanel.TryRemoveChild(Item);
                                 }
                             }
@@ -559,20 +697,6 @@ namespace MGUI.Core.UI
                         }
                     }
                 };
-
-                #region Bug Workaround
-                //  I have no clue why this is needed, but without it, the layout is incorrect if:
-                //      1. This ContextMenu's Vertical ScrollBar is visible (Set this.MaxHeight to a small value to test)
-                //      2. The menu is closed and then re-opened
-                //  The layout would be correct the first time the menu is opened. Afterwards, the menu items seem to ignore the Vertical ScrollBar's width
-                //  Good luck to future me trying to fix this issue for real instead of with a shitty workaround
-                //  Can also be 'fixed' by removing MGElement.TryGetRecentSelfMeasurement(...)
-                //  Seems to be related to how MGScrollViewer handles ScrollBarVisibility.Auto
-                ContextMenuOpening += (sender, e) => { SV.InvalidateLayout(); };
-                //  TODO: This may have been due to an issue that was fixed in this commit?
-                //  https://github.com/Videogamers0/MGUI/commit/dd4c1d6cefffe5d4474f8e6017687ff14b6c63c1
-                //  Should try re-testing the issue now and see if it's still reproducible
-                #endregion Bug Workaround
 
                 ButtonWrapperTemplate = CreateDefaultDropdownButton;
 
@@ -641,12 +765,14 @@ namespace MGUI.Core.UI
                 {
                     e.ItemSelected += Submenu_ItemSelected;
                     e.ItemToggled += Submenu_ItemToggled;
+                    e.ItemRadioSelected += Submenu_ItemRadioSelected;
                 };
 
                 SubmenuClosed += (sender, e) =>
                 {
                     e.ItemSelected -= Submenu_ItemSelected;
                     e.ItemToggled -= Submenu_ItemToggled;
+                    e.ItemRadioSelected -= Submenu_ItemRadioSelected;
                 };
 
                 ItemSelected += (sender, e) =>
@@ -660,11 +786,18 @@ namespace MGUI.Core.UI
                     if (!StaysOpenOnItemToggled)
                         TryCloseContextMenu();
                 };
+
+                ItemRadioSelected += (sender, e) =>
+                {
+                    if (!StaysOpenOnItemToggled)
+                        TryCloseContextMenu();
+                };
             }
         }
 
         private void Submenu_ItemSelected(object sender, MGContextMenuButton e) => ItemSelected?.Invoke(this, e);
         private void Submenu_ItemToggled(object sender, MGContextMenuToggle e) => ItemToggled?.Invoke(this, e);
+        private void Submenu_ItemRadioSelected(object sender, MGContextMenuRadioButton e) => ItemRadioSelected?.Invoke(this, e);
 
         private void MenuItem_ItemSelected(object sender, EventArgs e)
         {
@@ -676,6 +809,12 @@ namespace MGUI.Core.UI
         {
             if (sender is MGContextMenuToggle Toggle)
                 ItemToggled?.Invoke(this, Toggle);
+        }
+
+        private void MenuItem_ItemRadioSelected(object sender, bool e)
+        {
+            if (sender is MGContextMenuRadioButton RadioButton && RadioButton.IsChecked)
+                ItemRadioSelected?.Invoke(this, RadioButton);
         }
 
         public IEnumerable<TMenuItemType> GetItemsOfType<TMenuItemType>(bool IncludeSubmenus)
