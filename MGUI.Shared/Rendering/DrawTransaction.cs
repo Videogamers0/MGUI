@@ -179,6 +179,9 @@ namespace MGUI.Shared.Rendering
         /// <summary>
         /// Draws <paramref name="Text"/> using the active <see cref="ITextEngine"/>, while
         /// ensuring the correct <see cref="DrawContext"/> has been started on this transaction.
+        /// The <see cref="SpriteBatch"/> (<see cref="SB"/>) owned by this transaction is passed
+        /// automatically and is therefore not a parameter here, unlike the lower-level
+        /// <see cref="ITextEngine.DrawText"/> overload.
         /// </summary>
         public void DrawTextViaEngine(
             MGUI.Shared.Text.ResolvedFont Font,
@@ -235,7 +238,7 @@ namespace MGUI.Shared.Rendering
                 return Vector2.Zero;
 
             var resolved = TextEngine.ResolveFont(new FontSpec(Family, DesiredFontSize, Style));
-            if (resolved.NativeFont == null && resolved.IsFallback)
+            if (resolved.NativeFont == null)
                 return Vector2.Zero;
 
             Vector2 suggested = TextEngine.MeasureText(resolved, Text);

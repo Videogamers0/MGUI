@@ -86,8 +86,25 @@ namespace MGUI.FontStashSharp
         /// <para/>
         /// Set to <c>1f</c> if your <see cref="FontSystem"/> instances were built with sizes
         /// already expressed in the same unit as <c>FontSize</c>.
+        /// <para/>
+        /// Changing this value automatically clears the resolved-font cache so that all
+        /// subsequent <see cref="ResolveFont"/> calls use the new scale.
+        /// Must be set before rendering begins (MonoGame is single-threaded; do not change
+        /// this property from a background thread while the engine is in use).
         /// </summary>
-        public float FontSizeScale { get; set; } = 1.5f;
+        public float FontSizeScale
+        {
+            get => _fontSizeScale;
+            set
+            {
+                if (_fontSizeScale != value)
+                {
+                    _fontSizeScale = value;
+                    InvalidateCache();
+                }
+            }
+        }
+        private float _fontSizeScale = 1.5f;
 
         // ── Registration ─────────────────────────────────────────────────────────
 
@@ -224,10 +241,18 @@ namespace MGUI.FontStashSharp
             var h = GetHandle(font);
             if (h is null) return;
 
+            // FontStashSharp's DrawText does not accept SpriteEffects directly.
+            // Simulate flipping by negating the scale axes and adjusting the position,
+            // which is equivalent to what SpriteBatch does for sprite effects.
+            float sx = scale;
+            float sy = scale;
+            if ((effects & SpriteEffects.FlipHorizontally) != 0) sx = -sx;
+            if ((effects & SpriteEffects.FlipVertically)   != 0) sy = -sy;
+
             h.Font.DrawText(spriteBatch, text, position, color,
                 rotation:   rotation,
                 origin:     origin,
-                scale:      new Vector2(scale),
+                scale:      new Vector2(sx, sy),
                 layerDepth: depth);
         }
 

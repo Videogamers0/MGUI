@@ -103,6 +103,9 @@ namespace MGUI.Samples
                     ? (ITextEngine)_fssEngine
                     : new SpriteFontTextEngine(Desktop.FontManager);
                 Debug.WriteLine($"[TextEngine] switched to {Desktop.TextEngine.GetType().Name}");
+                // Different engines may have different layout metrics (e.g. line heights).
+                // Force all windows to re-measure so the new engine's metrics take effect immediately.
+                Desktop.InvalidateAllLayouts();
             }
             _prevKeyboardState = ks;
 

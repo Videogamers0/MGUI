@@ -572,6 +572,8 @@ namespace MGUI.Core.UI
                 return Vector2.Zero;
 
             ResolvedFont resolved = GetResolvedFont(IsBold, IsItalic);
+            if (resolved?.NativeFont == null)
+                return Vector2.Zero;
             Vector2 measured = TextEngine.MeasureText(resolved, Text);
             // LineHeight from the engine may be 0 for some backends; fall back to resolved value.
             return new Vector2(measured.X, measured.Y > 0 ? measured.Y : resolved.LineHeight);

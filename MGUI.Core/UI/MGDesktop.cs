@@ -35,6 +35,18 @@ namespace MGUI.Core.UI
             set => Renderer.TextEngine = value;
         }
 
+        /// <summary>
+        /// Invalidates the layout of every <see cref="MGWindow"/> on this desktop, forcing
+        /// all elements to be re-measured on the next frame.  Call this after switching
+        /// <see cref="TextEngine"/> at runtime so that the new engine's metrics (e.g. line
+        /// heights) are reflected immediately.
+        /// </summary>
+        public void InvalidateAllLayouts()
+        {
+            foreach (MGWindow window in Windows)
+                window.InvalidateLayout();
+        }
+
         /// <summary>A <see cref="MouseHandler"/> that is updated at the start of <see cref="Update()"/>, before any <see cref="MGWindow"/>s in <see cref="Windows"/> are updated.<br/>
         /// Objects that subscribe to this handler's mouse events will be the very first to receive and handle the event.<para/>
         /// Highly recommended to avoid using this unless absolutely necessary, and if you do use it, you probably shouldn't call e.SetHandledBy(...) so other elements can still receive the input.</summary>
