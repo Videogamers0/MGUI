@@ -307,107 +307,17 @@
 /processorParam:TextureFormat=Color
 /build:Fonts/Arial/9_Normal.spritefont
 
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-Bold.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-Bold.ttf
+#begin Fonts/ttf/arial.ttf
+/copy:Fonts/ttf/arial.ttf
 
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-BoldItalic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-BoldItalic.ttf
+#begin Fonts/ttf/arialbd.ttf
+/copy:Fonts/ttf/arialbd.ttf
 
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-ExtraBold.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-ExtraBold.ttf
+#begin Fonts/ttf/arialbi.ttf
+/copy:Fonts/ttf/arialbi.ttf
 
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-ExtraBoldItalic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-ExtraBoldItalic.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-ExtraLight.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-ExtraLight.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-ExtraLightItalic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-ExtraLightItalic.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-Italic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-Italic.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-Light.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-Light.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-LightItalic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-LightItalic.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-Medium.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-Medium.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-MediumItalic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-MediumItalic.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-Regular.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-Regular.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-SemiBold.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-SemiBold.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-SemiBoldItalic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-SemiBoldItalic.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-Thin.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-Thin.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMono-ThinItalic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMono-ThinItalic.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-Bold.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-Bold.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-BoldItalic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-BoldItalic.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-ExtraBold.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-ExtraBold.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-ExtraBoldItalic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-ExtraBoldItalic.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-ExtraLight.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-ExtraLight.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-ExtraLightItalic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-ExtraLightItalic.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-Italic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-Italic.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-Light.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-Light.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-LightItalic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-LightItalic.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-Medium.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-Medium.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-MediumItalic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-MediumItalic.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-Regular.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-Regular.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-SemiBold.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-SemiBold.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-SemiBoldItalic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-SemiBoldItalic.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-Thin.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-Thin.ttf
-
-#begin Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-ThinItalic.ttf
-/copy:Fonts/JetBrainsMono/ttf/JetBrainsMonoNL-ThinItalic.ttf
-
-#begin Fonts/tahoma.ttf
-/copy:Fonts/tahoma.ttf
-
-#begin Fonts/tahomabd.ttf
-/copy:Fonts/tahomabd.ttf
+#begin Fonts/ttf/ariali.ttf
+/copy:Fonts/ttf/ariali.ttf
 
 #begin Icons/AngryMeteor_MilitaryIconsSet.png
 /importer:TextureImporter

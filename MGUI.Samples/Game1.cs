@@ -55,23 +55,27 @@ namespace MGUI.Samples
             // ── FontStashSharp engine (F1 to toggle) ──────────────────────────────────
             try
             {
-                string jbmDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"Content\Fonts\JetBrainsMono\ttf"));
+                string ttfDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"Content\Fonts\ttf"));
 
                 _fssEngine = new FontStashSharpTextEngine();
 
-                var jbmNormal = new FontSystem();
-                jbmNormal.AddFont(File.ReadAllBytes(Path.Combine(jbmDir, "JetBrainsMono-Regular.ttf")));
-                _fssEngine.AddFontSystem("JetBrainsMono", CustomFontStyles.Normal, jbmNormal);
+                var arialNormal = new FontSystem();
+                arialNormal.AddFont(File.ReadAllBytes(Path.Combine(ttfDir, "arial.ttf")));
+                _fssEngine.AddFontSystem("Arial", CustomFontStyles.Normal, arialNormal);
 
-                var jbmBold = new FontSystem();
-                jbmBold.AddFont(File.ReadAllBytes(Path.Combine(jbmDir, "JetBrainsMono-Bold.ttf")));
-                _fssEngine.AddFontSystem("JetBrainsMono", CustomFontStyles.Bold, jbmBold);
+                var arialBold = new FontSystem();
+                arialBold.AddFont(File.ReadAllBytes(Path.Combine(ttfDir, "arialbd.ttf")));
+                _fssEngine.AddFontSystem("Arial", CustomFontStyles.Bold, arialBold);
 
-                var jbmItalic = new FontSystem();
-                jbmItalic.AddFont(File.ReadAllBytes(Path.Combine(jbmDir, "JetBrainsMono-Italic.ttf")));
-                _fssEngine.AddFontSystem("JetBrainsMono", CustomFontStyles.Italic, jbmItalic);
+                var arialItalic = new FontSystem();
+                arialItalic.AddFont(File.ReadAllBytes(Path.Combine(ttfDir, "ariali.ttf")));
+                _fssEngine.AddFontSystem("Arial", CustomFontStyles.Italic, arialItalic);
             }
-            catch (Exception ex) { Debug.WriteLine($"FSS engine init failed: {ex.Message}"); _fssEngine = null; }
+            catch (Exception ex) 
+            { 
+                Debug.WriteLine($"FSS engine init failed: {ex.Message}"); 
+                _fssEngine = null; 
+            }
             // ─────────────────────────────────────────────────────────────────────────
 
             //  This is a dialog with toggle buttons to launch other dialogs
