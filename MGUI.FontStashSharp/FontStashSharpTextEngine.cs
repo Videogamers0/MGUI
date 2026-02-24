@@ -75,6 +75,13 @@ namespace MGUI.FontStashSharp
         private readonly Dictionary<FontSpec, ResolvedFont> _cache = new();
 
         /// <summary>
+        /// Calibrated mapping built by <see cref="MatchSpriteFontSizing"/>.
+        /// Key = requested pt size, Value = FSS pixel size that matches SpriteFont's effective rendering.
+        /// When <c>null</c>, <see cref="ResolveFont"/> falls back to <c>spec.Size * FontSizeScale</c>.
+        /// </summary>
+        private Dictionary<int, int>? _calibratedPixelSizes;
+
+        /// <summary>
         /// Scale factor applied to MGUI's logical <c>FontSize</c> (in points) before
         /// passing it to <see cref="FontSystem.GetFont"/> (which expects pixels).
         /// <para/>
@@ -122,6 +129,45 @@ namespace MGUI.FontStashSharp
             InvalidateCache();
         }
 
+        /// <summary>
+        /// Calibrates this engine so that for each requested <c>FontSize</c>, the
+        /// FSS rasterisation pixel size matches the effective rendering size that
+        /// <see cref="SpriteFontTextEngine"/> would produce with its downsampled
+        /// <c>SuggestedScale</c> strategy.
+        /// <para/>
+        /// Without calibration, <c>FontSize = 11</c> maps to <c>round(11 × 4/3) = 15 px</c>,
+        /// but SpriteFont picks a baked 36 pt font and downsamples by 1/3 → effective 12 pt →
+        /// 16 px.  After calling this method, FSS will also use 16 px for <c>FontSize = 11</c>,
+        /// eliminating the mismatch.
+        /// <para/>
+        /// Call this once, after registering all <see cref="FontSystem"/>s and
+        /// before any rendering occurs.
+        /// </summary>
+        /// <param name="fontManager">The same <see cref="FontManager"/> used by
+        /// <c>MainRenderer</c> / <c>MGDesktop</c>.</param>
+        public void MatchSpriteFontSizing(FontManager fontManager)
+        {
+            if (fontManager is null) throw new ArgumentNullException(nameof(fontManager));
+
+            _calibratedPixelSizes = new Dictionary<int, int>();
+            string family = fontManager.DefaultFontFamily;
+
+            for (int ptSize = 1; ptSize <= 96; ptSize++)
+            {
+                if (fontManager.TryGetFont(family, CustomFontStyles.Normal, ptSize,
+                        /*PreferDownsampled*/ true,
+                        out _, out _, out int bakedSize, out _, out float suggestedScale))
+                {
+                    // SpriteFont effective pt size after downsampling
+                    float effectivePt = bakedSize * suggestedScale;
+                    int fssPx = Math.Max(1, (int)Math.Round(effectivePt * FontSizeScale));
+                    _calibratedPixelSizes[ptSize] = fssPx;
+                }
+            }
+
+            InvalidateCache();
+        }
+
         // ── ITextEngine ──────────────────────────────────────────────────────────
 
         /// <inheritdoc/>
@@ -153,7 +199,20 @@ namespace MGUI.FontStashSharp
                 return placeholder;
             }
 
-            SpriteFontBase spriteFontBase = fs.GetFont((int)Math.Round(spec.Size * FontSizeScale));
+            // Compute the FSS pixel size — use calibrated lookup when available,
+            // otherwise fall back to straight pt→px conversion.
+            int pixelSize;
+            if (_calibratedPixelSizes != null &&
+                _calibratedPixelSizes.TryGetValue(spec.Size, out int calibrated))
+            {
+                pixelSize = calibrated;
+            }
+            else
+            {
+                pixelSize = (int)Math.Round(spec.Size * FontSizeScale);
+            }
+
+            SpriteFontBase spriteFontBase = fs.GetFont(pixelSize);
             var handle = new FSSFontHandle(spriteFontBase);
 
             var resolved = new ResolvedFont(
