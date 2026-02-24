@@ -285,12 +285,16 @@ namespace MGUI.Core.UI.Text
                     CurrentIndicesMap.Add(CurrentIndexInOriginalText);
                 }
 
+                // Each run is measured as a complete string (whole-string MeasureText) so inter-word
+                // kerning within a run is captured correctly.  The wrapping-accumulated CurrentX is
+                // discarded because it was built word-by-word and can differ from the per-run whole-string
+                // measurement after kerning adjustments.
                 List<Vector2> TextRunSizes = CurrentLine.Where(x => x.RunType == TextRunType.Text).Cast<MGTextRunText>()
-                    .Select((x, index) => Measurer.MeasureText(x.Text, x.Settings.IsBold, x.Settings.IsItalic, index == 0)).ToList();
+                    .Select(x => Measurer.MeasureText(x.Text, x.Settings.IsBold, x.Settings.IsItalic, false)).ToList();
                 List<Vector2> ImageRunSizes = CurrentLine.Where(x => x.RunType == TextRunType.Image).Cast<MGTextRunImage>()
                     .Select(x => new Vector2(x.TargetWidth, x.TargetHeight)).ToList();
 
-                float LineWidth = Math.Max(CurrentX, TextRunSizes.Sum(x => x.X) + ImageRunSizes.Sum(x => x.X));
+                float LineWidth = TextRunSizes.Sum(x => x.X) + ImageRunSizes.Sum(x => x.X);
                 float LineTextHeight = TextRunSizes.DefaultIfEmpty(Vector2.Zero).Max(x => x.Y);
                 float LineImageHeight = ImageRunSizes.DefaultIfEmpty(Vector2.Zero).Max(x => x.Y);
                 float LineTotalHeight = GeneralUtils.Max(MinLineHeight, LineTextHeight, LineImageHeight);
