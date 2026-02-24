@@ -33,6 +33,11 @@ namespace MGUI.FontStashSharp
             public float          LineHeight { get; }
             public float          SpaceWidth { get; }
 
+            // Cache: char → measured advance width.  Populated lazily on first request so that
+            // TextRenderInfo.UpdateLines (called per-char per layout pass) avoids repeated
+            // single-character string allocations and MeasureString calls.
+            private readonly Dictionary<char, float> _glyphWidths = new();
+
             public FSSFontHandle(SpriteFontBase font)
             {
                 Font = font;
@@ -41,6 +46,20 @@ namespace MGUI.FontStashSharp
                 LineHeight = lineSize.Y;
                 var spaceSize = font.MeasureString(" ");
                 SpaceWidth = spaceSize.X;
+            }
+
+            /// <summary>
+            /// Returns the advance width of <paramref name="c"/>, allocating a single-char
+            /// string and calling <see cref="SpriteFontBase.MeasureString"/> only the first
+            /// time a given character is requested; subsequent calls return the cached value.
+            /// </summary>
+            public float GetGlyphWidth(char c)
+            {
+                if (_glyphWidths.TryGetValue(c, out float w))
+                    return w;
+                float measured = Font.MeasureString(c.ToString()).X;
+                _glyphWidths[c] = measured;
+                return measured;
             }
         }
 
@@ -174,11 +193,10 @@ namespace MGUI.FontStashSharp
             if (h is null)
                 return new GlyphMetrics(0, 0, 0, font.LineHeight);
 
-            // FSS doesn't expose per-glyph bearings via public API;
-            // measure the single-char string and report the full width as GlyphWidth
+            // FSS doesn't expose per-glyph bearings; report the full advance as GlyphWidth
             // (LeftSideBearing = RightSideBearing = 0, so TotalWidth == TotalWidthFirstGlyph).
-            var size = h.Font.MeasureString(c.ToString());
-            return new GlyphMetrics(0f, size.X, 0f, h.LineHeight);
+            // Width is cached per-char on the handle to avoid repeated string allocations.
+            return new GlyphMetrics(0f, h.GetGlyphWidth(c), 0f, h.LineHeight);
         }
 
         /// <inheritdoc/>
