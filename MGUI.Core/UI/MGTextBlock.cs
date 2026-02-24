@@ -617,31 +617,22 @@ namespace MGUI.Core.UI
 
         public override string ToString() => $"{base.ToString()}: \"{Text?.Truncate(100)}\"";
 
+        /// <summary>
+        /// Measures the rendered width of <paramref name="Text"/> using the active <see cref="ITextEngine"/>.
+        /// Delegates to <see cref="ITextEngine.MeasureText"/> (whole-string) so that kerning is accounted
+        /// for correctly.  The <paramref name="IgnoreFirstGlyphNegativeLeftSideBearing"/> parameter is kept
+        /// for <see cref="ITextMeasurer"/> interface compatibility but is no longer used here — the engine
+        /// already handles first-glyph bearing internally.
+        /// </summary>
         public Vector2 MeasureText(string Text, bool IsBold, bool IsItalic, bool IgnoreFirstGlyphNegativeLeftSideBearing)
         {
             if (string.IsNullOrEmpty(Text))
                 return Vector2.Zero;
 
             ResolvedFont resolved = GetResolvedFont(IsBold, IsItalic);
-            ITextEngine engine    = TextEngine;
-
-            float width = 0f;
-            bool first  = true;
-            foreach (char c in Text)
-            {
-                GlyphMetrics g = engine.MeasureGlyph(resolved, c);
-                if (first && IgnoreFirstGlyphNegativeLeftSideBearing)
-                {
-                    width += g.TotalWidthFirstGlyph;
-                    first  = false;
-                }
-                else
-                {
-                    width += g.TotalWidth;
-                }
-            }
-
-            return new Vector2(width, resolved.LineHeight);
+            Vector2 measured = TextEngine.MeasureText(resolved, Text);
+            // LineHeight from the engine may be 0 for some backends; fall back to resolved value.
+            return new Vector2(measured.X, measured.Y > 0 ? measured.Y : resolved.LineHeight);
         }
 
         private readonly List<ElementMeasurement> RecentSelfMeasurements = new();
