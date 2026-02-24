@@ -30,24 +30,11 @@ namespace MGUI.Core.UI
         /// <summary>To set this value, use <see cref="TrySetFont(string, int)"/> or <see cref="TrySetFontSize(int)"/></summary>
         public int FontSize { get => _FontSize; set => _ = TrySetFontSize(value); }
 
-        internal float FontScale { get; private set; }
-        internal Vector2 FontOrigin { get; private set; }
-        internal int FontHeight { get; private set; }
+        /// <summary>
+        /// Cached space-character width from <see cref="RF_Regular"/>.
+        /// Consumed by <see cref="MGUI.Core.UI.Text.TextRenderInfo"/> for default caret sizing.
+        /// </summary>
         internal float SpaceWidth { get; private set; }
-
-        internal SpriteFont SF_Regular { get; private set; }
-        internal SpriteFont SF_Bold { get; private set; }
-        internal SpriteFont SF_Italic { get; private set; }
-        internal SpriteFont SF_BoldItalic { get; private set; }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Dictionary<char, SpriteFont.Glyph> SF_Regular_Glyphs { get; set; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Dictionary<char, SpriteFont.Glyph> SF_Bold_Glyphs { get; set; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Dictionary<char, SpriteFont.Glyph> SF_Italic_Glyphs { get; set; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Dictionary<char, SpriteFont.Glyph> SF_BoldItalic_Glyphs { get; set; }
 
         // ── ITextEngine-backed resolved fonts (one per style variant) ─────────────
         /// <summary>Shortcut to the active <see cref="ITextEngine"/> from the parent Desktop.</summary>
@@ -67,30 +54,6 @@ namespace MGUI.Core.UI
             return RF_Italic;
         }
 
-        internal SpriteFont GetFont(bool IsBold, bool IsItalic, out Dictionary<char, SpriteFont.Glyph> Glyphs)
-        {
-            if (!IsBold && !IsItalic)
-            {
-                Glyphs = SF_Regular_Glyphs;
-                return SF_Regular;
-            }
-            else if (IsBold && IsItalic)
-            {
-                Glyphs = SF_BoldItalic_Glyphs;
-                return SF_BoldItalic;
-            }
-            else if (IsBold)
-            {
-                Glyphs = SF_Bold_Glyphs;
-                return SF_Bold;
-            }
-            else
-            {
-                Glyphs = SF_Italic_Glyphs;
-                return SF_Italic;
-            }
-        }
-
         public bool TrySetFontSize(int FontSize) => TrySetFont(FontFamily, FontSize);
         public bool TrySetFont(string FontFamily, int FontSize)
         {
@@ -99,34 +62,21 @@ namespace MGUI.Core.UI
                 string PreviousFontFamily = FontFamily;
                 int PreviousFontSize = FontSize;
 
-                if (!GetDesktop().FontManager.TryGetFont(FontFamily, CustomFontStyles.Normal, FontSize, true, out FontSet FS, out SpriteFont Font, out int Size, out float ExactScale, out float SuggestedScale))
+                // Validate that the requested font exists before committing the change
+                if (!GetDesktop().FontManager.TryGetFont(FontFamily, CustomFontStyles.Normal, FontSize, true, out _, out _, out _, out _, out _))
                     return false;
 
                 _FontFamily = FontFamily;
                 _FontSize = FontSize;
 
-                SF_Regular = Font;
-                FontScale = GetTheme().FontSettings.UseExactScale ? ExactScale : SuggestedScale;
-                FontOrigin = FS.Origins[Size];
-                FontHeight = FS.Heights[Size];
-                SpaceWidth = (SF_Regular.MeasureString(" ") * FontScale).X;
-
-                SF_Bold = GetFontStyleOrDefault(FS, CustomFontStyles.Bold, Size, SF_Regular);
-                SF_Italic = GetFontStyleOrDefault(FS, CustomFontStyles.Italic, Size, SF_Regular);
-                SF_BoldItalic = GetFontStyleOrDefault(FS, CustomFontStyles.Bold | CustomFontStyles.Italic, Size, SF_Bold ?? SF_Italic ?? SF_Regular);
-
-                SF_Regular_Glyphs    = SF_Regular?.GetGlyphs();
-                SF_Bold_Glyphs       = SF_Bold?.GetGlyphs();
-                SF_Italic_Glyphs     = SF_Italic?.GetGlyphs();
-                SF_BoldItalic_Glyphs = SF_BoldItalic?.GetGlyphs();
-
-                // Resolve ITextEngine handles for the 4 style variants
+                // Resolve ITextEngine handles for all 4 style variants
                 ITextEngine engine = TextEngine;
-                bool useExact = GetTheme().FontSettings.UseExactScale;
                 RF_Regular    = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Normal));
                 RF_Bold       = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Bold));
                 RF_Italic     = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Italic));
                 RF_BoldItalic = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Bold | CustomFontStyles.Italic));
+
+                SpaceWidth = RF_Regular.SpaceWidth;
 
                 InvokeLayoutChanged();
 
@@ -141,13 +91,7 @@ namespace MGUI.Core.UI
                 return true;
         }
 
-        private static SpriteFont GetFontStyleOrDefault(FontSet FS, CustomFontStyles Style, int Size, SpriteFont Default)
-        {
-            if (FS.TryGetFont(Style, Size, false, out SpriteFont Result, out _, out _, out _))
-                return Result;
-            else
-                return Default;
-        }
+
 
         #region Font Style
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -697,7 +641,7 @@ namespace MGUI.Core.UI
 
             Vector2 Size = new(MeasuredLines.Select(x => x.LineWidth).DefaultIfEmpty(0).Max(), MeasuredLines.Sum(x => x.LineTotalHeight) + LinePadding * Math.Max(0, MeasuredLines.Count - 1));
             if (MinLines > MeasuredLines.Count)
-                Size = Size.SetY(Size.Y + (MinLines - MeasuredLines.Count) * (FontHeight + LinePadding));
+                Size = Size.SetY(Size.Y + (MinLines - MeasuredLines.Count) * (RF_Regular.LineHeight + LinePadding));
 
             Thickness Measurement = new((int)Math.Ceiling(Size.X), (int)Math.Ceiling(Size.Y), 0, 0);
 
