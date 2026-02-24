@@ -41,11 +41,11 @@ namespace MGUI.FontStashSharp
             public FSSFontHandle(SpriteFontBase font)
             {
                 Font = font;
-                // MeasureString on a single pipe gives a reliable line-height approximation
-                var lineSize  = font.MeasureString("|");
-                LineHeight = lineSize.Y;
-                var spaceSize = font.MeasureString(" ");
-                SpaceWidth = spaceSize.X;
+                // Use the native FSS metric (ascender + descender in pixels at the
+                // rasterized size).  Avoids the previous MeasureString("|") hack which
+                // returned values influenced by internal leading.
+                LineHeight = font.LineHeight;
+                SpaceWidth = font.MeasureString(" ").X;
             }
 
             /// <summary>
@@ -75,22 +75,20 @@ namespace MGUI.FontStashSharp
         private readonly Dictionary<FontSpec, ResolvedFont> _cache = new();
 
         /// <summary>
-        /// Scale factor applied to MGUI's logical <c>FontSize</c> before passing it to
-        /// <see cref="FontSystem.GetFont"/>.
+        /// Scale factor applied to MGUI's logical <c>FontSize</c> (in points) before
+        /// passing it to <see cref="FontSystem.GetFont"/> (which expects pixels).
         /// <para/>
-        /// MonoGame's built-in SpriteFont renderer reports a <c>LineSpacing</c> that is
-        /// typically ~1.5× the nominal font size, whereas FontStashSharp's
-        /// <c>SpriteFontBase.LineHeight</c> is ~1.0× the pixel size passed to
-        /// <c>GetFont()</c>.  Multiplying by <c>1.5f</c> makes both engines produce
-        /// visually equivalent text metrics under MGUI's default layout.
+        /// At 96 DPI the standard conversion is <c>1pt = 96/72 px = 4/3 px</c>.
+        /// This matches the MonoGame Content Pipeline which also rasterizes
+        /// <c>.spritefont</c> sizes at 96 DPI, so both engines produce text of the
+        /// same physical width.
         /// <para/>
-        /// Set to <c>1f</c> if your <see cref="FontSystem"/> instances were built with sizes
-        /// already expressed in the same unit as <c>FontSize</c>.
+        /// Set to <c>1f</c> if your <see cref="FontSystem"/> instances were built with
+        /// sizes already expressed in pixels.
         /// <para/>
         /// Changing this value automatically clears the resolved-font cache so that all
         /// subsequent <see cref="ResolveFont"/> calls use the new scale.
-        /// Must be set before rendering begins (MonoGame is single-threaded; do not change
-        /// this property from a background thread while the engine is in use).
+        /// Must only be changed from the main thread before rendering begins.
         /// </summary>
         public float FontSizeScale
         {
@@ -104,7 +102,7 @@ namespace MGUI.FontStashSharp
                 }
             }
         }
-        private float _fontSizeScale = 1.5f;
+        private float _fontSizeScale = 4f / 3f;
 
         // ── Registration ─────────────────────────────────────────────────────────
 
