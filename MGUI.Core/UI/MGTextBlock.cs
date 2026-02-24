@@ -618,13 +618,11 @@ namespace MGUI.Core.UI
         public override string ToString() => $"{base.ToString()}: \"{Text?.Truncate(100)}\"";
 
         /// <summary>
-        /// Measures the rendered width of <paramref name="Text"/> using the active <see cref="ITextEngine"/>.
+        /// Measures the rendered size of <paramref name="Text"/> using the active <see cref="ITextEngine"/>.
         /// Delegates to <see cref="ITextEngine.MeasureText"/> (whole-string) so that kerning is accounted
-        /// for correctly.  The <paramref name="IgnoreFirstGlyphNegativeLeftSideBearing"/> parameter is kept
-        /// for <see cref="ITextMeasurer"/> interface compatibility but is no longer used here — the engine
-        /// already handles first-glyph bearing internally.
+        /// for correctly.
         /// </summary>
-        public Vector2 MeasureText(string Text, bool IsBold, bool IsItalic, bool IgnoreFirstGlyphNegativeLeftSideBearing)
+        public Vector2 MeasureText(string Text, bool IsBold, bool IsItalic)
         {
             if (string.IsNullOrEmpty(Text))
                 return Vector2.Zero;
@@ -801,7 +799,7 @@ namespace MGUI.Core.UI
                         float ActualOpacity = Opacity * TextRun.Settings.Opacity;
                         Color Foreground = (TextRun.Settings.Foreground ?? DefaultForeground) * ActualOpacity;
 
-                        Vector2 TextSize = MeasureText(TextRun.Text, IsBold, IsItalic, IsStartOfLine);
+                        Vector2 TextSize = MeasureText(TextRun.Text, IsBold, IsItalic);
                         TextRun.Settings.Background?.Draw(DA.SetOpacity(ActualOpacity), this, new((int)CurrentX, (int)TextYPosition, (int)TextSize.X, (int)Line.LineTextHeight));
 
                         if (TextRun.Settings.IsUnderlined)
@@ -884,8 +882,6 @@ namespace MGUI.Core.UI
                 float CurrentX = ApplyAlignment(LineBounds, TextAlignment, VerticalContentAlignment, new Size((int)Line.LineWidth, (int)Line.LineTotalHeight)).Left;
                 float TextYPosition = ApplyAlignment(LineBounds, TextAlignment, VerticalContentAlignment, new Size((int)Line.LineWidth, (int)Line.LineTextHeight)).Y;
 
-                bool IsStartOfLine = true;
-
                 foreach (MGTextRun Run in Line.Runs)
                 {
                     RectangleF RunBounds; // The bounds of the MGTextRun, in CoordinateSpace.Layout space
@@ -916,7 +912,7 @@ namespace MGUI.Core.UI
                         if (TextProgress.HasValue && RemainingCharacters < TextRun.Text.Length)
                             ActualText = TextRun.Text.Substring(0, RemainingCharacters);
 
-                        Vector2 TextSize = MeasureText(ActualText, IsBold, IsItalic, IsStartOfLine);
+                        Vector2 TextSize = MeasureText(ActualText, IsBold, IsItalic);
 
                         //  Draw background
                         if (TextRun.Settings.HasBackground)
@@ -960,7 +956,6 @@ namespace MGUI.Core.UI
 
                         RunBounds = new(CurrentX, TextYPosition, TextSize.X, TextSize.Y);
                         CurrentX += TextSize.X;
-                        IsStartOfLine = false;
 
                         RemainingCharacters -= ActualText.Length;
                         if (TextProgress.HasValue && RemainingCharacters <= 0)

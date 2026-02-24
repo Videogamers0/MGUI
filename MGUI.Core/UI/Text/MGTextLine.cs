@@ -13,16 +13,12 @@ namespace MGUI.Core.UI.Text
 {
     public interface ITextMeasurer
     {
-        /// <param name="IgnoreFirstGlyphNegativeLeftSideBearing">Typically true for the first glyph of a line that is being rendered, but false in all other cases.<para/>
-        /// See also: <see cref="SpriteFont.MeasureString(string)"/> source code at:<br/>
-        /// <see href="https://github.com/MonoGame/MonoGame/blob/develop/MonoGame.Framework/Graphics/SpriteFont.cs"/><para/>
-        /// <code>
-        /// if (firstGlyphOfLine) {
-        ///     offset.X = Math.Max(pCurrentGlyph->LeftSideBearing, 0);
-        ///     firstGlyphOfLine = false;
-        /// }
-        /// </code></param>
-        Vector2 MeasureText(string Text, bool IsBold, bool IsItalic, bool IgnoreFirstGlyphNegativeLeftSideBearing);
+        /// <summary>
+        /// Measures the rendered size of <paramref name="Text"/> using the given font style.
+        /// Implementations must use a whole-string measurement (not per-glyph summation) so that
+        /// kerning between characters is accounted for correctly.
+        /// </summary>
+        Vector2 MeasureText(string Text, bool IsBold, bool IsItalic);
     }
 
     public record class MGTextLine
@@ -258,7 +254,7 @@ namespace MGUI.Core.UI.Text
 
             const string MultiLineWordSuffix = "-"; // A suffix to append to the end of a line, when the line only consists of a single word that must wrap across multiple lines
 
-            float MinLineHeight = (float)Math.Ceiling(Measurer.MeasureText(" ", false, false, false).Y);
+            float MinLineHeight = (float)Math.Ceiling(Measurer.MeasureText(" ", false, false).Y);
             int LineNumber = 1;
             List<MGTextRun> CurrentLine = new();
             float CurrentX = 0;
@@ -290,7 +286,7 @@ namespace MGUI.Core.UI.Text
                 // discarded because it was built word-by-word and can differ from the per-run whole-string
                 // measurement after kerning adjustments.
                 List<Vector2> TextRunSizes = CurrentLine.Where(x => x.RunType == TextRunType.Text).Cast<MGTextRunText>()
-                    .Select(x => Measurer.MeasureText(x.Text, x.Settings.IsBold, x.Settings.IsItalic, false)).ToList();
+                    .Select(x => Measurer.MeasureText(x.Text, x.Settings.IsBold, x.Settings.IsItalic)).ToList();
                 List<Vector2> ImageRunSizes = CurrentLine.Where(x => x.RunType == TextRunType.Image).Cast<MGTextRunImage>()
                     .Select(x => new Vector2(x.TargetWidth, x.TargetHeight)).ToList();
 
@@ -367,7 +363,7 @@ namespace MGUI.Core.UI.Text
                             //  This may be several consecutive items.
                             //  EX: "Hello[b]World" results in 2 runs: Run1="Hello", Run2="World" but there is no word delimiter (space) between them so it's a single word "HelloWorld"
                             List<Vector2> Measurements = CurrentAndNext.Select((Word, Index) =>
-                                Measurer.MeasureText(Word.Text, Word.IsBold, Word.IsItalic, CurrentLine.Count == 0 && Index == 0 && UnwrappedText.Length == 0)).ToList();
+                                Measurer.MeasureText(Word.Text, Word.IsBold, Word.IsItalic)).ToList();
                             float CurrentWidth = Measurements[0].X;
                             float TotalWidth = Measurements.Sum(x => x.X);
 
@@ -410,7 +406,7 @@ namespace MGUI.Core.UI.Text
                                 else
                                 {
                                     //  This chunk of text is wider than an entire line, so it must be split up into several pieces
-                                    double MaxLineSuffixWidth = string.IsNullOrEmpty(MultiLineWordSuffix) ? 0 : CurrentAndNext.Max(x => Measurer.MeasureText(MultiLineWordSuffix, x.IsBold, x.IsItalic, false).X);
+                                    double MaxLineSuffixWidth = string.IsNullOrEmpty(MultiLineWordSuffix) ? 0 : CurrentAndNext.Max(x => Measurer.MeasureText(MultiLineWordSuffix, x.IsBold, x.IsItalic).X);
                                     if (MaxLineSuffixWidth >= MaxLineWidth)
                                     {
                                         if (CurrentLine.Any() && FlushLine(out Line, false))
@@ -426,7 +422,7 @@ namespace MGUI.Core.UI.Text
                                     {
                                         foreach (WrappableRunWord Word in WordsByRun)
                                         {
-                                            Vector2 WordSize = Measurer.MeasureText(Word.Text, Word.IsBold, Word.IsItalic, CurrentLine.Count == 0 && UnwrappedText.Length == 0);
+                                            Vector2 WordSize = Measurer.MeasureText(Word.Text, Word.IsBold, Word.IsItalic);
                                             if (CurrentX + WordSize.X + MaxLineSuffixWidth <= MaxLineWidth)
                                             {
                                                 UnwrappedText.Append(Word.Text);
@@ -442,7 +438,7 @@ namespace MGUI.Core.UI.Text
                                                 for (int CharIndex = 0; CharIndex < Word.Text.Length; CharIndex++)
                                                 {
                                                     char CurrentChar = Word.Text[CharIndex];
-                                                    float CharacterWidth = Measurer.MeasureText(CurrentChar.ToString(), Word.IsBold, Word.IsItalic, CurrentLine.Count == 0 && UnwrappedText.Length == 0).X;
+                                                    float CharacterWidth = Measurer.MeasureText(CurrentChar.ToString(), Word.IsBold, Word.IsItalic).X;
                                                     bool FitsOnCurrentLine = (CurrentLine.Count == 0 && UnwrappedText.Length == 0) || // Ensure we at least have 1 character per line to avoid infinite loop
                                                         (CurrentX + CharacterWidth + MaxLineSuffixWidth <= MaxLineWidth);
 

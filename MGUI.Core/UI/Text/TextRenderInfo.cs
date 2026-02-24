@@ -63,7 +63,7 @@ namespace MGUI.Core.UI.Text
             float CurrentY = LayoutBounds.Top + Padding.Top;
             if (TextBlockElement.Lines?.Any() != true)
             {
-                LineRenderInfo LineInfo = new(this, null, LineIndex, CurrentY, TextBlockElement.MeasureText("|", false, false, false).Y);
+                LineRenderInfo LineInfo = new(this, null, LineIndex, CurrentY, TextBlockElement.MeasureText("|", false, false).Y);
                 _Lines.Add(LineInfo);
 
                 float X = LayoutBounds.Left + Padding.Left;
