@@ -57,9 +57,8 @@ namespace MGUI.Core.UI.Text
             Thickness Padding = TextBlockElement.Padding;
             float LinePadding = TextBlockElement.LinePadding;
 
-            // Resolve font via ITextEngine (no direct SpriteFont dependency)
-            ITextEngine engine   = TextBlockElement.GetTextEngine();
-            ResolvedFont resolved = TextBlockElement.GetResolvedFont(TextBlockElement.IsBold, TextBlockElement.IsItalic);
+            // engine is shared; fonts are resolved per-run to respect inline bold/italic formatting
+            ITextEngine engine = TextBlockElement.GetTextEngine();
 
             float CurrentY = LayoutBounds.Top + Padding.Top;
             if (TextBlockElement.Lines?.Any() != true)
@@ -95,6 +94,8 @@ namespace MGUI.Core.UI.Text
                     {
                         foreach (MGTextRunText Run in Runs)
                         {
+                            // Resolve the correct font variant for this run's inline style
+                            ResolvedFont resolved = TextBlockElement.GetResolvedFont(Run.Settings.IsBold, Run.Settings.IsItalic);
                             bool IsStartOfLine = true;
 
                             foreach (char c in Run.Text)
