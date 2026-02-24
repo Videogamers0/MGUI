@@ -72,6 +72,10 @@ namespace MGUI.Samples
                 var arialItalic = new FontSystem();
                 arialItalic.AddFont(File.ReadAllBytes(Path.Combine(ttfDir, "ariali.ttf")));
                 _fssEngine.AddFontSystem("Arial", CustomFontStyles.Italic, arialItalic);
+
+                // Calibrate per-size advance widths to match SpriteFontTextEngine exactly.
+                // Must be called after FontSizeScale is set (via AddFontSystem overload above).
+                _fssEngine.MatchSpriteFontSizing(Desktop.FontManager);
             }
             catch (Exception ex) 
             { 

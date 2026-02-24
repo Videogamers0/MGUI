@@ -76,6 +76,14 @@ namespace MGUI.FontStashSharp
         private readonly Dictionary<FontSpec, ResolvedFont> _cache = new();
 
         /// <summary>
+        /// Per font-size effective-pt table built by <see cref="MatchSpriteFontSizing"/>.
+        /// Maps logical pt size → the <em>effective</em> pt size that SpriteFontTextEngine
+        /// would use for the same logical size (i.e. baked atlas size × suggested scale).
+        /// <c>null</c> when <see cref="MatchSpriteFontSizing"/> has not been called.
+        /// </summary>
+        private Dictionary<int, float>? _calibratedEffectivePt;
+
+        /// <summary>
         /// Scale factor applied to MGUI's logical <c>FontSize</c> (in points) before
         /// passing it to <see cref="FontSystem.GetFont"/> (which expects pixels).
         /// <para/>
@@ -145,6 +153,51 @@ namespace MGUI.FontStashSharp
             AddFontSystem(family, style, fontSystem);
             if (ttfData != null)
                 FontSizeScale = ComputeFontSizeScale(ttfData);
+        }
+
+        /// <summary>
+        /// Builds a per-size calibration table so that every logical font size used by
+        /// MGUI produces the same glyph advances (and therefore the same text widths) as
+        /// <see cref="SpriteFontTextEngine"/>.
+        /// <para/>
+        /// Call this after <see cref="AddFontSystem(string, CustomFontStyles, FontSystem, byte[])"/>
+        /// has set <see cref="FontSizeScale"/>.  You only need to call it once; the table
+        /// remains valid as long as <paramref name="fontManager"/>'s content does not change.
+        /// <para/>
+        /// <b>Why this is necessary:</b> <see cref="SpriteFontTextEngine"/> renders every
+        /// logical pt size from a discrete baked atlas (e.g. 36 pt atlas at 1/3 scale for
+        /// sizes 11–12).  The effective pt size is therefore
+        /// <c>bakedSize × suggestedScale</c> (e.g. 12 for logical size 11), not the
+        /// nominal logical size.  Without this correction FontStashSharp would measure
+        /// text at <c>ptSize × FontSizeScale</c> (e.g. 16.4 px) instead of
+        /// <c>effectivePt × FontSizeScale</c> (e.g. 17.9 px), producing advance widths
+        /// that differ by up to ~10 %, which causes visible misalignment or truncation.
+        /// </summary>
+        /// <param name="fontManager">
+        /// The <see cref="FontManager"/> that owns the SpriteFonts to match.
+        /// Typically <c>desktop.FontManager</c>.
+        /// </param>
+        public void MatchSpriteFontSizing(FontManager fontManager)
+        {
+            if (fontManager is null) throw new ArgumentNullException(nameof(fontManager));
+
+            string family = fontManager.DefaultFontFamily;
+            var table = new Dictionary<int, float>();
+
+            for (int ptSize = 1; ptSize <= 96; ptSize++)
+            {
+                if (fontManager.TryGetFont(family, CustomFontStyles.Normal, ptSize,
+                        true,
+                        out _, out _, out int bakedSize, out _, out float suggestedScale))
+                {
+                    // effectivePt is the actual size SpriteFontTextEngine renders at
+                    // for this logical ptSize.  FSS must use the same reference size.
+                    table[ptSize] = bakedSize * suggestedScale;
+                }
+            }
+
+            _calibratedEffectivePt = table;
+            InvalidateCache();
         }
 
         // ── TTF metrics helpers ───────────────────────────────────────────────────
@@ -250,9 +303,16 @@ namespace MGUI.FontStashSharp
                 return placeholder;
             }
 
-            // Compute the FSS pixel size: logical pt × FontSizeScale.
-            // GetFont accepts float — no rounding needed.
-            SpriteFontBase spriteFontBase = fs.GetFont(spec.Size * FontSizeScale);
+            // Compute the FSS pixel size.
+            // When MatchSpriteFontSizing has been called we use the effective pt from the
+            // SpriteFont calibration table (bakedSize × suggestedScale) rather than the
+            // raw logical size.  This ensures advance widths match SpriteFontTextEngine
+            // across all font sizes despite the quantised baked-atlas scheme it uses.
+            float effectivePt = _calibratedEffectivePt != null
+                && _calibratedEffectivePt.TryGetValue(spec.Size, out float cal)
+                ? cal
+                : (float)spec.Size;
+            SpriteFontBase spriteFontBase = fs.GetFont(effectivePt * FontSizeScale);
             var handle = new FSSFontHandle(spriteFontBase);
 
             var resolved = new ResolvedFont(
