@@ -212,8 +212,21 @@ namespace MGUI.Shared.Rendering
         public Vector2 DrawShadowedText(string Family, CustomFontStyles Style, string Text, Vector2 Position, Color TextColor, Color ShadowColor, 
             int DesiredFontSize, float XOffset = 1, float YOffset = 1, bool Exact = false)
         {
-            DrawText(Family, Style, Text, Position + new Vector2(XOffset, YOffset), ShadowColor, DesiredFontSize, Exact);
-            return DrawText(Family, Style, Text, Position, TextColor, DesiredFontSize, Exact);
+            // Resolve and measure once; draw twice (shadow + text) to avoid redundant font resolves
+            var resolved = TextEngine.ResolveFont(new FontSpec(Family, DesiredFontSize, Style));
+            if (resolved.NativeFont == null)
+                return Vector2.Zero;
+
+            float scale = Exact ? resolved.ExactScale : resolved.SuggestedScale;
+            Vector2 suggested = TextEngine.MeasureText(resolved, Text);
+
+            BeginDraw(DrawContext.Sprites);
+            TextEngine.DrawText(SB, resolved, Text, Position + new Vector2(XOffset, YOffset), ShadowColor, resolved.DrawOrigin, scale);
+            TextEngine.DrawText(SB, resolved, Text, Position, TextColor, resolved.DrawOrigin, scale);
+
+            if (!Exact || resolved.SuggestedScale == resolved.ExactScale)
+                return suggested;
+            return suggested * (resolved.ExactScale / resolved.SuggestedScale);
         }
 
         public Vector2 MeasureText(string Family, CustomFontStyles Style, string Text, int DesiredFontSize, bool Exact = false)
@@ -258,12 +271,13 @@ namespace MGUI.Shared.Rendering
 #endif
             }
 
-            BeginDraw(DrawContext.Sprites);
+            // Measure before drawing so we return the correct size without a second engine call.
             float scale = Exact ? resolved.ExactScale : resolved.SuggestedScale;
+            Vector2 suggested = TextEngine.MeasureText(resolved, Text);
+
+            BeginDraw(DrawContext.Sprites);
             TextEngine.DrawText(SB, resolved, Text, Position, Color, resolved.DrawOrigin, scale);
 
-            // Return the visual size
-            Vector2 suggested = TextEngine.MeasureText(resolved, Text);
             if (!Exact || resolved.SuggestedScale == resolved.ExactScale)
                 return suggested;
             return suggested * (resolved.ExactScale / resolved.SuggestedScale);
