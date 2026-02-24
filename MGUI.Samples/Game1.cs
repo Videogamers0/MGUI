@@ -59,9 +59,11 @@ namespace MGUI.Samples
 
                 _fssEngine = new FontStashSharpTextEngine();
 
+                byte[] arialBytes = File.ReadAllBytes(Path.Combine(ttfDir, "arial.ttf"));
                 var arialNormal = new FontSystem();
-                arialNormal.AddFont(File.ReadAllBytes(Path.Combine(ttfDir, "arial.ttf")));
-                _fssEngine.AddFontSystem("Arial", CustomFontStyles.Normal, arialNormal);
+                arialNormal.AddFont(arialBytes);
+                // Pass the raw TTF so FontSizeScale is auto-computed from the font metrics
+                _fssEngine.AddFontSystem("Arial", CustomFontStyles.Normal, arialNormal, arialBytes);
 
                 var arialBold = new FontSystem();
                 arialBold.AddFont(File.ReadAllBytes(Path.Combine(ttfDir, "arialbd.ttf")));
@@ -70,10 +72,6 @@ namespace MGUI.Samples
                 var arialItalic = new FontSystem();
                 arialItalic.AddFont(File.ReadAllBytes(Path.Combine(ttfDir, "ariali.ttf")));
                 _fssEngine.AddFontSystem("Arial", CustomFontStyles.Italic, arialItalic);
-
-                // Calibrate FSS pixel sizes to match SpriteFont's downsampled rendering
-                // so that both engines produce the same effective text width.
-                _fssEngine.MatchSpriteFontSizing(Desktop.FontManager);
             }
             catch (Exception ex) 
             { 

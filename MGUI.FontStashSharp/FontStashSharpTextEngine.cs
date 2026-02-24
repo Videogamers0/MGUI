@@ -14,11 +14,12 @@ namespace MGUI.FontStashSharp
     /// <para/>
     /// Usage:
     /// <code>
+    /// byte[] ttfData = File.ReadAllBytes("Arial.ttf");
     /// var fontSystem = new FontSystem();
-    /// fontSystem.AddFont(File.ReadAllBytes("Arial.ttf"));
+    /// fontSystem.AddFont(ttfData);
     ///
     /// var engine = new FontStashSharpTextEngine();
-    /// engine.AddFontSystem("Arial", CustomFontStyles.Normal, fontSystem);
+    /// engine.AddFontSystem("Arial", CustomFontStyles.Normal, fontSystem, ttfData);
     ///
     /// desktop.TextEngine = engine;
     /// </code>
@@ -75,27 +76,26 @@ namespace MGUI.FontStashSharp
         private readonly Dictionary<FontSpec, ResolvedFont> _cache = new();
 
         /// <summary>
-        /// Calibrated mapping built by <see cref="MatchSpriteFontSizing"/>.
-        /// Key = requested pt size, Value = FSS pixel size that matches SpriteFont's effective rendering.
-        /// When <c>null</c>, <see cref="ResolveFont"/> falls back to <c>spec.Size * FontSizeScale</c>.
-        /// </summary>
-        private Dictionary<int, int>? _calibratedPixelSizes;
-
-        /// <summary>
         /// Scale factor applied to MGUI's logical <c>FontSize</c> (in points) before
         /// passing it to <see cref="FontSystem.GetFont"/> (which expects pixels).
         /// <para/>
-        /// At 96 DPI the standard conversion is <c>1pt = 96/72 px = 4/3 px</c>.
-        /// This matches the MonoGame Content Pipeline which also rasterizes
-        /// <c>.spritefont</c> sizes at 96 DPI, so both engines produce text of the
-        /// same physical width.
+        /// The correct value depends on the loaded font and equals
+        /// <c>(96/72) × (hhea.ascender − hhea.descender) / head.unitsPerEm</c>.
+        /// This accounts for two things:
+        /// <list type="bullet">
+        ///   <item>The DPI conversion: MonoGame’s Content Pipeline rasterises
+        ///         <c>.spritefont</c> sizes at 96 DPI → <c>1 pt = 96/72 px</c>.</item>
+        ///   <item>The sizing-model gap: the Content Pipeline sizes by <b>em square</b>,
+        ///         while FontStashSharp (StbTrueType) sizes by <b>ascender − descender</b>.
+        ///         For fonts where these differ (e.g. Arial: ratio ≈ 1.117) a pure
+        ///         DPI factor (<c>4/3</c>) is not enough.</item>
+        /// </list>
+        /// Call <see cref="ComputeFontSizeScale(byte[])"/> to obtain the exact value
+        /// for a given TTF file, or pass <c>ttfData</c> to the
+        /// <see cref="AddFontSystem(string, CustomFontStyles, FontSystem, byte[])"/> overload
+        /// to have it set automatically.
         /// <para/>
-        /// Set to <c>1f</c> if your <see cref="FontSystem"/> instances were built with
-        /// sizes already expressed in pixels.
-        /// <para/>
-        /// Changing this value automatically clears the resolved-font cache so that all
-        /// subsequent <see cref="ResolveFont"/> calls use the new scale.
-        /// Must only be changed from the main thread before rendering begins.
+        /// Changing this value clears the resolved-font cache.
         /// </summary>
         public float FontSizeScale
         {
@@ -130,43 +130,94 @@ namespace MGUI.FontStashSharp
         }
 
         /// <summary>
-        /// Calibrates this engine so that for each requested <c>FontSize</c>, the
-        /// FSS rasterisation pixel size matches the effective rendering size that
-        /// <see cref="SpriteFontTextEngine"/> would produce with its downsampled
-        /// <c>SuggestedScale</c> strategy.
-        /// <para/>
-        /// Without calibration, <c>FontSize = 11</c> maps to <c>round(11 × 4/3) = 15 px</c>,
-        /// but SpriteFont picks a baked 36 pt font and downsamples by 1/3 → effective 12 pt →
-        /// 16 px.  After calling this method, FSS will also use 16 px for <c>FontSize = 11</c>,
-        /// eliminating the mismatch.
-        /// <para/>
-        /// Call this once, after registering all <see cref="FontSystem"/>s and
-        /// before any rendering occurs.
+        /// Registers a <see cref="FontSystem"/> and automatically computes
+        /// <see cref="FontSizeScale"/> from the raw TTF data so that FontStashSharp
+        /// renders at the same em-square size as MonoGame’s Content Pipeline.
         /// </summary>
-        /// <param name="fontManager">The same <see cref="FontManager"/> used by
-        /// <c>MainRenderer</c> / <c>MGDesktop</c>.</param>
-        public void MatchSpriteFontSizing(FontManager fontManager)
+        /// <param name="family">Case-sensitive font family name (e.g. "Arial").</param>
+        /// <param name="style">The style this <see cref="FontSystem"/> provides.</param>
+        /// <param name="fontSystem">Pre-configured <see cref="FontSystem"/>.</param>
+        /// <param name="ttfData">Raw TrueType font bytes (the same array passed to
+        /// <see cref="FontSystem.AddFont(byte[])"/>).  Used to read the <c>head</c> and
+        /// <c>hhea</c> tables and derive the correct <see cref="FontSizeScale"/>.</param>
+        public void AddFontSystem(string family, CustomFontStyles style, FontSystem fontSystem, byte[] ttfData)
         {
-            if (fontManager is null) throw new ArgumentNullException(nameof(fontManager));
+            AddFontSystem(family, style, fontSystem);
+            if (ttfData != null)
+                FontSizeScale = ComputeFontSizeScale(ttfData);
+        }
 
-            _calibratedPixelSizes = new Dictionary<int, int>();
-            string family = fontManager.DefaultFontFamily;
+        // ── TTF metrics helpers ───────────────────────────────────────────────────
 
-            for (int ptSize = 1; ptSize <= 96; ptSize++)
+        /// <summary>
+        /// Computes the correct <see cref="FontSizeScale"/> for a given TrueType font
+        /// so that FontStashSharp renders glyphs at the same em-square size as
+        /// MonoGame’s Content Pipeline (which rasterises <c>.spritefont</c> files at 96 DPI
+        /// using em-based sizing).
+        /// <para/>
+        /// The returned value equals
+        /// <c>(96 / 72) × (hhea.ascender − hhea.descender) / head.unitsPerEm</c>.
+        /// </summary>
+        /// <param name="ttfData">Raw TrueType (.ttf) font file bytes.</param>
+        /// <returns>The scale factor to assign to <see cref="FontSizeScale"/>.</returns>
+        /// <exception cref="ArgumentException">The data is too short or is missing
+        /// the required <c>head</c> / <c>hhea</c> tables.</exception>
+        public static float ComputeFontSizeScale(byte[] ttfData)
+        {
+            if (ttfData == null || ttfData.Length < 12)
+                throw new ArgumentException("Invalid TTF data.", nameof(ttfData));
+
+            int numTables = ReadUInt16BE(ttfData, 4);
+            int headOffset = -1;
+            int hheaOffset = -1;
+
+            for (int i = 0; i < numTables; i++)
             {
-                if (fontManager.TryGetFont(family, CustomFontStyles.Normal, ptSize,
-                        /*PreferDownsampled*/ true,
-                        out _, out _, out int bakedSize, out _, out float suggestedScale))
-                {
-                    // SpriteFont effective pt size after downsampling
-                    float effectivePt = bakedSize * suggestedScale;
-                    int fssPx = Math.Max(1, (int)Math.Round(effectivePt * FontSizeScale));
-                    _calibratedPixelSizes[ptSize] = fssPx;
-                }
+                int rec = 12 + i * 16;
+                if (rec + 16 > ttfData.Length) break;
+
+                if (TagEquals(ttfData, rec, 'h', 'e', 'a', 'd'))
+                    headOffset = (int)ReadUInt32BE(ttfData, rec + 8);
+                else if (TagEquals(ttfData, rec, 'h', 'h', 'e', 'a'))
+                    hheaOffset = (int)ReadUInt32BE(ttfData, rec + 8);
+
+                if (headOffset >= 0 && hheaOffset >= 0) break;
             }
 
-            InvalidateCache();
+            if (headOffset < 0 || hheaOffset < 0)
+                throw new ArgumentException(
+                    "TTF data is missing the required 'head' or 'hhea' table.",
+                    nameof(ttfData));
+
+            // head table: unitsPerEm at offset +18 (uint16)
+            int unitsPerEm = ReadUInt16BE(ttfData, headOffset + 18);
+
+            // hhea table: ascender at +4 (int16), descender at +6 (int16, negative)
+            int ascender   = ReadInt16BE(ttfData, hheaOffset + 4);
+            int descender  = ReadInt16BE(ttfData, hheaOffset + 6);
+
+            // StbTrueType’s ScaleForPixelHeight divides by (ascender − descender).
+            // The Content Pipeline scales by em square (ptSize × 96/72 / unitsPerEm).
+            // To make both produce the same glyph scale:
+            //   fssPixelHeight / (ascender − descender) = ptSize × (96/72) / unitsPerEm
+            //   fssPixelHeight = ptSize × (96/72) × (ascender − descender) / unitsPerEm
+            int ascentDescent = ascender - descender;
+            return (96f / 72f) * ascentDescent / (float)unitsPerEm;
         }
+
+        private static bool TagEquals(byte[] data, int offset, char c0, char c1, char c2, char c3)
+            => data[offset] == (byte)c0 && data[offset + 1] == (byte)c1
+            && data[offset + 2] == (byte)c2 && data[offset + 3] == (byte)c3;
+
+        private static ushort ReadUInt16BE(byte[] data, int offset)
+            => (ushort)((data[offset] << 8) | data[offset + 1]);
+
+        private static short ReadInt16BE(byte[] data, int offset)
+            => (short)((data[offset] << 8) | data[offset + 1]);
+
+        private static uint ReadUInt32BE(byte[] data, int offset)
+            => (uint)((data[offset] << 24) | (data[offset + 1] << 16)
+                    | (data[offset + 2] << 8) | data[offset + 3]);
 
         // ── ITextEngine ──────────────────────────────────────────────────────────
 
@@ -199,20 +250,9 @@ namespace MGUI.FontStashSharp
                 return placeholder;
             }
 
-            // Compute the FSS pixel size — use calibrated lookup when available,
-            // otherwise fall back to straight pt→px conversion.
-            int pixelSize;
-            if (_calibratedPixelSizes != null &&
-                _calibratedPixelSizes.TryGetValue(spec.Size, out int calibrated))
-            {
-                pixelSize = calibrated;
-            }
-            else
-            {
-                pixelSize = (int)Math.Round(spec.Size * FontSizeScale);
-            }
-
-            SpriteFontBase spriteFontBase = fs.GetFont(pixelSize);
+            // Compute the FSS pixel size: logical pt × FontSizeScale.
+            // GetFont accepts float — no rounding needed.
+            SpriteFontBase spriteFontBase = fs.GetFont(spec.Size * FontSizeScale);
             var handle = new FSSFontHandle(spriteFontBase);
 
             var resolved = new ResolvedFont(
