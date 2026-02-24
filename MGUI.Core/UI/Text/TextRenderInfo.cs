@@ -96,21 +96,43 @@ namespace MGUI.Core.UI.Text
                         {
                             // Resolve the correct font variant for this run's inline style
                             ResolvedFont resolved = TextBlockElement.GetResolvedFont(Run.Settings.IsBold, Run.Settings.IsItalic);
-                            bool IsStartOfLine = true;
 
-                            foreach (char c in Run.Text)
+                            if (string.IsNullOrEmpty(Run.Text))
+                                continue;
+
+                            // 1. Compute per-glyph advances.
+                            //    The first character on a line has its negative LSB clamped to 0 (matching
+                            //    SpriteFont behaviour); subsequent characters use the full signed advance.
+                            float[] advances = new float[Run.Text.Length];
+                            float glyphSum = 0f;
+                            for (int gi = 0; gi < Run.Text.Length; gi++)
                             {
-                                GlyphMetrics glyph = engine.MeasureGlyph(resolved, c);
+                                GlyphMetrics glyph = engine.MeasureGlyph(resolved, Run.Text[gi]);
+                                advances[gi] = gi == 0 ? glyph.TotalWidthFirstGlyph : glyph.TotalWidth;
+                                glyphSum += advances[gi];
+                            }
 
-                                float charWidth = IsStartOfLine
-                                    ? glyph.TotalWidthFirstGlyph
-                                    : glyph.TotalWidth;
-                                IsStartOfLine = false;
+                            // 2. Reconcile with the whole-string measurement so each run's right edge
+                            //    aligns exactly with where the next run (or line end) starts, absorbing
+                            //    any SpriteFont.Spacing or kerning residual between characters.
+                            if (glyphSum > 0f)
+                            {
+                                float wholeWidth = engine.MeasureText(resolved, Run.Text).X;
+                                float residual = wholeWidth - glyphSum;
+                                if (MathF.Abs(residual) > 0.001f)
+                                {
+                                    for (int gi = 0; gi < advances.Length; gi++)
+                                        advances[gi] += residual * (advances[gi] / glyphSum);
+                                }
+                            }
 
-                                LineInfo.AddCharacter(Line.OriginalCharacterIndices[CharacterIndexInWrappedLines], CharCounter, CurrentX, charWidth);
+                            // 3. Emit one caret record per character with the reconciled advance
+                            for (int gi = 0; gi < Run.Text.Length; gi++)
+                            {
+                                LineInfo.AddCharacter(Line.OriginalCharacterIndices[CharacterIndexInWrappedLines], CharCounter, CurrentX, advances[gi]);
                                 CharacterIndexInWrappedLines++;
                                 CharCounter++;
-                                CurrentX += charWidth;
+                                CurrentX += advances[gi];
                             }
                         }
                     }
