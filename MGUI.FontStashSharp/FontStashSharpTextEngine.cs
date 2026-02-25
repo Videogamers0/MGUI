@@ -105,6 +105,12 @@ namespace MGUI.FontStashSharp
         /// <para/>
         /// Changing this value clears the resolved-font cache.
         /// </summary>
+        /// <remarks>
+        /// <b>Thread safety:</b> this property must only be set from the MonoGame
+        /// update/draw thread (the same thread that drives <c>MGDesktop.Update</c> and
+        /// <c>MGDesktop.Draw</c>).  It is not safe to assign it from a background thread
+        /// while the UI is rendering.
+        /// </remarks>
         public float FontSizeScale
         {
             get => _fontSizeScale;
