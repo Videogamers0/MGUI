@@ -91,7 +91,22 @@ namespace MGUI.Core.UI
                 return true;
         }
 
-
+        /// <summary>
+        /// Re-resolves all four font-style handles from the currently active <see cref="ITextEngine"/>
+        /// and invalidates both the layout and the self-measurement cache.<para/>
+        /// Called by <see cref="MGDesktop.RecalculateTextLayouts"/> after a runtime engine switch so
+        /// that new engine metrics (e.g. different scale factors) are reflected immediately.
+        /// </summary>
+        internal void RefreshTextEngine()
+        {
+            ITextEngine engine = TextEngine;
+            RF_Regular    = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Normal));
+            RF_Bold       = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Bold));
+            RF_Italic     = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Italic));
+            RF_BoldItalic = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Bold | CustomFontStyles.Italic));
+            SpaceWidth    = RF_Regular.SpaceWidth;
+            InvokeLayoutChanged(); // clears RecentSelfMeasurements + fires LayoutChanged
+        }
 
         #region Font Style
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

@@ -36,15 +36,28 @@ namespace MGUI.Core.UI
         }
 
         /// <summary>
-        /// Invalidates the layout of every <see cref="MGWindow"/> on this desktop, forcing
-        /// all elements to be re-measured on the next frame.  Call this after switching
-        /// <see cref="TextEngine"/> at runtime so that the new engine's metrics (e.g. line
-        /// heights) are reflected immediately.
+        /// Invalidates the layout of every element on this desktop, forcing all elements to be
+        /// re-measured on the next frame.
         /// </summary>
         public void InvalidateAllLayouts()
         {
             foreach (MGWindow window in Windows)
-                window.InvalidateLayout();
+                foreach (MGElement element in window.TraverseVisualTree(true, true, true, true, MGElement.TreeTraversalMode.Preorder))
+                    element.InvalidateLayout();
+        }
+
+        /// <summary>
+        /// Re-resolves all <see cref="MGTextBlock"/> font handles from the currently active
+        /// <see cref="TextEngine"/> and invalidates their layout and measurement caches.<para/>
+        /// Call this after switching <see cref="TextEngine"/> at runtime so that the new engine's
+        /// metrics (e.g. different scale factors or glyph data) are reflected immediately on every
+        /// text element across all windows.
+        /// </summary>
+        public void RecalculateTextLayouts()
+        {
+            foreach (MGWindow window in Windows)
+                foreach (MGTextBlock tb in window.TraverseVisualTree<MGTextBlock>(true, true, true, true, MGElement.TreeTraversalMode.Preorder))
+                    tb.RefreshTextEngine();
         }
 
         /// <summary>A <see cref="MouseHandler"/> that is updated at the start of <see cref="Update()"/>, before any <see cref="MGWindow"/>s in <see cref="Windows"/> are updated.<br/>
