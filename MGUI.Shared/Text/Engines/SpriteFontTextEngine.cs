@@ -102,8 +102,11 @@ namespace MGUI.Shared.Text.Engines
             var handle = new SpriteFontHandle(sf, suggestedScale, exactScale, actualSize,
                 fs.Heights[actualSize], fs.Origins[actualSize]);
 
-            float lineHeight  = handle.FontHeight * handle.Scale;
-            float spaceWidth  = (sf.MeasureString(" ") * suggestedScale).X;
+            // Use exactScale for all measurements so that layout/wrapping matches the original
+            // MGTextBlock.MeasureText behaviour (which multiplied by FontScale = exactScale).
+            // Drawing still uses suggestedScale for sharp rendering (see DrawText / DrawTransaction).
+            float lineHeight  = handle.FontHeight * handle.ExactScale;
+            float spaceWidth  = (sf.MeasureString(" ") * exactScale).X;
 
             var resolved = new ResolvedFont(
                 spec,
@@ -145,9 +148,11 @@ namespace MGUI.Shared.Text.Engines
             var h = GetHandle(font);
             if (h is null) return Vector2.Zero;
 
-            // Width: use SF.MeasureString for consistency with DrawTransaction.MeasureText
-            float width = h.SF.MeasureString(text).X * h.Scale;
-            return new Vector2(width, h.FontHeight * h.Scale);
+            // Use exactScale so measurement matches the original MGTextBlock.MeasureText
+            // (which applied FontScale = exactScale).  Drawing still happens at suggestedScale
+            // via DrawTransaction, so layouts designed for the original engine remain correct.
+            float width = h.SF.MeasureString(text).X * h.ExactScale;
+            return new Vector2(width, h.FontHeight * h.ExactScale);
         }
 
         /// <inheritdoc/>
@@ -163,11 +168,9 @@ namespace MGUI.Shared.Text.Engines
                     h.Glyphs.TryGetValue(h.SF.DefaultCharacter.Value, out glyph);
             }
 
-            float scale  = h.Scale;
+            // Use exactScale to stay consistent with MeasureText and the original codebase.
+            float scale  = h.ExactScale;
             float height = h.FontHeight * scale;
-            // Reproduce the same arithmetic as MGTextBlock.MeasureText:
-            // CurrentXOffset += Glyph.WidthIncludingBearings  (no separate left/right attribution)
-            // We expose the real bearings so callers can apply the "first glyph" correction if needed.
             return new GlyphMetrics(
                 glyph.LeftSideBearing  * scale,
                 glyph.Width            * scale,
