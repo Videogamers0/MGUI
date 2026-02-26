@@ -77,11 +77,35 @@ namespace MGUI.FontStashSharp
 
         /// <summary>
         /// Per font-size effective-pt table built by <see cref="MatchSpriteFontSizing"/>.
-        /// Maps logical pt size → the <em>effective</em> pt size that SpriteFontTextEngine
-        /// would use for the same logical size (i.e. baked atlas size × suggested scale).
+        /// Maps logical pt size → the effective pt size used for FSS rasterisation
+        /// (<c>bakedSize × exactScale == ptSize</c>, so this equals the raw pt size).
         /// <c>null</c> when <see cref="MatchSpriteFontSizing"/> has not been called.
         /// </summary>
         private Dictionary<int, float>? _calibratedEffectivePt;
+
+        /// <summary>
+        /// Per font-size line height (px) matching SpriteFontTextEngine's tight glyph-crop
+        /// metric (<c>Heights[bakedSize] × exactScale</c>).  Populated by
+        /// <see cref="MatchSpriteFontSizing"/>.
+        /// </summary>
+        private Dictionary<int, float>? _calibratedLineHeight;
+
+        /// <summary>
+        /// Per font-size calibrated space-character width (px) matching SpriteFontTextEngine's
+        /// <c>SF.MeasureString(" ") × exactScale</c>.  Populated by
+        /// <see cref="MatchSpriteFontSizing"/>.
+        /// </summary>
+        private Dictionary<int, float>? _calibratedSpaceWidth;
+
+        /// <summary>
+        /// Per font-size draw origin (in pixels, already scaled for FSS drawScale=1)
+        /// matching SpriteFontTextEngine's top-glyph-crop offset.<br/>
+        /// The Y component equals <c>sfMinCroppingY × sfSuggestedScale</c> so that the
+        /// on-screen vertical shift is identical to what SpriteFontTextEngine produces
+        /// when it renders with <c>drawScale = SuggestedScale</c>.  Populated by
+        /// <see cref="MatchSpriteFontSizing"/>.
+        /// </summary>
+        private Dictionary<int, Vector2>? _calibratedDrawOrigin;
 
         /// <summary>
         /// Scale factor applied to MGUI's logical <c>FontSize</c> (in points) before
@@ -162,22 +186,20 @@ namespace MGUI.FontStashSharp
         }
 
         /// <summary>
-        /// Builds a per-size calibration table so that every logical font size used by
-        /// MGUI produces the same glyph advances (and therefore the same text widths) as
-        /// <see cref="SpriteFontTextEngine"/>.
-        /// <para/>
+        /// Calibrates FSS metrics against <see cref="SpriteFontTextEngine"/> for every
+        /// logical font size, so that both engines produce identical layout results:
+        /// <list type="bullet">
+        ///   <item><description><b>EffectivePt</b> — FSS renders at <c>ptSize × FontSizeScale</c>
+        ///     pixels, matching SF's ExactScale-based measurement.</description></item>
+        ///   <item><description><b>LineHeight</b> — copied from <c>FontSet.Heights[bakedSize] × exactScale</c>,
+        ///     the tight glyph-crop metric used by SpriteFontTextEngine.</description></item>
+        ///   <item><description><b>SpaceWidth</b> — copied from <c>SF.MeasureString(" ") × exactScale</c>.</description></item>
+        ///   <item><description><b>DrawOrigin</b> — vertical offset that shifts text up by the
+        ///     same number of screen pixels as SpriteFontTextEngine's crop origin.</description></item>
+        /// </list>
         /// Call this after <see cref="AddFontSystem(string, CustomFontStyles, FontSystem, byte[])"/>
-        /// has set <see cref="FontSizeScale"/>.  You only need to call it once; the table
-        /// remains valid as long as <paramref name="fontManager"/>'s content does not change.
-        /// <para/>
-        /// <b>Why this is necessary:</b> <see cref="SpriteFontTextEngine"/> renders every
-        /// logical pt size from a discrete baked atlas (e.g. 36 pt atlas at 1/3 scale for
-        /// sizes 11–12).  The effective pt size is therefore
-        /// <c>bakedSize × suggestedScale</c> (e.g. 12 for logical size 11), not the
-        /// nominal logical size.  Without this correction FontStashSharp would measure
-        /// text at <c>ptSize × FontSizeScale</c> (e.g. 16.4 px) instead of
-        /// <c>effectivePt × FontSizeScale</c> (e.g. 17.9 px), producing advance widths
-        /// that differ by up to ~10 %, which causes visible misalignment or truncation.
+        /// has set <see cref="FontSizeScale"/>.  You only need to call it once; the tables
+        /// remain valid as long as <paramref name="fontManager"/>'s content does not change.
         /// </summary>
         /// <param name="fontManager">
         /// The <see cref="FontManager"/> that owns the SpriteFonts to match.
@@ -188,21 +210,45 @@ namespace MGUI.FontStashSharp
             if (fontManager is null) throw new ArgumentNullException(nameof(fontManager));
 
             string family = fontManager.DefaultFontFamily;
-            var table = new Dictionary<int, float>();
+            var effectivePtTable = new Dictionary<int, float>();
+            var lineHeightTable  = new Dictionary<int, float>();
+            var spaceWidthTable  = new Dictionary<int, float>();
+            var drawOriginTable  = new Dictionary<int, Vector2>();
 
             for (int ptSize = 1; ptSize <= 96; ptSize++)
             {
                 if (fontManager.TryGetFont(family, CustomFontStyles.Normal, ptSize,
                         true,
-                        out _, out _, out int bakedSize, out _, out float suggestedScale))
+                        out FontSet fs, out SpriteFont sf,
+                        out int bakedSize, out float exactScale, out float suggestedScale))
                 {
-                    // effectivePt is the actual size SpriteFontTextEngine renders at
-                    // for this logical ptSize.  FSS must use the same reference size.
-                    table[ptSize] = bakedSize * suggestedScale;
+                    // effectivePt: bakedSize × exactScale == ptSize (by definition),
+                    // so FSS measures text at exactly the same pt size as SF does,
+                    // matching SF's ExactScale-based width measurements.
+                    effectivePtTable[ptSize] = bakedSize * exactScale;
+
+                    // LineHeight: use SpriteFont's tight glyph-crop metric so that
+                    // line spacing is identical between engines.
+                    if (fs.Heights.TryGetValue(bakedSize, out int sfHeight))
+                        lineHeightTable[ptSize] = sfHeight * exactScale;
+
+                    // SpaceWidth: match SF's measured space character at ExactScale.
+                    spaceWidthTable[ptSize] = sf.MeasureString(" ").X * exactScale;
+
+                    // DrawOrigin: SF draws each glyph with an origin of (0, MinCroppingY)
+                    // at drawScale = suggestedScale (default UseExactScale = false).
+                    // The resulting on-screen vertical shift is MinCroppingY * suggestedScale px.
+                    // FSS draws at scale = 1.0, so its origin.Y must equal that pixel shift
+                    // directly: sfOrigin.Y * suggestedScale.
+                    if (fs.Origins.TryGetValue(bakedSize, out Vector2 sfOrigin))
+                        drawOriginTable[ptSize] = new Vector2(sfOrigin.X, sfOrigin.Y * suggestedScale);
                 }
             }
 
-            _calibratedEffectivePt = table;
+            _calibratedEffectivePt = effectivePtTable;
+            _calibratedLineHeight  = lineHeightTable;
+            _calibratedSpaceWidth  = spaceWidthTable;
+            _calibratedDrawOrigin  = drawOriginTable;
             InvalidateCache();
         }
 
@@ -321,14 +367,31 @@ namespace MGUI.FontStashSharp
             SpriteFontBase spriteFontBase = fs.GetFont(effectivePt * FontSizeScale);
             var handle = new FSSFontHandle(spriteFontBase);
 
+            // Use calibrated metrics when available (populated by MatchSpriteFontSizing)
+            // so that layout and visual output match SpriteFontTextEngine exactly.
+            float lineHeight = _calibratedLineHeight != null
+                && _calibratedLineHeight.TryGetValue(spec.Size, out float calLH)
+                ? calLH
+                : handle.LineHeight;
+
+            float spaceWidth = _calibratedSpaceWidth != null
+                && _calibratedSpaceWidth.TryGetValue(spec.Size, out float calSW)
+                ? calSW
+                : handle.SpaceWidth;
+
+            Vector2 drawOrigin = _calibratedDrawOrigin != null
+                && _calibratedDrawOrigin.TryGetValue(spec.Size, out Vector2 calDO)
+                ? calDO
+                : Vector2.Zero;
+
             var resolved = new ResolvedFont(
                 spec,
                 actualSize:      spec.Size,          // FSS resolves fractional sizes exactly
                 exactScale:      1f,
                 suggestedScale:  1f,
-                lineHeight:      handle.LineHeight,
-                spaceWidth:      handle.SpaceWidth,
-                drawOrigin:      Vector2.Zero,        // FSS uses top-left origin by default
+                lineHeight:      lineHeight,
+                spaceWidth:      spaceWidth,
+                drawOrigin:      drawOrigin,
                 isFallback:      isFallback,
                 nativeFont:      handle);
 
