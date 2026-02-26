@@ -25,9 +25,12 @@ namespace MGUI.Samples
         private MainRenderer MGUIRenderer { get; set; }
         private MGDesktop Desktop { get; set; }
 
+        /// <summary>Default SpriteFont backend.</summary>
+        private SpriteFontTextEngine _sfEngine;
         /// <summary>Optional FontStashSharp backend. Press F1 to toggle between engines.</summary>
         private FontStashSharpTextEngine _fssEngine;
         private KeyboardState _prevKeyboardState;
+        private bool _diagnosticRun;
 
         //  IObservableUpdate implementation
         public event EventHandler<TimeSpan> PreviewUpdate;
@@ -51,6 +54,10 @@ namespace MGUI.Samples
 
             MGUIRenderer = new(new GameRenderHost<Game1>(this));
             Desktop = new(MGUIRenderer);
+
+            // Keep a reference to the default SF engine for diagnostics / toggling back.
+            _sfEngine = new SpriteFontTextEngine(Desktop.FontManager);
+            Desktop.TextEngine = _sfEngine;
 
             // ── FontStashSharp engine (F1 to toggle) ──────────────────────────────────
             try
@@ -94,6 +101,13 @@ namespace MGUI.Samples
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            // Run diagnostic once on first load so both engines are fully initialized.
+            if (!_diagnosticRun && _sfEngine != null && _fssEngine != null)
+            {
+                TextEngineDiagnostic.Run(_sfEngine, _fssEngine);
+                _diagnosticRun = true;
+            }
         }
 
         protected override void Update(GameTime gameTime)
@@ -107,7 +121,7 @@ namespace MGUI.Samples
             {
                 Desktop.TextEngine = Desktop.TextEngine is SpriteFontTextEngine
                     ? (ITextEngine)_fssEngine
-                    : new SpriteFontTextEngine(Desktop.FontManager);
+                    : (ITextEngine)_sfEngine;
                 Debug.WriteLine($"[TextEngine] switched to {Desktop.TextEngine.GetType().Name}");
                 // Re-resolve all MGTextBlock font handles from the new engine and clear
                 // measurement caches so layouts update in the very next frame.
