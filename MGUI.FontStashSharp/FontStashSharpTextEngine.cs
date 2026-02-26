@@ -108,6 +108,16 @@ namespace MGUI.FontStashSharp
         private Dictionary<int, Vector2>? _calibratedDrawOrigin;
 
         /// <summary>
+        /// Per font-size, per-char glyph metrics copied directly from the SpriteFont atlas
+        /// at ExactScale.  Using the SF values ensures pixel-identical LSB/RSB/Width
+        /// decomposition, which keeps the TextBox caret at the same position as
+        /// SpriteFontTextEngine.  Populated by <see cref="MatchSpriteFontSizing"/>.
+        /// <para/>
+        /// Characters not present in the SF atlas fall back to FSS’s own measurement.
+        /// </summary>
+        private Dictionary<int, Dictionary<char, GlyphMetrics>>? _calibratedGlyphMetrics;
+
+        /// <summary>
         /// Scale factor applied to MGUI's logical <c>FontSize</c> (in points) before
         /// passing it to <see cref="FontSystem.GetFont"/> (which expects pixels).
         /// <para/>
@@ -214,6 +224,7 @@ namespace MGUI.FontStashSharp
             var lineHeightTable  = new Dictionary<int, float>();
             var spaceWidthTable  = new Dictionary<int, float>();
             var drawOriginTable  = new Dictionary<int, Vector2>();
+            var glyphMetricsTable = new Dictionary<int, Dictionary<char, GlyphMetrics>>();
 
             for (int ptSize = 1; ptSize <= 96; ptSize++)
             {
@@ -228,9 +239,12 @@ namespace MGUI.FontStashSharp
                     effectivePtTable[ptSize] = bakedSize * exactScale;
 
                     // LineHeight: use SpriteFont's tight glyph-crop metric so that
-                    // line spacing is identical between engines.
-                    if (fs.Heights.TryGetValue(bakedSize, out int sfHeight))
-                        lineHeightTable[ptSize] = sfHeight * exactScale;
+                    // line spacing is identical between engines.  Fall back to bakedSize
+                    // (should never happen for a valid FontSet, but keeps code safe).
+                    float lineH = fs.Heights.TryGetValue(bakedSize, out int sfHeight)
+                        ? sfHeight * exactScale
+                        : bakedSize * exactScale;
+                    lineHeightTable[ptSize] = lineH;
 
                     // SpaceWidth: match SF's measured space character at ExactScale.
                     spaceWidthTable[ptSize] = sf.MeasureString(" ").X * exactScale;
@@ -242,6 +256,21 @@ namespace MGUI.FontStashSharp
                     // directly: sfOrigin.Y * suggestedScale.
                     if (fs.Origins.TryGetValue(bakedSize, out Vector2 sfOrigin))
                         drawOriginTable[ptSize] = new Vector2(sfOrigin.X, sfOrigin.Y * suggestedScale);
+
+                    // GlyphMetrics: copy LSB / Width / RSB directly from the SpriteFont atlas
+                    // scaled by ExactScale.  This ensures TextBox caret positions are
+                    // pixel-identical to SpriteFontTextEngine.
+                    var glyphDict = new Dictionary<char, GlyphMetrics>();
+                    foreach (var kv in sf.GetGlyphs())
+                    {
+                        SpriteFont.Glyph g = kv.Value;
+                        glyphDict[kv.Key] = new GlyphMetrics(
+                            g.LeftSideBearing  * exactScale,
+                            g.Width            * exactScale,
+                            g.RightSideBearing * exactScale,
+                            lineH);
+                    }
+                    glyphMetricsTable[ptSize] = glyphDict;
                 }
             }
 
@@ -249,6 +278,7 @@ namespace MGUI.FontStashSharp
             _calibratedLineHeight  = lineHeightTable;
             _calibratedSpaceWidth  = spaceWidthTable;
             _calibratedDrawOrigin  = drawOriginTable;
+            _calibratedGlyphMetrics = glyphMetricsTable;
             InvalidateCache();
         }
 
@@ -425,21 +455,38 @@ namespace MGUI.FontStashSharp
             if (h is null) return Vector2.Zero;
 
             var size = h.Font.MeasureString(text);
-            // Use the consistent line height rather than the string's own Y
-            return new Vector2(size.X, h.LineHeight);
+            // Use font.LineHeight (calibrated via MatchSpriteFontSizing when available)
+            // rather than the raw FSS metric, so the returned height is always consistent
+            // with what SpriteFontTextEngine would return for the same spec.
+            return new Vector2(size.X, font.LineHeight);
         }
 
         /// <inheritdoc/>
         public GlyphMetrics MeasureGlyph(ResolvedFont font, char c)
         {
+            // When calibrated, return the pre-computed SF glyph metrics directly.
+            // This guarantees LSB / Width / RSB match SpriteFontTextEngine exactly
+            // (Option C from the parity task list), keeping TextBox caret positions
+            // pixel-identical between the two engines.
+            if (_calibratedGlyphMetrics != null
+                && _calibratedGlyphMetrics.TryGetValue(font.Spec.Size, out var charMap)
+                && charMap.TryGetValue(c, out GlyphMetrics calibrated))
+            {
+                // Ensure Height reflects any post-calibration LineHeight value.
+                return calibrated.Height == font.LineHeight
+                    ? calibrated
+                    : calibrated with { Height = font.LineHeight };
+            }
+
+            // Fallback: FSS measurement (used when MatchSpriteFontSizing was not called
+            // or the character is not in the SF atlas).
             var h = GetHandle(font);
             if (h is null)
                 return new GlyphMetrics(0, 0, 0, font.LineHeight);
 
-            // FSS doesn't expose per-glyph bearings; report the full advance as GlyphWidth
+            // FSS doesn’t expose per-glyph bearings; report the full advance as GlyphWidth
             // (LeftSideBearing = RightSideBearing = 0, so TotalWidth == TotalWidthFirstGlyph).
-            // Width is cached per-char on the handle to avoid repeated string allocations.
-            return new GlyphMetrics(0f, h.GetGlyphWidth(c), 0f, h.LineHeight);
+            return new GlyphMetrics(0f, h.GetGlyphWidth(c), 0f, font.LineHeight);
         }
 
         /// <inheritdoc/>
