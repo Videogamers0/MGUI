@@ -118,6 +118,20 @@ namespace MGUI.FontStashSharp
         private Dictionary<int, Dictionary<char, GlyphMetrics>>? _calibratedGlyphMetrics;
 
         /// <summary>
+        /// Per font-size inter-glyph spacing (px, at ExactScale) copied from
+        /// <c>SpriteFont.Spacing</c>.  Zero for most fonts but captured so that
+        /// <see cref="MeasureText"/> can add <c>(n−1) × spacing</c> to the width sum,
+        /// matching the value <c>SpriteFont.MeasureString</c> returns.  Populated by
+        /// <see cref="MatchSpriteFontSizing"/>.
+        /// </summary>
+        private Dictionary<int, float>? _calibratedSpacing;
+
+        /// <summary>
+        /// Per font-size fallback character used when a glyph is not in the SF atlas
+        /// (mirrors <c>SpriteFont.DefaultCharacter</c>).  Populated by
+        /// <see cref="MatchSpriteFontSizing"/>.
+        /// </summary>
+        private Dictionary<int, char>? _calibratedDefaultChar;
         /// Scale factor applied to MGUI's logical <c>FontSize</c> (in points) before
         /// passing it to <see cref="FontSystem.GetFont"/> (which expects pixels).
         /// <para/>
@@ -220,11 +234,13 @@ namespace MGUI.FontStashSharp
             if (fontManager is null) throw new ArgumentNullException(nameof(fontManager));
 
             string family = fontManager.DefaultFontFamily;
-            var effectivePtTable = new Dictionary<int, float>();
-            var lineHeightTable  = new Dictionary<int, float>();
-            var spaceWidthTable  = new Dictionary<int, float>();
-            var drawOriginTable  = new Dictionary<int, Vector2>();
+            var effectivePtTable  = new Dictionary<int, float>();
+            var lineHeightTable   = new Dictionary<int, float>();
+            var spaceWidthTable   = new Dictionary<int, float>();
+            var drawOriginTable   = new Dictionary<int, Vector2>();
             var glyphMetricsTable = new Dictionary<int, Dictionary<char, GlyphMetrics>>();
+            var spacingTable      = new Dictionary<int, float>();
+            var defaultCharTable  = new Dictionary<int, char>();
 
             for (int ptSize = 1; ptSize <= 96; ptSize++)
             {
@@ -271,14 +287,24 @@ namespace MGUI.FontStashSharp
                             lineH);
                     }
                     glyphMetricsTable[ptSize] = glyphDict;
+
+                    // Spacing: SpriteFont.Spacing (inter-glyph gap in atlas coords)
+                    // already scaled by ExactScale to be in px.
+                    spacingTable[ptSize] = sf.Spacing * exactScale;
+
+                    // DefaultCharacter: used as fallback for unmapped chars.
+                    if (sf.DefaultCharacter.HasValue)
+                        defaultCharTable[ptSize] = sf.DefaultCharacter.Value;
                 }
             }
 
-            _calibratedEffectivePt = effectivePtTable;
-            _calibratedLineHeight  = lineHeightTable;
-            _calibratedSpaceWidth  = spaceWidthTable;
-            _calibratedDrawOrigin  = drawOriginTable;
+            _calibratedEffectivePt  = effectivePtTable;
+            _calibratedLineHeight   = lineHeightTable;
+            _calibratedSpaceWidth   = spaceWidthTable;
+            _calibratedDrawOrigin   = drawOriginTable;
             _calibratedGlyphMetrics = glyphMetricsTable;
+            _calibratedSpacing      = spacingTable;
+            _calibratedDefaultChar  = defaultCharTable;
             InvalidateCache();
         }
 
@@ -451,14 +477,50 @@ namespace MGUI.FontStashSharp
             if (string.IsNullOrEmpty(text))
                 return Vector2.Zero;
 
+            // When calibrated, compute the width by summing the SpriteFont-calibrated
+            // glyph advances and adding the per-glyph spacing, exactly mirroring what
+            // SpriteFont.MeasureString does internally.  This guarantees width parity
+            // with SpriteFontTextEngine regardless of StbTrueType rasterizer differences.
+            if (_calibratedGlyphMetrics != null
+                && _calibratedGlyphMetrics.TryGetValue(font.Spec.Size, out var charMap))
+            {
+                float spacing = 0f;
+                _calibratedSpacing?.TryGetValue(font.Spec.Size, out spacing);
+
+                // Pre-resolve the fallback default-char metrics (once, outside the loop).
+                GlyphMetrics defaultMetrics = default;
+                bool hasDefaultMetrics = false;
+                if (_calibratedDefaultChar != null
+                    && _calibratedDefaultChar.TryGetValue(font.Spec.Size, out char defChar))
+                {
+                    hasDefaultMetrics = charMap.TryGetValue(defChar, out defaultMetrics);
+                }
+
+                float width = 0f;
+                bool first  = true;
+                foreach (char c in text)
+                {
+                    if (!charMap.TryGetValue(c, out GlyphMetrics gm))
+                    {
+                        if (hasDefaultMetrics)
+                            gm = defaultMetrics;
+                        // else gm remains default (all zeros) — unknown char contributes nothing.
+                    }
+
+                    // SpriteFont first-glyph rule: clamp negative LSB to 0 for the first
+                    // character (mirrors SpriteFont.MeasureString behaviour).
+                    width += first ? gm.TotalWidthFirstGlyph : gm.TotalWidth;
+                    if (!first) width += spacing;
+                    first = false;
+                }
+
+                return new Vector2(width, font.LineHeight);
+            }
+
+            // Fallback: use FSS's own measurement when calibration is unavailable.
             var h = GetHandle(font);
             if (h is null) return Vector2.Zero;
-
-            var size = h.Font.MeasureString(text);
-            // Use font.LineHeight (calibrated via MatchSpriteFontSizing when available)
-            // rather than the raw FSS metric, so the returned height is always consistent
-            // with what SpriteFontTextEngine would return for the same spec.
-            return new Vector2(size.X, font.LineHeight);
+            return new Vector2(h.Font.MeasureString(text).X, font.LineHeight);
         }
 
         /// <inheritdoc/>
