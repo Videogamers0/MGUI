@@ -506,21 +506,27 @@ namespace MGUI.FontStashSharp
 
                 float width = 0f;
                 bool first  = true;
+                GlyphMetrics lastGm = default;
                 foreach (char c in text)
                 {
                     if (!charMap.TryGetValue(c, out GlyphMetrics gm))
                     {
-                        if (hasDefaultMetrics)
-                            gm = defaultMetrics;
-                        // else gm remains default (all zeros) — unknown char contributes nothing.
+                        gm = hasDefaultMetrics ? defaultMetrics : default;
+                        // Unknown char with no default contributes nothing (all zeros).
                     }
 
                     // SpriteFont first-glyph rule: clamp negative LSB to 0 for the first
                     // character (mirrors SpriteFont.MeasureString behaviour).
                     width += first ? gm.TotalWidthFirstGlyph : gm.TotalWidth;
                     if (!first) width += spacing;
-                    first = false;
+                    first  = false;
+                    lastGm = gm;
                 }
+
+                // SpriteFont last-glyph rule: MeasureString tracks proposedWidth as
+                // x + Math.Max(RSB, 0), so a negative RSB on the last character does not
+                // reduce the measured width.  Subtract the negative portion to match.
+                width -= MathF.Min(lastGm.RightSideBearing, 0f);
 
                 return new Vector2(width, font.LineHeight);
             }
