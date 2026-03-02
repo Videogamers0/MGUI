@@ -51,13 +51,23 @@ namespace MGUI.Core.UI
         /// <see cref="TextEngine"/> and invalidates their layout and measurement caches.<para/>
         /// Call this after switching <see cref="TextEngine"/> at runtime so that the new engine's
         /// metrics (e.g. different scale factors or glyph data) are reflected immediately on every
-        /// text element across all windows.
+        /// text element across all windows.<para/>
+        /// After re-resolving all font handles, also calls <see cref="InvalidateAllLayouts"/> to
+        /// flush any stale cached measurements on container elements that depend on text sizes,
+        /// ensuring the next frame re-measures the full layout tree with the new engine's metrics.
         /// </summary>
         public void RecalculateTextLayouts()
         {
+            // Step 1: re-resolve font handles and clear TextBlock self-measurement caches.
+            // RefreshTextEngine also calls InvokeLayoutChanged which propagates upward, but
+            // that only invalidates the parent chain of each TextBlock, not the full tree.
             foreach (MGWindow window in Windows)
                 foreach (MGTextBlock tb in window.TraverseVisualTree<MGTextBlock>(true, true, true, true, MGElement.TreeTraversalMode.Preorder))
                     tb.RefreshTextEngine();
+
+            // Step 2: invalidate every element's layout cache so containers at all levels
+            // re-measure their content with the new text-engine metrics on the next frame.
+            InvalidateAllLayouts();
         }
 
         /// <summary>A <see cref="MouseHandler"/> that is updated at the start of <see cref="Update()"/>, before any <see cref="MGWindow"/>s in <see cref="Windows"/> are updated.<br/>
