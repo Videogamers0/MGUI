@@ -208,6 +208,9 @@ namespace MGUI.Shared.Rendering
             int DesiredFontSize, float XOffset = 1, float YOffset = 1, bool Exact = false)
             => DrawShadowedText(Family, CustomFontStyles.Normal, Text, Position, TextColor, ShadowColor, DesiredFontSize, XOffset, YOffset, Exact);
 
+        // Both DrawShadowedText and MeasureText guard with `resolved.NativeFont == null`
+        // (not `&& resolved.IsFallback`) so the null-check is consistent across all
+        // text-rendering paths in DrawTransaction.  Verified as part of PR #35 review.
         /// <param name="Family">The font to use</param>
         /// <param name="DesiredFontSize">The desired size of the <see cref="SpriteFont"/>, in points.</param>
         /// <param name="Exact">If true, will attempt to render the text at exactly the given <paramref name="DesiredFontSize"/>.<br/>
