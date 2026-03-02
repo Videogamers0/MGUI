@@ -154,7 +154,13 @@ namespace MGUI.FontStashSharp
         /// <b>Thread safety:</b> this property must only be set from the MonoGame
         /// update/draw thread (the same thread that drives <c>MGDesktop.Update</c> and
         /// <c>MGDesktop.Draw</c>).  It is not safe to assign it from a background thread
-        /// while the UI is rendering.
+        /// while the UI is rendering.<br/>
+        /// <b>Mutation timing:</b> set this value (or let <see cref="AddFontSystem"/> /
+        /// <see cref="MatchSpriteFontSizing"/> set it automatically) <i>before</i> calling
+        /// <see cref="ResolveFont"/> for the first time.  Changing it after fonts have
+        /// already been resolved will clear the cache via <see cref="InvalidateCache"/>,
+        /// forcing all font handles to be re-resolved on the next layout pass, which may
+        /// cause a one-frame layout hiccup.
         /// </remarks>
         public float FontSizeScale
         {
