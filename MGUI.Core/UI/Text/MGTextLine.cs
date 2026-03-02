@@ -257,7 +257,7 @@ namespace MGUI.Core.UI.Text
         /// with <c>LineWidth = W' &lt; W</c>.  Calling <c>ParseLines(W')</c> then wraps again,
         /// because the per-word sum still exceeds W'.<br/>
         /// <br/>
-        /// Fix strategy (Task 3): align the wrapping decision with <c>FlushLine</c> by measuring
+        /// Fix: align the wrapping decision with <c>FlushLine</c> by measuring
         /// the candidate line as a whole string before deciding whether to wrap.
         /// </remarks>
         public static IEnumerable<MGTextLine> ParseLines(ITextMeasurer Measurer, double MaxLineWidth, bool WrapText, IEnumerable<MGTextRun> Runs, bool IgnoreEmptySpaceLines, params char[] WordDelimiters)
