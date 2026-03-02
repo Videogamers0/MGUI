@@ -247,6 +247,19 @@ namespace MGUI.Core.UI.Text
         /// -------</code>
         /// Note that lines consisting of multiple consecutive spaces will still be returned.</param>
         /// <param name="WordDelimiters">Recommended: ' ' (space) and '-' (hyphen)</param>
+        /// <remarks>
+        /// <b>Known non-idempotency issue (PR #35):</b><br/>
+        /// The wrapping <i>decision</i> uses a word-by-word accumulated width (<c>CurrentX</c>),
+        /// while the resulting <see cref="MGTextLine.LineWidth"/> is computed by re-measuring each
+        /// run as a <i>complete string</i> inside <c>FlushLine</c>.<br/>
+        /// Because a whole-string measurement can be smaller than the sum of its word-by-word
+        /// measurements (inter-glyph kerning), calling <c>ParseLines(W)</c> may produce a line
+        /// with <c>LineWidth = W' &lt; W</c>.  Calling <c>ParseLines(W')</c> then wraps again,
+        /// because the per-word sum still exceeds W'.<br/>
+        /// <br/>
+        /// Fix strategy (Task 3): align the wrapping decision with <c>FlushLine</c> by measuring
+        /// the candidate line as a whole string before deciding whether to wrap.
+        /// </remarks>
         public static IEnumerable<MGTextLine> ParseLines(ITextMeasurer Measurer, double MaxLineWidth, bool WrapText, IEnumerable<MGTextRun> Runs, bool IgnoreEmptySpaceLines, params char[] WordDelimiters)
         {
             if (Runs?.Any() != true || MaxLineWidth < 1)
@@ -367,6 +380,13 @@ namespace MGUI.Core.UI.Text
                             float CurrentWidth = Measurements[0].X;
                             float TotalWidth = Measurements.Sum(x => x.X);
 
+                            // ROOT CAUSE OF NON-IDEMPOTENCY:
+                            // The fit-check uses the SUM of individual word measurements (CurrentX + TotalWidth).
+                            // FlushLine, however, re-measures each run as a whole string, which may be smaller
+                            // than this sum due to kerning.  Consequence: ParseLines(W) can decide a group of
+                            // words fits (because their word-by-word sum ≤ W) and assign LineWidth = W' < W,
+                            // yet ParseLines(W') will conclude they don't fit because the word-by-word sum > W'.
+                            // FIX (Task 3): use whole-string measurement for the fit-check, not word-by-word sum.
                             if (CurrentX + TotalWidth <= MaxLineWidth)
                             {
                                 UnwrappedText.Append(Current.Text);
