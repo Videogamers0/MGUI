@@ -80,12 +80,13 @@ namespace MGUI.Tests.Text
         }
 
         /// <summary>
-        /// BUG REPRODUCTION — this test is RED until ParseLines is fixed (Task 3).
+        /// Verifies that ParseLines is idempotent: re-parsing with the resulting LineWidth
+        /// gives the same line count and layout as the original parse.
         ///
-        /// When the resulting LineWidth (87) is fed back as MaxLineWidth, ParseLines
-        /// should produce exactly the same layout (1 line).  Instead, because the
-        /// wrapping decision still uses the per-word sum (43+7+42 = 92 > 87), it wraps
-        /// "Valley" to a second line — a non-idempotent, incorrect result.
+        /// Scenario: "Stardew Valley" fits on one line at width=92 (word-by-word sum=92).
+        /// FlushLine measures the whole string → LineWidth=87.  Calling ParseLines(87) must
+        /// also return 1 line — the fix uses whole-string measurement for the wrap decision
+        /// so MeasureText("Stardew Valley")=87 ≤ 87 → 1 line.
         /// </summary>
         [Fact]
         public void ParseLines_IsIdempotent_ReParsingWithResultingLineWidthGivesSameLineCount()
@@ -98,28 +99,29 @@ namespace MGUI.Tests.Text
             Assert.Single(firstPass);
             float lineWidth = firstPass[0].LineWidth; // 87
 
-            // Second parse with the resulting width: should still be 1 line.
-            // BUG: currently produces 2 lines (50 + 42) because the word-by-word
-            // accumulation 43+7+42=92 exceeds the 87 px constraint.
+            // Second parse with the resulting width: must still produce exactly 1 line.
             var secondPass = MGTextLine.ParseLines(measurer, lineWidth, true, runs, false).ToList();
 
-            Assert.Single(secondPass); // <-- fails until Task 3 fix
+            Assert.Single(secondPass);
+            Assert.Equal(lineWidth, secondPass[0].LineWidth);
         }
 
         /// <summary>
-        /// Sanity-check the bug: with available width of 87, ParseLines currently wraps
-        /// "Valley" onto a second line.  Document the buggy output explicitly.
+        /// Verifies that after the fix, ParseLines with width=87 also produces a single line,
+        /// confirming idempotency: the result is now identical to ParseLines(92) because
+        /// the wrapping decision uses whole-string measurement (87 ≤ 87).
         /// </summary>
         [Fact]
-        public void ParseLines_WithWidth87_CurrentlyProducesTwoLines_BugDocumentation()
+        public void ParseLines_WithWidth87_AfterFix_ProducesOneLine()
         {
             var measurer = new KerningMeasurer();
             var runs = Runs("Stardew Valley");
 
             var lines = MGTextLine.ParseLines(measurer, 87, true, runs, false).ToList();
 
-            // TODO: after Task 3 fix, this count should be 1 not 2.
-            Assert.Equal(2, lines.Count); // documents current (buggy) behaviour
+            // After the fix: whole-string measurement MeasureText("Stardew Valley")=87 ≤ 87 → 1 line
+            Assert.Single(lines);
+            Assert.Equal(87f, lines[0].LineWidth);
         }
     }
 }
