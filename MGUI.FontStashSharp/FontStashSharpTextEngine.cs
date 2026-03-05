@@ -220,10 +220,22 @@ namespace MGUI.FontStashSharp
         ///     pixels, matching SF's ExactScale-based measurement.</description></item>
         ///   <item><description><b>LineHeight</b> — copied from <c>FontSet.Heights[bakedSize] × exactScale</c>,
         ///     the tight glyph-crop metric used by SpriteFontTextEngine.</description></item>
-        ///   <item><description><b>SpaceWidth</b> — copied from <c>SF.MeasureString(" ") × exactScale</c>.</description></item>
         ///   <item><description><b>DrawOrigin</b> — vertical offset that shifts text up by the
         ///     same number of screen pixels as SpriteFontTextEngine's crop origin.</description></item>
         /// </list>
+        /// <para/>
+        /// <b>Note on glyph-width calibration:</b> this method also populates per-glyph
+        /// metric tables (<c>_calibratedGlyphMetrics</c>, <c>_calibratedSpacing</c>, etc.)
+        /// from the SpriteFont atlas, but <see cref="MeasureText"/> and
+        /// <see cref="MeasureGlyph"/> deliberately do <b>not</b> use them.  SpriteFont atlas
+        /// glyph widths are integer-precision (rounded at bake time), whereas FSS rendering
+        /// uses float-precision StbTrueType advances.  Summing the calibrated integers
+        /// produces a width systematically <i>narrower</i> than the FSS DrawText output,
+        /// causing text to be clipped.  All width measurements therefore use FSS-native
+        /// <see cref="FontStashSharp.SpriteFontBase.MeasureString"/> for measure–draw
+        /// consistency.  The calibrated tables are retained for potential future use (e.g.
+        /// glyph-atlas debugging) and for <see cref="SpaceWidth"/> reference.
+        /// <para/>
         /// Call this after <see cref="AddFontSystem(string, CustomFontStyles, FontSystem, byte[])"/>
         /// has set <see cref="FontSizeScale"/>.  You only need to call it once; the tables
         /// remain valid as long as <paramref name="fontManager"/>'s content does not change.
