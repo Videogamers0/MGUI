@@ -517,31 +517,23 @@ namespace MGUI.FontStashSharp
         }
 
         /// <inheritdoc/>
+        /// <remarks>
+        /// <b>Consistency with <see cref="MeasureText"/>:</b> this method always returns
+        /// FSS-native glyph widths (via <see cref="FSSFontHandle.GetGlyphWidth"/>), not
+        /// the calibrated SpriteFont atlas values.  <c>TextRenderInfo</c> reconciles the
+        /// per-glyph sum against <see cref="MeasureText"/> (whole-string), so both must
+        /// come from the same measurement source to avoid caret-positioning drift.
+        /// </remarks>
         public GlyphMetrics MeasureGlyph(ResolvedFont font, char c)
         {
-            // When calibrated, return the pre-computed SF glyph metrics directly.
-            // This guarantees LSB / Width / RSB match SpriteFontTextEngine exactly
-            // (Option C from the parity task list), keeping TextBox caret positions
-            // pixel-identical between the two engines.
-            var styleKey = (font.Spec.Style, font.Spec.Size);
-            if (_calibratedGlyphMetrics != null
-                && _calibratedGlyphMetrics.TryGetValue(styleKey, out var charMap)
-                && charMap.TryGetValue(c, out GlyphMetrics calibrated))
-            {
-                // Ensure Height reflects any post-calibration LineHeight value.
-                return calibrated.Height == font.LineHeight
-                    ? calibrated
-                    : calibrated with { Height = font.LineHeight };
-            }
-
-            // Fallback: FSS measurement (used when MatchSpriteFontSizing was not called
-            // or the character is not in the SF atlas).
+            // Always use FSS-native per-glyph measurement so that caret positions
+            // (computed in TextRenderInfo) match the FSS-rendered glyph positions.
+            // FSS doesn't expose per-glyph bearings; report the full advance as GlyphWidth
+            // (LeftSideBearing = RightSideBearing = 0, so TotalWidth == TotalWidthFirstGlyph).
             var h = GetHandle(font);
             if (h is null)
                 return new GlyphMetrics(0, 0, 0, font.LineHeight);
 
-            // FSS doesn’t expose per-glyph bearings; report the full advance as GlyphWidth
-            // (LeftSideBearing = RightSideBearing = 0, so TotalWidth == TotalWidthFirstGlyph).
             return new GlyphMetrics(0f, h.GetGlyphWidth(c), 0f, font.LineHeight);
         }
 
