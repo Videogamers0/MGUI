@@ -10,10 +10,29 @@ using Xunit;
 namespace MGUI.Tests.Text;
 
 /// <summary>
-/// Verifies that <see cref="FontStashSharpTextEngine"/> produces consistent
-/// measurement results when using the FSS-native path (i.e. <see cref="FontStashSharp.SpriteFontBase.MeasureString"/>)
-/// rather than the calibrated SpriteFont glyph sum which was the source of
-/// the measure–draw width mismatch bug (text clipping).
+/// Verifies that <see cref="FontStashSharpTextEngine"/> produces internally
+/// consistent measurement results.
+///
+/// Background:
+/// Two bugs were fixed in sequence:
+///
+/// Bug 1 – text clipping:
+///   MeasureText previously returned the calibrated SpriteFont glyph-width sum
+///   (integer atlas advances × exactScale) while DrawText rendered using FSS's
+///   float-precision StbTrueType advances.  Because the FSS advances are wider
+///   than the SF values, text was drawn wider than the allocated layout slot and
+///   clipped on the right.  Fix: MeasureText now uses FSS-native
+///   <see cref="FontStashSharp.SpriteFontBase.MeasureString"/> on the resolved font.
+///
+/// Bug 2 – extra line-wrap (regression from Bug 1 fix):
+///   After switching MeasureText to FSS-native widths, the engine measured text
+///   as slightly WIDER than SpriteFontTextEngine (SF integer atlas × exactScale),
+///   causing ParseLines to wrap one word earlier and produce an extra line.
+///   Fix: ResolveFont now calibrates the FSS pixel size by applying the ratio
+///   (calibrated-SF-spaceWidth / FSS-native-raw-spaceWidth) so that ALL glyph
+///   advances scale to match SpriteFontTextEngine's measurements.  When
+///   MatchSpriteFontSizing has not been called the uncalibrated path is used
+///   as a safe fallback (tests below exercise this case).
 /// </summary>
 public class FSSMeasureDrawConsistencyTests
 {
@@ -78,9 +97,10 @@ public class FSSMeasureDrawConsistencyTests
         float spaceWidth = engine.GetSpaceWidth(font);
         float measuredSpace = engine.MeasureText(font, " ").X;
 
-        // SpaceWidth comes from FSS-native h.SpaceWidth (= MeasureString(" ").X)
-        // MeasureText also uses FSS-native MeasureString(" ").X
-        // They should match exactly.
+        // SpaceWidth comes from the resolved FSS font's h.SpaceWidth.
+        // MeasureText also calls FSS MeasureString on the same resolved font.
+        // Both must use the identical SpriteFontBase instance (whether corrected via
+        // pixel-size calibration or raw fallback) so they agree exactly.
         Assert.Equal(measuredSpace, spaceWidth, precision: 2);
     }
 
@@ -150,9 +170,49 @@ public class FSSMeasureDrawConsistencyTests
         float residual = wholeWidth - glyphSum;
         float residualPercent = MathF.Abs(residual) / wholeWidth * 100f;
 
-        // With both using FSS-native, the residual should be small (< 5%).
-        // Before the fix, using calibrated glyph widths could produce large residuals.
+        // With both using FSS-native on the same resolved font, the residual
+        // should be small (< 5%).  Before the fix, using calibrated SF glyph
+        // widths could produce large residuals when the font was pixel-corrected.
         Assert.True(residualPercent < 5f,
             $"Residual between MeasureText and glyph sum is {residualPercent:F1}% ({residual:F2}px), expected < 5%");
+    }
+
+    [Fact]
+    public void MeasureGlyph_SpaceChar_MatchesSpaceWidth()
+    {
+        // MeasureGlyph(' ') — used by TextRenderInfo to compute space advance — must
+        // agree with GetSpaceWidth, which in turn is used by ParseLines.  A mismatch
+        // would cause different wrap points depending on whether a line contains an
+        // explicit space glyph vs. the inter-word space accounted for by ParseLines.
+        var engine = CreateEngine(out _);
+        var font = Resolve(engine);
+
+        float spaceGlyphWidth = engine.MeasureGlyph(font, ' ').GlyphWidth;
+        float spaceWidth = engine.GetSpaceWidth(font);
+
+        Assert.Equal(spaceWidth, spaceGlyphWidth, precision: 2);
+    }
+
+    [Fact]
+    public void FSSMeasurement_ScalesProportionally_WithPixelSize()
+    {
+        // The pixel-size calibration in ResolveFont relies on the FSS linear-scaling
+        // property: if you scale the pixel size by factor k, every advance (including
+        // MeasureString results) also scales by k.  This test verifies that property
+        // holds for the Arial TTF at two sizes.
+        //
+        // If FSS ever switches to a non-linear advance model this test will catch it and
+        // signal that the calibration strategy needs revisiting.
+        var engine = CreateEngine(out _);
+        var font12 = Resolve(engine, 12);
+        var font24 = Resolve(engine, 24);   // exactly 2× size
+
+        float w12 = engine.MeasureText(font12, "Scale test").X;
+        float w24 = engine.MeasureText(font24, "Scale test").X;
+
+        // Ratio should be close to 2.0 (within 10% — FSS pixel-snapping and hinting
+        // introduce small non-linearity at small sizes, but the overall trend must hold).
+        float ratio = w24 / w12;
+        Assert.InRange(ratio, 1.7f, 2.3f);
     }
 }

@@ -117,6 +117,33 @@ atteint plusieurs pixels, causant le dépassement et le clipping.
 
 ---
 
+### ✅ Tâche 9 — Fix régression line-wrap (FSS wraps sur 3 lignes au lieu de 2)
+
+- **Symptôme** : après les fixes Tâches 2-4, le texte « Developer note: The transparent
+  ones aren't implemented yet... » s'affichait sur **3 lignes** avec FSS contre
+  **2 lignes** avec SpriteFontTextEngine.
+- **Cause racine** : `FSS.MeasureString(text)` sur le font brut à
+  `effectivePt × FontSizeScale` retourne des largeurs **plus grandes** que
+  `SF.MeasureString(text) × exactScale` (avances float StbTrueType > avances entières atlas SF).
+  `ParseLines` voyait donc des lignes plus larges et renvoyait à la ligne plus tôt.
+- **Fix** : dans `ResolveFont`, après avoir calculé `rawPixelSize = effectivePt × FontSizeScale`,
+  appliquer un facteur de correction linéaire :
+  ```
+  ratio = calibrated_SF_spaceWidth / FSS_native_spaceWidth(rawPixelSize)
+  correctedPixelSize = rawPixelSize × ratio
+  ```
+  FSS étant linéaire en taille de pixel, TOUS les caractères sont réduits
+  proportionnellement, ce qui aligne FSS sur SpriteFontTextEngine pour mesure ET rendu.
+  Sans calibration (`_calibratedSpaceWidth` absent) le chemin de fallback est utilisé.
+- **Fichiers** :
+  - `MGUI.FontStashSharp/FontStashSharpTextEngine.cs` — `ResolveFont`
+  - `MGUI.Tests/Text/FSSMeasureDrawConsistencyTests.cs` — commentaires mis à jour,
+    2 nouveaux tests (`MeasureGlyph_SpaceChar_MatchesSpaceWidth`,
+    `FSSMeasurement_ScalesProportionally_WithPixelSize`)
+- **Commit** : `fix(fss): calibrate FSS pixel size to match SpriteFontTextEngine widths and eliminate wrap regression`
+
+---
+
 ## Contexte technique
 
 ### Flux de mesure avec calibration (avant fix)
@@ -137,25 +164,42 @@ DrawText(..., scale=1.0)
      → TEXT CLIPPED because layout allocated W₁
 ```
 
-### Flux corrigé (après fix)
+### Après Tâches 2-4 (clipping corrigé, mais régression line-wrap)
 
 ```
 MeasureText(font, "Hello")
   │
-  └─ FSS native: h.Font.MeasureString("Hello").X
-     → returns width W₂ (matches rendering)
+  └─ FSS native: h.Font.MeasureString("Hello").X  ← same font as DrawText
+     → returns width W₂ (wider than SF W₁)
 
-DrawText(..., scale=1.0)
+ParseLines wraps when committed width > available width
   │
-  └─ FSS renders text at effectivePt × FontSizeScale
-     → visual width ≈ W₂
-     → TEXT FITS because layout allocated W₂
+  └─ W₂ > W₁ → ParseLines wraps earlier → 3 lines instead of 2
+```
+
+### Flux corrigé final (après Tâche 9 — calibration pixel-size)
+
+```
+ResolveFont:
+  rawPixelSize = effectivePt × FontSizeScale
+  ratio = calibrated_SF_spaceWidth / FSS_native_spaceWidth(rawPixelSize)
+  correctedPixelSize = rawPixelSize × ratio       ← scales ALL advances
+  font = FSS.GetFont(correctedPixelSize)
+
+MeasureText(font, "Hello")
+  │
+  └─ FSS native on corrected font → W₃ ≈ W₁ (matches SF)
+     → ParseLines wraps at same point as SF → 2 lines ✓
+
+DrawText(..., scale=1.0) on corrected font
+  │
+  └─ visual width ≈ W₃ ≈ W₁ → no clipping ✓
 ```
 
 ### Fichiers impactés
 
 | Fichier | Changement |
 |---------|-----------|
-| `MGUI.FontStashSharp/FontStashSharpTextEngine.cs` | MeasureText, MeasureGlyph, ResolveFont |
-| `MGUI.Tests/Text/FSSMeasureDrawConsistencyTests.cs` | Nouveaux tests |
+| `MGUI.FontStashSharp/FontStashSharpTextEngine.cs` | MeasureText, MeasureGlyph, ResolveFont (pixel-size calibration) |
+| `MGUI.Tests/Text/FSSMeasureDrawConsistencyTests.cs` | Nouveaux tests + mises à jour commentaires |
 | `itextengine-bugs.md` | Ce fichier (statut des tâches) |
