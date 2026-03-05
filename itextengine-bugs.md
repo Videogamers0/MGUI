@@ -34,7 +34,7 @@ atteint plusieurs pixels, causant le dépassement et le clipping.
 
 ---
 
-### ⬜ Tâche 2 — Fix `MeasureText` : utiliser la mesure FSS native pour la largeur
+### ✅ Tâche 2 — Fix `MeasureText` : utiliser la mesure FSS native pour la largeur
 
 - **Fichier** : `MGUI.FontStashSharp/FontStashSharpTextEngine.cs`
 - **Problème** : le chemin calibré somme les métriques SpriteFont (entiers × scale)
@@ -48,7 +48,7 @@ atteint plusieurs pixels, causant le dépassement et le clipping.
 
 ---
 
-### ⬜ Tâche 3 — Fix `MeasureGlyph` : utiliser la mesure FSS native par glyphe
+### ✅ Tâche 3 — Fix `MeasureGlyph` : utiliser la mesure FSS native par glyphe
 
 - **Fichier** : `MGUI.FontStashSharp/FontStashSharpTextEngine.cs`
 - **Problème** : `MeasureGlyph` retourne les métriques calibrées du SpriteFont atlas,
@@ -61,7 +61,7 @@ atteint plusieurs pixels, causant le dépassement et le clipping.
 
 ---
 
-### ⬜ Tâche 4 — Fix `SpaceWidth` dans `ResolveFont` : utiliser la valeur FSS native
+### ✅ Tâche 4 — Fix `SpaceWidth` dans `ResolveFont` : utiliser la valeur FSS native
 
 - **Fichier** : `MGUI.FontStashSharp/FontStashSharpTextEngine.cs`
 - **Problème** : `SpaceWidth` calibré provient de `SpriteFont.MeasureString(" ")`,
@@ -73,7 +73,7 @@ atteint plusieurs pixels, causant le dépassement et le clipping.
 
 ---
 
-### ⬜ Tâche 5 — Documenter le root cause dans le code
+### ✅ Tâche 5 — Documenter le root cause dans le code
 
 - **Fichier** : `MGUI.FontStashSharp/FontStashSharpTextEngine.cs`
 - **Action** : ajouter des commentaires XML `<remarks>` sur `MeasureText`,
@@ -84,7 +84,7 @@ atteint plusieurs pixels, causant le dépassement et le clipping.
 
 ---
 
-### ⬜ Tâche 6 — Tests unitaires de consistance mesure/rendu
+### ✅ Tâche 6 — Tests unitaires de consistance mesure/rendu
 
 - **Fichier** : `MGUI.Tests/Text/FSSMeasureDrawConsistencyTests.cs`
 - **Action** : créer des tests vérifiant que :
@@ -97,7 +97,7 @@ atteint plusieurs pixels, causant le dépassement et le clipping.
 
 ---
 
-### ⬜ Tâche 7 — Vérification build + tests + régression
+### ✅ Tâche 7 — Vérification build + tests + régression
 
 - **Action** :
   1. `dotnet build MGUI.sln` — 0 erreur
@@ -107,7 +107,7 @@ atteint plusieurs pixels, causant le dépassement et le clipping.
 
 ---
 
-### ⬜ Tâche 8 — Nettoyage final
+### ✅ Tâche 8 — Nettoyage final
 
 - **Action** :
   1. Supprimer les TODO/FIXME temporaires
