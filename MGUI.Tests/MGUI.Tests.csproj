@@ -24,7 +24,15 @@
 
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
+    <PackageReference Include="FontStashSharp.MonoGame" Version="1.5.4" />
     <ProjectReference Include="..\MGUI.Core\MGUI.Core.csproj" />
+    <ProjectReference Include="..\MGUI.FontStashSharp\MGUI.FontStashSharp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\MGUI.Core\Content\Fonts\ttf\arial.ttf" Link="Fonts\arial.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
