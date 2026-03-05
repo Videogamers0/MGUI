@@ -443,10 +443,11 @@ namespace MGUI.FontStashSharp
                 ? calLH
                 : handle.LineHeight;
 
-            float spaceWidth = _calibratedSpaceWidth != null
-                && _calibratedSpaceWidth.TryGetValue(spec.Size, out float calSW)
-                ? calSW
-                : handle.SpaceWidth;
+            // Always use FSS-native SpaceWidth for horizontal measurement consistency
+            // with MeasureText and MeasureGlyph (which now both use FSS-native widths).
+            // Using calibrated SpaceWidth from SpriteFont would introduce a measure-draw
+            // mismatch for space characters, similar to the glyph-width issue.
+            float spaceWidth = handle.SpaceWidth;
 
             Vector2 drawOrigin = _calibratedDrawOrigin != null
                 && _calibratedDrawOrigin.TryGetValue(spec.Size, out Vector2 calDO)
