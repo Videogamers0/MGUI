@@ -119,27 +119,31 @@ atteint plusieurs pixels, causant le dépassement et le clipping.
 
 ### ✅ Tâche 9 — Fix régression line-wrap (FSS wraps sur 3 lignes au lieu de 2)
 
-- **Symptôme** : après les fixes Tâches 2-4, le texte « Developer note: The transparent
-  ones aren't implemented yet... » s'affichait sur **3 lignes** avec FSS contre
-  **2 lignes** avec SpriteFontTextEngine.
-- **Cause racine (révisée)** : les largeurs des **espaces** sont identiques entre SF et FSS
-  (`calSW == rawSW = 4.0` pour toutes les tailles — ratio = 1.0, donc la correction
-  pixel-size ne s'appliquait jamais). La divergence vient de la mesure de
-  **chaînes multi-caractères** : `FSS.MeasureString(text)` retourne des valeurs
-  légèrement différentes de `SF.MeasureString(text) × exactScale` pour le texte réel.
-- **Fix** : dans `MeasureText`, déléguer à `SF.MeasureString(text).X × exactScale`
-  quand `MatchSpriteFontSizing` a été appelé — exactement le même chemin que
-  `SpriteFontTextEngine.MeasureText`. `ParseLines` voit des largeurs identiques et
-  positionne les retours à la ligne aux mêmes endroits que le moteur par défaut.
-  `DrawText` continue d'utiliser FSS à `effectivePt × FontSizeScale` (inchangé).
-- **Nouveau champ** : `_calibratedSpriteFont: Dictionary<(CustomFontStyles, int), (SpriteFont SF, float ExactScale)>`
-  populé dans `MatchSpriteFontSizing`, utilisé dans `MeasureText`.
-- **Tentatives précédentes supprimées** : la correction pixel-size via ratio des espaces
-  (commits `a30c4be`, `aecead6`) — ratio toujours 1.0, donc inopérante.
-- **Commits** :
-  - `a30c4be` — tentative pixel-size ratio (non fonctionnel, ratio=1.0)
+- **Symptôme** : après les fixes Tâches 2-4, le texte s'affichait sur **3 lignes** avec FSS
+  contre **2 lignes** avec SpriteFontTextEngine. La délégation à `SF.MeasureString`
+  (commit `f787306`) pour le layout avait corrigé le wrapping mais avait **réintroduit
+  le clipping** (DrawText FSS plus large que le layout alloué par SF).
+- **Cause racine (finale)** :
+  - Le ratio espace seul était toujours 1.0 (`calSW == rawSW`) → correction pixel-size
+    précédente (commit `a30c4be`) inopérante.
+  - `SF.MeasureString` délégué pour le layout → clipping car DrawText FSS rend plus large.
+  - La divergence est dans les chaînes **multi-caractères** : `FSS.MeasureString(text)` >
+    `SF.MeasureString(text) × exactScale`, ce qui n'est pas visible sur l'espace seul.
+- **Fix (définitif)** : dans `ResolveFont`, mesurer une chaîne de calibration couvrant
+  tout l'alphabet + chiffres + ponctuation avec SF ET FSS, puis corriger `pixelSize` :
+  ```
+  ratio = sfCalibWidth / fssCalibWidth
+  pixelSize *= ratio
+  ```
+  La correction étant appliquée au `pixelSize` FSS, elle est proportionnelle à tous les
+  caractères. `MeasureText` (FSS natif) et `DrawText` (FSS natif) utilisent le même
+  font corrigé → pas de clipping. Les largeurs FSS corrigées ≈ SF → même wrapping.
+- **Champ utilisé** : `_calibratedSpriteFont` (déjà populé), `CalibrationString` (constante).
+- **Commits cumulatifs** :
+  - `a30c4be` — tentative ratio espace (ratio = 1.0, non fonctionnel)
   - `aecead6` — diagnostic `Debug.WriteLine`
-  - `f787306` — **vrai fix** : `MeasureText` délègue à `SF.MeasureString × exactScale`
+  - `f787306` — délégation SF.MeasureString (wrapping OK mais clipping revenu)
+  - `4aa94a3` — **fix définitif** : correction pixel-size par chaîne multi-caractères
 
 ---
 
@@ -176,18 +180,24 @@ ParseLines wraps when committed width > available width
   └─ W₂ > W₁ → ParseLines wraps earlier → 3 lines instead of 2
 ```
 
-### Flux corrigé final (après Tâche 9 — délégation à SF.MeasureString)
+### Flux corrigé final (Tâche 9 commit `4aa94a3` — correction pixel-size multi-caractères)
 
 ```
-MeasureText(font, "Hello")   [MatchSpriteFontSizing appelé]
+ResolveFont:
+  pixelSize = effectivePt * FontSizeScale
+  sfW  = SF.MeasureString(CalibString) * exactScale
+  fssW = FSS.MeasureString(CalibString) at pixelSize
+  ratio = sfW / fssW  (< 1.0 : FSS était légèrement plus large)
+  pixelSize *= ratio  ← corrige TOUS les caractères proportionnellement
+
+MeasureText(font, "Hello")  [FSS natif sur font corrigé]
   │
-  └─ SF.MeasureString("Hello").X × exactScale = W₁ (identique à SpriteFontTextEngine)
+  └─ FSS.MeasureString("Hello") ≈ SF * exactScale = W₁
      → ParseLines wraps at same point as SF → 2 lines ✓
 
-DrawText(..., scale=1.0)
+DrawText(..., scale=1.0) [FSS natif, même font corrigé]
   │
-  └─ FSS renders at effectivePt × FontSizeScale (inchangé)
-     → visual width ≈ W₁ (calSW == rawSW donc pas de décalage) → no clipping ✓
+  └─ visual width ≈ W₁ = MeasureText width → no clipping ✓
 ```
 
 ### Fichiers impactés

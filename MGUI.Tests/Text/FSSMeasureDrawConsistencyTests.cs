@@ -24,19 +24,18 @@ namespace MGUI.Tests.Text;
 ///   clipped on the right.  Fix: MeasureText now uses FSS-native
 ///   <see cref="FontStashSharp.SpriteFontBase.MeasureString"/> on the resolved font.
 ///
-/// Bug 2 – extra line-wrap (regression from Bug 1 fix):
-///   After switching MeasureText to FSS-native widths, wrapping differed from
-///   SpriteFontTextEngine.  Investigation (Debug.WriteLine diagnostics) showed
-///   the space-width ratio calSW/rawSW was always exactly 1.0 for all font sizes,
-///   so a pixel-size correction approach was a no-op.  The real divergence is in
-///   multi-character string measurement: FSS.MeasureString returns slightly
-///   different values from SF.MeasureString*exactScale for actual text strings.
-///   Fix: MeasureText now delegates to SF.MeasureString(text)*exactScale when
-///   MatchSpriteFontSizing has been called (identical to SpriteFontTextEngine),
-///   so ParseLines sees the same widths and wraps at the same points.
-///   DrawText continues to render with FSS at effectivePt*FontSizeScale (unchanged).
-///   When MatchSpriteFontSizing has not been called the FSS-native fallback is used
-///   (tests below exercise this case — no MatchSpriteFontSizing called).
+/// Bug 2 – extra line-wrap + clipping (three attempts before correct fix):
+///   Attempt 1 (a30c4be): pixel-size correction using space-char ratio — ratio was
+///     always 1.0 (calSW==rawSW for all sizes) so the correction never applied.
+///   Attempt 2 (f787306): delegated MeasureText to SF.MeasureString*exactScale —
+///     fixed wrapping, but DrawText still used FSS at native width → clipping returned.
+///   Final fix (4aa94a3): at ResolveFont time, measure a full CalibrationString with
+///     both SF and FSS, scale pixelSize by (sfWidth/fssWidth).  The corrected FSS font
+///     advances match SF for all text:
+///       • MeasureText (FSS-native on corrected font) ≈ SF widths → same wrap points
+///       • DrawText (FSS-native on same corrected font) = MeasureText width → no clipping
+///   When MatchSpriteFontSizing has not been called the FSS-native path is used
+///   without correction (tests below exercise this uncalibrated case).
 /// </summary>
 public class FSSMeasureDrawConsistencyTests
 {
