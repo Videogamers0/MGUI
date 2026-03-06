@@ -194,6 +194,24 @@ public class FSSMeasureDrawConsistencyTests
     }
 
     [Fact]
+    public void SpaceWidth_IsNonZero()
+    {
+        // SpaceWidth must be positive — it is used both as the inter-word advance in
+        // ParseLines and as the calibration anchor for the FSS pixel-size correction.
+        // A zero SpaceWidth would mean MeasureString(" ").X returned 0 from FSS, which
+        // would silently disable the pixel-size calibration and leave the wrapping
+        // regression in place.
+        var engine = CreateEngine(out _);
+        var font = Resolve(engine);
+
+        float spaceWidth = engine.GetSpaceWidth(font);
+        Assert.True(spaceWidth > 0f,
+            $"FSS SpaceWidth must be > 0; got {spaceWidth}. " +
+            "If FSS MeasureString(' ') returns 0 (bounding-box rather than advance), " +
+            "the pixel-size calibration in ResolveFont silently falls back to rawPixelSize.");
+    }
+
+    [Fact]
     public void FSSMeasurement_ScalesProportionally_WithPixelSize()
     {
         // The pixel-size calibration in ResolveFont relies on the FSS linear-scaling

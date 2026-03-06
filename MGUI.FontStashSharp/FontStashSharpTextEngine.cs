@@ -467,13 +467,17 @@ namespace MGUI.FontStashSharp
                 && _calibratedSpaceWidth.TryGetValue(spec.Size, out float calSW) && calSW > 0f)
             {
                 float rawSpaceWidth = fs.GetFont(rawPixelSize).MeasureString(" ").X;
-                float correctedPixelSize = rawSpaceWidth > 0f
-                    ? rawPixelSize * (calSW / rawSpaceWidth)
-                    : rawPixelSize;
+                float ratio = rawSpaceWidth > 0f ? calSW / rawSpaceWidth : 1f;
+                float correctedPixelSize = rawPixelSize * ratio;
+                System.Diagnostics.Debug.WriteLine(
+                    $"[FSS ResolveFont] size={spec.Size} rawPx={rawPixelSize:F3} " +
+                    $"calSW={calSW:F3} rawSW={rawSpaceWidth:F3} ratio={ratio:F4} corrPx={correctedPixelSize:F3}");
                 spriteFontBase = fs.GetFont(correctedPixelSize);
             }
             else
             {
+                System.Diagnostics.Debug.WriteLine(
+                    $"[FSS ResolveFont] size={spec.Size} – no calibration (rawPx={rawPixelSize:F3})");
                 spriteFontBase = fs.GetFont(rawPixelSize);
             }
             var handle = new FSSFontHandle(spriteFontBase);
