@@ -488,13 +488,7 @@ namespace MGUI.FontStashSharp
                 float sfCalibWidth  = sfEntry.SF.MeasureString(CalibrationString).X * sfEntry.ExactScale;
                 float fssCalibWidth = fs.GetFont(pixelSize).MeasureString(CalibrationString).X;
                 if (sfCalibWidth > 0f && fssCalibWidth > 0f)
-                {
-                    float ratio = sfCalibWidth / fssCalibWidth;
-                    System.Diagnostics.Debug.WriteLine(
-                        $"[FSS calib] size={spec.Size} style={spec.Style} " +
-                        $"sfW={sfCalibWidth:F3} fssW={fssCalibWidth:F3} ratio={ratio:F4} px={pixelSize:F3}->{pixelSize*ratio:F3}");
-                    pixelSize *= ratio;
-                }
+                    pixelSize *= sfCalibWidth / fssCalibWidth;
             }
 
             SpriteFontBase spriteFontBase = fs.GetFont(pixelSize);
