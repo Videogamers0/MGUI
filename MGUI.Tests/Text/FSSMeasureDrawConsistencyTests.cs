@@ -25,14 +25,18 @@ namespace MGUI.Tests.Text;
 ///   <see cref="FontStashSharp.SpriteFontBase.MeasureString"/> on the resolved font.
 ///
 /// Bug 2 – extra line-wrap (regression from Bug 1 fix):
-///   After switching MeasureText to FSS-native widths, the engine measured text
-///   as slightly WIDER than SpriteFontTextEngine (SF integer atlas × exactScale),
-///   causing ParseLines to wrap one word earlier and produce an extra line.
-///   Fix: ResolveFont now calibrates the FSS pixel size by applying the ratio
-///   (calibrated-SF-spaceWidth / FSS-native-raw-spaceWidth) so that ALL glyph
-///   advances scale to match SpriteFontTextEngine's measurements.  When
-///   MatchSpriteFontSizing has not been called the uncalibrated path is used
-///   as a safe fallback (tests below exercise this case).
+///   After switching MeasureText to FSS-native widths, wrapping differed from
+///   SpriteFontTextEngine.  Investigation (Debug.WriteLine diagnostics) showed
+///   the space-width ratio calSW/rawSW was always exactly 1.0 for all font sizes,
+///   so a pixel-size correction approach was a no-op.  The real divergence is in
+///   multi-character string measurement: FSS.MeasureString returns slightly
+///   different values from SF.MeasureString*exactScale for actual text strings.
+///   Fix: MeasureText now delegates to SF.MeasureString(text)*exactScale when
+///   MatchSpriteFontSizing has been called (identical to SpriteFontTextEngine),
+///   so ParseLines sees the same widths and wraps at the same points.
+///   DrawText continues to render with FSS at effectivePt*FontSizeScale (unchanged).
+///   When MatchSpriteFontSizing has not been called the FSS-native fallback is used
+///   (tests below exercise this case — no MatchSpriteFontSizing called).
 /// </summary>
 public class FSSMeasureDrawConsistencyTests
 {
@@ -214,13 +218,12 @@ public class FSSMeasureDrawConsistencyTests
     [Fact]
     public void FSSMeasurement_ScalesProportionally_WithPixelSize()
     {
-        // The pixel-size calibration in ResolveFont relies on the FSS linear-scaling
-        // property: if you scale the pixel size by factor k, every advance (including
-        // MeasureString results) also scales by k.  This test verifies that property
-        // holds for the Arial TTF at two sizes.
+        // Verifies the FSS linear-scaling property: if you double the pixel size, every
+        // advance (including MeasureString results) also approximately doubles.
+        // This is a fundamental assumption of the FSS rasteriser and ensures the
+        // effectivePt calibration in ResolveFont behaves predictably.
         //
-        // If FSS ever switches to a non-linear advance model this test will catch it and
-        // signal that the calibration strategy needs revisiting.
+        // If FSS ever switches to a non-linear advance model this test will catch it.
         var engine = CreateEngine(out _);
         var font12 = Resolve(engine, 12);
         var font24 = Resolve(engine, 24);   // exactly 2× size

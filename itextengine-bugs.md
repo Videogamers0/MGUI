@@ -122,25 +122,24 @@ atteint plusieurs pixels, causant le dépassement et le clipping.
 - **Symptôme** : après les fixes Tâches 2-4, le texte « Developer note: The transparent
   ones aren't implemented yet... » s'affichait sur **3 lignes** avec FSS contre
   **2 lignes** avec SpriteFontTextEngine.
-- **Cause racine** : `FSS.MeasureString(text)` sur le font brut à
-  `effectivePt × FontSizeScale` retourne des largeurs **plus grandes** que
-  `SF.MeasureString(text) × exactScale` (avances float StbTrueType > avances entières atlas SF).
-  `ParseLines` voyait donc des lignes plus larges et renvoyait à la ligne plus tôt.
-- **Fix** : dans `ResolveFont`, après avoir calculé `rawPixelSize = effectivePt × FontSizeScale`,
-  appliquer un facteur de correction linéaire :
-  ```
-  ratio = calibrated_SF_spaceWidth / FSS_native_spaceWidth(rawPixelSize)
-  correctedPixelSize = rawPixelSize × ratio
-  ```
-  FSS étant linéaire en taille de pixel, TOUS les caractères sont réduits
-  proportionnellement, ce qui aligne FSS sur SpriteFontTextEngine pour mesure ET rendu.
-  Sans calibration (`_calibratedSpaceWidth` absent) le chemin de fallback est utilisé.
-- **Fichiers** :
-  - `MGUI.FontStashSharp/FontStashSharpTextEngine.cs` — `ResolveFont`
-  - `MGUI.Tests/Text/FSSMeasureDrawConsistencyTests.cs` — commentaires mis à jour,
-    2 nouveaux tests (`MeasureGlyph_SpaceChar_MatchesSpaceWidth`,
-    `FSSMeasurement_ScalesProportionally_WithPixelSize`)
-- **Commit** : `fix(fss): calibrate FSS pixel size to match SpriteFontTextEngine widths and eliminate wrap regression`
+- **Cause racine (révisée)** : les largeurs des **espaces** sont identiques entre SF et FSS
+  (`calSW == rawSW = 4.0` pour toutes les tailles — ratio = 1.0, donc la correction
+  pixel-size ne s'appliquait jamais). La divergence vient de la mesure de
+  **chaînes multi-caractères** : `FSS.MeasureString(text)` retourne des valeurs
+  légèrement différentes de `SF.MeasureString(text) × exactScale` pour le texte réel.
+- **Fix** : dans `MeasureText`, déléguer à `SF.MeasureString(text).X × exactScale`
+  quand `MatchSpriteFontSizing` a été appelé — exactement le même chemin que
+  `SpriteFontTextEngine.MeasureText`. `ParseLines` voit des largeurs identiques et
+  positionne les retours à la ligne aux mêmes endroits que le moteur par défaut.
+  `DrawText` continue d'utiliser FSS à `effectivePt × FontSizeScale` (inchangé).
+- **Nouveau champ** : `_calibratedSpriteFont: Dictionary<(CustomFontStyles, int), (SpriteFont SF, float ExactScale)>`
+  populé dans `MatchSpriteFontSizing`, utilisé dans `MeasureText`.
+- **Tentatives précédentes supprimées** : la correction pixel-size via ratio des espaces
+  (commits `a30c4be`, `aecead6`) — ratio toujours 1.0, donc inopérante.
+- **Commits** :
+  - `a30c4be` — tentative pixel-size ratio (non fonctionnel, ratio=1.0)
+  - `aecead6` — diagnostic `Debug.WriteLine`
+  - `f787306` — **vrai fix** : `MeasureText` délègue à `SF.MeasureString × exactScale`
 
 ---
 
@@ -177,29 +176,24 @@ ParseLines wraps when committed width > available width
   └─ W₂ > W₁ → ParseLines wraps earlier → 3 lines instead of 2
 ```
 
-### Flux corrigé final (après Tâche 9 — calibration pixel-size)
+### Flux corrigé final (après Tâche 9 — délégation à SF.MeasureString)
 
 ```
-ResolveFont:
-  rawPixelSize = effectivePt × FontSizeScale
-  ratio = calibrated_SF_spaceWidth / FSS_native_spaceWidth(rawPixelSize)
-  correctedPixelSize = rawPixelSize × ratio       ← scales ALL advances
-  font = FSS.GetFont(correctedPixelSize)
-
-MeasureText(font, "Hello")
+MeasureText(font, "Hello")   [MatchSpriteFontSizing appelé]
   │
-  └─ FSS native on corrected font → W₃ ≈ W₁ (matches SF)
+  └─ SF.MeasureString("Hello").X × exactScale = W₁ (identique à SpriteFontTextEngine)
      → ParseLines wraps at same point as SF → 2 lines ✓
 
-DrawText(..., scale=1.0) on corrected font
+DrawText(..., scale=1.0)
   │
-  └─ visual width ≈ W₃ ≈ W₁ → no clipping ✓
+  └─ FSS renders at effectivePt × FontSizeScale (inchangé)
+     → visual width ≈ W₁ (calSW == rawSW donc pas de décalage) → no clipping ✓
 ```
 
 ### Fichiers impactés
 
 | Fichier | Changement |
 |---------|-----------|
-| `MGUI.FontStashSharp/FontStashSharpTextEngine.cs` | MeasureText, MeasureGlyph, ResolveFont (pixel-size calibration) |
-| `MGUI.Tests/Text/FSSMeasureDrawConsistencyTests.cs` | Nouveaux tests + mises à jour commentaires |
+| `MGUI.FontStashSharp/FontStashSharpTextEngine.cs` | MeasureText (SF delegation), MeasureGlyph (FSS native), ResolveFont (effectivePt) |
+| `MGUI.Tests/Text/FSSMeasureDrawConsistencyTests.cs` | Nouveaux tests |
 | `itextengine-bugs.md` | Ce fichier (statut des tâches) |
