@@ -25,10 +25,6 @@ namespace MGUI.Samples
         private MainRenderer MGUIRenderer { get; set; }
         private MGDesktop Desktop { get; set; }
 
-        /// <summary>Default SpriteFont backend (F1 to toggle back from FSS).</summary>
-        private SpriteFontTextEngine _sfEngine;
-        /// <summary>Optional FontStashSharp backend. Press F1 to toggle between engines.</summary>
-        private FontStashSharpTextEngine _fssEngine;
         private KeyboardState _prevKeyboardState;
 
         //  IObservableUpdate implementation
@@ -54,46 +50,77 @@ namespace MGUI.Samples
             MGUIRenderer = new(new GameRenderHost<Game1>(this));
             Desktop = new(MGUIRenderer);
 
-            _sfEngine = new SpriteFontTextEngine(Desktop.FontManager);
-            Desktop.TextEngine = _sfEngine;
-
-            // ── FontStashSharp engine (F1 to toggle) ──────────────────────────────────
-            try
-            {
-                string ttfDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"Content\Fonts\ttf"));
-
-                _fssEngine = new FontStashSharpTextEngine();
-
-                byte[] arialBytes = File.ReadAllBytes(Path.Combine(ttfDir, "arial.ttf"));
-                var arialNormal = new FontSystem();
-                arialNormal.AddFont(arialBytes);
-                // Pass the raw TTF so FontSizeScale is auto-computed from the font metrics
-                _fssEngine.AddFontSystem("Arial", CustomFontStyles.Normal, arialNormal, arialBytes);
-
-                var arialBold = new FontSystem();
-                arialBold.AddFont(File.ReadAllBytes(Path.Combine(ttfDir, "arialbd.ttf")));
-                _fssEngine.AddFontSystem("Arial", CustomFontStyles.Bold, arialBold);
-
-                var arialItalic = new FontSystem();
-                arialItalic.AddFont(File.ReadAllBytes(Path.Combine(ttfDir, "ariali.ttf")));
-                _fssEngine.AddFontSystem("Arial", CustomFontStyles.Italic, arialItalic);
-
-                // Calibrate per-size advance widths to match SpriteFontTextEngine exactly.
-                // Must be called after FontSizeScale is set (via AddFontSystem overload above).
-                _fssEngine.MatchSpriteFontSizing(Desktop.FontManager);
-            }
-            catch (Exception ex) 
-            { 
-                Debug.WriteLine($"FSS engine init failed: {ex.Message}"); 
-                _fssEngine = null; 
-            }
-            // ─────────────────────────────────────────────────────────────────────────
+            InitializeTextEngines();
 
             //  This is a dialog with toggle buttons to launch other dialogs
             Compendium Compendium = new(Content, Desktop);
             Compendium.Show();
 
             base.Initialize();
+        }
+
+        /// <summary>Default SpriteFont backend (Press F1 to toggle the active text-rendering engine)</summary>
+        private SpriteFontTextEngine SpriteFontEngine;
+        /// <summary>Optional FontStashSharp backend. (Press F1 to toggle the active text-rendering engine)</summary>
+        private FontStashSharpTextEngine FontStashSharpEngine;
+
+        private void InitializeTextEngines()
+        {
+            //  You only need 1 textengine, but this sample project creates multiple engines
+            //  that you can toggle between by pressing F1 for demonstration purposes
+
+            SpriteFontEngine = new SpriteFontTextEngine(Desktop.FontManager);
+
+            //  Initialize the FontStashSharp text engine
+            try
+            {
+                string ttfDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"Content\Fonts\ttf"));
+
+                FontStashSharpEngine = new FontStashSharpTextEngine();
+
+                //  For each font you want to use:
+                //  1. Read the bytes data from the .ttf file
+                //  2. Create a FontSystem and add the data to the system
+                //  3. Add the FontSystem to the engine (be sure to use the AddFontSystem method overload that takes in the byte[] data)
+
+                const string FamilyName = "Arial";
+
+                byte[] arialBytes = File.ReadAllBytes(Path.Combine(ttfDir, "arial.ttf"));
+                FontSystem arialNormal = new FontSystem();
+                arialNormal.AddFont(arialBytes);
+                FontStashSharpEngine.AddFontSystem(FamilyName, CustomFontStyles.Normal, arialNormal, arialBytes);
+
+                FontSystem arialBold = new FontSystem();
+                arialBold.AddFont(File.ReadAllBytes(Path.Combine(ttfDir, "arialbd.ttf")));
+                FontStashSharpEngine.AddFontSystem(FamilyName, CustomFontStyles.Bold, arialBold);
+
+                FontSystem arialItalic = new FontSystem();
+                arialItalic.AddFont(File.ReadAllBytes(Path.Combine(ttfDir, "ariali.ttf")));
+                FontStashSharpEngine.AddFontSystem(FamilyName, CustomFontStyles.Italic, arialItalic);
+
+                // Calibrate per-size advance widths to match SpriteFontTextEngine exactly.
+                // Must be called after FontSizeScale is set (via AddFontSystem overload above).
+                FontStashSharpEngine.MatchSpriteFontSizing(Desktop.FontManager);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"FSS engine init failed: {ex.Message}");
+                FontStashSharpEngine = null;
+            }
+
+            Desktop.TextEngine = SpriteFontEngine;
+        }
+
+        /// <summary>Toggles the active text rendering engine between <see cref="SpriteFontTextEngine"/> and <see cref="FontStashSharpTextEngine"/></summary>
+        public void ToggleActiveTextEngine()
+        {
+            if (FontStashSharpEngine == null)
+                return;
+
+            ITextEngine CurrentEngine = Desktop.TextEngine;
+            ITextEngine NewEngine = CurrentEngine is SpriteFontTextEngine ? FontStashSharpEngine : SpriteFontEngine;
+            Desktop.TextEngine = NewEngine;
+            Debug.WriteLine($"[TextEngine] switched to {Desktop.TextEngine.GetType().Name}");
         }
 
         protected override void LoadContent()
@@ -105,23 +132,16 @@ namespace MGUI.Samples
         {
             PreviewUpdate?.Invoke(this, gameTime.TotalGameTime);
 
-            // F1 toggles between SpriteFontTextEngine and FontStashSharpTextEngine
+            //  F1 toggles between SpriteFontTextEngine and FontStashSharpTextEngine
             KeyboardState ks = Keyboard.GetState();
-            if (_fssEngine != null &&
-                ks.IsKeyDown(Keys.F1) && !_prevKeyboardState.IsKeyDown(Keys.F1))
-            {
-                Desktop.TextEngine = Desktop.TextEngine is SpriteFontTextEngine
-                    ? (ITextEngine)_fssEngine
-                    : (ITextEngine)_sfEngine;
-                Debug.WriteLine($"[TextEngine] switched to {Desktop.TextEngine.GetType().Name}");
-                // Re-resolve all MGTextBlock font handles from the new engine and clear
-                // measurement caches so layouts update in the very next frame.
-                Desktop.RecalculateTextLayouts();
-            }
+            if (ks.IsKeyDown(Keys.F1) && !_prevKeyboardState.IsKeyDown(Keys.F1))
+                ToggleActiveTextEngine();
             _prevKeyboardState = ks;
 
             Desktop.Update();
+
             // TODO: Add your update logic here
+
             base.Update(gameTime);
 
             EndUpdate?.Invoke(this, EventArgs.Empty);
@@ -130,7 +150,9 @@ namespace MGUI.Samples
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+
             // TODO: Add your drawing code here
+
             Desktop.Draw();
             base.Draw(gameTime);
         }
