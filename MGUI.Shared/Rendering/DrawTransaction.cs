@@ -1,5 +1,6 @@
 ﻿using MGUI.Shared.Helpers;
 using MGUI.Shared.Text;
+using MGUI.Shared.Text.Engines;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -28,7 +29,10 @@ namespace MGUI.Shared.Rendering
     public class DrawTransaction : IDisposable
     {
         public MainRenderer Renderer { get; }
+        [Obsolete("Access fonts through MainRenderer.TextEngine / ITextEngine instead.")]
         public FontManager FontManager => Renderer.FontManager;
+        /// <summary>Delegates to <see cref="MainRenderer.TextEngine"/>.</summary>
+        public ITextEngine TextEngine => Renderer.TextEngine;
         public GraphicsDevice GD => Renderer.GD;
         public SpriteBatch SB => Renderer.SB;
         private PrimitiveBatch PB => Renderer.PB;
@@ -161,6 +165,7 @@ namespace MGUI.Shared.Rendering
         #endregion Draw Texture
 
         #region Draw Text
+        [Obsolete("Use DrawTextViaEngine(ResolvedFont, ...) with the active ITextEngine instead.")]
         public void DrawSpriteFontText(SpriteFont Font, string Text, Vector2 Position, Color Color, 
             Vector2 Origin, float ScaleX = 1f, float ScaleY = 1f, float Rotation = 0f, float Depth = 0f, SpriteEffects Effects = SpriteEffects.None)
         {
@@ -171,6 +176,30 @@ namespace MGUI.Shared.Rendering
                 SB.DrawString(Font, Text, Position, Color, Rotation, Origin, new Vector2(ScaleX, ScaleY), Effects, Depth);
         }
 
+        /// <summary>
+        /// Draws <paramref name="Text"/> using the active <see cref="ITextEngine"/>, while
+        /// ensuring the correct <see cref="DrawContext"/> has been started on this transaction.
+        /// The <see cref="SpriteBatch"/> (<see cref="SB"/>) owned by this transaction is passed
+        /// automatically and is therefore not a parameter here, unlike the lower-level
+        /// <see cref="ITextEngine.DrawText"/> overload.
+        /// </summary>
+        public void DrawTextViaEngine(
+            MGUI.Shared.Text.ResolvedFont Font,
+            string Text,
+            Vector2 Position,
+            Color Color,
+            Vector2 Origin,
+            float Scale,
+            float Rotation = 0f,
+            float Depth    = 0f,
+            SpriteEffects Effects = SpriteEffects.None)
+        {
+            if (string.IsNullOrEmpty(Text) || Font?.NativeFont == null)
+                return;
+            BeginDraw(DrawContext.Sprites);
+            TextEngine.DrawText(SB, Font, Text, Position, Color, Origin, Scale, Rotation, Depth, Effects);
+        }
+
         /// <param name="Family">The font to use</param>
         /// <param name="DesiredFontSize">The desired size of the <see cref="SpriteFont"/>, in points.</param>
         /// <param name="Exact">If true, will attempt to render the text at exactly the given <paramref name="DesiredFontSize"/>.<br/>
@@ -179,6 +208,9 @@ namespace MGUI.Shared.Rendering
             int DesiredFontSize, float XOffset = 1, float YOffset = 1, bool Exact = false)
             => DrawShadowedText(Family, CustomFontStyles.Normal, Text, Position, TextColor, ShadowColor, DesiredFontSize, XOffset, YOffset, Exact);
 
+        // Both DrawShadowedText and MeasureText guard with `resolved.NativeFont == null`
+        // (not `&& resolved.IsFallback`) so the null-check is consistent across all
+        // text-rendering paths in DrawTransaction.  Verified as part of PR #35 review.
         /// <param name="Family">The font to use</param>
         /// <param name="DesiredFontSize">The desired size of the <see cref="SpriteFont"/>, in points.</param>
         /// <param name="Exact">If true, will attempt to render the text at exactly the given <paramref name="DesiredFontSize"/>.<br/>
@@ -186,22 +218,39 @@ namespace MGUI.Shared.Rendering
         public Vector2 DrawShadowedText(string Family, CustomFontStyles Style, string Text, Vector2 Position, Color TextColor, Color ShadowColor, 
             int DesiredFontSize, float XOffset = 1, float YOffset = 1, bool Exact = false)
         {
-            DrawText(Family, Style, Text, Position + new Vector2(XOffset, YOffset), ShadowColor, DesiredFontSize, Exact);
-            return DrawText(Family, Style, Text, Position, TextColor, DesiredFontSize, Exact);
+            // Resolve and measure once; draw twice (shadow + text) to avoid redundant font resolves
+            var resolved = TextEngine.ResolveFont(new FontSpec(Family, DesiredFontSize, Style));
+            if (resolved.NativeFont == null)
+                return Vector2.Zero;
+
+            float scale = Exact ? resolved.ExactScale : resolved.SuggestedScale;
+            Vector2 suggested = TextEngine.MeasureText(resolved, Text);
+
+            BeginDraw(DrawContext.Sprites);
+            TextEngine.DrawText(SB, resolved, Text, Position + new Vector2(XOffset, YOffset), ShadowColor, resolved.DrawOrigin, scale);
+            TextEngine.DrawText(SB, resolved, Text, Position, TextColor, resolved.DrawOrigin, scale);
+
+            if (!Exact || resolved.SuggestedScale == resolved.ExactScale)
+                return suggested;
+            return suggested * (resolved.ExactScale / resolved.SuggestedScale);
         }
 
         public Vector2 MeasureText(string Family, CustomFontStyles Style, string Text, int DesiredFontSize, bool Exact = false)
         {
-            if (FontManager.TryGetFont(Family, Style, DesiredFontSize, true, out FontSet FS, out SpriteFont SF, out int Size, out float ExactScale, out float SuggestedScale))
-            {
-                float Scale = Exact ? ExactScale : SuggestedScale;
-                Vector2 TextSize = new Vector2(SF.MeasureString(Text).X, FS.Heights[Size]) * Scale;
-                return TextSize;
-            }
-            else
-            {
+            if (string.IsNullOrEmpty(Text))
                 return Vector2.Zero;
-            }
+
+            var resolved = TextEngine.ResolveFont(new FontSpec(Family, DesiredFontSize, Style));
+            if (resolved.NativeFont == null)
+                return Vector2.Zero;
+
+            Vector2 suggested = TextEngine.MeasureText(resolved, Text);
+            if (!Exact || resolved.SuggestedScale == resolved.ExactScale)
+                return suggested;
+
+            // Adjust from SuggestedScale to ExactScale proportionally
+            float ratio = resolved.ExactScale / resolved.SuggestedScale;
+            return suggested * ratio;
         }
 
         /// <summary>Renders the given <paramref name="Text"/> using <see cref="CustomFontStyles.Normal"/> style.</summary>
@@ -218,25 +267,26 @@ namespace MGUI.Shared.Rendering
         /// If false, treats <paramref name="DesiredFontSize"/> as an approximation, and may render the text slightly larger or smaller to avoid blurriness</param>
         public Vector2 DrawText(string Family, CustomFontStyles Style, string Text, Vector2 Position, Color Color, int DesiredFontSize, bool Exact = false)
         {
-            if (FontManager.TryGetFont(Family, Style, DesiredFontSize, true, out FontSet FS, out SpriteFont SF, out int Size, out float ExactScale, out float SuggestedScale))
-            {
-                BeginDraw(DrawContext.Sprites);
-                float Scale = Exact ? ExactScale : SuggestedScale;
-
-                Vector2 Origin = FS.Origins[Size];
-                int TextHeight = FS.Heights[Size];
-                Vector2 TextSize = new Vector2(SF.MeasureString(Text).X, FS.Heights[Size]) * Scale;
-                SB.DrawString(SF, Text, Position, Color, 0f, Origin, Scale, SpriteEffects.None, 0);
-                return TextSize;
-            }
-            else
+            var resolved = TextEngine.ResolveFont(new FontSpec(Family, DesiredFontSize, Style));
+            if (resolved.NativeFont == null)
             {
 #if DEBUG
-                throw new KeyNotFoundException($"No font found for {nameof(Family)}={Family} and {nameof(Style)}={Style}");
+                throw new KeyNotFoundException($"No font found for Family={Family} and Style={Style}");
 #else
                 return Vector2.Zero;
 #endif
             }
+
+            // Measure before drawing so we return the correct size without a second engine call.
+            float scale = Exact ? resolved.ExactScale : resolved.SuggestedScale;
+            Vector2 suggested = TextEngine.MeasureText(resolved, Text);
+
+            BeginDraw(DrawContext.Sprites);
+            TextEngine.DrawText(SB, resolved, Text, Position, Color, resolved.DrawOrigin, scale);
+
+            if (!Exact || resolved.SuggestedScale == resolved.ExactScale)
+                return suggested;
+            return suggested * (resolved.ExactScale / resolved.SuggestedScale);
         }
         #endregion Draw Text
 

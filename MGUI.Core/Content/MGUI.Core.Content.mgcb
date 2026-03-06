@@ -307,6 +307,18 @@
 /processorParam:TextureFormat=Color
 /build:Fonts/Arial/9_Normal.spritefont
 
+#begin Fonts/ttf/arial.ttf
+/copy:Fonts/ttf/arial.ttf
+
+#begin Fonts/ttf/arialbd.ttf
+/copy:Fonts/ttf/arialbd.ttf
+
+#begin Fonts/ttf/arialbi.ttf
+/copy:Fonts/ttf/arialbi.ttf
+
+#begin Fonts/ttf/ariali.ttf
+/copy:Fonts/ttf/ariali.ttf
+
 #begin Icons/AngryMeteor_MilitaryIconsSet.png
 /importer:TextureImporter
 /processor:TextureProcessor

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using MGUI.Shared.Helpers;
+using MGUI.Shared.Text;
+using MGUI.Shared.Text.Engines;
 using MonoGame.Extended;
 
 namespace MGUI.Core.UI.Text
@@ -55,13 +57,13 @@ namespace MGUI.Core.UI.Text
             Thickness Padding = TextBlockElement.Padding;
             float LinePadding = TextBlockElement.LinePadding;
 
-            SpriteFont SF = TextBlockElement.GetFont(TextBlockElement.IsBold, TextBlockElement.IsItalic, out Dictionary<char, SpriteFont.Glyph> Glyphs);
-            Vector2 MeasurementScale = new Vector2(1.0f, TextBlockElement.FontHeight) * TextBlockElement.FontScale;
+            // engine is shared; fonts are resolved per-run to respect inline bold/italic formatting
+            ITextEngine engine = TextBlockElement.GetTextEngine();
 
             float CurrentY = LayoutBounds.Top + Padding.Top;
             if (TextBlockElement.Lines?.Any() != true)
             {
-                LineRenderInfo LineInfo = new(this, null, LineIndex, CurrentY, TextBlockElement.MeasureText("|", false, false, false).Y);
+                LineRenderInfo LineInfo = new(this, null, LineIndex, CurrentY, TextBlockElement.MeasureText("|", false, false).Y);
                 _Lines.Add(LineInfo);
 
                 float X = LayoutBounds.Left + Padding.Left;
@@ -92,29 +94,45 @@ namespace MGUI.Core.UI.Text
                     {
                         foreach (MGTextRunText Run in Runs)
                         {
-                            bool IsStartOfLine = true;
+                            // Resolve the correct font variant for this run's inline style
+                            ResolvedFont resolved = TextBlockElement.GetResolvedFont(Run.Settings.IsBold, Run.Settings.IsItalic);
 
-                            foreach (char c in Run.Text)
+                            if (string.IsNullOrEmpty(Run.Text))
+                                continue;
+
+                            // 1. Compute per-glyph advances.
+                            //    The first character on a line has its negative LSB clamped to 0 (matching
+                            //    SpriteFont behaviour); subsequent characters use the full signed advance.
+                            float[] advances = new float[Run.Text.Length];
+                            float glyphSum = 0f;
+                            for (int gi = 0; gi < Run.Text.Length; gi++)
                             {
-                                //SpriteFont.MeasureString source code is here:
-                                //https://github.com/MonoGame/MonoGame/blob/develop/MonoGame.Framework/Graphics/SpriteFont.cs
+                                GlyphMetrics glyph = engine.MeasureGlyph(resolved, Run.Text[gi]);
+                                advances[gi] = gi == 0 ? glyph.TotalWidthFirstGlyph : glyph.TotalWidth;
+                                glyphSum += advances[gi];
+                            }
 
-                                SpriteFont.Glyph Glyph = Glyphs[c];
-
-                                float ActualLeftSideBearing;
-                                if (IsStartOfLine)
+                            // 2. Reconcile with the whole-string measurement so each run's right edge
+                            //    aligns exactly with where the next run (or line end) starts, absorbing
+                            //    any SpriteFont.Spacing or kerning residual between characters.
+                            if (glyphSum > 0f)
+                            {
+                                float wholeWidth = engine.MeasureText(resolved, Run.Text).X;
+                                float residual = wholeWidth - glyphSum;
+                                if (MathF.Abs(residual) > 0.001f)
                                 {
-                                    IsStartOfLine = false;
-                                    ActualLeftSideBearing = Math.Max(Glyph.LeftSideBearing, 0);
+                                    for (int gi = 0; gi < advances.Length; gi++)
+                                        advances[gi] += residual * (advances[gi] / glyphSum);
                                 }
-                                else
-                                    ActualLeftSideBearing = SF.Spacing + Glyph.LeftSideBearing;
+                            }
 
-                                float Width = (ActualLeftSideBearing + Glyph.Width + Glyph.RightSideBearing) * MeasurementScale.X;
-                                LineInfo.AddCharacter(Line.OriginalCharacterIndices[CharacterIndexInWrappedLines], CharCounter, CurrentX, Width);
+                            // 3. Emit one caret record per character with the reconciled advance
+                            for (int gi = 0; gi < Run.Text.Length; gi++)
+                            {
+                                LineInfo.AddCharacter(Line.OriginalCharacterIndices[CharacterIndexInWrappedLines], CharCounter, CurrentX, advances[gi]);
                                 CharacterIndexInWrappedLines++;
                                 CharCounter++;
-                                CurrentX += Width;
+                                CurrentX += advances[gi];
                             }
                         }
                     }

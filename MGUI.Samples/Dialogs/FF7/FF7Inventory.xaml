@@ -36,6 +36,12 @@
                 <TextBlock HorizontalAlignment="Center" FontSize="14" Text="Items" />
             </Border>
             <Border StyleNames="PanelBorder" Dock="Top">
+                <!-- REGRESSION CHECK (PR #35 / ParseLines idempotency fix):
+                     Select the first item (Potion).  The description "Restores health by 100"
+                     must appear in full on one line without being clipped or wrapped to a
+                     second line that the TextBlock is too short to display.
+                     Before the fix, the text wrapped because the measured width from the
+                     first ParseLines pass exceeded the available width when re-measured. -->
                 <TextBlock HorizontalAlignment="Left" AllowsInlineFormatting="False"
                            Text="{MGBinding Path=SelectedItem.Description, Mode=OneWay, FallbackValue='Select an Item'}" />
             </Border>

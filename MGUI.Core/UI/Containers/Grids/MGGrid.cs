@@ -462,7 +462,7 @@ namespace MGUI.Core.UI.Containers.Grids
 #if DEBUG
                     throw new Exception($"{nameof(MGGrid)}.{nameof(ClearCellContent)}: failed to remove all elements in {Row},{Column}");
 #else
-                    ChildrenByRow[Row][Column].RemoveAll(x => Removed.Contains(x));
+                    ChildrenByRC[Row][Column].RemoveAll(x => Removed.Contains(x));
 #endif
                 }
             }

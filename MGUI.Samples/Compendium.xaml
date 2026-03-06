@@ -112,6 +112,13 @@
                             </Style>
                         </UniformGrid.Styles>
                         <ToggleButton Content="FF7 Inventory" IsChecked="{MGBinding Path=FF7Inventory.IsVisible, Mode=TwoWay}" />
+                        <!-- REGRESSION CHECK (PR #35 / ParseLines idempotency fix):
+                             The "Stardew Valley" button below must display both words on a single line.
+                             Before the fix, "Valley" wrapped to a hidden second line because
+                             ParseLines was non-idempotent: MeasureSelfOverride returned 87 px
+                             from a 92-px constraint, then the layout re-measured with 87 px
+                             and got 2 lines instead of 1.  Running the sample and seeing
+                             "Stardew Valley" fully visible confirms the fix is working. -->
                         <ToggleButton Content="Stardew Valley" IsChecked="{MGBinding Path=SDVInventory.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="Registration" IsChecked="{MGBinding Path=Registration.IsVisible, Mode=TwoWay}" />
                         <ToggleButton Content="HUD" IsChecked="{MGBinding Path=HUD.IsVisible, Mode=TwoWay}" />

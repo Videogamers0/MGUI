@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MonoGame.Extended;
 using MGUI.Shared.Text;
+using MGUI.Shared.Text.Engines;
 using MGUI.Shared.Rendering;
 using MGUI.Core.UI.Brushes.Fill_Brushes;
 using MGUI.Shared.Input.Mouse;
@@ -29,47 +30,28 @@ namespace MGUI.Core.UI
         /// <summary>To set this value, use <see cref="TrySetFont(string, int)"/> or <see cref="TrySetFontSize(int)"/></summary>
         public int FontSize { get => _FontSize; set => _ = TrySetFontSize(value); }
 
-        internal float FontScale { get; private set; }
-        internal Vector2 FontOrigin { get; private set; }
-        internal int FontHeight { get; private set; }
+        /// <summary>
+        /// Cached space-character width from <see cref="RF_Regular"/>.
+        /// Consumed by <see cref="MGUI.Core.UI.Text.TextRenderInfo"/> for default caret sizing.
+        /// </summary>
         internal float SpaceWidth { get; private set; }
 
-        internal SpriteFont SF_Regular { get; private set; }
-        internal SpriteFont SF_Bold { get; private set; }
-        internal SpriteFont SF_Italic { get; private set; }
-        internal SpriteFont SF_BoldItalic { get; private set; }
+        // ── ITextEngine-backed resolved fonts (one per style variant) ─────────────
+        /// <summary>Shortcut to the active <see cref="ITextEngine"/> from the parent Desktop.</summary>
+        private ITextEngine TextEngine => GetTextEngine();
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Dictionary<char, SpriteFont.Glyph> SF_Regular_Glyphs { get; set; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Dictionary<char, SpriteFont.Glyph> SF_Bold_Glyphs { get; set; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Dictionary<char, SpriteFont.Glyph> SF_Italic_Glyphs { get; set; }
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Dictionary<char, SpriteFont.Glyph> SF_BoldItalic_Glyphs { get; set; }
+        internal ResolvedFont RF_Regular    { get; private set; }
+        internal ResolvedFont RF_Bold       { get; private set; }
+        internal ResolvedFont RF_Italic     { get; private set; }
+        internal ResolvedFont RF_BoldItalic { get; private set; }
 
-        internal SpriteFont GetFont(bool IsBold, bool IsItalic, out Dictionary<char, SpriteFont.Glyph> Glyphs)
+        /// <summary>Returns the <see cref="ResolvedFont"/> corresponding to the given style flags.</summary>
+        internal ResolvedFont GetResolvedFont(bool IsBold, bool IsItalic)
         {
-            if (!IsBold && !IsItalic)
-            {
-                Glyphs = SF_Regular_Glyphs;
-                return SF_Regular;
-            }
-            else if (IsBold && IsItalic)
-            {
-                Glyphs = SF_BoldItalic_Glyphs;
-                return SF_BoldItalic;
-            }
-            else if (IsBold)
-            {
-                Glyphs = SF_Bold_Glyphs;
-                return SF_Bold;
-            }
-            else
-            {
-                Glyphs = SF_Italic_Glyphs;
-                return SF_Italic;
-            }
+            if (!IsBold && !IsItalic) return RF_Regular;
+            if (IsBold && IsItalic)   return RF_BoldItalic;
+            if (IsBold)               return RF_Bold;
+            return RF_Italic;
         }
 
         public bool TrySetFontSize(int FontSize) => TrySetFont(FontFamily, FontSize);
@@ -80,26 +62,21 @@ namespace MGUI.Core.UI
                 string PreviousFontFamily = FontFamily;
                 int PreviousFontSize = FontSize;
 
-                if (!GetDesktop().FontManager.TryGetFont(FontFamily, CustomFontStyles.Normal, FontSize, true, out FontSet FS, out SpriteFont Font, out int Size, out float ExactScale, out float SuggestedScale))
+                // Validate that the requested font exists before committing the change
+                if (!GetDesktop().FontManager.TryGetFont(FontFamily, CustomFontStyles.Normal, FontSize, true, out _, out _, out _, out _, out _))
                     return false;
 
                 _FontFamily = FontFamily;
                 _FontSize = FontSize;
 
-                SF_Regular = Font;
-                FontScale = GetTheme().FontSettings.UseExactScale ? ExactScale : SuggestedScale;
-                FontOrigin = FS.Origins[Size];
-                FontHeight = FS.Heights[Size];
-                SpaceWidth = (SF_Regular.MeasureString(" ") * FontScale).X;
+                // Resolve ITextEngine handles for all 4 style variants
+                ITextEngine engine = TextEngine;
+                RF_Regular    = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Normal));
+                RF_Bold       = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Bold));
+                RF_Italic     = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Italic));
+                RF_BoldItalic = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Bold | CustomFontStyles.Italic));
 
-                SF_Bold = GetFontStyleOrDefault(FS, CustomFontStyles.Bold, Size, SF_Regular);
-                SF_Italic = GetFontStyleOrDefault(FS, CustomFontStyles.Italic, Size, SF_Regular);
-                SF_BoldItalic = GetFontStyleOrDefault(FS, CustomFontStyles.Bold | CustomFontStyles.Italic, Size, SF_Bold ?? SF_Italic ?? SF_Regular);
-
-                SF_Regular_Glyphs = SF_Regular?.GetGlyphs();
-                SF_Bold_Glyphs = SF_Bold?.GetGlyphs();
-                SF_Italic_Glyphs = SF_Italic?.GetGlyphs();
-                SF_BoldItalic_Glyphs = SF_BoldItalic?.GetGlyphs();
+                SpaceWidth = RF_Regular.SpaceWidth;
 
                 InvokeLayoutChanged();
 
@@ -114,12 +91,21 @@ namespace MGUI.Core.UI
                 return true;
         }
 
-        private static SpriteFont GetFontStyleOrDefault(FontSet FS, CustomFontStyles Style, int Size, SpriteFont Default)
+        /// <summary>
+        /// Re-resolves all four font-style handles from the currently active <see cref="ITextEngine"/>
+        /// and invalidates both the layout and the self-measurement cache.<para/>
+        /// Called by <see cref="MGDesktop.RecalculateTextLayouts"/> after a runtime engine switch so
+        /// that new engine metrics (e.g. different scale factors) are reflected immediately.
+        /// </summary>
+        internal void RefreshTextEngine()
         {
-            if (FS.TryGetFont(Style, Size, false, out SpriteFont Result, out _, out _, out _))
-                return Result;
-            else
-                return Default;
+            ITextEngine engine = TextEngine;
+            RF_Regular    = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Normal));
+            RF_Bold       = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Bold));
+            RF_Italic     = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Italic));
+            RF_BoldItalic = engine.ResolveFont(new FontSpec(_FontFamily, _FontSize, CustomFontStyles.Bold | CustomFontStyles.Italic));
+            SpaceWidth    = RF_Regular.SpaceWidth;
+            InvokeLayoutChanged(); // clears RecentSelfMeasurements + fires LayoutChanged
         }
 
         #region Font Style
@@ -590,66 +576,22 @@ namespace MGUI.Core.UI
 
         public override string ToString() => $"{base.ToString()}: \"{Text?.Truncate(100)}\"";
 
-        public Vector2 MeasureText(string Text, bool IsBold, bool IsItalic, bool IgnoreFirstGlyphNegativeLeftSideBearing)
+        /// <summary>
+        /// Measures the rendered size of <paramref name="Text"/> using the active <see cref="ITextEngine"/>.
+        /// Delegates to <see cref="ITextEngine.MeasureText"/> (whole-string) so that kerning is accounted
+        /// for correctly.
+        /// </summary>
+        public Vector2 MeasureText(string Text, bool IsBold, bool IsItalic)
         {
             if (string.IsNullOrEmpty(Text))
                 return Vector2.Zero;
 
-            SpriteFont SF = GetFont(IsBold, IsItalic, out Dictionary<char, SpriteFont.Glyph> Glyphs);
-
-#if true
-            //  Referenced SpriteFont.MeasureString source code from:
-            //  https://github.com/MonoGame/MonoGame/blob/develop/MonoGame.Framework/Graphics/SpriteFont.cs
-
-            float Width = 0;
-            float Height = SF.LineSpacing;
-
-            float CurrentXOffset = 0;
-#pragma warning disable CS0219 // Variable is assigned but its value is never used
-            bool IsFirstCharacter = true;
-#pragma warning restore CS0219 // Variable is assigned but its value is never used
-
-            if (SF.Spacing != 0)
-                throw new NotImplementedException($"{nameof(MGTextBlock)}.{nameof(MeasureText)} currently does not handle {nameof(SpriteFont)}s with a non-zero Spacing.");
-
-            foreach (char c in Text)
-            {
-                if (!Glyphs.TryGetValue(c, out SpriteFont.Glyph Glyph))
-                    Glyph = Glyphs[SF.DefaultCharacter.Value];
-
-#if NEVER
-                if (IsFirstCharacter)
-                    IsFirstCharacter = false;
-                else
-                    CurrentXOffset += SF.Spacing;
-
-                if (IgnoreFirstGlyphNegativeLeftSideBearing)
-                {
-                    CurrentXOffset += Math.Max(Glyph.LeftSideBearing, 0);
-                    IgnoreFirstGlyphNegativeLeftSideBearing = false;
-                }
-                else
-                    CurrentXOffset += Glyph.LeftSideBearing;
-
-                CurrentXOffset += Glyph.Width;
-                Width = Math.Max(Width, CurrentXOffset + Math.Max(Glyph.RightSideBearing, 0));
-                CurrentXOffset += Glyph.RightSideBearing;
-                Height = Math.Max(Height, Glyph.Cropping.Height);
-#else
-                //TODO figure out why MonoGame's SpriteFont.cs uses Math.Max when adding the left/right bearings, then fix this logic accordingly
-                CurrentXOffset += Glyph.WidthIncludingBearings;
-                Width += Glyph.WidthIncludingBearings;
-                Height = Math.Max(Height, Glyph.Cropping.Height);
-#endif
-            }
-
-            return new Vector2(Width, FontHeight) * FontScale;
-#else
-            //  The problem with this logic is that it doesn't always result in the same total width when measuring a string versus measuring the sum of its substrings
-            //  EX: [Measure("HelloWorld").Width] isn't always equivalent to [Measure("Hello").Width + Measure("World").Width]
-            //  Which can cause a ton of issues in MGTextLine.ParseRuns(...)
-            return new Vector2(SF.MeasureString(Text).X, FontHeight) * FontScale;
-#endif
+            ResolvedFont resolved = GetResolvedFont(IsBold, IsItalic);
+            if (resolved?.NativeFont == null)
+                return Vector2.Zero;
+            Vector2 measured = TextEngine.MeasureText(resolved, Text);
+            // LineHeight from the engine may be 0 for some backends; fall back to resolved value.
+            return new Vector2(measured.X, measured.Y > 0 ? measured.Y : resolved.LineHeight);
         }
 
         private readonly List<ElementMeasurement> RecentSelfMeasurements = new();
@@ -716,7 +658,7 @@ namespace MGUI.Core.UI
 
             Vector2 Size = new(MeasuredLines.Select(x => x.LineWidth).DefaultIfEmpty(0).Max(), MeasuredLines.Sum(x => x.LineTotalHeight) + LinePadding * Math.Max(0, MeasuredLines.Count - 1));
             if (MinLines > MeasuredLines.Count)
-                Size = Size.SetY(Size.Y + (MinLines - MeasuredLines.Count) * (FontHeight + LinePadding));
+                Size = Size.SetY(Size.Y + (MinLines - MeasuredLines.Count) * (RF_Regular.LineHeight + LinePadding));
 
             Thickness Measurement = new((int)Math.Ceiling(Size.X), (int)Math.Ceiling(Size.Y), 0, 0);
 
@@ -781,115 +723,15 @@ namespace MGUI.Core.UI
             }
         }
 
-#if false //true
         public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
         {
             MGDesktop Desktop = GetDesktop();
-            DrawTransaction DT = DA.DT;
-            float Opacity = DA.Opacity;
-            Color DefaultForeground = this.ActualForeground;
-
-            float CurrentY = LayoutBounds.Top + Padding.Top;
-
-            foreach (MGTextLine Line in this.Lines)
-            {
-                Rectangle LineBounds = new(LayoutBounds.Left + Padding.Left, (int)CurrentY, LayoutBounds.Width - PaddingSize.Width, (int)Line.LineTotalHeight);
-                float CurrentX = ApplyAlignment(LineBounds, TextAlignment, VerticalContentAlignment, new Size((int)Line.LineWidth, (int)Line.LineTotalHeight)).Left;
-                float TextYPosition = ApplyAlignment(LineBounds, TextAlignment, VerticalContentAlignment, new Size((int)Line.LineWidth, (int)Line.LineTextHeight)).Y;
-
-                bool IsStartOfLine = true;
-
-                foreach (MGTextRun Run in Line.Runs)
-                {
-                    if (Run.RunType == TextRunType.Image && Run is MGTextRunImage ImageRun)
-                    {
-                        int ImgWidth = ImageRun.TargetWidth;
-                        int ImgHeight = ImageRun.TargetHeight;
-                        int YPosition = ApplyAlignment(LineBounds, HorizontalAlignment.Center, VerticalContentAlignment, new Size(ImgWidth, ImgHeight)).Top;
-                        Desktop.Resources.TryDrawTexture(DT, ImageRun.RegionName, new Point((int)CurrentX, YPosition), ImgWidth, ImgHeight);
-                        CurrentX += ImgWidth;
-                    }
-                    else if (Run.RunType == TextRunType.Text && Run is MGTextRunText TextRun)
-                    {
-                        bool IsBold = TextRun.Settings.IsBold;
-                        bool IsItalic = TextRun.Settings.IsItalic;
-                        SpriteFont SF = GetFont(IsBold, IsItalic, out _);
-
-                        float ActualOpacity = Opacity * TextRun.Settings.Opacity;
-                        Color Foreground = (TextRun.Settings.Foreground ?? DefaultForeground) * ActualOpacity;
-
-                        Vector2 TextSize = MeasureText(TextRun.Text, IsBold, IsItalic, IsStartOfLine);
-                        TextRun.Settings.Background?.Draw(DA.SetOpacity(ActualOpacity), this, new((int)CurrentX, (int)TextYPosition, (int)TextSize.X, (int)Line.LineTextHeight));
-
-                        if (TextRun.Settings.IsUnderlined)
-                        {
-                            DT.FillRectangle(DA.Offset.ToVector2(), new(CurrentX, TextYPosition + Line.LineTextHeight - 2, TextSize.X, 1), Foreground);
-                        }
-
-                        Vector2 Position = new Vector2(CurrentX, TextYPosition) + DA.Offset.ToVector2();
-                        if (TextRun.Settings.IsShadowed)
-                        {
-                            Color ShadowColor = (TextRun.Settings.ShadowColor ?? DefaultForeground) * ActualOpacity;
-                            Vector2 ShadowOffset = TextRun.Settings.ShadowOffset ?? new(1, 1);
-
-                            DT.DrawSpriteFontText(SF, TextRun.Text, Position + ShadowOffset, ShadowColor, FontOrigin, FontScale, FontScale);
-                            DT.DrawSpriteFontText(SF, TextRun.Text, Position, Foreground, FontOrigin, FontScale, FontScale);
-                        }
-                        else
-                        {
-                            DT.DrawSpriteFontText(SF, TextRun.Text, Position, Foreground, FontOrigin, FontScale, FontScale);
-                        }
-
-                        CurrentX += TextSize.X;
-                        IsStartOfLine = false;
-                    }
-                    else
-                        throw new NotImplementedException($"{nameof(MGTextBlock)}.{nameof(DrawSelf)} does not support rendering {nameof(MGTextRun)}s of type={nameof(TextRunType)}.{Run.RunType}");
-                }
-
-                CurrentY += Line.LineTotalHeight + LinePadding;
-            }
-        }
-#else
-        public override void DrawSelf(ElementDrawArgs DA, Rectangle LayoutBounds)
-        {
-            float WindowScale = ParentWindow.Scale;
-            MGDesktop Desktop = GetDesktop();
-            FontManager FontManager = Desktop.FontManager;
             DrawTransaction DT = DA.DT;
             float Opacity = DA.Opacity;
             Color DefaultForeground = ActualForeground;
-            Vector2 FontOrigin = this.FontOrigin;
 
             Matrix Transform = Matrix.CreateTranslation(new Vector3(DA.Offset.ToVector2(), 0));
-            IDisposable TemporaryDrawTransform = null;
-            bool UseScaledSpriteFont = false;
             float ImageSizeScalar = 1.0f;
-#if NEVER
-            //  This logic *almost* works but not quite :( Seems like there's minor issues with the measured text width, so the X-positioning is slightly inaccurate
-            //  Maybe issues due to truncating floating point positions to an int?
-            //  Maybe issues related to Kerning? 
-            //      EX: SpriteFont1 has FontSize=24
-            //          SpriteFont2 has FontSize=12
-            //          Are the bearings in SpriteFont1's Kerning always exactly twice that of SpriteFont2? Check SpriteFont.Glyphs[char].LeftSideBearing and RightSideBearing/Width
-            //  If you re-enable this logic, try typing "iiiiiiiiiiiiiiiiiiiiiiiiiii" inside a TextBox and you'll notice the Caret positioning becomes less and less corect with each successive character
-            if (ParentWindow.IsWindowScaled)
-            {
-                //  Experimental logic that attempts to handle MGWindow.Scale by using a larger SpriteFont rather than scaling the current, smaller SpriteFont.
-                //  This probably only works correctly if the FontSet for the current FontFamily contains a SpriteFont that exactly matches the scale
-                //      EX: If using 12pt font, and MGWindow.Scale=1.5f, we need an 18pt font. Using something like a 16pt font with 1.125 scale will likely yield poor results
-                float ExactScaledFontSize = this.FontSize * ParentWindow.Scale;
-                if (ExactScaledFontSize == (int)ExactScaledFontSize && FontManager.FontsByFamily[FontFamily].SupportedSizes.Contains((int)ExactScaledFontSize))
-                {
-                    TemporaryDrawTransform = DA.DT.SetTransformTemporary(Matrix.Identity); // Remove the current transform since we'll calculate the scaled positions ourself
-                    Transform = GetTransform(CoordinateSpace.Layout, CoordinateSpace.Screen) *
-                        Matrix.CreateTranslation(new Vector3((DA.Offset + Origin).ToVector2() * WindowScale, 0));
-                    UseScaledSpriteFont = true;
-                    ImageSizeScalar = WindowScale;
-                    FontOrigin = this.FontOrigin / WindowScale;
-                }
-            }
-#endif
 
             ActionBounds.Clear();
             ToolTipBounds.Clear();
@@ -903,8 +745,6 @@ namespace MGUI.Core.UI
                 Rectangle LineBounds = new(LayoutBounds.Left + Padding.Left, (int)CurrentY, LayoutBounds.Width - PaddingSize.Width, (int)Line.LineTotalHeight);
                 float CurrentX = ApplyAlignment(LineBounds, TextAlignment, VerticalContentAlignment, new Size((int)Line.LineWidth, (int)Line.LineTotalHeight)).Left;
                 float TextYPosition = ApplyAlignment(LineBounds, TextAlignment, VerticalContentAlignment, new Size((int)Line.LineWidth, (int)Line.LineTextHeight)).Y;
-
-                bool IsStartOfLine = true;
 
                 foreach (MGTextRun Run in Line.Runs)
                 {
@@ -922,21 +762,12 @@ namespace MGUI.Core.UI
                     }
                     else if (Run.RunType == TextRunType.Text && Run is MGTextRunText TextRun)
                     {
-                        bool IsBold = TextRun.Settings.IsBold;
+                        bool IsBold   = TextRun.Settings.IsBold;
                         bool IsItalic = TextRun.Settings.IsItalic;
-                        SpriteFont SF = GetFont(IsBold, IsItalic, out _);
-
-                        float FontScale = this.FontScale;
-                        if (UseScaledSpriteFont)
-                        {
-                            CustomFontStyles FontStyle = 
-                                IsBold && IsItalic ? CustomFontStyles.Bold | CustomFontStyles.Italic : 
-                                IsBold ? CustomFontStyles.Bold : 
-                                IsItalic ? CustomFontStyles.Italic : 
-                                CustomFontStyles.Normal;
-                            SF = Desktop.FontManager.GetFont(FontFamily, FontStyle,(int)(FontSize * FontScale * WindowScale), true, out _, out float ExactScale, out float SuggestedScale, out _);
-                            FontScale = ExactScale;
-                        }
+                        ResolvedFont resolved   = GetResolvedFont(IsBold, IsItalic);
+                        float drawScale = GetTheme().FontSettings.UseExactScale
+                            ? resolved.ExactScale
+                            : resolved.SuggestedScale;
 
                         float ActualOpacity = Opacity * TextRun.Settings.Opacity;
                         Color Foreground = (TextRun.Settings.Foreground ?? DefaultForeground) * ActualOpacity;
@@ -945,7 +776,7 @@ namespace MGUI.Core.UI
                         if (TextProgress.HasValue && RemainingCharacters < TextRun.Text.Length)
                             ActualText = TextRun.Text.Substring(0, RemainingCharacters);
 
-                        Vector2 TextSize = MeasureText(ActualText, IsBold, IsItalic, IsStartOfLine);
+                        Vector2 TextSize = MeasureText(ActualText, IsBold, IsItalic);
 
                         //  Draw background
                         if (TextRun.Settings.HasBackground)
@@ -953,19 +784,9 @@ namespace MGUI.Core.UI
                             IFillBrush BackgroundBrush = TextRun.Settings.Background.Brush;
                             Thickness BackgroundPadding = TextRun.Settings.Background.Padding;
 
-                            if (UseScaledSpriteFont)
-                            {
-                                Rectangle BackgroundDestination = new Rectangle((int)CurrentX, (int)TextYPosition, (int)TextSize.X, (int)Line.LineTextHeight)
-                                    .GetExpanded(BackgroundPadding)
-                                    .CreateTransformed(Transform);
-                                BackgroundBrush.Draw(DA.SetOpacity(ActualOpacity).AsZeroOffset(), this, BackgroundDestination);
-                            }
-                            else
-                            {
-                                Rectangle BackgroundDestination = new Rectangle((int)CurrentX, (int)TextYPosition, (int)TextSize.X, (int)Line.LineTextHeight)
-                                    .GetExpanded(BackgroundPadding);
-                                BackgroundBrush.Draw(DA.SetOpacity(ActualOpacity), this, BackgroundDestination);
-                            }
+                            Rectangle BackgroundDestination = new Rectangle((int)CurrentX, (int)TextYPosition, (int)TextSize.X, (int)Line.LineTextHeight)
+                                .GetExpanded(BackgroundPadding);
+                            BackgroundBrush.Draw(DA.SetOpacity(ActualOpacity), this, BackgroundDestination);
                         }
 
                         //  Draw underline
@@ -989,17 +810,16 @@ namespace MGUI.Core.UI
                             Color ShadowColor = (TextRun.Settings.Shadow.ShadowColor ?? DefaultForeground) * ActualOpacity;
                             Vector2 ShadowOffset = TextRun.Settings.Shadow.ShadowOffset ?? new(1, 1);
 
-                            DT.DrawSpriteFontText(SF, ActualText, Position + ShadowOffset, ShadowColor, FontOrigin, FontScale, FontScale);
-                            DT.DrawSpriteFontText(SF, ActualText, Position, Foreground, FontOrigin, FontScale, FontScale);
+                            DT.DrawTextViaEngine(resolved, ActualText, Position + ShadowOffset, ShadowColor, resolved.DrawOrigin, drawScale);
+                            DT.DrawTextViaEngine(resolved, ActualText, Position,               Foreground,  resolved.DrawOrigin, drawScale);
                         }
                         else
                         {
-                            DT.DrawSpriteFontText(SF, ActualText, Position, Foreground, FontOrigin, FontScale, FontScale);
+                            DT.DrawTextViaEngine(resolved, ActualText, Position, Foreground, resolved.DrawOrigin, drawScale);
                         }
 
                         RunBounds = new(CurrentX, TextYPosition, TextSize.X, TextSize.Y);
                         CurrentX += TextSize.X;
-                        IsStartOfLine = false;
 
                         RemainingCharacters -= ActualText.Length;
                         if (TextProgress.HasValue && RemainingCharacters <= 0)
@@ -1044,9 +864,6 @@ namespace MGUI.Core.UI
                 if (TextProgress.HasValue && RemainingCharacters <= 0)
                     break;
             }
-
-            TemporaryDrawTransform?.Dispose();
         }
-#endif
     }
 }

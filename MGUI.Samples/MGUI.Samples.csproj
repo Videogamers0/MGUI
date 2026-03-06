@@ -184,6 +184,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MGUI.Core\MGUI.Core.csproj" />
     <ProjectReference Include="..\MGUI.Shared\MGUI.Shared.csproj" />
+    <ProjectReference Include="..\MGUI.FontStashSharp\MGUI.FontStashSharp.csproj" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />

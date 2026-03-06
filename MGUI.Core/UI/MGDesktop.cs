@@ -27,6 +27,48 @@ namespace MGUI.Core.UI
         public MainRenderer Renderer { get; }
         public InputTracker InputTracker => Renderer.Input;
         public FontManager FontManager => Renderer.FontManager;
+        /// <summary>The active <see cref="MGUI.Shared.Text.Engines.ITextEngine"/> used for all
+        /// text measurement and rendering.  Assign a different engine to switch backends globally.</summary>
+        public MGUI.Shared.Text.Engines.ITextEngine TextEngine
+        {
+            get => Renderer.TextEngine;
+            set => Renderer.TextEngine = value;
+        }
+
+        /// <summary>
+        /// Invalidates the layout of every element on this desktop, forcing all elements to be
+        /// re-measured on the next frame.
+        /// </summary>
+        public void InvalidateAllLayouts()
+        {
+            foreach (MGWindow window in Windows)
+                foreach (MGElement element in window.TraverseVisualTree(true, true, true, true, MGElement.TreeTraversalMode.Preorder))
+                    element.InvalidateLayout();
+        }
+
+        /// <summary>
+        /// Re-resolves all <see cref="MGTextBlock"/> font handles from the currently active
+        /// <see cref="TextEngine"/> and invalidates their layout and measurement caches.<para/>
+        /// Call this after switching <see cref="TextEngine"/> at runtime so that the new engine's
+        /// metrics (e.g. different scale factors or glyph data) are reflected immediately on every
+        /// text element across all windows.<para/>
+        /// After re-resolving all font handles, also calls <see cref="InvalidateAllLayouts"/> to
+        /// flush any stale cached measurements on container elements that depend on text sizes,
+        /// ensuring the next frame re-measures the full layout tree with the new engine's metrics.
+        /// </summary>
+        public void RecalculateTextLayouts()
+        {
+            // Step 1: re-resolve font handles and clear TextBlock self-measurement caches.
+            // RefreshTextEngine also calls InvokeLayoutChanged which propagates upward, but
+            // that only invalidates the parent chain of each TextBlock, not the full tree.
+            foreach (MGWindow window in Windows)
+                foreach (MGTextBlock tb in window.TraverseVisualTree<MGTextBlock>(true, true, true, true, MGElement.TreeTraversalMode.Preorder))
+                    tb.RefreshTextEngine();
+
+            // Step 2: invalidate every element's layout cache so containers at all levels
+            // re-measure their content with the new text-engine metrics on the next frame.
+            InvalidateAllLayouts();
+        }
 
         /// <summary>A <see cref="MouseHandler"/> that is updated at the start of <see cref="Update()"/>, before any <see cref="MGWindow"/>s in <see cref="Windows"/> are updated.<br/>
         /// Objects that subscribe to this handler's mouse events will be the very first to receive and handle the event.<para/>
