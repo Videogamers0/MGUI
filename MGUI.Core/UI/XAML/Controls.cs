@@ -2495,6 +2495,16 @@ namespace MGUI.Core.UI.XAML
                 yield return Element;
             yield return Border;
         }
+
+        protected override IEnumerable<(XAMLBindableBase Source, object Target, string TargetPath)> GetBindableObjects(MGElement Element)
+        {
+            foreach (var Item in base.GetBindableObjects(Element))
+                yield return Item;
+            if (Element is MGTreeView TypedElement)
+            {
+                yield return (SelectionBackgroundBrush, TypedElement.SelectionBackgroundBrush, nameof(MGTreeView.SelectionBackgroundBrush));
+            }
+        }
     }
 
     [ContentProperty(nameof(Children))]
