@@ -36,7 +36,13 @@ namespace MGUI.Core.UI
                 if (_InternalRowItems != value)
                 {
                     if (InternalRowItems != null)
-                        InternalRowItems.CollectionChanged += RowItems_CollectionChanged;
+                    {
+                        // Collect and clean up all templated content from existing rows before clearing
+                        IEnumerable<MGElement> OldElements = InternalRowItems
+                            .SelectMany(x => x.GetRowContents().Values);
+                        HandleTemplatedContentRemoved(OldElements);
+                        InternalRowItems.CollectionChanged -= RowItems_CollectionChanged;  // Fix: was incorrectly += causing duplicate subscriptions
+                    }
                     _InternalRowItems = value;
                     if (InternalRowItems != null)
                         InternalRowItems.CollectionChanged += RowItems_CollectionChanged;
@@ -50,16 +56,20 @@ namespace MGUI.Core.UI
         }
         public IReadOnlyList<MGListViewItem<TItemType>> RowItems => InternalRowItems;
 
-        //TODO invoke this method whenever Content that was auto-created via a column's CellTemplate gets deleted.
-        //  (Such as in MGListViewColumn.RefreshColumnContent or in RowItems_CollectionChanged)
-        //  This isn't completely necessary but may help avoid memory leaks from old DataBindings that are subscribed to
-        //  PropertyChanged events even though the target object isn't in use anymore.
-        private void HandleTemplatedContentRemoved(IEnumerable<MGElement> Items)
+        // Cleans up DataBindings on elements that were auto-created via a column's CellTemplate and are
+        // no longer in use, preventing memory leaks from old bindings subscribed to PropertyChanged.
+        internal void HandleTemplatedContentRemoved(IEnumerable<MGElement> Items)
         {
             if (Items != null)
             {
+                int count = 0;
                 foreach (MGElement Item in Items)
+                {
                     Item.RemoveDataBindings(true);
+                    count++;
+                }
+                if (count > 0)
+                    Debug.WriteLine($"[MGListView] Cleaned up {count} DataBindings");
             }
         }
 
@@ -69,6 +79,13 @@ namespace MGUI.Core.UI
             {
                 if (e.Action is NotifyCollectionChangedAction.Reset)
                 {
+                    // Clean up all templated content before clearing
+                    if (InternalRowItems != null)
+                    {
+                        IEnumerable<MGElement> OldElements = InternalRowItems
+                            .SelectMany(x => x.GetRowContents().Values);
+                        HandleTemplatedContentRemoved(OldElements);
+                    }
                     _ = DataGrid.TryRemoveAll();
                 }
                 else if (e.Action is NotifyCollectionChangedAction.Add && e.NewItems != null)
@@ -82,6 +99,8 @@ namespace MGUI.Core.UI
                 {
                     foreach (MGListViewItem<TItemType> Item in e.OldItems)
                     {
+                        // Clean up templated content before removing the row
+                        HandleTemplatedContentRemoved(Item.GetRowContents().Values);
                         DataGrid.RemoveRow(Item.DataRow);
                     }
                 }
@@ -91,6 +110,8 @@ namespace MGUI.Core.UI
                     List<MGListViewItem<TItemType>> New = e.NewItems.Cast<MGListViewItem<TItemType>>().ToList();
                     for (int i = 0; i < Old.Count; i++)
                     {
+                        // Clean up old templated content before replacing
+                        HandleTemplatedContentRemoved(Old[i].GetRowContents().Values);
                         New[i].RefreshRowContent();
                     }
                 }
@@ -479,6 +500,8 @@ namespace MGUI.Core.UI
         {
             using (DataGrid.AllowChangingContentTemporarily())
             {
+                // Clean up existing templated content before regenerating the row
+                ListView.HandleTemplatedContentRemoved(GetRowContents().Values);
                 DataGrid.ClearRowContent(DataRow);
                 foreach (MGListViewColumn<TItemType> Column in ListView.Columns)
                 {
@@ -550,6 +573,15 @@ namespace MGUI.Core.UI
         {
             using (DataGrid.AllowChangingContentTemporarily())
             {
+                // Clean up existing templated content in this column before regenerating it
+                if (ListView.RowItems != null)
+                {
+                    IEnumerable<MGElement> OldElements = ListView.RowItems
+                        .Select(item => item.GetRowContents())
+                        .Where(contents => contents.ContainsKey(this))
+                        .Select(contents => contents[this]);
+                    ListView.HandleTemplatedContentRemoved(OldElements);
+                }
                 DataGrid.ClearColumnContent(DataColumn);
                 if (ListView.RowItems != null && CellTemplate != null)
                 {
